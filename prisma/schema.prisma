@@ -1,0 +1,61 @@
+// Rift — Prisma schema
+// Docs: https://pris.ly/d/prisma-schema
+// Minimal MVP: Complaint, Opportunity, SavedOpportunity only (no auth).
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Complaint {
+  id            String   @id @default(cuid())
+  title         String
+  body          String
+  sourceDate    DateTime?
+  sentiment     Float? // -1.0 (negative) .. 1.0 (positive)
+  severity      Float? // 0.0 .. 100.0 estimated severity
+  opportunity   Opportunity? @relation(fields: [opportunityId], references: [id], onDelete: SetNull)
+  opportunityId String?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  @@index([opportunityId])
+}
+
+model Opportunity {
+  id                 String   @id @default(cuid())
+  title              String   // generated problem title
+  summary            String   // summarised problem
+  industry           String
+  keywords           String[]
+  opportunityScore   Int      // 0..100
+  scoreBreakdown     Json     // explanation of how the score was calculated
+  mentions           Int      // number of complaints in this cluster
+  growth             Float    // growth trend inside the uploaded dataset
+  competition        String   // "Low" | "Medium" | "High"
+  sentiment          Float?   // average sentiment of cluster (-1..1)
+  severity           Float?   // average severity of cluster (1..10, from Gemini)
+  confidence         Int?     // Gemini confidence in the cluster (0..100)
+  reason             String?  // Gemini reasoning / explanation for the cluster
+  suggestedSoftware  String   // suggested software opportunity
+  trend              Json     // [{ date, count }] for the trend chart
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  complaints        Complaint[]
+  savedOpportunities SavedOpportunity[]
+}
+
+model SavedOpportunity {
+  id            String      @id @default(cuid())
+  opportunity   Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  opportunityId String
+  note          String?
+  createdAt      DateTime    @default(now())
+
+  @@unique([opportunityId]) // one save per opportunity (no users in MVP)
+}

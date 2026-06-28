@@ -1,0 +1,3510 @@
+{
+  "metadata": {
+    "title": "Dental Industry - Customer Complaints Database",
+    "industry": "Dentists",
+    "total_complaints": 500,
+    "generated_date": "2026-06-27"
+  },
+  "complaints": [
+    {
+      "id": 1,
+      "title": "No-show patients destroying revenue",
+      "body": "15% of appointments no-show, empty chairs at $200 per hour, confirmations ignored",
+      "sentiment": "frustrated",
+      "severity": "critical"
+    },
+    {
+      "id": 2,
+      "title": "Insurance verification takes too long",
+      "body": "15 min per patient on hold with insurers, 5 hours daily wasted instead of checking in patients",
+      "sentiment": "angry",
+      "severity": "critical"
+    },
+    {
+      "id": 3,
+      "title": "Prior authorization delays treatment",
+      "body": "Auths take 3-5 weeks, patients lose interest and go elsewhere while waiting",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 4,
+      "title": "Claims denied for documentation errors",
+      "body": "20% denied for minor issues, hours wasted on appeals, preventable revenue loss",
+      "sentiment": "angry",
+      "severity": "critical"
+    },
+    {
+      "id": 5,
+      "title": "Patient recall system failing",
+      "body": "2000 patients and 30% overdue, paper list nobody updates, easy revenue walking out",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 6,
+      "title": "Treatment plan acceptance below 40%",
+      "body": "Present $5000 plans, patients say think about it and never return",
+      "sentiment": "frustrated",
+      "severity": "critical"
+    },
+    {
+      "id": 7,
+      "title": "Insurance reimbursement too low",
+      "body": "PPO pays $35 for cleaning costing $50, fee schedule flat for 5 years",
+      "sentiment": "angry",
+      "severity": "critical"
+    },
+    {
+      "id": 8,
+      "title": "Patient communication fragmented",
+      "body": "Text some email some call some, no central record of who we contacted",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 9,
+      "title": "Staff turnover destroying consistency",
+      "body": "Front desk quit, training new person, patients notice the difference",
+      "sentiment": "stressed",
+      "severity": "high"
+    },
+    {
+      "id": 10,
+      "title": "Appointment reminders ignored",
+      "body": "Automated reminders sent but no-shows continue, messages feel generic",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 11,
+      "title": "Patient portal nobody uses",
+      "body": "Spent $5000 on portal, 2% adoption, patients still call for everything",
+      "sentiment": "disappointed",
+      "severity": "low"
+    },
+    {
+      "id": 12,
+      "title": "Billing confusion at checkout",
+      "body": "Patients see insurance portion and their portion and don't understand the difference",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 13,
+      "title": "Referral tracking impossible",
+      "body": "Ask how patients found us but can't track which referrals actually convert",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 14,
+      "title": "Online reviews hurting reputation",
+      "body": "Three old one-star reviews show first, 200 happy patients but no review collection",
+      "sentiment": "worried",
+      "severity": "high"
+    },
+    {
+      "id": 15,
+      "title": "Dental anxiety patients avoid treatment",
+      "body": "Anxious patients cancel or postpone, no system to manage their fear",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 16,
+      "title": "X-ray review too slow",
+      "body": "10 min per patient reviewing radiographs, 3 hours daily of chairside image review",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 17,
+      "title": "Insurance claim follow-up abandoned",
+      "body": "150 outstanding claims nobody chases, some 60+ days old, $30k+ left behind",
+      "sentiment": "angry",
+      "severity": "critical"
+    },
+    {
+      "id": 18,
+      "title": "Scheduling preferences ignored",
+      "body": "Patients want evenings and weekends, we're 9-5, losing working patients",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 19,
+      "title": "Treatment presentation feels salesy",
+      "body": "Patients feel upsold instead of educated, case acceptance suffers",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 20,
+      "title": "Lab case tracking chaos",
+      "body": "20 lab cases weekly with no visibility, labs call needing info we can't find",
+      "sentiment": "stressed",
+      "severity": "high"
+    },
+    {
+      "id": 21,
+      "title": "Patient dissatisfaction unreported",
+      "body": "Patients leave unhappy but only tell friends, we find out months later",
+      "sentiment": "worried",
+      "severity": "high"
+    },
+    {
+      "id": 22,
+      "title": "Insurance credentialing black hole",
+      "body": "Applied to PPO network 4 months ago, no response, can't treat those patients",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 23,
+      "title": "Collecting patient balances painful",
+      "body": "$45k in outstanding balances, collections calls damage relationships",
+      "sentiment": "angry",
+      "severity": "critical"
+    },
+    {
+      "id": 24,
+      "title": "Hygiene department underperforming",
+      "body": "Hygienists booked solid but production flat, not presenting perio treatment",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 25,
+      "title": "Technology integration nightmare",
+      "body": "Practice software doesn't talk to imaging or payment, triple data entry",
+      "sentiment": "angry",
+      "severity": "medium"
+    },
+    {
+      "id": 26,
+      "title": "Patient check-in too slow",
+      "body": "10 min wait for paper forms, patients annoyed before being called back",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 27,
+      "title": "Insurance eligibility not real-time",
+      "body": "Verify days ahead but benefits change by appointment time",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 28,
+      "title": "Case presentation not compelling",
+      "body": "Show X-rays and say need crown but don't explain why, patients unconvinced",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 29,
+      "title": "Overhead eating margins",
+      "body": "75% overhead growing, supplies staff rent up while reimbursement flat",
+      "sentiment": "stressed",
+      "severity": "critical"
+    },
+    {
+      "id": 30,
+      "title": "Marketing spend not converting",
+      "body": "$2000 monthly on Google Ads for 5 patients, no idea what works",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 31,
+      "title": "Patient retention declining",
+      "body": "Losing 15% annually adding only 10%, net patient count shrinking",
+      "sentiment": "worried",
+      "severity": "critical"
+    },
+    {
+      "id": 32,
+      "title": "Scheduling conflicts happening",
+      "body": "Double-booked two root canals, no conflict detection in system",
+      "sentiment": "angry",
+      "severity": "high"
+    },
+    {
+      "id": 33,
+      "title": "Consent forms still paper",
+      "body": "50 consent forms printed weekly, patients sign illegible papers that get lost",
+      "sentiment": "annoyed",
+      "severity": "low"
+    },
+    {
+      "id": 34,
+      "title": "Pre-appointment instructions missing",
+      "body": "Patients eat before sedation, no automated instruction system",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 35,
+      "title": "Referral letters too slow",
+      "body": "Specialist referral letters take a week, process is slow and manual",
+      "sentiment": "stressed",
+      "severity": "medium"
+    },
+    {
+      "id": 36,
+      "title": "Inventory management guesswork",
+      "body": "Run out of composite mid-procedure or over-order materials that expire",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 37,
+      "title": "Complaint handling inconsistent",
+      "body": "Different staff handle complaints differently, no standardized process",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 38,
+      "title": "Pre-determination too slow",
+      "body": "3-4 weeks for pre-determinations, patients lose interest waiting",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 39,
+      "title": "Staff meetings unproductive",
+      "body": "Weekly meetings are complaint sessions with no agenda or action items",
+      "sentiment": "annoyed",
+      "severity": "low"
+    },
+    {
+      "id": 40,
+      "title": "Paper recall list outdated",
+      "body": "Paper recall list nobody updates, patients fall through cracks",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 41,
+      "title": "Online booking not working",
+      "body": "Website appointment form gets no submissions, patients still call",
+      "sentiment": "disappointed",
+      "severity": "medium"
+    },
+    {
+      "id": 42,
+      "title": "Patient portal login issues",
+      "body": "Patients can't remember login and call instead, under 10% adoption",
+      "sentiment": "annoyed",
+      "severity": "low"
+    },
+    {
+      "id": 43,
+      "title": "Fee schedule outdated",
+      "body": "PPO fee schedule from 2018, losing money on every procedure",
+      "sentiment": "angry",
+      "severity": "critical"
+    },
+    {
+      "id": 44,
+      "title": "Treatment follow-up inconsistent",
+      "body": "Some patients get 3 calls some get zero, no tracking system",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 45,
+      "title": "Patient records not secure",
+      "body": "Shared drive accessible by everyone, not HIPAA compliant",
+      "sentiment": "worried",
+      "severity": "critical"
+    },
+    {
+      "id": 46,
+      "title": "Cancellation policy not enforced",
+      "body": "Same-day cancellations lose production, staff afraid to charge fees",
+      "sentiment": "angry",
+      "severity": "high"
+    },
+    {
+      "id": 47,
+      "title": "Patient appreciation missing",
+      "body": "Used to send birthday cards but stopped, no automated appreciation",
+      "sentiment": "disappointed",
+      "severity": "low"
+    },
+    {
+      "id": 48,
+      "title": "Limited payment options",
+      "body": "Only cash/check/card, patients want CareCredit Apple Pay payment plans",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 49,
+      "title": "Waiting period not tracked",
+      "body": "Patients have insurance waiting periods but we schedule treatment too early",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 50,
+      "title": "Treatment codes disputed",
+      "body": "Insurance says CDT codes wrong, we resubmit same code and it approves",
+      "sentiment": "angry",
+      "severity": "medium"
+    },
+    {
+      "id": 51,
+      "title": "Age-inappropriate communication",
+      "body": "Same letter to 25-year-old and 75-year-old, no personalization",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 52,
+      "title": "Appointment confirmation low",
+      "body": "Only 60% confirm, manually calling other 40% wastes front desk time",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 53,
+      "title": "Specialist feedback delayed",
+      "body": "Refer to oral surgeon but hear nothing for 2 weeks, patients call us",
+      "sentiment": "stressed",
+      "severity": "medium"
+    },
+    {
+      "id": 54,
+      "title": "Education materials outdated",
+      "body": "Root canal pamphlets from 2010, patients Google and know more",
+      "sentiment": "embarrassed",
+      "severity": "low"
+    },
+    {
+      "id": 55,
+      "title": "No emergency slots available",
+      "body": "Dental emergencies can't be seen same-day, patients go to ER",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 56,
+      "title": "Coordination of benefits confusing",
+      "body": "Dual insurance patients impossible to figure primary payer",
+      "sentiment": "confused",
+      "severity": "medium"
+    },
+    {
+      "id": 57,
+      "title": "Recall postcards not mailed",
+      "body": "Monthly postcards stopped 3 months ago, staff too busy",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 58,
+      "title": "Reviews not requested",
+      "body": "Do great work but nobody asks for reviews, reputation suffers",
+      "sentiment": "disappointed",
+      "severity": "high"
+    },
+    {
+      "id": 59,
+      "title": "Morning huddle not happening",
+      "body": "Staff runs late, no morning prep, start each day scrambling",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 60,
+      "title": "Financing options limited",
+      "body": "No payment plans offered, patients choose cheaper care or go elsewhere",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 61,
+      "title": "Allergies not flagged",
+      "body": "No system to flag patient allergies, staff offers unsafe snacks",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 62,
+      "title": "Claim status invisible",
+      "body": "100 submitted claims with no status visibility, don't know which are denied",
+      "sentiment": "angry",
+      "severity": "high"
+    },
+    {
+      "id": 63,
+      "title": "Recall timing not personalized",
+      "body": "All patients at 6 months regardless of risk, perio needs 3-month",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 64,
+      "title": "New patient conversion low",
+      "body": "20 inquiries monthly only 8 book, 40% conversion dropping",
+      "sentiment": "worried",
+      "severity": "high"
+    },
+    {
+      "id": 65,
+      "title": "Staff training missing",
+      "body": "New hires shadow one day with no manual or SOPs",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 66,
+      "title": "Satisfaction surveys not sent",
+      "body": "Never send surveys, flying blind on patient perception",
+      "sentiment": "disappointed",
+      "severity": "medium"
+    },
+    {
+      "id": 67,
+      "title": "Pre-auth submission delayed",
+      "body": "Pre-auths take a week to submit, staff doesn't prioritize",
+      "sentiment": "angry",
+      "severity": "high"
+    },
+    {
+      "id": 68,
+      "title": "Post-procedure follow-up missing",
+      "body": "No calls after major procedures, patients call us instead",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 69,
+      "title": "Reminders too generic",
+      "body": "Says you have an appointment without details or duration",
+      "sentiment": "annoyed",
+      "severity": "low"
+    },
+    {
+      "id": 70,
+      "title": "Records transfer slow",
+      "body": "Getting records from old dentist takes 2-3 weeks, treatment delayed",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 71,
+      "title": "Eligibility not checked same-day",
+      "body": "Verify benefits days ahead but coverage may have changed",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 72,
+      "title": "Family scheduling difficult",
+      "body": "Can't coordinate back-to-back family appointments, they book elsewhere",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 73,
+      "title": "Cost breakdown unclear",
+      "body": "Patients don't understand why crown costs $1200, no breakdown",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 74,
+      "title": "No loyalty program",
+      "body": "No incentive to stay, no referral rewards, patients leave for discounts",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 75,
+      "title": "Network status confusion",
+      "body": "Patients think we're in-network when not, bad surprises at checkout",
+      "sentiment": "angry",
+      "severity": "high"
+    },
+    {
+      "id": 76,
+      "title": "Appointment duration wrong",
+      "body": "Book 30-min cleaning takes 45, schedule falls behind daily",
+      "sentiment": "stressed",
+      "severity": "high"
+    },
+    {
+      "id": 77,
+      "title": "Implant planning too slow",
+      "body": "Implant plans take a week, patients want faster answers",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 78,
+      "title": "Records not backed up",
+      "body": "Local server no cloud backup, if it crashes we lose everything",
+      "sentiment": "worried",
+      "severity": "critical"
+    },
+    {
+      "id": 79,
+      "title": "Benefit utilization unknown",
+      "body": "Patients ask remaining benefit, have to call insurance",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 80,
+      "title": "Communication preferences ignored",
+      "body": "Some hate texts some hate calls, we blast everyone same way",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 81,
+      "title": "Recall system manual",
+      "body": "Staff manually prints letters makes calls sends texts, should be automated",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 82,
+      "title": "Reminders sent too early",
+      "body": "2-week advance reminders, patients forget by appointment",
+      "sentiment": "annoyed",
+      "severity": "low"
+    },
+    {
+      "id": 83,
+      "title": "Appeal letters take too long",
+      "body": "5 appeals weekly at 30 min each, 2.5 hours of admin time",
+      "sentiment": "angry",
+      "severity": "medium"
+    },
+    {
+      "id": 84,
+      "title": "Dental history not imported",
+      "body": "New patients history reconstructed from memory not records",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 85,
+      "title": "Hygiene and exam recall separate",
+      "body": "Two recall systems for hygiene and exams that don't talk",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 86,
+      "title": "Patient contact info outdated",
+      "body": "10% of records have wrong phone or address",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 87,
+      "title": "Treatment urgency not communicated",
+      "body": "Present without urgency, patients procrastinate indefinitely",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 88,
+      "title": "Payment plans tracked on paper",
+      "body": "Paper-based tracking, collections inconsistent",
+      "sentiment": "angry",
+      "severity": "high"
+    },
+    {
+      "id": 89,
+      "title": "Claim resubmission forgotten",
+      "body": "Claims needing resubmission sit for weeks, no ownership",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 90,
+      "title": "Time preferences ignored",
+      "body": "Patients request morning or afternoon but we book whenever",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 91,
+      "title": "Anxiety management inconsistent",
+      "body": "Each provider handles anxious patients differently",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 92,
+      "title": "Referral tracking broken",
+      "body": "Ask for referrals but can't track who referred whom",
+      "sentiment": "disappointed",
+      "severity": "medium"
+    },
+    {
+      "id": 93,
+      "title": "Family verification takes 45 minutes",
+      "body": "Four family members each different coverage, verification too slow",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 94,
+      "title": "Confirmation too late",
+      "body": "Confirm 24 hours before, too late to fill cancellation slots",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 95,
+      "title": "Presentation lacks visuals",
+      "body": "Show X-rays but no visual aids to explain procedures",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 96,
+      "title": "Anxiety scores not tracked",
+      "body": "No systematic anxiety assessment until patient is in chair",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 97,
+      "title": "Claim documentation incomplete",
+      "body": "Denied because X-rays or perio charts not attached",
+      "sentiment": "angry",
+      "severity": "high"
+    },
+    {
+      "id": 98,
+      "title": "Recall frequency not customized",
+      "body": "Every patient at 6 months regardless of risk level",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 99,
+      "title": "Emergency intake slow",
+      "body": "Emergency patients use same slow process as routine",
+      "sentiment": "stressed",
+      "severity": "high"
+    },
+    {
+      "id": 100,
+      "title": "Double booking errors",
+      "body": "Scheduled two procedures for same patient same time",
+      "sentiment": "angry",
+      "severity": "high"
+    },
+    {
+      "id": 101,
+      "title": "Fee schedule not compared",
+      "body": "Don't compare fees across plans, some pay 30% less",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 102,
+      "title": "Dental goals not discussed",
+      "body": "Jump to treatment without asking patients what they want",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 103,
+      "title": "Recall letters identical",
+      "body": "Every patient gets same recall letter",
+      "sentiment": "annoyed",
+      "severity": "low"
+    },
+    {
+      "id": 104,
+      "title": "Benefits expiring unused",
+      "body": "Patients forget $1500 annual coverage, we never remind",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 105,
+      "title": "Charting inconsistent between providers",
+      "body": "Each dentist charts differently, findings inconsistent",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 106,
+      "title": "Payment at service difficult",
+      "body": "Patients want to pay later, we end up chasing",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 107,
+      "title": "Claims spreadsheet broken",
+      "body": "500-row spreadsheet impossible to manage, nobody updates",
+      "sentiment": "angry",
+      "severity": "medium"
+    },
+    {
+      "id": 108,
+      "title": "Referral letters delayed",
+      "body": "Referral letter goes out a week later",
+      "sentiment": "stressed",
+      "severity": "medium"
+    },
+    {
+      "id": 109,
+      "title": "Financing not mentioned early",
+      "body": "Only discuss financing after patient says can't afford",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 110,
+      "title": "Reminders not branded",
+      "body": "Generic with no practice name, patients think spam",
+      "sentiment": "annoyed",
+      "severity": "low"
+    },
+    {
+      "id": 111,
+      "title": "Claim status not communicated",
+      "body": "Patients ask about claim status and we have no answer",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 112,
+      "title": "Anxiety not asked at booking",
+      "body": "Don't ask about anxiety, anxious patients show unprepared",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 113,
+      "title": "Recall not available online",
+      "body": "Patients can't book recall appointments online",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 114,
+      "title": "Treatment history not visible",
+      "body": "Can't quickly see full treatment history, must dig through notes",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 115,
+      "title": "Claim attachments missing",
+      "body": "Denied because required documents not attached",
+      "sentiment": "angry",
+      "severity": "high"
+    },
+    {
+      "id": 116,
+      "title": "Phone-only scheduling",
+      "body": "Only phone scheduling, patients want text or online",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 117,
+      "title": "Hygiene production targets missing",
+      "body": "Hygienists no goals, do cleanings but not perio screening",
+      "sentiment": "concerned",
+      "severity": "high"
+    },
+    {
+      "id": 118,
+      "title": "Emergency triage protocol missing",
+      "body": "Staff doesn't know how to triage emergency calls",
+      "sentiment": "stressed",
+      "severity": "high"
+    },
+    {
+      "id": 119,
+      "title": "Claim aging not reviewed",
+      "body": "Claims over 90 days uncollected, nobody reviews",
+      "sentiment": "angry",
+      "severity": "critical"
+    },
+    {
+      "id": 120,
+      "title": "Recall methods single-channel",
+      "body": "Only letters for recall, patients ignore mail",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 121,
+      "title": "Acceptance rate not tracked",
+      "body": "No idea what percentage of plans get accepted",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 122,
+      "title": "No-show follow-up weak",
+      "body": "Call once and give up, no systematic rescheduling",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 123,
+      "title": "CDT coding education missing",
+      "body": "Staff guesses codes, claims denied",
+      "sentiment": "angry",
+      "severity": "high"
+    },
+    {
+      "id": 124,
+      "title": "Reminders not customizable",
+      "body": "Same message for every appointment type",
+      "sentiment": "annoyed",
+      "severity": "low"
+    },
+    {
+      "id": 125,
+      "title": "Records from previous dentist slow",
+      "body": "Requesting records takes weeks",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 126,
+      "title": "Claims batched weekly",
+      "body": "Submit weekly instead of daily, cash flow delayed",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 127,
+      "title": "Appointment length not optimized",
+      "body": "Same slot for crown and filling, schedule backs up",
+      "sentiment": "stressed",
+      "severity": "high"
+    },
+    {
+      "id": 128,
+      "title": "Recall and scheduling separate",
+      "body": "Two systems that don't talk, manual booking",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 129,
+      "title": "Anxiety resources not shared",
+      "body": "No anxiety resources provided before visit",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 130,
+      "title": "Denial patterns not analyzed",
+      "body": "Same mistakes repeated, root causes not tracked",
+      "sentiment": "angry",
+      "severity": "high"
+    },
+    {
+      "id": 131,
+      "title": "Time estimate wrong",
+      "body": "Tell patients 30 min but takes 60",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 132,
+      "title": "Alternatives not presented",
+      "body": "One option instead of showing patients choices",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 133,
+      "title": "Emergency patients not reminded",
+      "body": "Emergency follow-ups not reminded, patients forget",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 134,
+      "title": "Claim status process missing",
+      "body": "No process to check status after submission",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 135,
+      "title": "Education not personalized",
+      "body": "Same advice for 20-year-old and 70-year-old",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 136,
+      "title": "Recall duration not estimated",
+      "body": "Book without time estimate, schedule off track",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 137,
+      "title": "Availability not shown quickly",
+      "body": "Can't show available times when patients call",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 138,
+      "title": "Payment posting delayed",
+      "body": "EOBs sit for a week, incorrect statements sent",
+      "sentiment": "angry",
+      "severity": "high"
+    },
+    {
+      "id": 139,
+      "title": "History not shared with specialists",
+      "body": "Refer without patient history, specialists start over",
+      "sentiment": "stressed",
+      "severity": "medium"
+    },
+    {
+      "id": 140,
+      "title": "Recall not confirmed",
+      "body": "Book without confirmation, patients forget",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 141,
+      "title": "Reminders to wrong number",
+      "body": "Old numbers in records, reminders go nowhere",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 142,
+      "title": "Mixed submission methods",
+      "body": "Some electronic some mail, confusion and delays",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 143,
+      "title": "Goals not documented",
+      "body": "Don't ask patients what they want to achieve",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 144,
+      "title": "Recall compliance not tracked",
+      "body": "No metrics on recall response rates",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 145,
+      "title": "Scheduling bottleneck",
+      "body": "One front desk handles all, patients wait on hold",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 146,
+      "title": "Resubmission deadlines missed",
+      "body": "Claim resubmission deadlines missed, revenue lost",
+      "sentiment": "angry",
+      "severity": "high"
+    },
+    {
+      "id": 147,
+      "title": "Anxiety triggers not documented",
+      "body": "Start over each visit managing patient fear",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 148,
+      "title": "Recall letters manual",
+      "body": "Staff spends 2 hours monthly creating letters",
+      "sentiment": "annoyed",
+      "severity": "low"
+    },
+    {
+      "id": 149,
+      "title": "Text confirmations unreliable",
+      "body": "Only 30% confirm via text",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 150,
+      "title": "Claims not submitted real-time",
+      "body": "End of week batching delays reimbursement",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 151,
+      "title": "Paper charts not digitized",
+      "body": "Years of paper charts can't be searched",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 152,
+      "title": "Recall not grouped",
+      "body": "Scattered through schedule instead of grouped",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 153,
+      "title": "Too many reminders",
+      "body": "Three reminders per appointment, patients nagged",
+      "sentiment": "annoyed",
+      "severity": "low"
+    },
+    {
+      "id": 154,
+      "title": "Documentation inconsistent",
+      "body": "Each provider documents differently",
+      "sentiment": "angry",
+      "severity": "high"
+    },
+    {
+      "id": 155,
+      "title": "Medical history outdated",
+      "body": "Patients start meds and don't tell us",
+      "sentiment": "worried",
+      "severity": "high"
+    },
+    {
+      "id": 156,
+      "title": "Recall delivery unknown",
+      "body": "No confirmation patients received messages",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 157,
+      "title": "No evening or weekend hours",
+      "body": "9-5 only, working patients can't come",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 158,
+      "title": "Appeal deadlines missed",
+      "body": "Claim appeal windows expire, permanent revenue loss",
+      "sentiment": "angry",
+      "severity": "critical"
+    },
+    {
+      "id": 159,
+      "title": "Anxiety not screened at intake",
+      "body": "Wait for patients to mention anxiety",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 160,
+      "title": "Recall not personalized",
+      "body": "Same message regardless of last visit",
+      "sentiment": "annoyed",
+      "severity": "low"
+    },
+    {
+      "id": 161,
+      "title": "Wait times too long",
+      "body": "Patients wait 20 min past appointment time",
+      "sentiment": "angry",
+      "severity": "high"
+    },
+    {
+      "id": 162,
+      "title": "Claims not reviewed for accuracy",
+      "body": "Submitted without review, preventable denials",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 163,
+      "title": "Records not remote accessible",
+      "body": "Can't access records from home or weekends",
+      "sentiment": "stressed",
+      "severity": "medium"
+    },
+    {
+      "id": 164,
+      "title": "Recall not in patient portal",
+      "body": "Patients can't see recall status",
+      "sentiment": "annoyed",
+      "severity": "low"
+    },
+    {
+      "id": 165,
+      "title": "Not multi-provider friendly",
+      "body": "Patients want specific provider but get whoever",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 166,
+      "title": "Denial rates by procedure unknown",
+      "body": "Don't know which procedures get denied most",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 167,
+      "title": "Anxiety info not shared",
+      "body": "Anxious patient history not shared between providers",
+      "sentiment": "worried",
+      "severity": "medium"
+    },
+    {
+      "id": 168,
+      "title": "Recall not sequenced",
+      "body": "Single message instead of text-email-call sequence",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 169,
+      "title": "Reminders not time-zone aware",
+      "body": "Traveling patients get wrong time zone reminders",
+      "sentiment": "annoyed",
+      "severity": "low"
+    },
+    {
+      "id": 170,
+      "title": "Timely filing missed",
+      "body": "Sometimes miss claim filing deadlines",
+      "sentiment": "angry",
+      "severity": "critical"
+    },
+    {
+      "id": 171,
+      "title": "Family history not linked",
+      "body": "Family dental histories not connected",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 172,
+      "title": "Recall ignores pending treatment",
+      "body": "Don't consider incomplete treatment for recall",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 173,
+      "title": "Insurance not checked at booking",
+      "body": "Patient arrives and we find no coverage",
+      "sentiment": "angry",
+      "severity": "high"
+    },
+    {
+      "id": 174,
+      "title": "Claims not quality reviewed",
+      "body": "Simple errors cause denials, unchecked",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 175,
+      "title": "Records arrive by fax",
+      "body": "Illegible faxed records from other practices",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 176,
+      "title": "Recall not coordinated with treatment",
+      "body": "Recalled for hygiene but also needs crown",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 177,
+      "title": "No-show prediction missing",
+      "body": "All patients treated same, no risk identification",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 178,
+      "title": "Claims not audited",
+      "body": "No accuracy auditing, revenue leakage invisible",
+      "sentiment": "worried",
+      "severity": "high"
+    },
+    {
+      "id": 179,
+      "title": "Anxiety not quantified",
+      "body": "No anxiety measurement system",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 180,
+      "title": "Recall not risk-segmented",
+      "body": "All patients same recall regardless of risk",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 181,
+      "title": "Next appointment not proactive",
+      "body": "Wait for patients to call instead of scheduling ahead",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 182,
+      "title": "Common claims manual",
+      "body": "Every claim submitted manually, no templates",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 183,
+      "title": "Records not searchable",
+      "body": "Scrolling through years of notes to find info",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 184,
+      "title": "Recall not sent to referred patients",
+      "body": "Referred patients not recalled, lost",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 185,
+      "title": "Production scheduling not optimized",
+      "body": "Low-value fills prime slots instead of high-value",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 186,
+      "title": "Filing deadline not tracked",
+      "body": "No tracking relative to claim deadlines",
+      "sentiment": "angry",
+      "severity": "high"
+    },
+    {
+      "id": 187,
+      "title": "Records not linked to medical",
+      "body": "Dental and medical records separate",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 188,
+      "title": "Recall ignores outstanding balances",
+      "body": "Recall patients with unpaid balances awkward",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 189,
+      "title": "Scheduling not data-driven",
+      "body": "Gut feel instead of appointment pattern analysis",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 190,
+      "title": "Denial rates by provider not tracked",
+      "body": "Don't know whose claims get denied most",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 191,
+      "title": "Records not versioned",
+      "body": "Old info lost when records updated",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 192,
+      "title": "New patients not in recall",
+      "body": "Not auto-added to recall, lost after first visit",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 193,
+      "title": "Cancel slot not offered to waitlist",
+      "body": "Empty slots from cancellations not filled",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 194,
+      "title": "Payment posting not tracked",
+      "body": "No tracking of paid claims, manual EOB",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 195,
+      "title": "Records siloed between providers",
+      "body": "Associate can't see owner notes",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 196,
+      "title": "Recall preferences not tracked",
+      "body": "Don't know patient preferred contact method",
+      "sentiment": "annoyed",
+      "severity": "low"
+    },
+    {
+      "id": 197,
+      "title": "Rescheduling too difficult",
+      "body": "Patients give up and go elsewhere",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 198,
+      "title": "Denied claims pile up",
+      "body": "No systematic appeal process",
+      "sentiment": "angry",
+      "severity": "high"
+    },
+    {
+      "id": 199,
+      "title": "No cloud backup",
+      "body": "Local server only, HIPAA nightmare",
+      "sentiment": "worried",
+      "severity": "critical"
+    },
+    {
+      "id": 200,
+      "title": "Recall conversion not tracked",
+      "body": "Don't know what percentage book",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 201,
+      "title": "No 24/7 booking",
+      "body": "Patients research at 9pm and book competitors",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 202,
+      "title": "Denial patterns by carrier unknown",
+      "body": "Don't know which insurers deny most",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 203,
+      "title": "Records not exportable",
+      "body": "Can't easily export when patients leave",
+      "sentiment": "annoyed",
+      "severity": "low"
+    },
+    {
+      "id": 204,
+      "title": "Recall not linked to communication",
+      "body": "Can't see prior contact when planning recall",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 205,
+      "title": "Time preferences not tracked",
+      "body": "Morning people get afternoon slots",
+      "sentiment": "annoyed",
+      "severity": "low"
+    },
+    {
+      "id": 206,
+      "title": "Claim aging not monitored",
+      "body": "Old claims sit uncollected unnoticed",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 207,
+      "title": "Records not state compliant",
+      "body": "Not sure if record-keeping meets requirements",
+      "sentiment": "worried",
+      "severity": "high"
+    },
+    {
+      "id": 208,
+      "title": "Inactive patients not recalled",
+      "body": "2+ years no visit, permanently lost",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 209,
+      "title": "Portal useless for scheduling",
+      "body": "Can't book through portal, must call",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 210,
+      "title": "Resubmission falls through cracks",
+      "body": "No systematic resubmission tracking",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 211,
+      "title": "Treatment plans not linked to records",
+      "body": "Can't see planned vs completed",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 212,
+      "title": "Recall response time not tracked",
+      "body": "No measurement of patient response time",
+      "sentiment": "annoyed",
+      "severity": "low"
+    },
+    {
+      "id": 213,
+      "title": "Overdue patients not auto-contacted",
+      "body": "Past due patients not reached out to",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 214,
+      "title": "Payment trends not analyzed",
+      "body": "Don't know which insurers underpay",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 215,
+      "title": "Records not accessible from home",
+      "body": "Can't review offsite for weekend emergencies",
+      "sentiment": "stressed",
+      "severity": "medium"
+    },
+    {
+      "id": 216,
+      "title": "Recall based on wrong date",
+      "body": "Uses appointment date not visit date",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 217,
+      "title": "No-show risk not predicted",
+      "body": "Same reminders for high and low risk",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 218,
+      "title": "Compliance not tracked",
+      "body": "Don't track payer compliance requirements",
+      "sentiment": "worried",
+      "severity": "high"
+    },
+    {
+      "id": 219,
+      "title": "Consent forms separate from records",
+      "body": "Can't verify consent without separate lookup",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 220,
+      "title": "Recall status not in portal",
+      "body": "Patients can't see when due",
+      "sentiment": "annoyed",
+      "severity": "low"
+    },
+    {
+      "id": 221,
+      "title": "Verification not at booking",
+      "body": "Verify days before not at booking time",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 222,
+      "title": "Aging report inaccurate",
+      "body": "Can't trust for financial decisions",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 223,
+      "title": "Lab results separate",
+      "body": "Can't correlate with clinical findings",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 224,
+      "title": "Recall not for pending treatment",
+      "body": "Incomplete treatment patients need different approach",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 225,
+      "title": "Scheduling not linked to treatment planning",
+      "body": "No clinical coordination with scheduling",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 226,
+      "title": "Denial rate by procedure not tracked",
+      "body": "Can't focus improvement efforts",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 227,
+      "title": "Records not accessible after hours",
+      "body": "Emergency records unavailable when closed",
+      "sentiment": "stressed",
+      "severity": "high"
+    },
+    {
+      "id": 228,
+      "title": "Contact attempts not logged",
+      "body": "No visibility into outreach frequency",
+      "sentiment": "annoyed",
+      "severity": "low"
+    },
+    {
+      "id": 229,
+      "title": "Preferences not used for scheduling",
+      "body": "Random assignment ignores time preferences",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 230,
+      "title": "Resubmission deadlines not tracked",
+      "body": "Missed deadlines permanently lose revenue",
+      "sentiment": "angry",
+      "severity": "critical"
+    },
+    {
+      "id": 231,
+      "title": "Appointment history not in chart",
+      "body": "Can't see past appointments in record",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 232,
+      "title": "Recall same for all procedures",
+      "body": "Implants and cleanings get same interval",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 233,
+      "title": "Clinical notes not informing schedule",
+      "body": "Duration estimated not based on data",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 234,
+      "title": "Payments posted inaccurately",
+      "body": "Wrong balance statements from posting errors",
+      "sentiment": "angry",
+      "severity": "high"
+    },
+    {
+      "id": 235,
+      "title": "Records not searchable by procedure",
+      "body": "Can't find patients by procedure type",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 236,
+      "title": "Recall ignores patient balances",
+      "body": "Can't see balances when sending recall",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 237,
+      "title": "Provider schedules unbalanced",
+      "body": "Some overbooked others have gaps",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 238,
+      "title": "Patient responsibility not tracked",
+      "body": "Don't track patient vs insurance portions",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 239,
+      "title": "Radiographs separate from records",
+      "body": "X-rays not in same view as chart",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 240,
+      "title": "Recall not clinically indicated",
+      "body": "Time-based not need-based",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 241,
+      "title": "Scheduling not linked to acceptance",
+      "body": "Don't track who accepted treatment",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 242,
+      "title": "Revenue reports inaccurate",
+      "body": "Claims tracking issues affect financial reports",
+      "sentiment": "angry",
+      "severity": "high"
+    },
+    {
+      "id": 243,
+      "title": "Communication history not in record",
+      "body": "Past conversations not visible in chart",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 244,
+      "title": "Recall not demographic-personalized",
+      "body": "Age and family not used for messaging",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 245,
+      "title": "Wrong provider for procedure",
+      "body": "Specialties not matched to patient needs",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 246,
+      "title": "Appeal success rate unknown",
+      "body": "Don't know what works in appeals",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 247,
+      "title": "Treatment history disconnected",
+      "body": "Can't see all treatment across visits",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 248,
+      "title": "Unscheduled treatment not followed up",
+      "body": "Diagnosed but unscheduled, no outreach",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 249,
+      "title": "Satisfaction not linked to scheduling",
+      "body": "Don't use feedback to improve booking",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 250,
+      "title": "Cash flow unpredictable",
+      "body": "Can't forecast with unreliable claims tracking",
+      "sentiment": "stressed",
+      "severity": "high"
+    },
+    {
+      "id": 251,
+      "title": "Can't share records digitally",
+      "body": "Fax is only option for record sharing",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 252,
+      "title": "Recall engagement not measured",
+      "body": "Don't know if messages are read",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 253,
+      "title": "Contact method not respected",
+      "body": "Same method for every patient",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 254,
+      "title": "Insurance aging unreliable",
+      "body": "Can't tell slow from denied payers",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 255,
+      "title": "Insurance info not in main record",
+      "body": "Separate lookup required",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 256,
+      "title": "Overdue treatment patients not contacted",
+      "body": "Drift away without outreach",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 257,
+      "title": "Loyal patients not prioritized",
+      "body": "No priority scheduling for loyal patients",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 258,
+      "title": "Duplicate insurance verification",
+      "body": "Verify separately from claims, redundant",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 259,
+      "title": "No clinical context at booking",
+      "body": "Can't see history when scheduling",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 260,
+      "title": "Best recall method unknown",
+      "body": "Don't know what channel works",
+      "sentiment": "frustrated",
+      "severity": "low"
+    },
+    {
+      "id": 261,
+      "title": "Acceptance not linked to scheduling",
+      "body": "No tracking of scheduling approach impact",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 262,
+      "title": "Claim status outdated",
+      "body": "Think pending when actually denied",
+      "sentiment": "angry",
+      "severity": "high"
+    },
+    {
+      "id": 263,
+      "title": "Preferences not documented",
+      "body": "Each visit starts from scratch",
+      "sentiment": "annoyed",
+      "severity": "low"
+    },
+    {
+      "id": 264,
+      "title": "High-risk patients not prioritized",
+      "body": "Even distribution not risk-based",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 265,
+      "title": "Provider schedules not coordinated",
+      "body": "Double-bookings from poor sync",
+      "sentiment": "stressed",
+      "severity": "high"
+    },
+    {
+      "id": 266,
+      "title": "Processing times unpredictable",
+      "body": "Can't give accurate timelines",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 267,
+      "title": "Lab results disconnected",
+      "body": "Findings not in patient records",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 268,
+      "title": "Lifecycle not considered for recall",
+      "body": "Different stages need different approach",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 269,
+      "title": "Full history not visible when booking",
+      "body": "Don't know if patient needs extra time",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 270,
+      "title": "Revenue collection inaccurate",
+      "body": "Financial reports can't be trusted",
+      "sentiment": "angry",
+      "severity": "high"
+    },
+    {
+      "id": 271,
+      "title": "Treatment outcomes not tracked",
+      "body": "Can't measure success or failure",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 272,
+      "title": "High caries patients not recalled frequently",
+      "body": "Risk not factored into recall frequency",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 273,
+      "title": "Outcomes not linked to scheduling",
+      "body": "Can't optimize timing for results",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 274,
+      "title": "Insurance reconciliation inaccurate",
+      "body": "Payments don't match expectations",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 275,
+      "title": "Referral source not in record",
+      "body": "Can't measure marketing effectiveness",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 276,
+      "title": "Attendance patterns not analyzed",
+      "body": "Not using data on who cancels",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 277,
+      "title": "Demographics not informing scheduling",
+      "body": "Age and family should matter",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 278,
+      "title": "Claim processing time unpredictable",
+      "body": "Can't set patient expectations",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 279,
+      "title": "Satisfaction not linked to clinical",
+      "body": "Can't correlate with outcomes",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 280,
+      "title": "Same recall for all treatments",
+      "body": "Different procedures different intervals",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 281,
+      "title": "Retention not linked to scheduling",
+      "body": "Can't optimize for retention",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 282,
+      "title": "Insurance management reactive",
+      "body": "Respond to problems not prevent",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 283,
+      "title": "Payment history not visible",
+      "body": "Can't see financial status at glance",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 284,
+      "title": "Recall communication repetitive",
+      "body": "Can't see past messages sent",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 285,
+      "title": "Scheduling random not personalized",
+      "body": "No preference tracking",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 286,
+      "title": "Claims pipeline invisible",
+      "body": "No visibility into full pipeline",
+      "sentiment": "angry",
+      "severity": "high"
+    },
+    {
+      "id": 287,
+      "title": "Findings not tracked over time",
+      "body": "Can't see progression across visits",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 288,
+      "title": "Forgetful patients need extra reminders",
+      "body": "One reminder fits all doesn't work",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 289,
+      "title": "Patients not educated on scheduling",
+      "body": "Don't know optimal intervals",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 290,
+      "title": "No insurance performance analytics",
+      "body": "Can't identify trends",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 291,
+      "title": "Contact info buried in records",
+      "body": "Have to search for phone numbers",
+      "sentiment": "annoyed",
+      "severity": "low"
+    },
+    {
+      "id": 292,
+      "title": "Portal recall status missing",
+      "body": "Can't see when due in portal",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 293,
+      "title": "Urgent treatment not prioritized",
+      "body": "Routine and urgent same scheduling",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 294,
+      "title": "Insurance processes stale",
+      "body": "Same inefficiencies monthly",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 295,
+      "title": "Insurance lookup separate",
+      "body": "Need separate screen from record",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 296,
+      "title": "Disengaged patients not special-recalled",
+      "body": "No special outreach for quiet patients",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 297,
+      "title": "Communication context missing at booking",
+      "body": "Can't see recent conversations",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 298,
+      "title": "Claim resolution time unknown",
+      "body": "Can't tell patients timeline",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 299,
+      "title": "Planned vs completed not visible",
+      "body": "Can't compare plan to actual",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 300,
+      "title": "Recall not demographic-targeted",
+      "body": "Age and family not used",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 301,
+      "title": "Scheduling provider-centric",
+      "body": "Patient convenience secondary",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 302,
+      "title": "Payer performance metrics inaccurate",
+      "body": "Can't evaluate insurance partners",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 303,
+      "title": "Incomplete patient history",
+      "body": "Information pieced together",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 304,
+      "title": "Treatment started but not finished",
+      "body": "No follow-up for incomplete treatment",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 305,
+      "title": "Outcome data not scheduling-linked",
+      "body": "Can't optimize timing",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 306,
+      "title": "Billing errors cause denials",
+      "body": "Preventable claim denials",
+      "sentiment": "angry",
+      "severity": "high"
+    },
+    {
+      "id": 307,
+      "title": "Documents not linked to record",
+      "body": "Consent forms stored separately",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 308,
+      "title": "Recall ignores communication preferences",
+      "body": "Patients feel spammed",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 309,
+      "title": "Feedback not improving scheduling",
+      "body": "Same complaints persist",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 310,
+      "title": "Insurance follow-up inconsistent",
+      "body": "Some claims followed some not",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 311,
+      "title": "Appointment history separate",
+      "body": "Not visible in patient record",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 312,
+      "title": "Encouragement not part of recall",
+      "body": "Needs motivation same as all",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 313,
+      "title": "Satisfaction not optimizing scheduling",
+      "body": "Bad experiences unchanged",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 314,
+      "title": "Insurance collection accuracy poor",
+      "body": "Can't tell paid vs owed",
+      "sentiment": "angry",
+      "severity": "high"
+    },
+    {
+      "id": 315,
+      "title": "Marketing data lost",
+      "body": "Referral sources not tracked",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 316,
+      "title": "Urgent needs same recall as routine",
+      "body": "Urgency not considered",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 317,
+      "title": "Patient needs not scheduling factor",
+      "body": "One-size-fits-all scheduling",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 318,
+      "title": "Insurance management error-prone",
+      "body": "Manual processes cause errors",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 319,
+      "title": "Communication history not in chart",
+      "body": "Full interaction history missing",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 320,
+      "title": "Critical patients not recalled urgently",
+      "body": "No special outreach for critical",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 321,
+      "title": "Patient availability not factor",
+      "body": "Schedule when providers free",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 322,
+      "title": "Claims disorganized",
+      "body": "No clear ownership or process",
+      "sentiment": "angry",
+      "severity": "high"
+    },
+    {
+      "id": 323,
+      "title": "Clinical data not integrated",
+      "body": "Findings in separate systems",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 324,
+      "title": "Engagement not used for recall",
+      "body": "Can't target based on engagement",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 325,
+      "title": "Full history not available when booking",
+      "body": "Scheduling without clinical context",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 326,
+      "title": "Claims slow from no tracking",
+      "body": "Nobody monitors status",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 327,
+      "title": "Outcomes not in patient record",
+      "body": "Treatment results not tracked",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 328,
+      "title": "Risk level ignored for recall",
+      "body": "High-risk not recalled more",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 329,
+      "title": "Engagement data not scheduling factor",
+      "body": "Should prioritize engaged",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 330,
+      "title": "Claim submission inconsistent",
+      "body": "Some correct some errors",
+      "sentiment": "angry",
+      "severity": "high"
+    },
+    {
+      "id": 331,
+      "title": "Hard to find documents",
+      "body": "Not linked to main record",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 332,
+      "title": "Recall generic not personalized",
+      "body": "Treatment history not used",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 333,
+      "title": "Demographics not scheduling consideration",
+      "body": "Profile should influence",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 334,
+      "title": "Insurance follow-through weak",
+      "body": "Give up too easily",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 335,
+      "title": "Patient data scattered",
+      "body": "Multiple systems needed",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 336,
+      "title": "Extra attention patients not identified",
+      "body": "Need flagging system",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 337,
+      "title": "Needs not assessed at booking",
+      "body": "Don't know what patient needs",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 338,
+      "title": "Claim resolution untracked",
+      "body": "Don't know when resolved",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 339,
+      "title": "Patient profile has gaps",
+      "body": "Important info missing",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 340,
+      "title": "Recall not informed by past communication",
+      "body": "Don't see what was said",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 341,
+      "title": "Patient availability unknown",
+      "body": "Schedule without knowing availability",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 342,
+      "title": "Insurance not tracked for improvement",
+      "body": "Can't identify process fixes",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 343,
+      "title": "Patient info scattered across systems",
+      "body": "Hard to compile record",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 344,
+      "title": "Recall not considering patient-specific factors",
+      "body": "Generic approach for all",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 345,
+      "title": "Slots wasted while patients wait",
+      "body": "No demand matching",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 346,
+      "title": "No defined claim process",
+      "body": "Each staff handles differently",
+      "sentiment": "angry",
+      "severity": "high"
+    },
+    {
+      "id": 347,
+      "title": "Systems don't talk",
+      "body": "Multiple disconnected systems",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 348,
+      "title": "Recall and treatment planning separate",
+      "body": "No coordination",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 349,
+      "title": "Engagement not scheduling factor",
+      "body": "Don't use engagement data",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 350,
+      "title": "Insurance processes not improved",
+      "body": "No performance tracking",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 351,
+      "title": "Patient management disconnected",
+      "body": "Can't manage with siloed data",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 352,
+      "title": "Recall not reaching all who need it",
+      "body": "System gaps",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 353,
+      "title": "Scheduling without communication context",
+      "body": "No interaction history",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 354,
+      "title": "Claims lack ownership",
+      "body": "Nobody owns end-to-end",
+      "sentiment": "angry",
+      "severity": "high"
+    },
+    {
+      "id": 355,
+      "title": "Care history fragmented",
+      "body": "Not in one view",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 356,
+      "title": "Recall scheduling manual",
+      "body": "No integration with scheduling",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 357,
+      "title": "Basic availability management",
+      "body": "Primitive slot matching",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 358,
+      "title": "Insurance response reactive",
+      "body": "Problems not prevented",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 359,
+      "title": "Patient experience data isolated",
+      "body": "Can't use feedback",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 360,
+      "title": "Engagement not informing recall",
+      "body": "Level should guide outreach",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 361,
+      "title": "Preferences not scheduling factor",
+      "body": "Should remember preferences",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 362,
+      "title": "Ad hoc insurance management",
+      "body": "No systematic approach",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 363,
+      "title": "Care improvement data missing",
+      "body": "Can't demonstrate quality",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 364,
+      "title": "Recall not outcome-informed",
+      "body": "Last visit should determine timing",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 365,
+      "title": "Preference tracking not done",
+      "body": "No learning from patterns",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 366,
+      "title": "No insurance ROI measurement",
+      "body": "Can't prove value",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 367,
+      "title": "Data not actionable",
+      "body": "Exists but not usable",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 368,
+      "title": "Recall effectiveness unknown",
+      "body": "No measurement",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 369,
+      "title": "Outcomes not scheduling factor",
+      "body": "Can't optimize for results",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 370,
+      "title": "Insurance process picture incomplete",
+      "body": "Can't see full workflow",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 371,
+      "title": "Can't track care journey",
+      "body": "Patient path fragmented",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 372,
+      "title": "Recall misses engagement opportunities",
+      "body": "Data not used for timing",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 373,
+      "title": "No learning from scheduling patterns",
+      "body": "Mistakes repeated",
+      "sentiment": "annoyed",
+      "severity": "low"
+    },
+    {
+      "id": 374,
+      "title": "Insurance bottlenecks invisible",
+      "body": "Can't find stuck points",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 375,
+      "title": "Data quality not monitored",
+      "body": "Degradation unnoticed",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 376,
+      "title": "Recall scheduling effectiveness unknown",
+      "body": "Can't measure call-to-booking",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 377,
+      "title": "Communication history missing at scheduling",
+      "body": "Past conversations hidden",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 378,
+      "title": "Recurring insurance issues",
+      "body": "Same problems repeat",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 379,
+      "title": "Patient care not holistic",
+      "body": "Can't manage all aspects",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 380,
+      "title": "Comprehensive recall missing",
+      "body": "Systematic gaps",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 381,
+      "title": "No availability insights",
+      "body": "Don't know when patients free",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 382,
+      "title": "Claims managed inconsistently",
+      "body": "Unequal attention",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 383,
+      "title": "No data quality process",
+      "body": "No systematic monitoring",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 384,
+      "title": "Recall optimization missing",
+      "body": "Engagement not tracked",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 385,
+      "title": "Preferences lost between visits",
+      "body": "Must repeat every time",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 386,
+      "title": "Insurance process not monitored",
+      "body": "No performance oversight",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 387,
+      "title": "Care quality not ensured",
+      "body": "No quality monitoring",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 388,
+      "title": "Recall not need-based",
+      "body": "Clinical needs ignored",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 389,
+      "title": "Can't optimize scheduling for outcomes",
+      "body": "No timing-results link",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 390,
+      "title": "Insurance claims get unequal attention",
+      "body": "Some pursued some ignored",
+      "sentiment": "angry",
+      "severity": "high"
+    },
+    {
+      "id": 391,
+      "title": "Data scattered across silos",
+      "body": "Information in disconnected systems",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 392,
+      "title": "Recall and scheduling disconnected",
+      "body": "Manual coordination",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 393,
+      "title": "No communication context for scheduling",
+      "body": "Follow-up inconsistent",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 394,
+      "title": "Insurance process chaotic",
+      "body": "No systematic management",
+      "sentiment": "angry",
+      "severity": "high"
+    },
+    {
+      "id": 395,
+      "title": "Care management not proactive",
+      "body": "React instead of prevent",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 396,
+      "title": "Recall system misses patients",
+      "body": "Not everyone gets contacted",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 397,
+      "title": "Scheduling inefficient",
+      "body": "Patients wait too long",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 398,
+      "title": "Insurance management stagnant",
+      "body": "No measurable improvement",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 399,
+      "title": "Patient information outdated",
+      "body": "Records not refreshed",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 400,
+      "title": "Recall improvement not measured",
+      "body": "No tracking of recall metrics",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 401,
+      "title": "Scheduling preferences ignored",
+      "body": "Experience doesn't improve",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 402,
+      "title": "Insurance processes never improve",
+      "body": "No improvement culture",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 403,
+      "title": "Can't demonstrate care improvement",
+      "body": "No quality metrics",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 404,
+      "title": "Recall not outcome-improvement focused",
+      "body": "Data not used for timing",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 405,
+      "title": "Scheduling not outcome-improving",
+      "body": "Can't demonstrate progress",
+      "sentiment": "annoyed",
+      "severity": "low"
+    },
+    {
+      "id": 406,
+      "title": "Insurance value not measurable",
+      "body": "Can't prove management ROI",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 407,
+      "title": "Patient data not leveraged",
+      "body": "Collected but unused",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 408,
+      "title": "Recall ROI unknown",
+      "body": "Can't measure return",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 409,
+      "title": "Scheduling outcome data missing",
+      "body": "No improvement link",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 410,
+      "title": "Insurance inefficiencies persist",
+      "body": "Month after month",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 411,
+      "title": "Can't measure care effectiveness",
+      "body": "No treatment outcome data",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 412,
+      "title": "Recall not engagement-improving",
+      "body": "Engagement data not used",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 413,
+      "title": "Can't optimize scheduling for preferences",
+      "body": "No learning mechanism",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 414,
+      "title": "Insurance tracking incomplete",
+      "body": "Can't see full performance",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 415,
+      "title": "Data quality unchecked",
+      "body": "Degradation unnoticed",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 416,
+      "title": "Recall scheduling measurement missing",
+      "body": "Can't measure conversion",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 417,
+      "title": "Communication history not accessible",
+      "body": "Patient timeline hidden",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 418,
+      "title": "Insurance bottlenecks not identified",
+      "body": "Same issues never fixed",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 419,
+      "title": "Patient journey untracked",
+      "body": "Can't follow lifecycle",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 420,
+      "title": "Patients needing recall are missed",
+      "body": "Coverage gaps",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 421,
+      "title": "Can't optimize scheduling results",
+      "body": "No data on what works",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 422,
+      "title": "Insurance improvement not tracked",
+      "body": "No process metrics",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 423,
+      "title": "Data quality not improving",
+      "body": "Same problems yearly",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 424,
+      "title": "Recall value not measured",
+      "body": "Is it worth investment",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 425,
+      "title": "Preferences never analyzed",
+      "body": "Collected but unused",
+      "sentiment": "annoyed",
+      "severity": "low"
+    },
+    {
+      "id": 426,
+      "title": "Insurance process ownership unclear",
+      "body": "Nobody responsible",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 427,
+      "title": "Care quality unmonitored",
+      "body": "No systematic checks",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 428,
+      "title": "Recall not engagement-data informed",
+      "body": "Patterns not used",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 429,
+      "title": "Can't measure preference impact",
+      "body": "No data on matching",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 430,
+      "title": "Insurance management has blind spots",
+      "body": "Performance invisible",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 431,
+      "title": "Data quality issues unknown",
+      "body": "Problems undetected",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 432,
+      "title": "Recall not patient-outcome driven",
+      "body": "Outcomes should guide",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 433,
+      "title": "Scheduling not data-improved",
+      "body": "Methods unchanged",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 434,
+      "title": "Insurance processes not optimized",
+      "body": "Inefficient workflows",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 435,
+      "title": "Care outcomes not measurable",
+      "body": "Can't quantify improvement",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 436,
+      "title": "Recall not engagement-improving",
+      "body": "No feedback loop",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 437,
+      "title": "Preference data collection missing",
+      "body": "No systematic collection",
+      "sentiment": "annoyed",
+      "severity": "low"
+    },
+    {
+      "id": 438,
+      "title": "Insurance tracking fragmented",
+      "body": "Multiple systems",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 439,
+      "title": "Data not used for decisions",
+      "body": "Available but untouched",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 440,
+      "title": "Recall method optimization missing",
+      "body": "No channel testing",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 441,
+      "title": "Scheduling not preference-adaptive",
+      "body": "Approach never changes",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 442,
+      "title": "Insurance processes lack accountability",
+      "body": "No process ownership",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 443,
+      "title": "Care not outcome-optimized",
+      "body": "Approach not adjusted",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 444,
+      "title": "Recall not clinical-need based",
+      "body": "Calendar-driven not need-driven",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 445,
+      "title": "Scheduling not outcome-linked",
+      "body": "Can't connect changes to results",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 446,
+      "title": "Insurance results not measured",
+      "body": "No KPIs for management",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 447,
+      "title": "Patient data not integrated",
+      "body": "Different sources disconnected",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 448,
+      "title": "Recall effectiveness stagnant",
+      "body": "Conversion not improving",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 449,
+      "title": "Can't optimize scheduling experience",
+      "body": "Satisfaction not tracked",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 450,
+      "title": "Insurance process improvement absent",
+      "body": "No workflow initiatives",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 451,
+      "title": "Can't prove care quality improvement",
+      "body": "No improvement data",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 452,
+      "title": "Recall not engagement-timed",
+      "body": "Messages timed poorly",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 453,
+      "title": "Preference-based scheduling not tested",
+      "body": "Never tried matching",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 454,
+      "title": "Insurance process visibility limited",
+      "body": "Can't see full workflow",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 455,
+      "title": "Data accuracy not validated",
+      "body": "Never checked",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 456,
+      "title": "Recall not behavior-informed",
+      "body": "Patient patterns unused",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 457,
+      "title": "Scheduling not adaptive to needs",
+      "body": "Needs change approach doesn't",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 458,
+      "title": "Insurance processes not measured",
+      "body": "No efficiency metrics",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 459,
+      "title": "Care effectiveness data missing",
+      "body": "No outcome collection",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 460,
+      "title": "Recall not patient-journey aligned",
+      "body": "Lifecycle not considered",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 461,
+      "title": "Scheduling not insight-driven",
+      "body": "Data available but unused",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 462,
+      "title": "Insurance management not accountable",
+      "body": "No performance ownership",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 463,
+      "title": "Data fragmentation impacts care",
+      "body": "Care suffers from silos",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 464,
+      "title": "Recall not optimized for conversion",
+      "body": "No messaging optimization",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 465,
+      "title": "Scheduling preference insights ignored",
+      "body": "Data collected but unused",
+      "sentiment": "annoyed",
+      "severity": "low"
+    },
+    {
+      "id": 466,
+      "title": "Insurance processes not data-driven",
+      "body": "No data for improvement",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 467,
+      "title": "Outcome tracking not systematic",
+      "body": "Inconsistent if at all",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 468,
+      "title": "Recall not data-informed",
+      "body": "Decisions without data",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 469,
+      "title": "Scheduling not continuously improving",
+      "body": "No improvement process",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 470,
+      "title": "Insurance performance not benchmarked",
+      "body": "No target comparison",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 471,
+      "title": "Patient insights not captured",
+      "body": "Valuable data not collected",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 472,
+      "title": "Recall not results-oriented",
+      "body": "Conversion not a focus",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 473,
+      "title": "Scheduling not evidence-based",
+      "body": "Decisions unsupported",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 474,
+      "title": "Insurance processes not evolving",
+      "body": "Workflows years old",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 475,
+      "title": "Care quality not benchmarked",
+      "body": "No standard comparison",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 476,
+      "title": "Recall not engagement-score based",
+      "body": "Scores unused for targeting",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 477,
+      "title": "Scheduling not preference-optimized",
+      "body": "Data exists but unused",
+      "sentiment": "annoyed",
+      "severity": "low"
+    },
+    {
+      "id": 478,
+      "title": "Insurance performance not transparent",
+      "body": "Processes invisible",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 479,
+      "title": "Patient data not consolidated",
+      "body": "Visit data not merged",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 480,
+      "title": "Recall not outcome-driven",
+      "body": "Outcomes should guide timing",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 481,
+      "title": "Scheduling not patient-responsive",
+      "body": "Feedback not acted on",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 482,
+      "title": "Insurance process not accountable",
+      "body": "No outcome responsibility",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 483,
+      "title": "Care outcomes not improving",
+      "body": "No improvement trend",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 484,
+      "title": "Recall not patient-centered",
+      "body": "Patient needs not considered",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 485,
+      "title": "Scheduling not optimized for patients",
+      "body": "Provider-centric",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 486,
+      "title": "Insurance processes not efficient",
+      "body": "Same problems persist",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 487,
+      "title": "Care tracking not integrated",
+      "body": "Can't see full picture",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 488,
+      "title": "Recall not behavior-based",
+      "body": "Patient habits not used",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 489,
+      "title": "Scheduling not preference-aware",
+      "body": "Preferences ignored",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 490,
+      "title": "Insurance management not measured",
+      "body": "No performance tracking",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 491,
+      "title": "Data not used for care improvement",
+      "body": "Can't improve without data",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 492,
+      "title": "Recall not engagement-optimized",
+      "body": "Engagement patterns unused",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 493,
+      "title": "Scheduling not patient-informed",
+      "body": "Patient input not used",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 494,
+      "title": "Insurance processes not accountable",
+      "body": "No ownership",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 495,
+      "title": "Care outcomes not tracked",
+      "body": "No outcome visibility",
+      "sentiment": "concerned",
+      "severity": "medium"
+    },
+    {
+      "id": 496,
+      "title": "Recall not needs-based",
+      "body": "Clinical needs not driving",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    },
+    {
+      "id": 497,
+      "title": "Scheduling not experience-improving",
+      "body": "Experience doesn't improve",
+      "sentiment": "concerned",
+      "severity": "low"
+    },
+    {
+      "id": 498,
+      "title": "Insurance management not improving",
+      "body": "Stagnant processes",
+      "sentiment": "frustrated",
+      "severity": "high"
+    },
+    {
+      "id": 499,
+      "title": "Patient data not actionable",
+      "body": "Data collected but unusable",
+      "sentiment": "annoyed",
+      "severity": "medium"
+    },
+    {
+      "id": 500,
+      "title": "Recall not performance-tracked",
+      "body": "No conversion metrics",
+      "sentiment": "frustrated",
+      "severity": "medium"
+    }
+  ]
+}

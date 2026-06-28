@@ -1,0 +1,42 @@
+import Link from "next/link";
+import { ArrowLeft, ArrowRight } from "lucide-react";
+
+/* Prev / Next navigation, ordered by createdAt DESC.
+ * Buttons disabled when no neighbour exists.
+ */
+export function PrevNextNav({
+  prevId,
+  nextId,
+}: {
+  prevId: string | null;
+  nextId: string | null;
+}) {
+  const base =
+    "inline-flex items-center gap-1.5 rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-2 text-sm transition-colors duration-150 ease-out";
+  const enabledCls = "hover:border-[var(--color-primary)]/60 hover:text-[var(--color-primary)]";
+  const disabledCls = "cursor-not-allowed opacity-50";
+
+  return (
+    <nav aria-label="Opportunity navigation" className="mt-6 flex items-center justify-between gap-3">
+      {prevId ? (
+        <Link href={`/dashboard/opportunities/${prevId}`} className={`${base} ${enabledCls}`}>
+          <ArrowLeft className="h-4 w-4" /> Previous
+        </Link>
+      ) : (
+        <span aria-disabled="true" role="link" className={`${base} ${disabledCls}`}>
+          <ArrowLeft className="h-4 w-4" /> Previous
+        </span>
+      )}
+      <span className="text-xs text-[var(--color-muted-foreground)]">By created date</span>
+      {nextId ? (
+        <Link href={`/dashboard/opportunities/${nextId}`} className={`${base} ${enabledCls}`}>
+          Next <ArrowRight className="h-4 w-4" />
+        </Link>
+      ) : (
+        <span aria-disabled="true" role="link" className={`${base} ${disabledCls}`}>
+          Next <ArrowRight className="h-4 w-4" />
+        </span>
+      )}
+    </nav>
+  );
+}

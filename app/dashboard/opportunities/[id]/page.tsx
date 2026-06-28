@@ -1,0 +1,366 @@
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import {
+  ArrowLeft,
+  Briefcase,
+  Users,
+  AlertTriangle,
+  Target,
+  Sparkles,
+  Hash,
+  CheckCircle2,
+  Lightbulb,
+  Layers,
+} from "lucide-react";
+
+import { prisma } from "@/lib/db";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  selectRelated,
+  selectPrevNext,
+  type RelatedCandidate,
+  type NeighbourCandidate,
+} from "@/lib/opportunity-relations";
+import { ExampleComplaints } from "@/components/opportunities/example-complaints";
+import { RelatedOpportunityCard } from "@/components/opportunities/related-opportunity-card";
+import { NoRelatedEmpty } from "@/components/opportunities/no-related-empty";
+import { PrevNextNav } from "@/components/opportunities/prev-next-nav";
+
+export default async function OpportunityDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+
+  const [op, allOthers, allNeighbours] = await Promise.all([
+    prisma.opportunity.findUnique({
+      where: { id },
+      include: {
+        complaints: {
+          orderBy: { createdAt: "asc" },
+          take: 5,
+          select: {
+            id: true,
+            title: true,
+            body: true,
+            sourceDate: true,
+            createdAt: true,
+          },
+        },
+        savedOpportunities: { select: { id: true } },
+      },
+    }),
+    prisma.opportunity.findMany({
+      select: {
+        id: true,
+        title: true,
+        industry: true,
+        opportunityScore: true,
+        keywords: true,
+        createdAt: true,
+      },
+    }),
+    prisma.opportunity.findMany({
+      orderBy: { createdAt: "desc" },
+      select: { id: true, createdAt: true },
+    }),
+  ]);
+
+  if (!op) notFound();
+
+  const bd = op.scoreBreakdown as {
+    weights?: { count: number; severity: number; confidence: number };
+    inputs?: { complaintCount: number; severity: number; confidence: number };
+    subscores?: { count: number; severity: number; confidence: number };
+    final?: number;
+  } | null;
+
+  // Related opportunities (no AI; pure keyword + industry).
+  const current: RelatedCandidate = {
+    id: op.id,
+    title: op.title,
+    industry: op.industry,
+    opportunityScore: op.opportunityScore,
+    keywords: op.keywords,
+    createdAt: op.createdAt,
+  };
+  const related = selectRelated(current, allOthers, 3);
+
+  // Prev / Next (createdAt DESC).
+  const { prev: prevId, next: nextId } = selectPrevNext(id, allNeighbours as NeighbourCandidate[]);
+
+  // Keywords sorted alphabetically.
+  const sortedKeywords = [...op.keywords].sort((a, b) =>
+    a.toLowerCase().localeCompare(b.toLowerCase())
+  );
+
+  return (
+    <div className="mx-auto max-w-6xl space-y-8">
+      {/* Back */}
+      <div>
+        <Button asChild variant="ghost" size="sm">
+          <Link href="/dashboard/opportunities">
+            <ArrowLeft className="h-4 w-4" /> Back to opportunities
+          </Link>
+        </Button>
+      </div>
+
+      {/* Header */}
+      <header className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-6">
+        <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-[var(--color-muted-foreground)]">
+          <Briefcase className="h-3.5 w-3.5" />
+          {op.industry}
+        </div>
+        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-balance">
+          {op.title}
+        </h1>
+        <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
+          <HeaderStat icon={Target} label="Score" value={op.opportunityScore} highlight />
+          <HeaderStat
+            icon={AlertTriangle}
+            label="Severity"
+            value={op.severity !== null ? op.severity.toFixed(1) : "—"}
+          />
+          <HeaderStat
+            icon={Sparkles}
+            label="Confidence"
+            value={op.confidence !== null ? `${op.confidence}%` : "—"}
+          />
+          <HeaderStat icon={Users} label="Complaints" value={op.mentions} />
+          <HeaderStat
+            icon={CheckCircle2}
+            label="Created"
+            value={op.createdAt.toLocaleDateString()}
+          />
+        </div>
+      </header>
+
+      <PrevNextNav prevId={prevId} nextId={nextId} />
+
+      <div className="grid gap-8 lg:grid-cols-[2fr_1fr]">
+        {/* LEFT column */}
+        <div className="space-y-6">
+          {/* Summary — readable max width */}
+          <section className="max-w-2xl">
+            <h2 className="text-base font-semibold">Summary</h2>
+            <p className="mt-2 text-sm leading-relaxed text-[var(--color-muted-foreground)]">
+              {op.summary}
+            </p>
+          </section>
+
+          {/* AI Reasoning — highlighted card */}
+          <section className="rounded-[12px] border border-[var(--color-primary)]/30 bg-[var(--color-primary)]/5 p-6">
+            <h2 className="flex items-center gap-2 text-base font-semibold">
+              <Sparkles className="h-4 w-4 text-[var(--color-primary)]" /> AI Reasoning
+            </h2>
+            <p className="mt-2 text-sm leading-relaxed text-[var(--color-foreground)]/90">
+              {op.reason ?? "No reasoning provided."}
+            </p>
+          </section>
+
+          {/* Example complaints */}
+          <section className="max-w-2xl">
+            <h2 className="text-base font-semibold">Example complaints</h2>
+            <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
+              Linked complaints, oldest first.
+            </p>
+            <div className="mt-3">
+              <ExampleComplaints items={op.complaints} />
+            </div>
+          </section>
+        </div>
+
+        {/* RIGHT column — sticky on large screens */}
+        <aside className="space-y-6 lg:sticky lg:top-6 lg:self-start">
+          {/* Opportunity Score hero */}
+          <div className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-6 text-center">
+            <p className="text-xs uppercase tracking-wide text-[var(--color-muted-foreground)]">
+              Opportunity score
+            </p>
+            <p className="mt-2 text-5xl font-bold leading-none">
+              {op.opportunityScore}
+            </p>
+            <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">out of 100</p>
+          </div>
+
+          {/* MiniStats */}
+          <div className="grid grid-cols-3 gap-2">
+            <MiniStat icon={Users} label="Complaints" value={op.mentions} />
+            <MiniStat
+              icon={AlertTriangle}
+              label="Severity"
+              value={op.severity !== null ? op.severity.toFixed(1) : "—"}
+            />
+            <MiniStat
+              icon={Target}
+              label="Confidence"
+              value={op.confidence !== null ? `${op.confidence}%` : "—"}
+            />
+          </div>
+
+          {/* Score Breakdown */}
+          {bd?.subscores && (
+            <section className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-6">
+              <h2 className="text-sm font-semibold">Score breakdown</h2>
+              <div className="mt-3 space-y-3">
+                <BarRow
+                  label="Frequency"
+                  value={bd.subscores.count}
+                  weight={bd.weights?.count ?? 0.4}
+                />
+                <BarRow
+                  label="Severity"
+                  value={bd.subscores.severity}
+                  weight={bd.weights?.severity ?? 0.35}
+                />
+                <BarRow
+                  label="Confidence"
+                  value={bd.subscores.confidence}
+                  weight={bd.weights?.confidence ?? 0.25}
+                />
+              </div>
+              {bd.final != null && (
+                <div className="mt-4 flex items-center justify-between border-t border-[var(--color-border)] pt-3 text-sm">
+                  <span className="text-[var(--color-muted-foreground)]">Final Opportunity Score</span>
+                  <span className="font-semibold text-[var(--color-primary)]">{bd.final}</span>
+                </div>
+              )}
+            </section>
+          )}
+
+          {/* Suggested Software — visually distinct from summary */}
+          <section className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-6">
+            <h2 className="flex items-center gap-2 text-sm font-semibold">
+              <Lightbulb className="h-4 w-4 text-[var(--color-warning)]" />
+              Suggested software
+            </h2>
+            <p className="mt-2 text-sm text-[var(--color-foreground)]/90">
+              {op.suggestedSoftware}
+            </p>
+          </section>
+
+          {/* Keywords — alphabetical */}
+          <section className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-6">
+            <h2 className="flex items-center gap-2 text-sm font-semibold">
+              <Hash className="h-4 w-4 text-[var(--color-muted-foreground)]" />
+              Keywords
+            </h2>
+            {sortedKeywords.length === 0 ? (
+              <p className="mt-2 text-xs text-[var(--color-muted-foreground)]">No keywords.</p>
+            ) : (
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                {sortedKeywords.map((k) => (
+                  <Badge key={k} variant="primary">
+                    {k}
+                  </Badge>
+                ))}
+              </div>
+            )}
+          </section>
+
+          {/* Related Opportunities */}
+          <section className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-6">
+            <h2 className="flex items-center gap-2 text-sm font-semibold">
+              <Layers className="h-4 w-4 text-[var(--color-primary)]" />
+              Related opportunities
+            </h2>
+            <div className="mt-3 space-y-2">
+              {related.length === 0 ? (
+                <NoRelatedEmpty />
+              ) : (
+                related.map(({ op: r, shared }) => (
+                  <RelatedOpportunityCard
+                    key={r.id}
+                    op={{
+                      id: r.id,
+                      title: r.title,
+                      industry: r.industry,
+                      opportunityScore: r.opportunityScore,
+                    }}
+                    shared={shared}
+                  />
+                ))
+              )}
+            </div>
+          </section>
+
+          <div className="flex items-center gap-2 text-xs text-[var(--color-muted-foreground)]">
+            <CheckCircle2 className="h-3.5 w-3.5 text-[var(--color-success)]" />
+            Created {op.createdAt.toLocaleDateString()}
+          </div>
+
+          {op.savedOpportunities.length > 0 && <Badge variant="success">Saved</Badge>}
+        </aside>
+      </div>
+    </div>
+  );
+}
+
+function HeaderStat({
+  icon: Icon,
+  label,
+  value,
+  highlight = false,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  value: React.ReactNode;
+  highlight?: boolean;
+}) {
+  return (
+    <span className="inline-flex items-center gap-1.5 text-[var(--color-muted-foreground)]">
+      <Icon className="h-3.5 w-3.5" />
+      <span className={highlight ? "font-semibold text-[var(--color-foreground)]" : ""}>
+        {value}
+      </span>
+      <span className="text-[10px] uppercase tracking-wide">{label}</span>
+    </span>
+  );
+}
+
+function MiniStat({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  value: React.ReactNode;
+}) {
+  return (
+    <div className="flex flex-col items-center rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-3 text-center">
+      <Icon className="h-3.5 w-3.5 text-[var(--color-muted-foreground)]" />
+      <span className="mt-1 text-sm font-medium">{value}</span>
+      <span className="text-[10px] text-[var(--color-muted-foreground)]">{label}</span>
+    </div>
+  );
+}
+
+function BarRow({
+  label,
+  value,
+  weight,
+}: {
+  label: string;
+  value: number;
+  weight: number;
+}) {
+  return (
+    <div>
+      <div className="flex justify-between text-xs text-[var(--color-muted-foreground)]">
+        <span>{label}</span>
+        <span>
+          {value}/100 × {Math.round(weight * 100)}%
+        </span>
+      </div>
+      <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-[var(--color-border)]">
+        <div
+          className="h-full bg-[var(--color-primary)] transition-all duration-150 ease-out"
+          style={{ width: `${value}%` }}
+        />
+      </div>
+    </div>
+  );
+}

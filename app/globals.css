@@ -1,0 +1,64 @@
+@import "tailwindcss";
+
+/* ----------------------------------------------------------------------------
+   Rift design tokens (Tailwind v4 @theme)
+   Dark mode by default. Palette per project spec.
+---------------------------------------------------------------------------- */
+@theme {
+  /* Surfaces */
+  --color-background: #09090b;
+  --color-card: #18181b;
+  --color-border: #27272a;
+  --color-foreground: #fafafa;
+  --color-muted-foreground: #a1a1aa;
+
+  /* Accents */
+  --color-primary: #2563eb;
+  --color-primary-foreground: #ffffff;
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+
+  /* Radius scale (12px base per spec) */
+  --radius: 0.75rem;
+
+  /* Fonts (Inter via next/font) */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, monospace;
+}
+
+/* ----------------------------------------------------------------------------
+   Base styles
+---------------------------------------------------------------------------- */
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+/* ----------------------------------------------------------------------------
+   Utilities
+---------------------------------------------------------------------------- */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
