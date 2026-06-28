@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { useActionState } from "react";
+import Link from "next/link";
 import Papa from "papaparse";
 import {
   Upload,
@@ -9,9 +10,11 @@ import {
   CheckCircle2,
   AlertTriangle,
   Loader2,
+  Download,
+  Sparkles,
 } from "lucide-react";
 
-import { uploadComplaints } from "@/actions/complaints";
+import { uploadComplaints, loadDemoComplaints } from "@/actions/complaints";
 import type { UploadResult } from "@/lib/schemas";
 import { Button } from "@/components/ui/button";
 
@@ -24,6 +27,10 @@ export function CsvUploader() {
     uploadComplaints,
     null
   );
+  const [demoState, demoAction, demoPending] = useActionState<
+    UploadResult | null,
+    FormData
+  >(loadDemoComplaints, null);
 
   function handleFile(file: File) {
     const okTypes = ["text/csv", "application/csv", "text/plain"];
@@ -134,6 +141,63 @@ export function CsvUploader() {
       )}
 
       {state && <UploadSummary result={state} />}
+
+      {/* Onboarding helpers — beside the uploader, consistent with existing UI */}
+      <div className="flex flex-wrap items-center gap-3 border-t border-[var(--color-border)] pt-4">
+        <Button asChild variant="secondary" size="md">
+          <Link href="/sample_complaints.csv" download>
+            <Download className="h-4 w-4" /> Download sample CSV
+          </Link>
+        </Button>
+
+        <form action={demoAction}>
+          <Button type="submit" variant="outline" disabled={demoPending}>
+            {demoPending ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" /> Loading demo…
+              </>
+            ) : (
+              <>
+                <Sparkles className="h-4 w-4" /> Use demo data
+              </>
+            )}
+          </Button>
+        </form>
+      </div>
+
+      {demoState && <DemoSummary result={demoState} />}
+    </div>
+  );
+}
+
+function DemoSummary({ result }: { result: UploadResult }) {
+  if (result.inserted === 0) {
+    return (
+      <div className="flex items-start gap-2 rounded-[12px] border border-[var(--color-danger)]/40 bg-[var(--color-danger)]/10 p-4 text-sm text-[var(--color-danger)]">
+        <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+        <span>Demo data could not be loaded. Try uploading a CSV instead.</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex items-start gap-2 rounded-[12px] border border-[var(--color-success)]/40 bg-[var(--color-success)]/10 p-4 text-sm text-[var(--color-success)]">
+      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
+      <div className="space-y-1">
+        <p className="font-medium">
+          {result.inserted} demo complaint{result.inserted === 1 ? "" : "s"} loaded.
+        </p>
+        <p className="text-xs text-[var(--color-muted-foreground)]">
+          Now head to{" "}
+          <Link
+            href="/dashboard/opportunities"
+            className="font-medium text-[var(--color-primary)] hover:underline"
+          >
+            Opportunities → Run AI clustering
+          </Link>{" "}
+          to turn them into scored business opportunities.
+        </p>
+      </div>
     </div>
   );
 }

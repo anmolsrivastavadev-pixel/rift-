@@ -35,6 +35,18 @@ function pickField(row: Record<string, unknown>, keys: string[]): string {
   return "";
 }
 
+function insertValidRows(
+  valid: { title: string; body: string; sourceDate: Date | null }[]
+): Promise<unknown> {
+  const CHUNK = 500;
+  const inserts = [];
+  for (let i = 0; i < valid.length; i += CHUNK) {
+    const batch = valid.slice(i, i + CHUNK);
+    inserts.push(prisma.complaint.createMany({ data: batch }));
+  }
+  return Promise.all(inserts);
+}
+
 /* Server action: receives a form with a hidden "data" field containing the
  * JSON-encoded CSV rows (parsed by PapaParse on the client). Validates each
  * row with Zod and inserts the valid ones into the database. Invalid rows are
@@ -91,9 +103,9 @@ export async function uploadComplaints(
 
   const skipped = capped.length - valid.length;
 
-  // If every single row failed because body was empty, it almost certainly
-  // means the CSV has no recognised complaint-text column. Surface a clear,
-  // single error instead of 220 identical ones.
+// If every single row failed because body was empty, it almost certainly
+// means the CSV has no recognised complaint-text column. Surface a clear,
+// single error instead of 220 identical ones.
   if (valid.length === 0 && errors.length > 0) {
     const firstRow = capped[0] as Record<string, unknown> | undefined;
     const cols = firstRow ? Object.keys(firstRow) : [];
@@ -113,14 +125,63 @@ export async function uploadComplaints(
   }
 
   // Insert in chunks to keep query size reasonable.
-  const CHUNK = 500;
-  for (let i = 0; i < valid.length; i += CHUNK) {
-    const batch = valid.slice(i, i + CHUNK);
-    await prisma.complaint.createMany({ data: batch });
-  }
+  await insertValidRows(valid);
 
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/complaints");
 
   return { inserted: valid.length, skipped, errors };
+}
+
+// ---------------------------------------------------------------------------
+// Demo data
+// ---------------------------------------------------------------------------
+// Same fictional complaints as /public/sample_complaints.csv.
+// Used by the "Use demo data" button on the upload page so a new user can
+// explore Rift without having to source or format their own CSV first.
+// ---------------------------------------------------------------------------
+const DEMO_ROWS: { title: string; body: string; sourceDate: string }[] = [
+  { title: "Slow login", body: "The login page takes forever to load and sometimes times out.", sourceDate: "2025-01-04" },
+  { title: "App crashes on startup", body: "Every time I open the app it crashes within ten seconds please fix this.", sourceDate: "2025-01-08" },
+  { title: "Bad export", body: "Exporting my data to CSV fails silently and I lose hours of work.", sourceDate: "2025-01-09" },
+  { title: "Confusing onboarding", body: "The onboarding flow is impossible to understand I had to watch three tutorials.", sourceDate: "2025-01-12" },
+  { title: "Mobile layout broken", body: "The mobile layout is completely broken half the screen is cut off.", sourceDate: "2025-01-15" },
+  { title: "No dark mode", body: "Why is there no dark mode in 2025 this is unacceptable.", sourceDate: "2025-01-18" },
+  { title: "Slow search", body: "Search takes 15 seconds to return results and I have a fast connection.", sourceDate: "2025-01-22" },
+  { title: "Bad notifications", body: "The notification settings reset every time I log out extremely frustrating.", sourceDate: "2025-01-25" },
+  { title: "Pricing too high", body: "Your pricing doubled overnight with no warning this is unacceptable.", sourceDate: "2025-01-28" },
+  { title: "Crashes on big files", body: "The app crashes whenever I upload files larger than 50MB.", sourceDate: "2025-02-02" },
+];
+
+export async function loadDemoComplaints(): Promise<UploadResult> {
+  const valid: { title: string; body: string; sourceDate: Date | null }[] = [];
+  const errors: { row: number; reason: string }[] = [];
+
+  for (let i = 0; i < DEMO_ROWS.length; i++) {
+    const parsed = complaintRowSchema.safeParse(DEMO_ROWS[i]);
+    if (parsed.success) {
+      const { title, body, sourceDate } = parsed.data;
+      valid.push({
+        title: title && title.length ? title : body.slice(0, 80),
+        body,
+        sourceDate: sourceDate ? new Date(sourceDate) : null,
+      });
+    } else {
+      errors.push({
+        row: i + 2,
+        reason: parsed.error.issues[0]?.message ?? "Invalid row",
+      });
+    }
+  }
+
+  if (valid.length === 0) {
+    return { inserted: 0, skipped: DEMO_ROWS.length, errors };
+  }
+
+  await insertValidRows(valid);
+
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/complaints");
+
+  return { inserted: valid.length, skipped: DEMO_ROWS.length - valid.length, errors };
 }
