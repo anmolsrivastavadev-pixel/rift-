@@ -35,8 +35,9 @@ export default async function OpportunitiesPage() {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Opportunities</h1>
           <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
-            {complaintCount} complaint{complaintCount === 1 ? "" : "s"} analysed
-            {" "}into {ops.length} opportunit{ops.length === 1 ? "y" : "ies"}.
+            {complaintCount} complaint{complaintCount === 1 ? "" : "s"} in this
+            workspace analysed into {ops.length} opportunit
+            {ops.length === 1 ? "y" : "ies"}.
           </p>
         </div>
       </div>
@@ -44,8 +45,9 @@ export default async function OpportunitiesPage() {
       <section className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-6">
         <h2 className="text-base font-semibold">AI engine</h2>
         <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
-          Run Gemini to cluster uploaded complaints ({complaintCount} total) into
-          scored business opportunities. This replaces existing opportunities.
+          Run Gemini to cluster the {complaintCount} complaint
+          {complaintCount === 1 ? "" : "s"} in this workspace into scored
+          startup opportunities. Each run replaces the existing opportunities.
         </p>
         <div className="mt-4">
           <RunOpportunitiesButton />

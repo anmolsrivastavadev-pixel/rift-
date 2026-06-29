@@ -3,23 +3,23 @@ import { Container } from "@/components/container";
 const steps = [
   {
     n: "01",
-    title: "Upload complaints",
-    text: "Import a CSV of real customer complaints from support, reviews or forums.",
+    title: "Add pain data",
+    text: "Upload a CSV of complaints or reviews, or load demo data to explore the flow with zero setup.",
   },
   {
     n: "02",
     title: "AI clusters them",
-    text: "Gemini groups similar complaints and summarises the core problem for each cluster.",
+    text: "Gemini groups similar complaints and writes a clear problem summary for each cluster.",
   },
   {
     n: "03",
     title: "Score & rank",
-    text: "Rift scores each opportunity 0–100 using frequency, sentiment, severity and growth.",
+    text: "Rift scores each opportunity 0–100 from frequency, severity, and confidence — the same data always gives the same score.",
   },
   {
     n: "04",
     title: "Explore & save",
-    text: "Browse ranked opportunities, inspect the underlying complaints, and save the keepers.",
+    text: "Browse ranked opportunities, read the real complaints behind each one, and save the ideas worth building.",
   },
 ];
 
@@ -29,11 +29,11 @@ export function HowItWorks() {
       <Container>
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-            How Rift works
+            The breakdown
           </h2>
           <p className="mt-4 text-[var(--color-muted-foreground)]">
-            A repeatable pipeline from raw complaints to a ranked opportunity
-            list.
+            Four clear stages, end to end. No scraping feeds, no invented
+            market sizes — only the signal in your own data.
           </p>
         </div>
 

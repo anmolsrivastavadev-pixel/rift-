@@ -63,12 +63,13 @@ export default async function DashboardPage() {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Overview</h1>
           <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
-            What your customer complaints look like at a glance.
+            This MVP workspace shows the data you add — demo complaints or your
+            own uploads. Nothing here is public, shared, or hardcoded.
           </p>
         </div>
         <Button asChild>
           <Link href="/dashboard/complaints">
-            Upload <ArrowRight className="h-4 w-4" />
+            Add complaints <ArrowRight className="h-4 w-4" />
           </Link>
         </Button>
       </div>
@@ -131,11 +132,12 @@ export default async function DashboardPage() {
           <div className="mt-4 rounded-[12px] border border-dashed border-[var(--color-border)] bg-[var(--color-card)] p-12 text-center">
             <FileText className="mx-auto h-8 w-8 text-[var(--color-muted-foreground)]" />
             <p className="mt-3 text-sm text-[var(--color-muted-foreground)]">
-              No complaints yet. Upload a CSV to see it here.
+              No complaints in this MVP workspace yet. Use demo data (fake and
+              safe to test with), download a sample CSV, or upload your own.
             </p>
             <Button asChild className="mt-4">
               <Link href="/dashboard/complaints">
-                Upload complaints <ArrowRight className="h-4 w-4" />
+                Add complaints <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>
           </div>
@@ -164,8 +166,8 @@ export default async function DashboardPage() {
           <div>
             <h2 className="text-base font-semibold">Next: generate opportunities</h2>
             <p className="text-xs text-[var(--color-muted-foreground)]">
-              Use Gemini AI to cluster complaints and score business
-              opportunities. Available in Milestone 3.
+              Run AI clustering to group your complaints into scored startup
+              opportunities. Existing opportunities are replaced on each run.
             </p>
           </div>
         </div>

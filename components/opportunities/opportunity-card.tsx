@@ -57,7 +57,8 @@ export function OpportunityCard({ op }: { op: OpportunityCardData }) {
         </div>
 
         <p className="mt-1 line-clamp-1 text-xs text-[var(--color-muted-foreground)]">
-          Suggested: <span className="text-[var(--color-foreground)]/80">{op.suggestedSoftware}</span>
+          Product opportunity:{" "}
+          <span className="text-[var(--color-foreground)]/80">{op.suggestedSoftware}</span>
         </p>
 
         <div className="mt-4 flex flex-wrap gap-1.5">
@@ -91,6 +92,10 @@ export function OpportunityCard({ op }: { op: OpportunityCardData }) {
             </div>
           </div>
         </div>
+
+        <p className="mt-3 text-[10px] leading-snug text-[var(--color-muted-foreground)]">
+          Score combines frequency, severity, and confidence.
+        </p>
       </Link>
     </div>
   );

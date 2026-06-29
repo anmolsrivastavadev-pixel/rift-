@@ -19,7 +19,7 @@ export async function ComplaintsList({ query }: { query: string }) {
   return (
     <div className="space-y-4">
       <ComplaintSearch initial={query} />
-      <ComplaintsTable rows={rows} />
+      <ComplaintsTable rows={rows} hasQuery={Boolean(query)} />
     </div>
   );
 }

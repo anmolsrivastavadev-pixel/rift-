@@ -25,7 +25,7 @@ export function Hero() {
         >
           <span className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1 text-xs text-[var(--color-muted-foreground)]">
             <Sparkles className="h-3.5 w-3.5 text-[var(--color-primary)]" />
-            Opportunity intelligence for founders
+            Startup opportunities from real market pain
           </span>
         </motion.div>
 
@@ -35,10 +35,10 @@ export function Hero() {
           transition={{ duration: 0.45, ease: "easeOut", delay: 0.05 }}
           className="mt-6 text-balance text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl"
         >
-          Find the business hiding in
+          Find startup opportunities hiding in
           <br className="hidden sm:block" />{" "}
           <span className="text-[var(--color-primary)]">
-            customer complaints
+            real customer pain
           </span>
           .
         </motion.h1>
@@ -49,20 +49,21 @@ export function Hero() {
           transition={{ duration: 0.45, ease: "easeOut", delay: 0.1 }}
           className="mx-auto mt-6 max-w-2xl text-balance text-base text-[var(--color-muted-foreground)] sm:text-lg"
         >
-          Rift clusters real complaints with AI, summarises the underlying
-          problems, and scores the strongest software opportunities — so you
-          build what people already want.
+          Rift turns complaints, reviews, support tickets, and forum posts
+          into evidence-backed product opportunities — scored and ranked so
+          you build what people already want. Try it with demo data in
+          seconds, or upload your own CSV when you&apos;re ready.
         </motion.p>
 
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, ease: "easeOut", delay: 0.15 }}
-          className="mt-10 flex items-center justify-center gap-3"
+          className="mt-10 flex flex-wrap items-center justify-center gap-3"
         >
           <Button asChild size="lg">
-            <Link href="/dashboard">
-              Open dashboard <ArrowRight className="h-4 w-4" />
+            <Link href="/dashboard/complaints">
+              Try the demo <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>
           <Button asChild size="lg" variant="outline">

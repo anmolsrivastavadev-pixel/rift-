@@ -171,11 +171,29 @@ export function CsvUploader() {
 }
 
 function DemoSummary({ result }: { result: UploadResult }) {
+  // Demo data validation can't realistically fail (rows are hardcoded and
+  // validated), so inserted === 0 means every demo row was already in the
+  // database. Surface an informational "already loaded" message rather than
+  // an error.
   if (result.inserted === 0) {
     return (
-      <div className="flex items-start gap-2 rounded-[12px] border border-[var(--color-danger)]/40 bg-[var(--color-danger)]/10 p-4 text-sm text-[var(--color-danger)]">
-        <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
-        <span>Demo data could not be loaded. Try uploading a CSV instead.</span>
+      <div className="flex items-start gap-2 rounded-[12px] border border-[var(--color-primary)]/40 bg-[var(--color-primary)]/10 p-4 text-sm text-[var(--color-primary)]">
+        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
+        <div className="space-y-1">
+          <p className="font-medium">
+            Demo complaints are already loaded. You can run AI clustering now.
+          </p>
+          <p className="text-xs text-[var(--color-muted-foreground)]">
+            Demo data is fake and safe to test with. Head to{" "}
+            <Link
+              href="/dashboard/opportunities"
+              className="font-medium text-[var(--color-primary)] hover:underline"
+            >
+              Opportunities → Run AI clustering
+            </Link>{" "}
+            to generate scored opportunities.
+          </p>
+        </div>
       </div>
     );
   }
@@ -185,17 +203,18 @@ function DemoSummary({ result }: { result: UploadResult }) {
       <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
       <div className="space-y-1">
         <p className="font-medium">
-          {result.inserted} demo complaint{result.inserted === 1 ? "" : "s"} loaded.
+          Demo complaints added ({result.inserted}). Now run AI clustering to
+          generate opportunities.
         </p>
         <p className="text-xs text-[var(--color-muted-foreground)]">
-          Now head to{" "}
+          This is fake demo data, safe to test with. Next:{" "}
           <Link
             href="/dashboard/opportunities"
             className="font-medium text-[var(--color-primary)] hover:underline"
           >
             Opportunities → Run AI clustering
           </Link>{" "}
-          to turn them into scored business opportunities.
+          to turn the complaints into scored startup opportunities.
         </p>
       </div>
     </div>

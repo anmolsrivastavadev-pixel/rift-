@@ -1,0 +1,258 @@
+# Rift — Testing Checklist
+
+> Practical manual checklist for verifying Rift end-to-end. Run the relevant sections before reporting a milestone complete. Do not run destructive database commands from this checklist.
+
+---
+
+## Pre-flight commands (run before any milestone sign-off)
+
+```bash
+npx tsc --noEmit       # must exit 0 with no output
+npm run lint           # must exit 0 with no warnings
+npm run build          # must exit 0; routes should compile
+npx prisma validate    # must pass without warnings
+npx prisma generate    # must regenerate lib/generated/prisma cleanly
+```
+
+For `npm run build`, the expected output ends with:
+
+```
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ○ /dashboard
+├ ƒ /dashboard/complaints
+├ ○ /dashboard/opportunities
+├ ƒ /dashboard/opportunities/[id]
+├ ○ /dashboard/saved
+├ ○ /robots.txt
+└ ○ /sitemap.xml
+```
+
+(Static `○` and dynamic `ƒ` flags are fine — the route list matters.)
+
+---
+
+## 1. Local setup
+
+- [ ] Node.js 18.18+ installed (`node -v`).
+- [ ] PostgreSQL installed and running on `localhost:5432` (or a Neon project).
+- [ ] `npm install` completes (may print ERESOLVE warnings — `.npmrc` sets `legacy-peer-deps=true` so install still succeeds).
+- [ ] `.env` exists with `DATABASE_URL` and `GEMINI_API_KEY` filled in (use `.env.example` as a template).
+- [ ] `npx prisma generate` runs and creates `lib/generated/prisma/`.
+- [ ] `npx prisma db push` runs and creates the three tables in Postgres.
+- [ ] `npm run dev` boots and prints `✓ Ready in`.
+- [ ] `curl -I http://localhost:3000/` returns `200`.
+
+## 2. Environment variables
+
+- [ ] `DATABASE_URL` is set in `.env` (local) and in Vercel env vars (production).
+- [ ] `GEMINI_API_KEY` is set in `.env` (local) and in Vercel env vars (production).
+- [ ] `.env` is **not** staged for commit (`git status` should not list `.env`).
+- [ ] `.env.example` **is** committable (gitignored with `!.env.example` exception).
+- [ ] No source file imports `process.env.DATABASE_URL` or `process.env.GEMINI_API_KEY` from a `"use client"` file. (Quick audit: `grep -r "process.env" --include="*.tsx" --include="*.ts" app/ components/` should only show hits in `lib/db.ts` and `lib/ai.ts`, plus JSDoc comments inside `lib/generated/prisma/`.)
+
+## 3. Database connection
+
+- [ ] `psql -U postgres -d rift -c "SELECT 1;"` returns 1 (or use the equivalent for your install).
+- [ ] `/dashboard` loads without a Prisma connection error.
+
+## 4. CSV upload — happy path
+
+- [ ] Open `/dashboard/complaints`.
+- [ ] Download `sample_complaints.csv` from the page (or use the one in `/public`).
+- [ ] Drag it onto the uploader, or click to browse and select it.
+- [ ] Click **Upload complaints**.
+- [ ] A green "Imported 10 complaints" summary appears.
+- [ ] `/dashboard` reflects the new count in the **Complaints** KPI card.
+- [ ] The "Complaints over time" chart renders with bars.
+
+## 5. CSV upload — invalid input
+
+- [ ] Drag a non-CSV file (e.g., a `.png`) onto the uploader → it is rejected with a clear error ("not a CSV file").
+- [ ] Upload a CSV with only a `body` column (no `title`, no `sourceDate`) → rows import successfully.
+- [ ] Upload a CSV with a `body` column containing an empty cell for one row → that row is skipped; others import.
+- [ ] Upload a CSV whose complaint column is named `feedback` (not `body`) → rows import (the action accepts many synonyms).
+- [ ] Upload a CSV whose complaint column is named `manifest_id` (not recognised) → uploader returns a single clear error listing the detected columns and the expected ones.
+
+## 6. "Use demo data" button
+
+- [ ] On `/dashboard/complaints`, click **Use demo data**.
+- [ ] A spinner shows "Loading demo…" while pending.
+- [ ] A green success message appears ("10 demo complaints loaded").
+- [ ] The success message links to **Opportunities → Run AI clustering**.
+- [ ] Complaints list underneath the uploader refreshes to show the demo rows.
+
+## 7. Complaint validation
+
+- [ ] Duplicates are dropped by `cleanComplaints` — verified via `lib/cleaning.ts` behaviour or by uploading a CSV with two identical bodies and seeing only one import.
+- [ ] Complaints shorter than 3 non-whitespace characters are dropped.
+
+## 8. AI clustering (requires `GEMINI_API_KEY`)
+
+- [ ] Open `/dashboard/opportunities`.
+- [ ] Click **Run AI clustering**. The progress panel renders stages: Cleaning → Clustering → Generating → Saving → Complete.
+- [ ] Within ~30s for the 10-row sample, the panel shows a green "Complete. N opportunities created" message.
+- [ ] Opportunity cards appear on the grid, sorted by Opportunity Score.
+- [ ] Without a `GEMINI_API_KEY`, the same flow runs and produces mock clusters (key-less fallback) — cards still appear with `Mock cluster (no Gemini key)` reasoning.
+
+## 9. Opportunity creation
+
+- [ ] The **Opportunities** KPI on `/dashboard` increments.
+- [ ] The **Avg. score** KPI updates from `—` to a numeric value.
+- [ ] The **Industries** KPI reflects distinct industries from the run.
+- [ ] Visiting `/dashboard/opportunities/<id>` for any created opportunity renders the detail page (no 404).
+
+## 10. Opportunity scoring
+
+- [ ] Every opportunity has `opportunityScore` between 0 and 100.
+- [ ] The score breakdown panel on the detail page shows three bars (Frequency, Severity, Confidence) and a Final Opportunity Score match.
+- [ ] Re-running the pipeline on the same dataset produces the same scores (deterministic — same input → same output).
+- [ ] The scores match the formula in `lib/scoring.ts`: `round(countScore*0.4 + severityScore*0.35 + confScore*0.25)`. (Spot-check one opportunity.)
+
+## 11. Dashboard stats
+
+- [ ] `/dashboard` shows 4 KPI cards: Opportunities, Avg. score, Complaints, Industries — each with a Lucide icon.
+- [ ] "Complaints over time" chart renders bars of varying heights when source dates differ.
+- [ ] "Recent complaints" shows the latest 5 with title + truncated body. Empty state shows when no complaints exist.
+- [ ] "Next: generate opportunities" card links to `/dashboard/opportunities`.
+
+## 12. Search
+
+- [ ] On `/dashboard/opportunities`, type into the search box.
+- [ ] Results filter live against title, summary, industry, Product Opportunity text (stored as `suggestedSoftware`), and keywords.
+- [ ] The "Showing X of Y opportunities" counter updates with `aria-live="polite"` (visible to screen readers).
+- [ ] Clearing the search box restores the full list.
+
+## 13. Filters
+
+- [ ] Industry dropdown is populated from the actual industries in the dataset.
+- [ ] Setting "Min score" to e.g. 65 hides opportunities below 65.
+- [ ] "Min severity" slider and "Min complaints" slider each filter correctly.
+- [ ] Multiple filters combine.
+- [ ] **Reset filters** button restores all defaults.
+
+## 14. Sorting
+
+- [ ] Switching the Sort dropdown reorders cards for: Highest Opportunity Score, Lowest Opportunity Score, Highest Severity, Most Complaints, Newest.
+
+## 15. Saved opportunities
+
+- [ ] Click the bookmark icon on a card → it fills in primary colour within ~150ms.
+- [ ] Navigate to `/dashboard/saved` → the saved opportunity appears.
+- [ ] Click the bookmark again (on either page) → it un-fills and the saved page no longer shows it.
+- [ ] On the saved page with no saved items, the `BookmarkX` empty state appears with a "Browse opportunities" CTA.
+
+## 16. Opportunity detail page
+
+- [ ] Header shows: industry, title, and the five stats (Score, Severity, Confidence, Complaints, Created).
+- [ ] Prev/Next nav appears above the columns; clicking navigates to the right neighbour by `createdAt DESC`.
+- [ ] On the newest opportunity, the **Next** button is disabled (opacity 50%, `aria-disabled="true"`).
+- [ ] On the oldest opportunity, the **Previous** button is disabled.
+- [ ] Right column is sticky on desktop (`lg:sticky lg:top-6`) and not sticky on mobile.
+- [ ] Score Breakdown shows three progress bars plus the Final Opportunity Score.
+- [ ] Keywords are sorted alphabetically.
+- [ ] Example Complaints lists up to 5 complaints, oldest first.
+- [ ] If any complaint body exceeds 500 chars, a **Show more** / **Show less** toggle appears for that complaint.
+- [ ] AI Reasoning card has a primary-tinted border and shows the stored `reason` text (never regenerated).
+- [ ] Product Opportunity card uses the Lightbulb icon and renders `suggestedSoftware` (internal field name).
+
+## 17. Related opportunities (if present)
+
+- [ ] Related Opportunities section in the right column shows up to 3 cards.
+- [ ] When ≥2 keywords overlap with another opportunity, that card appears with a "N shared keywords" badge.
+- [ ] When fewer than 3 keyword-matched opportunities exist, same-industry opportunities fill the remaining slots (no shared-keyword badge).
+- [ ] If no related opportunities exist, a small `Layers` empty state appears.
+- [ ] No duplicates; current opportunity is excluded.
+
+## 18. Empty states
+
+- [ ] `/dashboard/opportunities` with 0 opportunities shows the `Target` empty state with a "Run AI clustering" CTA.
+- [ ] Search returning no matches shows the `SearchX` empty state with a "Reset filters" CTA.
+- [ ] `/dashboard/saved` with no saves shows the `BookmarkX` empty state.
+- [ ] Detail page with no linked complaints shows the `MessageSquareOff` empty state inside Example Complaints.
+- [ ] Detail page with no related opportunities shows the `Layers` empty state inside Related Opportunities.
+
+## 19. Accessibility
+
+- [ ] Icon-only buttons (save, prev/next disabled state) have `aria-label`.
+- [ ] All filter inputs (search, industry select, sort select, three sliders) have `aria-label`.
+- [ ] Disabled prev/next use `aria-disabled="true"` and `role="link"` (announce intentionally disabled).
+- [ ] Tabbing through the page shows a visible focus outline on interactive elements.
+- [ ] Heading order is reasonable: page H1, section H2s, card H3s.
+
+## 20. Mobile layout
+
+- [ ] On a 375px viewport (mobile), `/dashboard` KPI grid collapses to 2 columns.
+- [ ] `/dashboard/opportunities` filter row stacks vertically; sort dropdown and reset button remain accessible.
+- [ ] Opportunity cards span the full width and never overflow horizontally.
+- [ ] Detail page renders a single column (right sidebar moves below left content) with no sticky behaviour.
+- [ ] Prev/Next nav wraps gracefully without horizontal scroll.
+
+## 21. Production build
+
+- [ ] `npm run build` exits 0.
+- [ ] `npm run start` boots the production server (`✓ Ready in ...`).
+- [ ] `curl -I http://localhost:3000/` returns `200`.
+- [ ] `curl -I http://localhost:3000/dashboard` returns `200`.
+- [ ] `curl -I http://localhost:3000/robots.txt` returns `200`.
+- [ ] `curl -I http://localhost:3000/sitemap.xml` returns `200`.
+- [ ] `curl -I http://localhost:3000/sample_complaints.csv` returns `200` and the right `Content-Type`.
+
+## 22. Vercel deployment readiness
+
+Pre-deploy checks:
+- [ ] `.env` is not staged for commit.
+- [ ] `public/sample_complaints.csv` is committed.
+- [ ] `package.json` `build` script is `prisma generate && next build`.
+- [ ] `.gitignore` excludes `.env*` (except `.env.example`) and `/lib/generated/prisma`.
+- [ ] No temp files (`test-*`, `seed-*`, `gen_complaints.*`) are staged.
+- [ ] No screenshots or accidental binary files are staged.
+- [ ] `git log` on the working branch shows clean, conventional commit messages.
+
+Vercel env vars to add:
+- [ ] `DATABASE_URL` — Neon pooled connection string with `?sslmode=require`.
+- [ ] `GEMINI_API_KEY` — your Gemini API key.
+
+Post-deploy checks (on the deployed URL):
+- [ ] `/` loads (landing page).
+- [ ] `/dashboard` loads, KPIs are 0 / "—" before any upload.
+- [ ] `/dashboard/complaints` lets you click **Use demo data** and shows the green success summary.
+- [ ] `/dashboard/opportunities` lets you click **Run AI clustering** and shows the progress panel.
+- [ ] After completion, opportunities render with scores.
+- [ ] `/dashboard/saved` shows the `BookmarkX` empty state (no saves yet).
+- [ ] `/sample_complaints.csv` downloads the sample file.
+- [ ] `/robots.txt` and `/sitemap.xml` serve correctly.
+
+---
+
+## 23. M7 — Repositioning + demo flow
+
+- [ ] Landing page hero explains Rift finds startup opportunities from real market pain and offers a demo path.
+- [ ] Landing page hero, features, and how-it-works each have a distinct purpose (no repeated hook).
+- [ ] `/sample_complaints.csv` downloads and uploads successfully.
+- [ ] "Use demo data" inserts the fake demo complaints.
+- [ ] Clicking "Use demo data" a second time shows the "Demo complaints are already loaded. You can run AI clustering now." message and does NOT create duplicates.
+- [ ] After demo data load, the success message guides to Opportunities → Run AI clustering.
+- [ ] Opportunity cards say "Product opportunity:" instead of "Suggested:".
+- [ ] Opportunity detail page right column shows "Product Opportunity" labelled section using `suggestedSoftware`.
+- [ ] Opportunity cards show a compact score helper: "Score combines frequency, severity, and confidence."
+- [ ] Opportunity detail page shows the full score explanation under the score breakdown.
+- [ ] Opportunity detail page left column reads: Problem Summary → Evidence From Complaints (example complaints + Keywords) → Why This Matters → Product Opportunity.
+- [ ] No-opportunities empty state offers direct CTAs: Use Demo Data / Download Sample CSV / Upload CSV / Run AI clustering.
+- [ ] Dashboard overview copy reads as "this MVP workspace" tone; the stale "Available in Milestone 3" note is gone.
+- [ ] No UI text says "Suggested Software" or "Suggested:" any more (internal `suggestedSoftware` DB field unchanged).
+
+---
+
+## Do not run
+
+These are destructive and must never appear in your testing flow:
+
+- ❌ `prisma db push --force-reset`
+- ❌ `prisma migrate reset`
+- ❌ Any SQL containing `DROP`, `TRUNCATE`, or `DELETE FROM <table>` without a WHERE clause
+- ❌ `git push --force` to a shared branch
+- ❌ `npm audit fix --force` (can break intentional legacy peer deps)
+
+If you hit stale test data, prefer the in-app **Reset** button on `/dashboard/opportunities` (which preserves complaints) or `resetOpportunitiesAction` via the API.

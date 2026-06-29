@@ -178,10 +178,31 @@ export async function loadDemoComplaints(): Promise<UploadResult> {
     return { inserted: 0, skipped: DEMO_ROWS.length, errors };
   }
 
-  await insertValidRows(valid);
+  // Never insert duplicate demo rows. Match on the exact demo body text so
+  // re-clicking "Use demo data" is idempotent: only complaints that are not
+  // already present get inserted. This is a demo-data convenience and does
+  // not affect the regular CSV upload pipeline.
+  const demoBodies = valid.map((r) => r.body);
+  const existing = await prisma.complaint.findMany({
+    where: { body: { in: demoBodies } },
+    select: { body: true },
+  });
+  const existingBodies = new Set(existing.map((c) => c.body));
+  const toInsert = valid.filter((r) => !existingBodies.has(r.body));
+
+  if (toInsert.length > 0) {
+    await insertValidRows(toInsert);
+  }
 
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/complaints");
 
-  return { inserted: valid.length, skipped: DEMO_ROWS.length - valid.length, errors };
+  // inserted === 0 means every demo row is already present, which the UI uses
+  // to show the "already loaded" message. skipped counts rows that were
+  // skipped because they were already in the database (not validation skips).
+  return {
+    inserted: toInsert.length,
+    skipped: valid.length - toInsert.length,
+    errors,
+  };
 }

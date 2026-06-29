@@ -30,7 +30,8 @@ export default async function SavedPage() {
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Saved</h1>
         <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
-          {cards.length} bookmarked opportun{cards.length === 1 ? "ity" : "ities"}.
+          {cards.length} saved opportun{cards.length === 1 ? "ity" : "ies"} in
+          this MVP workspace.
         </p>
       </div>
 

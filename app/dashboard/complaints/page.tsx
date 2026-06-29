@@ -16,17 +16,20 @@ export default async function ComplaintsPage({
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Complaints</h1>
         <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
-          Upload a CSV of real customer complaints. Rift stores them for AI
-          clustering and opportunity scoring.
+          Add the pain signals Rift should work with. Use demo data to try the
+          flow with zero setup, or upload a CSV of your own complaints, reviews,
+          support tickets, or forum posts. Uploaded data stays in this MVP
+          project database.
         </p>
       </div>
 
       <section>
-        <h2 className="text-base font-semibold">Upload CSV</h2>
+        <h2 className="text-base font-semibold">Add complaints</h2>
         <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
-          Expected columns: <code className="font-mono">body</code> (required);
-          optional <code className="font-mono">title</code>,{" "}
-          <code className="font-mono">sourceDate</code> (ISO date).
+          Expected CSV columns: <code className="font-mono">body</code>{" "}
+          (required); optional <code className="font-mono">title</code>,{" "}
+          <code className="font-mono">sourceDate</code> (ISO date). You can
+          also download a sample CSV to see the format, or use demo data below.
         </p>
         <div className="mt-3">
           <CsvUploader />

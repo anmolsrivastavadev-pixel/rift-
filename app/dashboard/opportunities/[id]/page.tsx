@@ -142,33 +142,64 @@ export default async function OpportunityDetailPage({
       <div className="grid gap-8 lg:grid-cols-[2fr_1fr]">
         {/* LEFT column */}
         <div className="space-y-6">
-          {/* Summary — readable max width */}
+          {/* 1. Problem Summary */}
           <section className="max-w-2xl">
-            <h2 className="text-base font-semibold">Summary</h2>
+            <h2 className="text-base font-semibold">Problem Summary</h2>
             <p className="mt-2 text-sm leading-relaxed text-[var(--color-muted-foreground)]">
               {op.summary}
             </p>
           </section>
 
-          {/* AI Reasoning — highlighted card */}
-          <section className="rounded-[12px] border border-[var(--color-primary)]/30 bg-[var(--color-primary)]/5 p-6">
-            <h2 className="flex items-center gap-2 text-base font-semibold">
-              <Sparkles className="h-4 w-4 text-[var(--color-primary)]" /> AI Reasoning
-            </h2>
-            <p className="mt-2 text-sm leading-relaxed text-[var(--color-foreground)]/90">
-              {op.reason ?? "No reasoning provided."}
-            </p>
-          </section>
-
-          {/* Example complaints */}
+          {/* 2. Evidence From Complaints — example complaints + keywords */}
           <section className="max-w-2xl">
-            <h2 className="text-base font-semibold">Example complaints</h2>
+            <h2 className="text-base font-semibold">Evidence From Complaints</h2>
             <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
-              Linked complaints, oldest first.
+              Real, uploaded complaints that the AI grouped into this
+              opportunity. Linked complaints, oldest first.
             </p>
             <div className="mt-3">
               <ExampleComplaints items={op.complaints} />
             </div>
+
+            {/* Keywords — alphabetical, evidence of what the cluster is about */}
+            <div className="mt-5">
+              <h3 className="flex items-center gap-2 text-sm font-semibold">
+                <Hash className="h-4 w-4 text-[var(--color-muted-foreground)]" />
+                Keywords
+              </h3>
+              {sortedKeywords.length === 0 ? (
+                <p className="mt-2 text-xs text-[var(--color-muted-foreground)]">No keywords.</p>
+              ) : (
+                <div className="mt-3 flex flex-wrap gap-1.5">
+                  {sortedKeywords.map((k) => (
+                    <Badge key={k} variant="primary">
+                      {k}
+                    </Badge>
+                  ))}
+                </div>
+              )}
+            </div>
+          </section>
+
+          {/* 3. Why This Matters — stored AI reasoning */}
+          <section className="rounded-[12px] border border-[var(--color-primary)]/30 bg-[var(--color-primary)]/5 p-6">
+            <h2 className="flex items-center gap-2 text-base font-semibold">
+              <Sparkles className="h-4 w-4 text-[var(--color-primary)]" /> Why This Matters
+            </h2>
+            <p className="mt-2 text-sm leading-relaxed text-[var(--color-foreground)]/90">
+              {op.reason ?? "No reasoning was generated for this opportunity."}
+            </p>
+          </section>
+
+          {/* 4. Product Opportunity — stored suggestedSoftware, relabelled */}
+          <section className="max-w-2xl rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-6">
+            <h2 className="flex items-center gap-2 text-sm font-semibold">
+              <Lightbulb className="h-4 w-4 text-[var(--color-warning)]" />
+              Product Opportunity
+            </h2>
+            <p className="mt-2 text-sm leading-relaxed text-[var(--color-foreground)]/90">
+              {op.suggestedSoftware}
+            </p>
           </section>
         </div>
 
@@ -200,7 +231,7 @@ export default async function OpportunityDetailPage({
             />
           </div>
 
-          {/* Score Breakdown */}
+          {/* Score Breakdown + plain-English explanation */}
           {bd?.subscores && (
             <section className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-6">
               <h2 className="text-sm font-semibold">Score breakdown</h2>
@@ -227,38 +258,14 @@ export default async function OpportunityDetailPage({
                   <span className="font-semibold text-[var(--color-primary)]">{bd.final}</span>
                 </div>
               )}
+              <p className="mt-4 text-xs leading-relaxed text-[var(--color-muted-foreground)]">
+                Frequency measures how often the pain appears. Severity
+                estimates how urgent the pain sounds. Confidence shows how
+                clearly the AI identified the pattern. The final score
+                combines these signals to help prioritize opportunities.
+              </p>
             </section>
           )}
-
-          {/* Suggested Software — visually distinct from summary */}
-          <section className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-6">
-            <h2 className="flex items-center gap-2 text-sm font-semibold">
-              <Lightbulb className="h-4 w-4 text-[var(--color-warning)]" />
-              Suggested software
-            </h2>
-            <p className="mt-2 text-sm text-[var(--color-foreground)]/90">
-              {op.suggestedSoftware}
-            </p>
-          </section>
-
-          {/* Keywords — alphabetical */}
-          <section className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-6">
-            <h2 className="flex items-center gap-2 text-sm font-semibold">
-              <Hash className="h-4 w-4 text-[var(--color-muted-foreground)]" />
-              Keywords
-            </h2>
-            {sortedKeywords.length === 0 ? (
-              <p className="mt-2 text-xs text-[var(--color-muted-foreground)]">No keywords.</p>
-            ) : (
-              <div className="mt-3 flex flex-wrap gap-1.5">
-                {sortedKeywords.map((k) => (
-                  <Badge key={k} variant="primary">
-                    {k}
-                  </Badge>
-                ))}
-              </div>
-            )}
-          </section>
 
           {/* Related Opportunities */}
           <section className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-6">

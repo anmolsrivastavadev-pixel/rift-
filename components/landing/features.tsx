@@ -4,23 +4,23 @@ import { Container } from "@/components/container";
 const features = [
   {
     icon: Upload,
-    title: "Upload real complaints",
-    text: "Drop a CSV of customer complaints. Rift parses and cleans each row so analysis starts from real data, not guesses.",
+    title: "Bring your own pain data",
+    text: "Upload a CSV of complaints, reviews, support tickets, or forum posts. Rift parses and cleans it so analysis starts from real voices, not guesses.",
   },
   {
     icon: Sparkles,
-    title: "AI clustering",
-    text: "Gemini groups similar complaints, summarises the underlying problem per cluster, and tags industry and keywords.",
+    title: "AI clusters the pain",
+    text: "Gemini groups similar complaints, summarises the underlying problem per cluster, and tags industry and keywords from the text itself.",
   },
   {
     icon: LineChart,
-    title: "Opportunity scoring",
-    text: "Each opportunity is scored 0–100 from complaint frequency, sentiment, severity and growth trend — never invented stats.",
+    title: "Each opportunity, scored",
+    text: "Every opportunity gets a 0–100 score from how often the pain appears, how urgent it sounds, and how clearly the AI identified it. No invented market stats.",
   },
   {
     icon: Target,
-    title: "Build what people want",
-    text: "Compare opportunities, save the ones worth pursuing, and start from a validated problem before you write code.",
+    title: "Start from a real problem",
+    text: "Browse ranked opportunities, inspect the complaints behind each one, and save the ideas worth pursuing before you write any code.",
   },
 ];
 
@@ -30,11 +30,11 @@ export function Features() {
       <Container>
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-            From noise to signal in four steps
+            From scattered frustrations to ranked opportunities
           </h2>
           <p className="mt-4 text-[var(--color-muted-foreground)]">
-            Everything you need to turn scattered customer frustration into a
-            ranked list of software opportunities.
+            Rift is built around four jobs: gather real pain, cluster it,
+            score it, and decide where to start.
           </p>
         </div>
 
