@@ -270,19 +270,41 @@ Post-deploy checks (on the deployed URL):
 
 - [ ] `npx prisma validate` passes; `npx prisma generate` regenerates the client; `npx prisma db push` adds the new `Opportunity` columns non-destructively (no data wipe).
 - [ ] Run AI clustering creates opportunities that include `marketGap`, `targetCustomer`, `likelyCurrentWorkarounds`, `whyWorkaroundsFallShort`, `productAngle`, `differentiationAngle`, `validationQuestions`, `riskFlags`.
-- [ ] Opportunity detail page left column reads (in order): Problem Summary → Evidence From Complaints → Product Opportunity → Market Gap Hypothesis → Validation Questions → Risk Flags.
+- [ ] Opportunity detail page left column reads (in order): Problem Summary → Evidence From Complaints → Product Opportunity → Market Gap Hypothesis → Validation Workspace.
 - [ ] Market Gap Hypothesis section shows the six hypothesis fields with a clear "hypothesis, not proven market research" sub-label.
-- [ ] Validation Questions render as a numbered list.
-- [ ] Risk Flags render as a list with a warning icon per item.
+- [ ] Validation Questions and Risk Flags are rendered inside the Validation Workspace (not as separate duplicate sections).
 - [ ] Score Breakdown, Related Opportunities, and Prev/Next are still present (in the right column / below).
 - [ ] Opportunity cards show a compact "For: [targetCustomer] / Angle: [productAngle]" preview when M9 fields exist; the preview is hidden on legacy rows.
 - [ ] Saved page cards show the same compact M9 preview.
-- [ ] Product Opportunity section uses `productAngle` when present and falls back to `suggestedSoftware` — never shows two repetitive "Product Opportunity" + "Product Angle" sections with the same content.
+- [ ] Product Opportunity section uses `suggestedSoftware` (broad); Product Angle field inside Market Gap Hypothesis uses `productAngle` (wedge) — never the same content twice.
 - [ ] Legacy opportunities created before M9 render without crashing: missing M9 fields show a subtle "Run AI clustering again to generate market gap hypotheses…" rerun hint (no fake placeholder analysis).
 - [ ] Mock fallback (no `GEMINI_API_KEY`) produces clearly-fake M9 fields prefixed "Mock …".
 - [ ] No UI text claims market size, revenue, or named competitors (unless a competitor is literally in the complaint text).
 - [ ] Search matches against `targetCustomer` and `productAngle` (type a word from either into the opportunities search box).
 - [ ] Save/unsave, CSV upload, paste text, `.txt`/`.md` upload, and Use Demo Data all still work unchanged.
+
+---
+
+## 26. M10 — Opportunity Validation Workflow
+
+- [ ] Opportunity detail page shows a Validation Workspace section (after Market Gap Hypothesis, before the right column).
+- [ ] Validation Workspace includes: Hypothesis To Test, Who To Interview, Interview Questions, Evidence To Collect, Signs This May Be Worth Pursuing, Risks To Test, Validation Checklist, Copy Validation Brief.
+- [ ] Hypothesis To Test uses `marketGap` → `productAngle` → `summary` → `suggestedSoftware` fallback; shows rerun hint when all M9 fields are missing.
+- [ ] Who To Interview uses `targetCustomer` when available; falls back to "Start with people who match the complaints shown in Evidence From Complaints."
+- [ ] Interview Questions use `validationQuestions` when available; deterministic fallback questions fill in until at least 3 exist.
+- [ ] Evidence To Collect shows the deterministic 5-item checklist.
+- [ ] Signs This May Be Worth Pursuing shows the deterministic 5-item success signals.
+- [ ] Risks To Test uses `riskFlags` when available; deterministic fallback risks appear when missing.
+- [ ] Validation Questions and Risk Flags are NOT rendered as separate standalone sections (only inside the Validation Workspace — no duplicates).
+- [ ] Interactive checklist can be checked and unchecked.
+- [ ] Checklist state persists after refresh in the same browser (localStorage key `rift-validation-checklist-${opportunity.id}`).
+- [ ] Checklist state is separate per opportunity ID (check an item on one opportunity, navigate to another — it is unchecked).
+- [ ] "Saved only in this browser." note appears below the checklist.
+- [ ] "Copy validation brief" copies concise plain text to clipboard; "Copied validation brief." appears on success.
+- [ ] If clipboard fails, "Copy failed. Select the text manually." appears.
+- [ ] Existing Score Breakdown, Related Opportunities, Prev/Next, save/unsave all still work.
+- [ ] Existing search/filter/sort, CSV/paste/.txt/.md upload, demo data, AI clustering all still work.
+- [ ] No Prisma schema was changed; no new dependencies; no new Gemini calls.
 
 ---
 

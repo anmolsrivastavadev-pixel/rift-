@@ -112,7 +112,8 @@ components/
 └─ opportunities/        opportunity-card, opportunity-browser, filters, save-button,
                          related-opportunity-card, no-related-empty, prev-next-nav,
                          example-complaints, complaint-body, empty-states, run-button,
-                         market-gap-hypothesis (M9)
+                         market-gap-hypothesis (M9), validation-workspace + validation-checklist
+                         + copy-validation-brief (M10)
 
 lib/
 ├─ db.ts                 Prisma client singleton (driver-adapter mode)
@@ -126,6 +127,7 @@ lib/
 ├─ schemas.ts           Zod schema for CSV rows + UploadResult
 ├─ utils.ts             cn() (clsx + tailwind-merge)
 ├─ text-import.ts       Pure paste/text-file parser → Complaint rows (M8)
+├─ validation-plan.ts   Pure deterministic helpers for M10 validation workspace
 ├─ prompts.ts            ⚠ LEGACY/UNUSED — dental-specific prompts from an earlier
 ├─ generated/prisma/    Prisma client output (gitignored — regenerated at build)
 

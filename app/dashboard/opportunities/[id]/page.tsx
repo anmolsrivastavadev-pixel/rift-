@@ -11,8 +11,6 @@ import {
   CheckCircle2,
   Lightbulb,
   Layers,
-  HelpCircle,
-  Flag,
 } from "lucide-react";
 
 import { prisma } from "@/lib/db";
@@ -29,6 +27,7 @@ import { RelatedOpportunityCard } from "@/components/opportunities/related-oppor
 import { NoRelatedEmpty } from "@/components/opportunities/no-related-empty";
 import { PrevNextNav } from "@/components/opportunities/prev-next-nav";
 import { MarketGapHypothesis } from "@/components/opportunities/market-gap-hypothesis";
+import { ValidationWorkspace } from "@/components/opportunities/validation-workspace";
 
 export default async function OpportunityDetailPage({
   params,
@@ -210,12 +209,6 @@ export default async function OpportunityDetailPage({
               reason: op.reason,
             }}
           />
-
-          {/* 5. Validation Questions */}
-          <ValidationQuestions items={op.validationQuestions} />
-
-          {/* 6. Risk Flags */}
-          <RiskFlags items={op.riskFlags} />
         </div>
 
         {/* RIGHT column — sticky on large screens */}
@@ -316,6 +309,24 @@ export default async function OpportunityDetailPage({
           {op.savedOpportunities.length > 0 && <Badge variant="success">Saved</Badge>}
         </aside>
       </div>
+
+      {/* Full-width Validation Workspace — below the two-column layout so it
+          has room to breathe. Owns interview questions + risks (rendered once,
+          not duplicated as standalone sections). */}
+      <ValidationWorkspace
+        input={{
+          id: op.id,
+          title: op.title,
+          summary: op.summary,
+          suggestedSoftware: op.suggestedSoftware,
+          opportunityScore: op.opportunityScore,
+          marketGap: op.marketGap,
+          targetCustomer: op.targetCustomer,
+          productAngle: op.productAngle,
+          validationQuestions: op.validationQuestions,
+          riskFlags: op.riskFlags,
+        }}
+      />
     </div>
   );
 }
@@ -384,72 +395,5 @@ function BarRow({
         />
       </div>
     </div>
-  );
-}
-
-/* 5. Validation Questions — list. Empty/missing on legacy rows => hide with a
- * tiny rerun hint instead of fake content.
- */
-function ValidationQuestions({ items }: { items: string[] }) {
-  if (!items || items.length === 0) {
-    return (
-      <section className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-6">
-        <h2 className="flex items-center gap-2 text-base font-semibold">
-          <HelpCircle className="h-4 w-4 text-[var(--color-muted-foreground)]" /> Validation Questions
-        </h2>
-        <p className="mt-2 text-xs text-[var(--color-muted-foreground)]">
-          Questions to validate before building appear here. Run AI clustering
-          again to generate them for this opportunity.
-        </p>
-      </section>
-    );
-  }
-  return (
-    <section className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-6">
-      <h2 className="flex items-center gap-2 text-base font-semibold">
-        <HelpCircle className="h-4 w-4 text-[var(--color-muted-foreground)]" /> Validation Questions
-      </h2>
-      <ul className="mt-3 space-y-2">
-        {items.map((q, i) => (
-          <li key={i} className="flex gap-2 text-sm text-[var(--color-foreground)]/90">
-            <span className="text-[var(--color-muted-foreground)]">{i + 1}.</span>
-            <span>{q}</span>
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
-}
-
-/* 6. Risk Flags — list. Same legacy-empty handling as Validation Questions.
- */
-function RiskFlags({ items }: { items: string[] }) {
-  if (!items || items.length === 0) {
-    return (
-      <section className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-6">
-        <h2 className="flex items-center gap-2 text-base font-semibold">
-          <Flag className="h-4 w-4 text-[var(--color-warning)]" /> Risk Flags
-        </h2>
-        <p className="mt-2 text-xs text-[var(--color-muted-foreground)]">
-          Reasons this opportunity might be weak or uncertain appear here. Run
-          AI clustering again to generate them.
-        </p>
-      </section>
-    );
-  }
-  return (
-    <section className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-6">
-      <h2 className="flex items-center gap-2 text-base font-semibold">
-        <Flag className="h-4 w-4 text-[var(--color-warning)]" /> Risk Flags
-      </h2>
-      <ul className="mt-3 space-y-2">
-        {items.map((r, i) => (
-          <li key={i} className="flex gap-2 text-sm text-[var(--color-foreground)]/90">
-            <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[var(--color-warning)]" />
-            <span>{r}</span>
-          </li>
-        ))}
-      </ul>
-    </section>
   );
 }
