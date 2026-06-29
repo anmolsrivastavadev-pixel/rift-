@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import { useActionState } from "react";
-import Link from "next/link";
 import Papa from "papaparse";
 import {
   Upload,
@@ -10,13 +9,12 @@ import {
   CheckCircle2,
   AlertTriangle,
   Loader2,
-  Download,
-  Sparkles,
 } from "lucide-react";
 
-import { uploadComplaints, loadDemoComplaints } from "@/actions/complaints";
+import { uploadComplaints } from "@/actions/complaints";
 import type { UploadResult } from "@/lib/schemas";
 import { Button } from "@/components/ui/button";
+import { ImportNextStepLink } from "@/components/complaints/import-summary";
 
 export function CsvUploader() {
   const inputRef = React.useRef<HTMLInputElement>(null);
@@ -27,10 +25,6 @@ export function CsvUploader() {
     uploadComplaints,
     null
   );
-  const [demoState, demoAction, demoPending] = useActionState<
-    UploadResult | null,
-    FormData
-  >(loadDemoComplaints, null);
 
   function handleFile(file: File) {
     const okTypes = ["text/csv", "application/csv", "text/plain"];
@@ -141,82 +135,6 @@ export function CsvUploader() {
       )}
 
       {state && <UploadSummary result={state} />}
-
-      {/* Onboarding helpers — beside the uploader, consistent with existing UI */}
-      <div className="flex flex-wrap items-center gap-3 border-t border-[var(--color-border)] pt-4">
-        <Button asChild variant="secondary" size="md">
-          <Link href="/sample_complaints.csv" download>
-            <Download className="h-4 w-4" /> Download sample CSV
-          </Link>
-        </Button>
-
-        <form action={demoAction}>
-          <Button type="submit" variant="outline" disabled={demoPending}>
-            {demoPending ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" /> Loading demo…
-              </>
-            ) : (
-              <>
-                <Sparkles className="h-4 w-4" /> Use demo data
-              </>
-            )}
-          </Button>
-        </form>
-      </div>
-
-      {demoState && <DemoSummary result={demoState} />}
-    </div>
-  );
-}
-
-function DemoSummary({ result }: { result: UploadResult }) {
-  // Demo data validation can't realistically fail (rows are hardcoded and
-  // validated), so inserted === 0 means every demo row was already in the
-  // database. Surface an informational "already loaded" message rather than
-  // an error.
-  if (result.inserted === 0) {
-    return (
-      <div className="flex items-start gap-2 rounded-[12px] border border-[var(--color-primary)]/40 bg-[var(--color-primary)]/10 p-4 text-sm text-[var(--color-primary)]">
-        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
-        <div className="space-y-1">
-          <p className="font-medium">
-            Demo complaints are already loaded. You can run AI clustering now.
-          </p>
-          <p className="text-xs text-[var(--color-muted-foreground)]">
-            Demo data is fake and safe to test with. Head to{" "}
-            <Link
-              href="/dashboard/opportunities"
-              className="font-medium text-[var(--color-primary)] hover:underline"
-            >
-              Opportunities → Run AI clustering
-            </Link>{" "}
-            to generate scored opportunities.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="flex items-start gap-2 rounded-[12px] border border-[var(--color-success)]/40 bg-[var(--color-success)]/10 p-4 text-sm text-[var(--color-success)]">
-      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
-      <div className="space-y-1">
-        <p className="font-medium">
-          Demo complaints added ({result.inserted}). Now run AI clustering to
-          generate opportunities.
-        </p>
-        <p className="text-xs text-[var(--color-muted-foreground)]">
-          This is fake demo data, safe to test with. Next:{" "}
-          <Link
-            href="/dashboard/opportunities"
-            className="font-medium text-[var(--color-primary)] hover:underline"
-          >
-            Opportunities → Run AI clustering
-          </Link>{" "}
-          to turn the complaints into scored startup opportunities.
-        </p>
-      </div>
     </div>
   );
 }
@@ -241,13 +159,15 @@ function UploadSummary({ result }: { result: UploadResult }) {
   return (
     <div className="flex items-start gap-2 rounded-[12px] border border-[var(--color-success)]/40 bg-[var(--color-success)]/10 p-4 text-sm text-[var(--color-success)]">
       <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
-      <div>
+      <div className="space-y-1">
         <p className="font-medium">
-          Imported {result.inserted} complaint{result.inserted === 1 ? "" : "s"}.
+          Imported {result.inserted} complaint{result.inserted === 1 ? "" : "s"}
+          {" "}from CSV. Now run AI clustering to generate opportunities.
         </p>
         {result.skipped > 0 && (
           <p className="text-xs">Skipped {result.skipped} invalid row(s).</p>
         )}
+        <ImportNextStepLink />
       </div>
     </div>
   );

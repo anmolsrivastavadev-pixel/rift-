@@ -11,6 +11,8 @@ import {
   CheckCircle2,
   Lightbulb,
   Layers,
+  HelpCircle,
+  Flag,
 } from "lucide-react";
 
 import { prisma } from "@/lib/db";
@@ -26,6 +28,7 @@ import { ExampleComplaints } from "@/components/opportunities/example-complaints
 import { RelatedOpportunityCard } from "@/components/opportunities/related-opportunity-card";
 import { NoRelatedEmpty } from "@/components/opportunities/no-related-empty";
 import { PrevNextNav } from "@/components/opportunities/prev-next-nav";
+import { MarketGapHypothesis } from "@/components/opportunities/market-gap-hypothesis";
 
 export default async function OpportunityDetailPage({
   params,
@@ -181,17 +184,10 @@ export default async function OpportunityDetailPage({
             </div>
           </section>
 
-          {/* 3. Why This Matters — stored AI reasoning */}
-          <section className="rounded-[12px] border border-[var(--color-primary)]/30 bg-[var(--color-primary)]/5 p-6">
-            <h2 className="flex items-center gap-2 text-base font-semibold">
-              <Sparkles className="h-4 w-4 text-[var(--color-primary)]" /> Why This Matters
-            </h2>
-            <p className="mt-2 text-sm leading-relaxed text-[var(--color-foreground)]/90">
-              {op.reason ?? "No reasoning was generated for this opportunity."}
-            </p>
-          </section>
-
-          {/* 4. Product Opportunity — stored suggestedSoftware, relabelled */}
+          {/* 3. Product Opportunity — the broad buildable product (suggestedSoftware).
+              The wedge/narrow entry point lives in the Market Gap Hypothesis
+              section as "Product Angle" (productAngle) so the two never show
+              the same content. suggestedSoftware is always non-null. */}
           <section className="max-w-2xl rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-6">
             <h2 className="flex items-center gap-2 text-sm font-semibold">
               <Lightbulb className="h-4 w-4 text-[var(--color-warning)]" />
@@ -201,6 +197,25 @@ export default async function OpportunityDetailPage({
               {op.suggestedSoftware}
             </p>
           </section>
+
+          {/* 4. Market Gap Hypothesis — complaint-grounded hypothesis fields */}
+          <MarketGapHypothesis
+            data={{
+              marketGap: op.marketGap,
+              targetCustomer: op.targetCustomer,
+              likelyCurrentWorkarounds: op.likelyCurrentWorkarounds,
+              whyWorkaroundsFallShort: op.whyWorkaroundsFallShort,
+              productAngle: op.productAngle,
+              differentiationAngle: op.differentiationAngle,
+              reason: op.reason,
+            }}
+          />
+
+          {/* 5. Validation Questions */}
+          <ValidationQuestions items={op.validationQuestions} />
+
+          {/* 6. Risk Flags */}
+          <RiskFlags items={op.riskFlags} />
         </div>
 
         {/* RIGHT column — sticky on large screens */}
@@ -369,5 +384,72 @@ function BarRow({
         />
       </div>
     </div>
+  );
+}
+
+/* 5. Validation Questions — list. Empty/missing on legacy rows => hide with a
+ * tiny rerun hint instead of fake content.
+ */
+function ValidationQuestions({ items }: { items: string[] }) {
+  if (!items || items.length === 0) {
+    return (
+      <section className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-6">
+        <h2 className="flex items-center gap-2 text-base font-semibold">
+          <HelpCircle className="h-4 w-4 text-[var(--color-muted-foreground)]" /> Validation Questions
+        </h2>
+        <p className="mt-2 text-xs text-[var(--color-muted-foreground)]">
+          Questions to validate before building appear here. Run AI clustering
+          again to generate them for this opportunity.
+        </p>
+      </section>
+    );
+  }
+  return (
+    <section className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-6">
+      <h2 className="flex items-center gap-2 text-base font-semibold">
+        <HelpCircle className="h-4 w-4 text-[var(--color-muted-foreground)]" /> Validation Questions
+      </h2>
+      <ul className="mt-3 space-y-2">
+        {items.map((q, i) => (
+          <li key={i} className="flex gap-2 text-sm text-[var(--color-foreground)]/90">
+            <span className="text-[var(--color-muted-foreground)]">{i + 1}.</span>
+            <span>{q}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+/* 6. Risk Flags — list. Same legacy-empty handling as Validation Questions.
+ */
+function RiskFlags({ items }: { items: string[] }) {
+  if (!items || items.length === 0) {
+    return (
+      <section className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-6">
+        <h2 className="flex items-center gap-2 text-base font-semibold">
+          <Flag className="h-4 w-4 text-[var(--color-warning)]" /> Risk Flags
+        </h2>
+        <p className="mt-2 text-xs text-[var(--color-muted-foreground)]">
+          Reasons this opportunity might be weak or uncertain appear here. Run
+          AI clustering again to generate them.
+        </p>
+      </section>
+    );
+  }
+  return (
+    <section className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-6">
+      <h2 className="flex items-center gap-2 text-base font-semibold">
+        <Flag className="h-4 w-4 text-[var(--color-warning)]" /> Risk Flags
+      </h2>
+      <ul className="mt-3 space-y-2">
+        {items.map((r, i) => (
+          <li key={i} className="flex gap-2 text-sm text-[var(--color-foreground)]/90">
+            <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[var(--color-warning)]" />
+            <span>{r}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }

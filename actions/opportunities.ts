@@ -141,6 +141,17 @@ export async function runPipeline(
           confidence: cluster.confidence,
           reason: cluster.reason,
           suggestedSoftware: cluster.suggestedSoftware,
+          // M9 market-gap hypothesis fields. Store null for missing optional
+          // strings; lists default to [] via the schema/Zod. A missing field
+          // never fails the whole pipeline.
+          marketGap: cluster.marketGap ?? null,
+          targetCustomer: cluster.targetCustomer ?? null,
+          likelyCurrentWorkarounds: cluster.likelyCurrentWorkarounds ?? null,
+          whyWorkaroundsFallShort: cluster.whyWorkaroundsFallShort ?? null,
+          productAngle: cluster.productAngle ?? null,
+          differentiationAngle: cluster.differentiationAngle ?? null,
+          validationQuestions: cluster.validationQuestions,
+          riskFlags: cluster.riskFlags,
           trend: trend as unknown as object,
         },
       });

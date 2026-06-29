@@ -21,6 +21,8 @@ export default async function SavedPage() {
       confidence: s.opportunity.confidence,
       keywords: s.opportunity.keywords,
       suggestedSoftware: s.opportunity.suggestedSoftware,
+      targetCustomer: s.opportunity.targetCustomer,
+      productAngle: s.opportunity.productAngle,
       createdAt: s.opportunity.createdAt,
       saved: true,
     }));

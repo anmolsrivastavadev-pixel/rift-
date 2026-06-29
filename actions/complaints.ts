@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 
 import { prisma } from "@/lib/db";
 import { complaintRowSchema, type UploadResult } from "@/lib/schemas";
+import { parseComplaintsFromText, normaliseBodyForKey } from "@/lib/text-import";
 
 const MAX_ROWS = 5000;
 
@@ -205,4 +206,98 @@ export async function loadDemoComplaints(): Promise<UploadResult> {
     skipped: valid.length - toInsert.length,
     errors,
   };
+}
+
+/* -------------------------------------------------------------------------
+ * Text import (paste text / upload .txt or .md)
+ * -------------------------------------------------------------------------
+ * Shares the same Zod schema and the same insertValidRows helper as the CSV
+ * upload path. Parsing lives in lib/text-import.ts (pure functions). The AI
+ * pipeline is not touched and is not auto-run; the user clicks "Run AI
+ * clustering" after a successful import.
+ */
+export async function importTextComplaints(
+  _prev: UploadResult | null,
+  formData: FormData
+): Promise<UploadResult> {
+  const text = String(formData.get("text") ?? "");
+
+  if (!text.trim()) {
+    return {
+      inserted: 0,
+      skipped: 0,
+      errors: [{ row: 0, reason: "No text provided." }],
+    };
+  }
+
+  const parsed = parseComplaintsFromText(text);
+
+  if (parsed.length === 0) {
+    return {
+      inserted: 0,
+      skipped: 0,
+      errors: [
+        {
+          row: 0,
+          reason:
+            "No usable complaints found. Paste one complaint per line or separate complaints with blank lines.",
+        },
+      ],
+    };
+  }
+
+  const capped = parsed.slice(0, MAX_ROWS);
+  const errors: { row: number; reason: string }[] = [];
+  const valid: { title: string; body: string; sourceDate: Date | null }[] = [];
+
+  for (let i = 0; i < capped.length; i++) {
+    // Reuse the existing Zod schema so min/max length rules stay in one place.
+    const z = complaintRowSchema.safeParse({ body: capped[i].body });
+    if (z.success) {
+      valid.push({
+        title: capped[i].title,
+        body: z.data.body,
+        sourceDate: null,
+      });
+    } else {
+      errors.push({
+        row: i + 1,
+        reason: z.error.issues[0]?.message ?? "Invalid entry",
+      });
+    }
+  }
+
+  if (valid.length === 0) {
+    return { inserted: 0, skipped: capped.length, errors };
+  }
+
+  // Never insert complaints that are already in the database. Comparison is
+  // case- AND whitespace-insensitive (trim + lowercase + collapse internal
+  // whitespace to single spaces), so a stored "The onboarding takes way too
+  // long." also blocks an incoming "the ONBOARDING takes  way too long.".
+  // Stored bodies keep their original user-submitted form; only the
+  // comparison key is normalised. M8 text import only — CSV upload does not
+  // dedupe against the DB and is unaffected. For MVP-scale workspaces a
+  // single select-bodies scan is cheap and matches the pipeline's own
+  // `prisma.complaint.findMany` usage.
+  const all = await prisma.complaint.findMany({ select: { body: true } });
+  const existingKeys = new Set(all.map((c) => normaliseBodyForKey(c.body)));
+  const toInsert = valid.filter(
+    (r) => !existingKeys.has(normaliseBodyForKey(r.body))
+  );
+
+  // skipped = everything we did not insert: too-short/invalid + in-batch
+  // duplicates (already removed by the parser) + bodies already in the DB.
+  const skipped = capped.length - toInsert.length;
+
+  if (toInsert.length > 0) {
+    await insertValidRows(toInsert);
+  }
+
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/complaints");
+
+  // inserted === 0 with no errors means every parsed complaint was already
+  // loaded — the UI surfaces an informational "already loaded" message.
+  return { inserted: toInsert.length, skipped, errors };
 }

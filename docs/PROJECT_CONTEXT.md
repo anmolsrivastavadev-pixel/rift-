@@ -33,6 +33,12 @@ CSV upload (drag/drop or demo data)
   → PapaParse on the client
   → server action validates rows with Zod
   → valid rows inserted into Complaint table
+        — OR (M8+) —
+  Paste text / upload .txt or .md
+  → client stages raw text or reads the file in-browser
+  → importTextComplaints parses via lib/text-import.ts (split, strip bullets,
+    dedupe, cap length, build titles), re-validates with the SAME Zod schema,
+    dedups against existing bodies in the DB, inserts only missing rows
   → "Run AI clustering" server action
         → clean complaints (normalise, dedupe, drop empties)
         → batch Gemini calls (≤100 complaints each)
@@ -101,10 +107,12 @@ components/
 ├─ ui/                   Button, Card, Badge (cva + cn())
 ├─ container.tsx         max-w wrapper
 ├─ dashboard/            stat-card, complaints-chart (Recharts), shell
-├─ complaints/           csv-uploader, complaints-list, complaints-table, complaint-search
+├─ complaints/           csv-uploader, complaints-input (tabs), text-input (paste/file),
+│                        import-summary, complaints-list, complaints-table, complaint-search
 └─ opportunities/        opportunity-card, opportunity-browser, filters, save-button,
                          related-opportunity-card, no-related-empty, prev-next-nav,
-                         example-complaints, complaint-body, empty-states, run-button
+                         example-complaints, complaint-body, empty-states, run-button,
+                         market-gap-hypothesis (M9)
 
 lib/
 ├─ db.ts                 Prisma client singleton (driver-adapter mode)
@@ -117,11 +125,12 @@ lib/
 ├─ opportunity-relations.ts  selectRelated + selectPrevNext (pure helpers)
 ├─ schemas.ts           Zod schema for CSV rows + UploadResult
 ├─ utils.ts             cn() (clsx + tailwind-merge)
+├─ text-import.ts       Pure paste/text-file parser → Complaint rows (M8)
 ├─ prompts.ts            ⚠ LEGACY/UNUSED — dental-specific prompts from an earlier
 ├─ generated/prisma/    Prisma client output (gitignored — regenerated at build)
 
 actions/
-├─ complaints.ts        uploadComplaints, loadDemoComplaints
+├─ complaints.ts        uploadComplaints, loadDemoComplaints, importTextComplaints
 ├─ opportunities.ts    runPipeline, getProcessingStatus, resetOpportunities,
 │                       resetOpportunitiesAction
 └─ saved.ts             saveOpportunity, unsaveOpportunity, saveAction, unsaveAction
@@ -181,7 +190,18 @@ model Opportunity {
   severity           Float?   // 1..10, from Gemini
   confidence         Int?     // 0..100, from Gemini
   reason             String?  // Gemini reasoning, grounded in complaints
-  suggestedSoftware  String
+  suggestedSoftware  String   // kept for backwards compat; UI prefers productAngle
+  // M9 — complaint-grounded market-gap hypothesis (all optional so legacy
+  // rows render without crashing). UI prefers productAngle and falls back
+  // to suggestedSoftware.
+  marketGap                String?
+  targetCustomer           String?
+  likelyCurrentWorkarounds String?
+  whyWorkaroundsFallShort  String?
+  productAngle             String?
+  differentiationAngle     String?
+  validationQuestions      String[] @default([])
+  riskFlags                String[] @default([])
   trend              Json     // [{ date, count }] for trend chart
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
@@ -225,7 +245,7 @@ Three models. No `User`. No auth. No `UploadHistory` table — upload history is
 - One file owns all Gemini access: `lib/ai.ts` (per spec — "one AI service file only").
 - SDK: `@google/genai` v2.10.0 (`new GoogleGenAI({ apiKey })` → `ai.models.generateContent({ model, contents, config: { responseMimeType: "application/json" } })`).
 - Model: `gemini-2.5-flash` (overridable via `GEMINI_MODEL` env var).
-- **Mock fallback:** when `GEMINI_API_KEY` is absent, `lib/ai.ts` falls back to `mockCluster()` — a deterministic local keyword-grouping heuristic. This keeps the pipeline runnable end-to-end during local dev without a key, and produces stable clusters for UI work.
+- **Mock fallback:** when `GEMINI_API_KEY` is absent, `lib/ai.ts` falls back to `mockCluster()` — a deterministic local keyword-grouping heuristic. This keeps the pipeline runnable end-to-end during local dev without a key, produces stable clusters for UI work, and (M9) emits clearly-fake mock market-gap hypothesis fields prefixed "Mock …" so the M9 UI is exercisable without Gemini.
 - Batching: complaints are split into batches of **100** before sending to Gemini to bound token usage and latency.
 - Cross-batch merge: clusters across batches are merged if their keyword Jaccard similarity ≥ 0.5 (case-insensitive).
 - JSON parsing: tolerant — accepts either a bare array `[{...}]` or `{clusters: [...]}`.
@@ -263,7 +283,7 @@ The full breakdown (`weights`, `inputs`, `subscores`, `final`) is stored on the 
 1. Loads all complaints from the DB (`Complaint.findMany`).
 2. **Stage 1 — cleaning** (`lib/cleaning.ts`): normalise whitespace, drop rows <3 chars or duplicates.
 3. **Stage 2 — clustering** (`lib/ai.ts:clusterComplaints`): batch Gemini calls; tolerant JSON parse; cross-batch merge.
-4. **Stage 3 — opportunity generation**: for each cluster, link its complaints, compute the Opportunity Score locally, build the trend `[{date, count}]`, persist an `Opportunity` row, set `Complaint.opportunityId`.
+4. **Stage 3 — opportunity generation**: for each cluster, link its complaints, compute the Opportunity Score locally, build the trend `[{date, count}]`, persist an `Opportunity` row (including the M9 market-gap hypothesis fields returned by Gemini — `marketGap`, `targetCustomer`, `likelyCurrentWorkarounds`, `whyWorkaroundsFallShort`, `productAngle`, `differentiationAngle`, `validationQuestions`, `riskFlags`; missing optional strings stored as `null`, `productAngle` falls back to `suggestedSoftware`), set `Complaint.opportunityId`.
 5. **Stage 4 — revalidation**: `revalidatePath` for dashboard, opportunities, and complaints routes so caches refresh.
 6. Progress is tracked in `lib/progress.ts` (in-memory, keyed by jobId, 10-min TTL) so the client `RunOpportunitiesButton` can poll `getProcessingStatus(jobId)` and render stages + progress bars.
 

@@ -15,6 +15,9 @@ export type OpportunityCardData = {
   confidence: number | null;
   keywords: string[];
   suggestedSoftware: string;
+  // M9 — optional market-gap hypothesis preview fields.
+  targetCustomer?: string | null;
+  productAngle?: string | null;
   createdAt: Date;
   saved: boolean;
 };
@@ -60,6 +63,24 @@ export function OpportunityCard({ op }: { op: OpportunityCardData }) {
           Product opportunity:{" "}
           <span className="text-[var(--color-foreground)]/80">{op.suggestedSoftware}</span>
         </p>
+
+        {/* Compact M9 market-gap preview. Hidden entirely if the opportunity
+            predates M9 (no targetCustomer + no productAngle) so legacy rows
+            render cleanly. */}
+        {(op.targetCustomer || op.productAngle) && (
+          <div className="mt-2 space-y-0.5 text-[11px] text-[var(--color-muted-foreground)]">
+            {op.targetCustomer && (
+              <p className="line-clamp-1">
+                For: <span className="text-[var(--color-foreground)]/80">{op.targetCustomer}</span>
+              </p>
+            )}
+            {op.productAngle && (
+              <p className="line-clamp-2">
+                Angle: <span className="text-[var(--color-foreground)]/80">{op.productAngle}</span>
+              </p>
+            )}
+          </div>
+        )}
 
         <div className="mt-4 flex flex-wrap gap-1.5">
           {op.keywords.slice(0, 4).map((k) => (

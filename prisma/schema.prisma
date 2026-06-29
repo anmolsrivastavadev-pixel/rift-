@@ -41,7 +41,18 @@ model Opportunity {
   severity           Float?   // average severity of cluster (1..10, from Gemini)
   confidence         Int?     // Gemini confidence in the cluster (0..100)
   reason             String?  // Gemini reasoning / explanation for the cluster
-  suggestedSoftware  String   // suggested software opportunity
+  suggestedSoftware  String   // suggested software opportunity (kept for backwards compat)
+  // M9 — complaint-grounded market-gap hypothesis (all optional so existing
+  // rows render without crashing). UI prefers productAngle when present and
+  // falls back to suggestedSoftware.
+  marketGap                String?
+  targetCustomer           String?
+  likelyCurrentWorkarounds String?
+  whyWorkaroundsFallShort  String?
+  productAngle             String?
+  differentiationAngle     String?
+  validationQuestions      String[] @default([])
+  riskFlags                String[] @default([])
   trend              Json     // [{ date, count }] for the trend chart
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt

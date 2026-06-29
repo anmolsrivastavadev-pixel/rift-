@@ -57,6 +57,8 @@ export function OpportunityBrowser({
           o.summary,
           o.industry,
           o.suggestedSoftware,
+          o.targetCustomer ?? "",
+          o.productAngle ?? "",
           ...o.keywords,
         ]
           .join(" ")

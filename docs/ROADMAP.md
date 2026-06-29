@@ -75,6 +75,18 @@ Each milestone:
 - **What was built:** Repositioned landing copy (hero, features, how-it-works, footer) so a new user understands Rift in under 30 seconds and sees the demo-data path; demo data duplicate prevention in `loadDemoComplaints` (matches exact demo bodies, inserts only missing rows); "already loaded" message in `CsvUploader`; renamed user-facing "Suggested Software"/"Suggested:" to "Product Opportunity" everywhere (internal `suggestedSoftware` field unchanged); restructured the opportunity detail page into Problem Summary → Evidence From Complaints (example complaints + keywords) → Why This Matters → Product Opportunity; added plain-English score explanations on the opportunity card ("Score combines frequency, severity, and confidence.") and beside the detail-page score breakdown; improved empty states with direct CTAs (Use Demo Data / Download Sample CSV / Upload CSV / Run AI clustering); clarified dashboard/opportunities/saved/complaints copy to "this MVP workspace" tone and removed the stale "Available in Milestone 3" note.
 - **Not included:** No schema changes, no AI prompt changes, no scoring logic changes, no new dependencies, no new components beyond copy/labels. Sample CSV download and "Use demo data" button already shipped in the Post-M6 add-on; this milestone added idempotency + onboarding copy around them.
 
+### M8 — Flexible Input (paste text + text files)
+- **Status:** ✅ Done
+- **Purpose:** Remove the spreadsheet-only friction so founders can add market pain without preparing a CSV. Driven by real tester feedback that CSV upload felt like the wrong default.
+- **What was built:** Tabbed input on `/dashboard/complaints` (Upload CSV / Paste Text / Upload Text File) via new `components/complaints/complaints-input.tsx`; shared paste + file flow in `components/complaints/text-input.tsx` (source-type dropdown, optional source label, textarea or `.txt`/`.md` file picker, client-side file read, reuses one `importTextComplaints` server action); pure parsing helper `lib/text-import.ts` (`parseComplaintsFromText`, `createTitleFromBody`, `normaliseComplaintBody`, `SOURCE_TYPES`); server action `importTextComplaints` in `actions/complaints.ts` reusing the existing `complaintRowSchema` + `insertValidRows`; DB-level dedup (match exact body, insert only missing rows) so re-imports and demo re-imports don't duplicate; shared import summaries in `components/complaints/import-summary.tsx`. CSV upload, sample CSV download, Use Demo Data, validation, complaints list/search, and the AI clustering flow are all unchanged and still work.
+- **Not included:** No schema changes (no `Source`/`Upload`/`User` models), no new dependencies, no OCR, no PDF, no DOCX, no image parsing, no web scraping, no Reddit/app-store APIs, no AI pipeline or scoring changes, no auto-run of clustering after import. Source type/label is UI-only metadata — not stored on the complaint.
+
+### M9 — Market Gap Hypothesis
+- **Status:** ✅ Done
+- **Purpose:** Make each generated opportunity feel like an evidence-backed startup opportunity, not issue prioritization. Adds a complaint-grounded market-gap hypothesis (explicitly a hypothesis, not real market research).
+- **What was built:** Non-destructive `Opportunity` schema extension — `marketGap`, `targetCustomer`, `likelyCurrentWorkarounds`, `whyWorkaroundsFallShort`, `productAngle`, `differentiationAngle` (nullable `String?`) + `validationQuestions`, `riskFlags` (`String[] @default([])`). Gemini prompt extended to request these fields with strict grounding rules (only infer from the complaint text, never invent market size/stats, don't name competitors unless mentioned in complaints, frame workarounds/differentiation as hypotheses, never compute the score); `clusterSchema` extended with the same fields as optional/defaulted so a missing field never fails the pipeline; mock fallback in `lib/ai.ts` emits clearly-fake mock M9 fields; cross-batch merge adopts the dominant cluster's fields and unions the lists. `runPipeline` persists the new fields (null for missing strings, `productAngle` falls back to `suggestedSoftware`). Detail page restructured to: Problem Summary → Evidence From Complaints → Product Opportunity (prefers `productAngle`, falls back to `suggestedSoftware`, never both) → Market Gap Hypothesis (`components/opportunities/market-gap-hypothesis.tsx`) → Validation Questions (list) → Risk Flags (list) → Score Breakdown → Related Opportunities → Prev/Next. Opportunity card shows a compact "For: … / Angle: …" preview when M9 fields exist. Client-side search haystack extended with `targetCustomer` + `productAngle`. Legacy pre-M9 opportunities render with subtle "Run AI clustering again…" rerun hints instead of fake placeholder analysis.
+- **Not included:** No real market research, no scraping, no competitor agents, no market-size estimation, no new dependencies, no scoring changes, no new models, no save/upload behavior changes. `suggestedSoftware` kept for backwards compatibility.
+
 ---
 
 ## Current state
@@ -100,27 +112,29 @@ Upload CSV or Use demo data
 
 Do **not** start any of these without an explicit user prompt. They appear here only for visibility.
 
-### M7 — Authentication & user accounts
+> Note: M7 (Repositioning + Demo Flow), M8 (Flexible Input), and M9 (Market Gap Hypothesis) are complete — see "Completed milestones" above. The items below are post-MVP and start at M10.
+
+### M10 — Authentication & user accounts
 - Per-user saved opportunities, upload ownership, private dashboards.
 - Likely tech: NextAuth or Clerk; new `User` model + FK on `SavedOpportunity` and a new `UploadHistory`.
 
-### M8 — Upload history & re-runs
+### M11 — Upload history & re-runs
 - Persist each upload as a row in the DB; let users reopen past analyses and compare AI re-runs.
 - Requires a new `Upload` model (file name, date, complaint count, opportunities generated, processing status).
 
-### M9 — Comparison & multi-opportunity tools
+### M12 — Comparison & multi-opportunity tools
 - Side-by-side comparison view for 2–3 opportunities; export to PDF/CSV.
 
-### M10 — Notification & in-app messaging
+### M13 — Notification & in-app messaging
 - Server-side status when long jobs complete; optional email digest.
 
-### M11 — Multi-source ingestion / scraping (if explicitly approved)
+### M14 — Multi-source ingestion / scraping (if explicitly approved)
 - Auto-pull complaints from review sites, app stores, forums. **Out of scope for MVP** — must not be added automatically.
 
-### M12 — Light mode + theming
+### M15 — Light mode + theming
 - Toggle light/dark; persist preference locally. Pure UX; no schema changes.
 
-### M13 — Prompt experimentation
+### M16 — Prompt experimentation
 - A/B different Gemini prompts and track quality. **Must not change the production prompt or scoring weights without explicit sign-off.**
 
 ---

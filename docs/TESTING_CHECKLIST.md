@@ -77,11 +77,11 @@ Route (app)
 
 ## 6. "Use demo data" button
 
-- [ ] On `/dashboard/complaints`, click **Use demo data**.
+- [ ] On `/dashboard/complaints`, click **Use demo data** (now lives below the input tabs, shared across CSV / Paste Text / Upload Text File).
 - [ ] A spinner shows "Loading demo…" while pending.
-- [ ] A green success message appears ("10 demo complaints loaded").
-- [ ] The success message links to **Opportunities → Run AI clustering**.
-- [ ] Complaints list underneath the uploader refreshes to show the demo rows.
+- [ ] A green success message appears — "Demo complaints added (N) …" — and links to **Opportunities → Run AI clustering**.
+- [ ] Clicking it again when all demo rows already exist shows "Demo complaints are already loaded. You can run AI clustering now." and creates no duplicates.
+- [ ] Complaints list underneath the input refreshes to show the demo rows.
 
 ## 7. Complaint validation
 
@@ -154,8 +154,8 @@ Route (app)
 - [ ] Keywords are sorted alphabetically.
 - [ ] Example Complaints lists up to 5 complaints, oldest first.
 - [ ] If any complaint body exceeds 500 chars, a **Show more** / **Show less** toggle appears for that complaint.
-- [ ] AI Reasoning card has a primary-tinted border and shows the stored `reason` text (never regenerated).
-- [ ] Product Opportunity card uses the Lightbulb icon and renders `suggestedSoftware` (internal field name).
+- [ ] AI Reasoning is shown inside the M9 Market Gap Hypothesis section as a "Why this could matter" note (M9 restructured the page; the standalone "AI Reasoning" card was retired in favour of the hypothesis section).
+- [ ] Product Opportunity card uses the Lightbulb icon and renders `productAngle` (falling back to `suggestedSoftware` on legacy rows).
 
 ## 17. Related opportunities (if present)
 
@@ -235,13 +235,54 @@ Post-deploy checks (on the deployed URL):
 - [ ] Clicking "Use demo data" a second time shows the "Demo complaints are already loaded. You can run AI clustering now." message and does NOT create duplicates.
 - [ ] After demo data load, the success message guides to Opportunities → Run AI clustering.
 - [ ] Opportunity cards say "Product opportunity:" instead of "Suggested:".
-- [ ] Opportunity detail page right column shows "Product Opportunity" labelled section using `suggestedSoftware`.
+- [ ] Opportunity detail page shows a "Product Opportunity" labelled section.
 - [ ] Opportunity cards show a compact score helper: "Score combines frequency, severity, and confidence."
 - [ ] Opportunity detail page shows the full score explanation under the score breakdown.
-- [ ] Opportunity detail page left column reads: Problem Summary → Evidence From Complaints (example complaints + Keywords) → Why This Matters → Product Opportunity.
 - [ ] No-opportunities empty state offers direct CTAs: Use Demo Data / Download Sample CSV / Upload CSV / Run AI clustering.
 - [ ] Dashboard overview copy reads as "this MVP workspace" tone; the stale "Available in Milestone 3" note is gone.
 - [ ] No UI text says "Suggested Software" or "Suggested:" any more (internal `suggestedSoftware` DB field unchanged).
+
+---
+
+## 24. M8 — Flexible input (paste text + text files)
+
+- [ ] On `/dashboard/complaints`, three input tabs render: Upload CSV, Paste Text, Upload Text File.
+- [ ] CSV upload still works (retest the M2/M4 happy path).
+- [ ] "Download sample CSV" and "Use demo data" appear below all tabs (moved out of the CSV-only area) and still work.
+- [ ] Paste Text: paste bullet-list text → "Import pasted text" creates complaint rows.
+- [ ] Paste Text: paste blank-line-separated paragraphs → each paragraph becomes one complaint row.
+- [ ] Paste Text: entries under 10 characters are ignored (not imported).
+- [ ] Paste Text: exact duplicate bodies (case-insensitive) within the paste are skipped.
+- [ ] Paste Text: bodies already in the database (case- + whitespace-insensitive) are not re-inserted.
+- [ ] Paste Text: success summary "Imported N complaints … Now run AI clustering to generate opportunities." appears and links to Opportunities.
+- [ ] Repeat Paste Text with the same content in different casing → "These complaints are already loaded. You can run AI clustering now."
+- [ ] Upload Text File: a `.txt` file imports the same rows as pasting its contents would.
+- [ ] Upload Text File: a `.md` file imports the same rows.
+- [ ] Uploading a non-text file (e.g. `.png`) shows a clear "Unsupported file type" error and does not submit.
+- [ ] Source type dropdown + optional source label render for both paste and file; the label is not stored on the complaint (UI feedback only).
+- [ ] After a text import, clicking "Run AI clustering" on `/dashboard/opportunities` processes the new complaints into scored opportunities exactly as it does for CSV data.
+- [ ] Dashboard complaint KPI, complaints list, and complaints search reflect the new rows.
+- [ ] No Prisma model was changed for M8 (`Complaint` reused; no `Source`/`Upload`/`User` models).
+
+---
+
+## 25. M9 — Market Gap Hypothesis
+
+- [ ] `npx prisma validate` passes; `npx prisma generate` regenerates the client; `npx prisma db push` adds the new `Opportunity` columns non-destructively (no data wipe).
+- [ ] Run AI clustering creates opportunities that include `marketGap`, `targetCustomer`, `likelyCurrentWorkarounds`, `whyWorkaroundsFallShort`, `productAngle`, `differentiationAngle`, `validationQuestions`, `riskFlags`.
+- [ ] Opportunity detail page left column reads (in order): Problem Summary → Evidence From Complaints → Product Opportunity → Market Gap Hypothesis → Validation Questions → Risk Flags.
+- [ ] Market Gap Hypothesis section shows the six hypothesis fields with a clear "hypothesis, not proven market research" sub-label.
+- [ ] Validation Questions render as a numbered list.
+- [ ] Risk Flags render as a list with a warning icon per item.
+- [ ] Score Breakdown, Related Opportunities, and Prev/Next are still present (in the right column / below).
+- [ ] Opportunity cards show a compact "For: [targetCustomer] / Angle: [productAngle]" preview when M9 fields exist; the preview is hidden on legacy rows.
+- [ ] Saved page cards show the same compact M9 preview.
+- [ ] Product Opportunity section uses `productAngle` when present and falls back to `suggestedSoftware` — never shows two repetitive "Product Opportunity" + "Product Angle" sections with the same content.
+- [ ] Legacy opportunities created before M9 render without crashing: missing M9 fields show a subtle "Run AI clustering again to generate market gap hypotheses…" rerun hint (no fake placeholder analysis).
+- [ ] Mock fallback (no `GEMINI_API_KEY`) produces clearly-fake M9 fields prefixed "Mock …".
+- [ ] No UI text claims market size, revenue, or named competitors (unless a competitor is literally in the complaint text).
+- [ ] Search matches against `targetCustomer` and `productAngle` (type a word from either into the opportunities search box).
+- [ ] Save/unsave, CSV upload, paste text, `.txt`/`.md` upload, and Use Demo Data all still work unchanged.
 
 ---
 

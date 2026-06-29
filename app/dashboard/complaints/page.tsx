@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 
-import { CsvUploader } from "@/components/complaints/csv-uploader";
+import { ComplaintsInput } from "@/components/complaints/complaints-input";
 import { ComplaintsList } from "@/components/complaints/complaints-list";
 
 export default async function ComplaintsPage({
@@ -16,23 +16,25 @@ export default async function ComplaintsPage({
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Complaints</h1>
         <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
-          Add the pain signals Rift should work with. Use demo data to try the
-          flow with zero setup, or upload a CSV of your own complaints, reviews,
-          support tickets, or forum posts. Uploaded data stays in this MVP
-          project database.
+          Add market pain by uploading a CSV, pasting raw comments, or uploading
+          a text file. Rift will turn each complaint or review into a row before
+          AI clustering. Uploaded data stays in this MVP project database.
         </p>
       </div>
 
       <section>
         <h2 className="text-base font-semibold">Add complaints</h2>
         <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
-          Expected CSV columns: <code className="font-mono">body</code>{" "}
-          (required); optional <code className="font-mono">title</code>,{" "}
-          <code className="font-mono">sourceDate</code> (ISO date). You can
-          also download a sample CSV to see the format, or use demo data below.
+          Choose an input method below. For CSV, the expected columns are{" "}
+          <code className="font-mono">body</code> (required); optional{" "}
+          <code className="font-mono">title</code>,{" "}
+          <code className="font-mono">sourceDate</code> (ISO date). For pasted
+          text or <code className="font-mono">.txt</code>/<code>.md</code> files,
+          one complaint per line or one per blank-line-separated paragraph.
+          You can also download a sample CSV or use demo data below.
         </p>
         <div className="mt-3">
-          <CsvUploader />
+          <ComplaintsInput />
         </div>
       </section>
 

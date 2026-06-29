@@ -25,6 +25,8 @@ export default async function OpportunitiesPage() {
     confidence: o.confidence,
     keywords: o.keywords,
     suggestedSoftware: o.suggestedSoftware,
+    targetCustomer: o.targetCustomer,
+    productAngle: o.productAngle,
     createdAt: o.createdAt,
     saved: savedSet.has(o.id),
   }));
