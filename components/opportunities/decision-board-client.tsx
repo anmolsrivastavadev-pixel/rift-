@@ -24,6 +24,14 @@ import {
   DecisionStatusSelect,
   useDecisionStatuses,
 } from "@/components/opportunities/decision-status-select";
+import {
+  evidenceStorageKey,
+  parseEvidenceState,
+  computeEvidenceSignal,
+  computeSuggestedNextStep,
+  EVIDENCE_SIGNAL_LABELS,
+  type EvidenceState,
+} from "@/lib/validation-evidence";
 
 export type DecisionBoardOpportunity = {
   id: string;
@@ -73,6 +81,65 @@ function priorityColor(priority: string): string {
   }
 }
 
+function evidenceSignalColor(signal: string): string {
+  switch (signal) {
+    case "promising-signal":
+      return "text-[var(--color-success)]";
+    case "early-signal":
+      return "text-[var(--color-primary)]";
+    case "weak-signal":
+      return "text-[var(--color-danger)]";
+    case "mixed-signal":
+      return "text-[var(--color-warning)]";
+    case "needs-more-evidence":
+      return "text-[var(--color-warning)]";
+    default:
+      return "text-[var(--color-muted-foreground)]";
+  }
+}
+
+/* Read-only hook: loads evidence snapshots from localStorage for a set of
+ * opportunity IDs. Never writes to evidence keys — editing is detail-page
+ * only. Refreshes on mount and on window focus so the board updates after a
+ * founder edits evidence on the detail page and returns.
+ */
+function useEvidenceSnapshots(opportunityIds: string[]): {
+  snapshots: Record<string, EvidenceState>;
+  hydrated: boolean;
+} {
+  const [snapshots, setSnapshots] = React.useState<Record<string, EvidenceState>>({});
+  const [hydrated, setHydrated] = React.useState(false);
+
+  const readAll = React.useCallback(() => {
+    const map: Record<string, EvidenceState> = {};
+    try {
+      for (const id of opportunityIds) {
+        const raw = window.localStorage.getItem(evidenceStorageKey(id));
+        map[id] = parseEvidenceState(raw);
+      }
+    } catch {
+      // localStorage unavailable
+    }
+    return map;
+  }, [opportunityIds]);
+
+  React.useEffect(() => {
+    setSnapshots(readAll()); // eslint-disable-line react-hooks/set-state-in-effect
+    setHydrated(true);
+  }, [readAll]);
+
+  // Refresh on window focus so the board picks up evidence edits from the
+  // detail page without a full page reload.
+  React.useEffect(() => {
+    if (!hydrated) return;
+    const onFocus = () => setSnapshots(readAll());
+    window.addEventListener("focus", onFocus);
+    return () => window.removeEventListener("focus", onFocus);
+  }, [hydrated, readAll]);
+
+  return { snapshots, hydrated };
+}
+
 export function DecisionBoardClient({
   opportunities,
 }: {
@@ -80,6 +147,8 @@ export function DecisionBoardClient({
 }) {
   const ids = React.useMemo(() => opportunities.map((o) => o.id), [opportunities]);
   const { statuses, hydrated, setStatus } = useDecisionStatuses(ids);
+  const { snapshots: evidenceSnapshots, hydrated: evidenceHydrated } =
+    useEvidenceSnapshots(ids);
   const [filter, setFilter] = React.useState<FilterValue>("all");
 
   // Resolve the effective status for each opportunity (default undecided).
@@ -167,6 +236,11 @@ export function DecisionBoardClient({
       <p className="flex items-center gap-1 text-[11px] text-[var(--color-muted-foreground)]">
         <Info className="h-3 w-3" /> {TESTING_PRIORITY_HELPER}
       </p>
+      <p className="text-[11px] text-[var(--color-muted-foreground)]">
+        Testing Priority is based on opportunity score, complaint count,
+        confidence, and risk flags. Evidence Signal is based only on validation
+        evidence saved in this browser.
+      </p>
 
       {/* Opportunity comparison cards */}
       <div className="grid gap-4 lg:grid-cols-2">
@@ -251,6 +325,13 @@ export function DecisionBoardClient({
                   value={op.validationQuestions.length}
                 />
               </div>
+
+              {/* Evidence snapshot (read-only, from localStorage) */}
+              <EvidenceSnapshot
+                opportunityId={op.id}
+                evidence={evidenceHydrated ? evidenceSnapshots[op.id] : undefined}
+                hydrated={evidenceHydrated}
+              />
 
               {/* Decision status selector */}
               <div className="mt-4 flex items-center justify-between border-t border-[var(--color-border)] pt-3">
@@ -348,5 +429,54 @@ function Stat({
       <span className="font-medium text-[var(--color-foreground)]">{value}</span>
       <span className="text-[10px]">{label}</span>
     </span>
+  );
+}
+
+/* Compact read-only evidence snapshot for the Decision Board. Never edits
+ * evidence — just displays it and links to the detail-page Evidence Log.
+ */
+function EvidenceSnapshot({
+  opportunityId,
+  evidence,
+  hydrated,
+}: {
+  opportunityId: string;
+  evidence?: EvidenceState;
+  hydrated: boolean;
+}) {
+  const hasEvidence = hydrated && evidence && evidence.interviewsCompleted > 0;
+
+  return (
+    <div className="mt-3 rounded-[8px] border border-[var(--color-border)] bg-[var(--color-background)] p-3">
+      <p className="text-[10px] uppercase tracking-wide text-[var(--color-muted-foreground)]">
+        Evidence so far
+      </p>
+      {hydrated && hasEvidence && evidence ? (
+        <>
+          <p className={`mt-0.5 text-xs font-medium ${evidenceSignalColor(computeEvidenceSignal(evidence))}`}>
+            {EVIDENCE_SIGNAL_LABELS[computeEvidenceSignal(evidence)]}
+          </p>
+          <p className="mt-0.5 text-[11px] text-[var(--color-muted-foreground)]">
+            {evidence.interviewsCompleted} interviews ·{" "}
+            {evidence.peopleReportingSamePain} same pain ·{" "}
+            {evidence.peopleWillingToTry} willing to try ·{" "}
+            {evidence.peopleWillingToPay} willing to pay
+          </p>
+          <p className="mt-0.5 text-[11px] text-[var(--color-muted-foreground)]">
+            {computeSuggestedNextStep(evidence)}
+          </p>
+        </>
+      ) : (
+        <p className="mt-0.5 text-[11px] text-[var(--color-muted-foreground)]">
+          {hydrated ? "No evidence yet" : "—"}
+        </p>
+      )}
+      <Link
+        href={`/dashboard/opportunities/${opportunityId}#validation-evidence-log`}
+        className="mt-1.5 inline-block text-[11px] text-[var(--color-primary)] hover:underline"
+      >
+        Open evidence log
+      </Link>
+    </div>
   );
 }

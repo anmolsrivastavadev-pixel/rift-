@@ -360,6 +360,29 @@ Post-deploy checks (on the deployed URL):
 
 ---
 
+## 29. M13 — Evidence-Aware Decision Board
+
+- [ ] `/dashboard/opportunities/decision-board` loads with evidence snapshots on each opportunity card.
+- [ ] Each card shows: Evidence Signal label, interview/pain/willing-to-try/willing-to-pay counts, Suggested Next Step, and "Open evidence log" link.
+- [ ] Opportunities with no evidence show "No evidence yet" + link.
+- [ ] Evidence entered on the detail page appears on the Decision Board after refresh.
+- [ ] Evidence refreshes when the window receives focus (edit on detail page → return to board → focus → snapshot updates).
+- [ ] Evidence state is separate per opportunity ID.
+- [ ] Decision Board never writes to `rift-validation-evidence-${opportunityId}` (read-only).
+- [ ] "Open evidence log" links to `/dashboard/opportunities/[id]#validation-evidence-log`.
+- [ ] Anchor `#validation-evidence-log` scrolls to the Evidence Log section on the detail page.
+- [ ] Header helper line explains Testing Priority vs Evidence Signal.
+- [ ] Testing Priority still appears and still says it is not a new AI score.
+- [ ] Evidence Signal does not automatically change decision status.
+- [ ] No evidence filters were added.
+- [ ] Decision status selector, filters, and summary counts all still work.
+- [ ] Copy Validation Brief still works unchanged.
+- [ ] Save/unsave, Score Breakdown, Related Opportunities, Prev/Next, and upload flows all still work.
+- [ ] No localStorage or hydration errors in browser console.
+- [ ] No Prisma schema was changed; no new dependencies; no new Gemini calls.
+
+---
+
 ## Do not run
 
 These are destructive and must never appear in your testing flow:

@@ -99,7 +99,10 @@ export function ValidationEvidenceLog({
   const hasNoEvidence = state.interviewsCompleted === 0 && !hydrated;
 
   return (
-    <section className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-6 space-y-6">
+    <section
+      id="validation-evidence-log"
+      className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-6 space-y-6 scroll-mt-6"
+    >
       {/* Header */}
       <div className="flex flex-wrap items-start justify-between gap-3 border-b border-[var(--color-border)] pb-4">
         <div>
