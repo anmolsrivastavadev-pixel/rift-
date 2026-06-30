@@ -152,29 +152,29 @@ Upload CSV or Use demo data
 
 Do **not** start any of these without an explicit user prompt. They appear here only for visibility.
 
-> Note: M7–M11 are complete — see "Completed milestones" above. The items below are post-MVP and start at M12.
+> Note: M7–M15 are complete — see "Completed milestones" above. The items below are post-MVP and start at M16.
 
-### M12 — Authentication & user accounts
+### M16 — Authentication & user accounts
 - Per-user saved opportunities, upload ownership, private dashboards.
 - Likely tech: NextAuth or Clerk; new `User` model + FK on `SavedOpportunity` and a new `UploadHistory`.
 
-### M13 — Upload history & re-runs
+### M17 — Upload history & re-runs
 - Persist each upload as a row in the DB; let users reopen past analyses and compare AI re-runs.
 - Requires a new `Upload` model (file name, date, complaint count, opportunities generated, processing status).
 
-### M14 — Comparison & multi-opportunity tools
+### M18 — Comparison & multi-opportunity tools
 - Side-by-side comparison view for 2–3 opportunities; export to PDF/CSV.
 
-### M15 — Notification & in-app messaging
+### M19 — Notification & in-app messaging
 - Server-side status when long jobs complete; optional email digest.
 
-### M16 — Multi-source ingestion / scraping (if explicitly approved)
+### M20 — Multi-source ingestion / scraping (if explicitly approved)
 - Auto-pull complaints from review sites, app stores, forums. **Out of scope for MVP** — must not be added automatically.
 
-### M17 — Light mode + theming
+### M21 — Light mode + theming
 - Toggle light/dark; persist preference locally. Pure UX; no schema changes.
 
-### M18 — Prompt experimentation
+### M22 — Prompt experimentation
 - A/B different Gemini prompts and track quality. **Must not change the production prompt or scoring weights without explicit sign-off.**
 
 ---
