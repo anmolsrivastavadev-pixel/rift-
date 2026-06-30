@@ -141,11 +141,11 @@ export default async function OpportunityDetailPage({
 
       <PrevNextNav prevId={prevId} nextId={nextId} />
 
-      <div className="grid gap-8 lg:grid-cols-[2fr_1fr]">
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_420px]">
         {/* LEFT column */}
         <div className="space-y-6">
           {/* 1. Problem Summary */}
-          <section className="max-w-2xl">
+          <section>
             <h2 className="text-base font-semibold">Problem Summary</h2>
             <p className="mt-2 text-sm leading-relaxed text-[var(--color-muted-foreground)]">
               {op.summary}
@@ -153,7 +153,7 @@ export default async function OpportunityDetailPage({
           </section>
 
           {/* 2. Evidence From Complaints — example complaints + keywords */}
-          <section className="max-w-2xl">
+          <section>
             <h2 className="text-base font-semibold">Evidence From Complaints</h2>
             <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
               Real, uploaded complaints that the AI grouped into this
@@ -187,7 +187,7 @@ export default async function OpportunityDetailPage({
               The wedge/narrow entry point lives in the Market Gap Hypothesis
               section as "Product Angle" (productAngle) so the two never show
               the same content. suggestedSoftware is always non-null. */}
-          <section className="max-w-2xl rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-6">
+          <section className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-6">
             <h2 className="flex items-center gap-2 text-sm font-semibold">
               <Lightbulb className="h-4 w-4 text-[var(--color-warning)]" />
               Product Opportunity
