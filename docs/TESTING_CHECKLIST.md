@@ -404,6 +404,26 @@ Post-deploy checks (on the deployed URL):
 
 ---
 
+## 31. M15 — MVP Release Candidate Polish
+
+- [ ] Sidebar nav says "Home" (not "Overview") and includes a "Decision Board" link.
+- [ ] Mobile top-nav bar renders on small screens (horizontal scroll) with all nav links.
+- [ ] Mobile content is not hidden under the top-nav bar (`pt-12` on mobile, `pt-0` on desktop).
+- [ ] Detail-page loading skeleton grid matches the actual page layout (`minmax(0,1fr)_420px`).
+- [ ] No UI text says "Suggested Software" or "Suggested:" (internal `suggestedSoftware` field is fine).
+- [ ] No UI text says "Available in Milestone N" or references milestone numbers.
+- [ ] No UI text claims "guaranteed", "proven opportunity", "blue ocean", "validated opportunity", "highest ROI", or "confirmed market" (careful disclaimers like "not proven market research" are correct and should remain).
+- [ ] All local-only features (Validation Checklist, Evidence Log, Decision Board, Dashboard summaries) include a "this browser" note.
+- [ ] Save button has `aria-pressed` and `aria-label`.
+- [ ] Prev/Next nav has `aria-label` and `aria-disabled`.
+- [ ] No `useSyncExternalStore` actual usage in the codebase (comments mentioning it are fine).
+- [ ] No obvious horizontal overflow on desktop on any page.
+- [ ] Mobile layout stacks cleanly on: dashboard, opportunities, detail page, Decision Board, Saved.
+- [ ] All existing routes still load and work.
+- [ ] No Prisma schema was changed; no new dependencies; no new Gemini calls; no new features.
+
+---
+
 ## Do not run
 
 These are destructive and must never appear in your testing flow:

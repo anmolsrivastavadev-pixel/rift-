@@ -4,7 +4,7 @@ export default function LoadingOpportunityDetail() {
       <div className="h-8 w-40 animate-pulse rounded bg-[var(--color-card)]" />
       <div className="h-28 w-full animate-pulse rounded-[12px] bg-[var(--color-card)]" />
       <div className="h-12 w-full animate-pulse rounded-[12px] bg-[var(--color-card)]" />
-      <div className="grid gap-8 lg:grid-cols-[2fr_1fr]">
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_420px]">
         <div className="space-y-4">
           <div className="h-24 w-full animate-pulse rounded-[12px] bg-[var(--color-card)]" />
           <div className="h-32 w-full animate-pulse rounded-[12px] bg-[var(--color-card)]" />

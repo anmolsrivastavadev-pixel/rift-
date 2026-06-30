@@ -117,6 +117,16 @@ Each milestone:
 - **What was built:** Rewrote `app/dashboard/page.tsx` with a Founder Command Center header, 4 project stat cards (Complaints loaded / Opportunities generated / Saved / Highest score — all server-side via Prisma), a `FounderCommandClient` client component that reads decision + evidence localStorage (read-only, never writes, refreshes on window focus) and renders: Recommended Next Action card, 5 Workflow Step cards (Import → Generate → Review → Validate → Decide with deterministic status labels), Decision status summary (Pursue/Park/Reject/Undecided counts), Evidence summary (with evidence / no evidence / promising / needs more counts). Pure helpers in `lib/dashboard-plan.ts` (`computeWorkflowSteps`, `computeNextAction`, types). High-signal opportunities section (top 3 by score, server-side). Empty states for no-complaints and no-opportunities. Kept the existing Complaints-over-time chart and Recent complaints list.
 - **Not included:** No schema changes, no DB persistence, no auth, no new dependencies, no AI calls, no scoring changes, no evidence/decision editing on the dashboard, no Copy Validation Brief changes, no existing routes removed. Dashboard reads localStorage but never writes to decision or evidence keys.
 
+### M15 — MVP Release Candidate Polish
+- **Status:** ✅ Done
+- **Purpose:** Final polish pass to make Rift feel clean, coherent, demo-ready, and free of obvious UI/copy/accessibility issues. Not a feature expansion.
+- **What was built/fixed:**
+  - Sidebar nav: renamed "Overview" → "Home" (matches the Founder Command Center page), added Decision Board to the nav, added `aria-label` on the nav element, added `focus-visible` outline on sidebar links.
+  - Mobile nav: added a fixed top-nav bar (horizontal scroll) visible only on `md:hidden` so mobile users can navigate — previously the sidebar was `hidden md:block` with no mobile alternative. Added `pt-12 md:pt-0` to the main content area so it doesn't sit under the mobile bar.
+  - Detail-page loading skeleton: fixed the grid ratio from `lg:grid-cols-[2fr_1fr]` to `lg:grid-cols-[minmax(0,1fr)_420px]` to match the actual detail page layout from the M10 layout polish.
+  - Verified: no stale "Suggested Software" in UI, no "Milestone N" in app code, no `useSyncExternalStore` actual usage (only comments), no overclaiming ("guaranteed/proven/validated opportunity/blue ocean" — the only "proven" hits are in careful disclaimers like "not proven market research"), all local-only features have "Saved only in this browser" or equivalent, `SaveButton` has `aria-pressed`/`aria-label`, `PrevNextNav` has `aria-label`/`aria-disabled`.
+- **Not included:** No schema changes, no AI/scoring changes, no new dependencies, no new features, no redesign, no new routes, no removed routes. Dead-code cleanup was conservative — only the loading skeleton grid was updated to match the actual page.
+
 ---
 
 ## Current state
