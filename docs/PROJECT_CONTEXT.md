@@ -113,7 +113,8 @@ components/
                          related-opportunity-card, no-related-empty, prev-next-nav,
                          example-complaints, complaint-body, empty-states, run-button,
                          market-gap-hypothesis (M9), validation-workspace + validation-checklist
-                         + copy-validation-brief (M10)
+                         + copy-validation-brief (M10), decision-board-client +
+                         decision-status-select (M11)
 
 lib/
 ├─ db.ts                 Prisma client singleton (driver-adapter mode)
@@ -128,6 +129,7 @@ lib/
 ├─ utils.ts             cn() (clsx + tailwind-merge)
 ├─ text-import.ts       Pure paste/text-file parser → Complaint rows (M8)
 ├─ validation-plan.ts   Pure deterministic helpers for M10 validation workspace
+├─ decision-board.ts    Pure deterministic helpers for M11 decision board
 ├─ prompts.ts            ⚠ LEGACY/UNUSED — dental-specific prompts from an earlier
 ├─ generated/prisma/    Prisma client output (gitignored — regenerated at build)
 
@@ -304,6 +306,7 @@ The pipeline **deletes existing opportunities before inserting new ones** (re-ru
 | `/dashboard/complaints` | dynamic | Upload UI + complaints list + search (?q=) |
 | `/dashboard/opportunities` | static | AI engine + OpportunityBrowser (client-side search/filter/sort) |
 | `/dashboard/opportunities/[id]` | dynamic | Detail page |
+| `/dashboard/opportunities/decision-board` | static | Decision Board (M11) |
 | `/dashboard/saved` | static | Saved opportunities grid |
 | `/robots.txt` | static | Robots |
 | `/sitemap.xml` | static | Sitemap (only `/`) |

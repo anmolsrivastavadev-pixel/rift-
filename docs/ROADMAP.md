@@ -93,6 +93,12 @@ Each milestone:
 - **What was built:** A `ValidationWorkspace` section on the detail page with 8 sub-sections: Hypothesis To Test, Who To Interview, Interview Questions, Evidence To Collect, Signs This May Be Worth Pursuing, Risks To Test, Validation Checklist, and Copy Validation Brief. Pure deterministic helpers in `lib/validation-plan.ts` (hypothesis builder, fallback questions/risks, evidence checklist, success signals, copyable plain-text brief) — no Gemini calls, no new AI content. Interactive checklist uses `useSyncExternalStore` + localStorage keyed by opportunity ID (no DB, no auth, "Saved only in this browser" note). Copy Validation Brief uses the browser clipboard API. Standalone M9 `ValidationQuestions` and `RiskFlags` sections were removed from the detail page and absorbed into the Validation Workspace to avoid duplicates. Missing M9 fields use deterministic fallback copy or a rerun hint. Legacy pre-M9 rows render with fallbacks.
 - **Not included:** No schema changes, no AI prompt/schema changes, no scoring changes, no new dependencies, no DB-persisted validation notes, no interview CRM, no PDF/CSV export, no auth, no scraping. localStorage is the only persistence for checklist state.
 
+### M11 — Opportunity Decision Board
+- **Status:** ✅ Done
+- **Purpose:** Help founders move from discovery to decision — "which opportunity should I test, park, or reject next?" instead of just listing opportunities.
+- **What was built:** New route `/dashboard/opportunities/decision-board` (server page fetches opportunities, passes to a client component). `components/opportunities/decision-board-client.tsx` renders summary cards (Total / Pursue / Park / Reject / Undecided), client-side status filters, and comparison cards showing title, score, Testing Priority label, product opportunity, target customer, mini-stats (complaints, severity, confidence, risk count, question count), and a decision status selector. `components/opportunities/decision-status-select.tsx` — native `<select>` + a `useDecisionStatuses` hook that reads/writes localStorage keyed `rift-opportunity-decision-${id}` after hydration (no `useSyncExternalStore`, no hydration crash). `lib/decision-board.ts` — pure deterministic `computeTestingPriority` helper (Needs more evidence → High risk → Strong signal → Worth testing → Needs review) based on score/mentions/confidence/riskFlags, plus `TestingPriority` labels and helper copy. Link from `/dashboard/opportunities` to the Decision Board. Empty state with CTAs to Complaints and Opportunities. Saved-vs-Decision helper line.
+- **Not included:** No schema changes, no DB persistence, no auth, no new dependencies, no AI calls, no scoring changes, no notes, no drag-and-drop, no kanban, no export. Decision status is localStorage-only and separate from Saved/bookmark behavior.
+
 ---
 
 ## Current state
@@ -118,29 +124,29 @@ Upload CSV or Use demo data
 
 Do **not** start any of these without an explicit user prompt. They appear here only for visibility.
 
-> Note: M7 (Repositioning + Demo Flow), M8 (Flexible Input), and M9 (Market Gap Hypothesis) are complete — see "Completed milestones" above. The items below are post-MVP and start at M10.
+> Note: M7–M11 are complete — see "Completed milestones" above. The items below are post-MVP and start at M12.
 
-### M10 — Authentication & user accounts
+### M12 — Authentication & user accounts
 - Per-user saved opportunities, upload ownership, private dashboards.
 - Likely tech: NextAuth or Clerk; new `User` model + FK on `SavedOpportunity` and a new `UploadHistory`.
 
-### M11 — Upload history & re-runs
+### M13 — Upload history & re-runs
 - Persist each upload as a row in the DB; let users reopen past analyses and compare AI re-runs.
 - Requires a new `Upload` model (file name, date, complaint count, opportunities generated, processing status).
 
-### M12 — Comparison & multi-opportunity tools
+### M14 — Comparison & multi-opportunity tools
 - Side-by-side comparison view for 2–3 opportunities; export to PDF/CSV.
 
-### M13 — Notification & in-app messaging
+### M15 — Notification & in-app messaging
 - Server-side status when long jobs complete; optional email digest.
 
-### M14 — Multi-source ingestion / scraping (if explicitly approved)
+### M16 — Multi-source ingestion / scraping (if explicitly approved)
 - Auto-pull complaints from review sites, app stores, forums. **Out of scope for MVP** — must not be added automatically.
 
-### M15 — Light mode + theming
+### M17 — Light mode + theming
 - Toggle light/dark; persist preference locally. Pure UX; no schema changes.
 
-### M16 — Prompt experimentation
+### M18 — Prompt experimentation
 - A/B different Gemini prompts and track quality. **Must not change the production prompt or scoring weights without explicit sign-off.**
 
 ---

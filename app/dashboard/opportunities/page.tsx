@@ -1,6 +1,10 @@
+import Link from "next/link";
+import { LayoutGrid } from "lucide-react";
+
 import { prisma } from "@/lib/db";
 import { RunOpportunitiesButton } from "@/components/opportunities/run-button";
 import { OpportunityBrowser } from "@/components/opportunities/opportunity-browser";
+import { Button } from "@/components/ui/button";
 
 export default async function OpportunitiesPage() {
   const [ops, complaintCount, savedRows] = await Promise.all([
@@ -42,6 +46,11 @@ export default async function OpportunitiesPage() {
             {ops.length === 1 ? "y" : "ies"}.
           </p>
         </div>
+        <Button asChild variant="outline">
+          <Link href="/dashboard/opportunities/decision-board">
+            <LayoutGrid className="h-4 w-4" /> Decision Board
+          </Link>
+        </Button>
       </div>
 
       <section className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-6">

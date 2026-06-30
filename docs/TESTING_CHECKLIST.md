@@ -287,7 +287,7 @@ Post-deploy checks (on the deployed URL):
 
 ## 26. M10 — Opportunity Validation Workflow
 
-- [ ] Opportunity detail page shows a Validation Workspace section (after Market Gap Hypothesis, before the right column).
+- [ ] Opportunity detail page shows a Validation Workspace section (full-width, below the two-column layout).
 - [ ] Validation Workspace includes: Hypothesis To Test, Who To Interview, Interview Questions, Evidence To Collect, Signs This May Be Worth Pursuing, Risks To Test, Validation Checklist, Copy Validation Brief.
 - [ ] Hypothesis To Test uses `marketGap` → `productAngle` → `summary` → `suggestedSoftware` fallback; shows rerun hint when all M9 fields are missing.
 - [ ] Who To Interview uses `targetCustomer` when available; falls back to "Start with people who match the complaints shown in Evidence From Complaints."
@@ -304,6 +304,30 @@ Post-deploy checks (on the deployed URL):
 - [ ] If clipboard fails, "Copy failed. Select the text manually." appears.
 - [ ] Existing Score Breakdown, Related Opportunities, Prev/Next, save/unsave all still work.
 - [ ] Existing search/filter/sort, CSV/paste/.txt/.md upload, demo data, AI clustering all still work.
+- [ ] No Prisma schema was changed; no new dependencies; no new Gemini calls.
+
+---
+
+## 27. M11 — Opportunity Decision Board
+
+- [ ] `/dashboard/opportunities/decision-board` loads.
+- [ ] `/dashboard/opportunities` has a "Decision Board" link/button to the new page.
+- [ ] `/dashboard/opportunities` page still works unchanged.
+- [ ] Empty state shows when there are no opportunities ("No opportunities to compare yet" + CTAs to Complaints and Opportunities).
+- [ ] Existing opportunities render as comparison cards on the Decision Board.
+- [ ] Summary cards show Total / Pursue / Park / Reject / Undecided counts.
+- [ ] Status selector (native `<select>`) works — can change an opportunity to Pursue / Park / Reject / Undecided.
+- [ ] Status persists after refresh in the same browser (localStorage key `rift-opportunity-decision-${opportunity.id}`).
+- [ ] Status is separate per opportunity ID.
+- [ ] Filters work for All / Pursue / Park / Reject / Undecided.
+- [ ] Testing Priority labels appear (Needs more evidence / High risk / Strong signal / Worth testing / Needs review).
+- [ ] Testing Priority copy makes clear it is not a new AI score.
+- [ ] Testing Priority is NOT shown as a numeric score, percentage, rank, or replacement for Opportunity Score.
+- [ ] Each card links to the opportunity detail page.
+- [ ] "Saved only in this browser." note appears.
+- [ ] "Saved opportunities are bookmarks. Decision status is your local next-step choice." helper line appears in the header.
+- [ ] Existing Opportunity Browser, detail page, Validation Workspace, checklist, Copy Validation Brief, save/unsave, and upload flows all still work.
+- [ ] No localStorage or hydration errors in the browser console.
 - [ ] No Prisma schema was changed; no new dependencies; no new Gemini calls.
 
 ---
