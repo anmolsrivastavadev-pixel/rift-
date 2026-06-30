@@ -383,6 +383,27 @@ Post-deploy checks (on the deployed URL):
 
 ---
 
+## 30. M14 — Founder Command Center
+
+- [ ] `/dashboard` loads with "Founder Command Center" header.
+- [ ] 4 project stat cards render: Complaints loaded, Opportunities generated, Saved, Highest score (shows `—` when no opportunities).
+- [ ] Recommended Next Action card renders and changes based on complaints/opportunities/local decision+evidence state.
+- [ ] 5 Workflow Step cards render (Import → Generate → Review → Validate → Decide) with deterministic status labels (Not started / Ready / In progress / Done).
+- [ ] Decision status summary reads existing localStorage decision statuses (Pursue / Park / Reject / Undecided counts).
+- [ ] Evidence summary reads existing localStorage evidence (with evidence / no evidence / promising / needs more counts).
+- [ ] Dashboard does NOT write to decision or evidence localStorage (read-only).
+- [ ] Evidence/decision summaries refresh on window focus.
+- [ ] High-signal opportunities section shows up to 3 top-scoring opportunities with links to detail pages.
+- [ ] Empty state "Start by adding customer complaints" appears when complaintCount = 0.
+- [ ] Empty state "Ready to generate opportunities" appears when complaints exist but no opportunities.
+- [ ] Links to Complaints, Opportunities, Decision Board, and detail pages all work.
+- [ ] Existing `/dashboard/complaints`, `/dashboard/opportunities`, `/dashboard/opportunities/decision-board`, and detail pages all still work.
+- [ ] Validation Evidence Log, Decision Board, Copy Validation Brief, save/unsave all still work.
+- [ ] No localStorage or hydration errors in browser console.
+- [ ] No Prisma schema was changed; no new dependencies; no new Gemini calls.
+
+---
+
 ## Do not run
 
 These are destructive and must never appear in your testing flow:

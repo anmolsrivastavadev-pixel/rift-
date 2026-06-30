@@ -3,10 +3,10 @@ import {
   ArrowRight,
   FileText,
   Target,
-  Sparkles,
   Users,
-  Gauge,
-  Layers,
+  Bookmark,
+  Trophy,
+  Briefcase,
 } from "lucide-react";
 
 import { prisma } from "@/lib/db";
@@ -15,7 +15,9 @@ import {
   ComplaintsChart,
   type DayBucket,
 } from "@/components/dashboard/complaints-chart";
+import { FounderCommandClient } from "@/components/dashboard/founder-command-client";
 import { Button } from "@/components/ui/button";
+import type { DashboardStats } from "@/lib/dashboard-plan";
 
 function bucketByDay(rows: { sourceDate: Date | null }[]): DayBucket[] {
   const map = new Map<string, number>();
@@ -31,12 +33,14 @@ function bucketByDay(rows: { sourceDate: Date | null }[]): DayBucket[] {
 
 export default async function DashboardPage() {
   const [
-    total,
+    complaintCount,
     recent,
     dated,
     opportunityCount,
-    avgScore,
-    industries,
+    savedCount,
+    topOpportunity,
+    topOpportunities,
+    opportunityIds,
   ] = await Promise.all([
     prisma.complaint.count(),
     prisma.complaint.findMany({
@@ -49,134 +53,210 @@ export default async function DashboardPage() {
       where: { sourceDate: { not: null } },
     }),
     prisma.opportunity.count(),
-    prisma.opportunity.aggregate({ _avg: { opportunityScore: true } }),
-    prisma.opportunity.findMany({ select: { industry: true } }),
+    prisma.savedOpportunity.count(),
+    prisma.opportunity.aggregate({ _max: { opportunityScore: true } }),
+    prisma.opportunity.findMany({
+      orderBy: { opportunityScore: "desc" },
+      take: 3,
+      select: {
+        id: true,
+        title: true,
+        summary: true,
+        industry: true,
+        opportunityScore: true,
+        mentions: true,
+      },
+    }),
+    prisma.opportunity.findMany({
+      orderBy: { opportunityScore: "desc" },
+      take: 100,
+      select: { id: true },
+    }),
   ]);
 
-  const industriesDiscovered = new Set(industries.map((o) => o.industry)).size;
-
+  const highestScore = topOpportunity._max.opportunityScore ?? null;
   const buckets = bucketByDay(dated);
+
+  const stats: DashboardStats = {
+    complaintCount,
+    opportunityCount,
+    savedCount,
+    highestScore,
+  };
 
   return (
     <div className="mx-auto max-w-6xl space-y-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Overview</h1>
-          <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
-            This MVP workspace shows the data you add — demo complaints or your
-            own uploads. Nothing here is public, shared, or hardcoded.
-          </p>
-        </div>
-        <Button asChild>
-          <Link href="/dashboard/complaints">
-            Add complaints <ArrowRight className="h-4 w-4" />
-          </Link>
-        </Button>
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-semibold tracking-tight">
+          Founder Command Center
+        </h1>
+        <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
+          Track your opportunity discovery workflow from raw complaints to
+          validated next steps.
+        </p>
+        <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
+          Rift helps you move from customer pain signals to opportunities,
+          validation evidence, and decisions.
+        </p>
       </div>
 
+      {/* Project stat cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          icon={Target}
-          label="Opportunities"
-          value={opportunityCount.toLocaleString()}
-          hint={
-            opportunityCount > 0 ? "Discovered by AI" : "Run AI clustering →"
-          }
-        />
-        <StatCard
-          icon={Gauge}
-          label="Avg. score"
-          value={
-            avgScore._avg.opportunityScore != null
-              ? Math.round(avgScore._avg.opportunityScore).toString()
-              : "—"
-          }
-          hint="Across all opportunities"
-        />
-        <StatCard
           icon={Users}
-          label="Complaints"
-          value={total.toLocaleString()}
-          hint="Total processed"
+          label="Complaints loaded"
+          value={complaintCount.toLocaleString()}
+          hint={complaintCount > 0 ? "Ready for clustering" : "None yet"}
         />
         <StatCard
-          icon={Layers}
-          label="Industries"
-          value={industriesDiscovered.toLocaleString()}
-          hint="Distinct contexts"
+          icon={Target}
+          label="Opportunities generated"
+          value={opportunityCount.toLocaleString()}
+          hint={opportunityCount > 0 ? "Discovered by AI" : "Run clustering →"}
+        />
+        <StatCard
+          icon={Bookmark}
+          label="Saved opportunities"
+          value={savedCount.toLocaleString()}
+          hint={savedCount > 0 ? "Bookmarked" : "None saved"}
+        />
+        <StatCard
+          icon={Trophy}
+          label="Highest score"
+          value={highestScore !== null ? highestScore.toString() : "—"}
+          hint="Opportunity score (0–100)"
         />
       </div>
 
-      <section className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-6">
-        <h2 className="text-base font-semibold">Complaints over time</h2>
-        <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
-          Bucketed by source date when available; falls back to import date.
-        </p>
-        <div className="mt-4">
-          <ComplaintsChart data={buckets} />
+      {/* Empty state: no complaints */}
+      {complaintCount === 0 ? (
+        <div className="rounded-[12px] border border-dashed border-[var(--color-border)] bg-[var(--color-card)] p-12 text-center">
+          <FileText className="mx-auto h-8 w-8 text-[var(--color-muted-foreground)]" />
+          <h2 className="mt-4 text-base font-semibold">
+            Start by adding customer complaints
+          </h2>
+          <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
+            Import complaints from CSV, paste text, upload a text file, or use
+            demo data to begin.
+          </p>
+          <Button asChild className="mt-4">
+            <Link href="/dashboard/complaints">
+              Go to Complaints <ArrowRight className="h-4 w-4" />
+            </Link>
+          </Button>
         </div>
-      </section>
-
-      <section>
-        <div className="flex items-center justify-between">
-          <h2 className="text-base font-semibold">Recent complaints</h2>
-          <Link
-            href="/dashboard/complaints"
-            className="text-sm text-[var(--color-primary)] hover:underline"
-          >
-            View all
-          </Link>
+      ) : opportunityCount === 0 ? (
+        /* Empty state: complaints but no opportunities */
+        <div className="rounded-[12px] border border-dashed border-[var(--color-border)] bg-[var(--color-card)] p-12 text-center">
+          <Target className="mx-auto h-8 w-8 text-[var(--color-muted-foreground)]" />
+          <h2 className="mt-4 text-base font-semibold">
+            Ready to generate opportunities
+          </h2>
+          <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
+            Run AI clustering to turn complaints into scored opportunity
+            hypotheses.
+          </p>
+          <Button asChild className="mt-4">
+            <Link href="/dashboard/opportunities">
+              Go to Opportunities <ArrowRight className="h-4 w-4" />
+            </Link>
+          </Button>
         </div>
+      ) : null}
 
-        {recent.length === 0 ? (
-          <div className="mt-4 rounded-[12px] border border-dashed border-[var(--color-border)] bg-[var(--color-card)] p-12 text-center">
-            <FileText className="mx-auto h-8 w-8 text-[var(--color-muted-foreground)]" />
-            <p className="mt-3 text-sm text-[var(--color-muted-foreground)]">
-              No complaints in this MVP workspace yet. Use demo data (fake and
-              safe to test with), download a sample CSV, or upload your own.
-            </p>
-            <Button asChild className="mt-4">
-              <Link href="/dashboard/complaints">
-                Add complaints <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
+      {/* Client-side workflow + next action + decision/evidence snapshot */}
+      <FounderCommandClient stats={stats} opportunityIds={opportunityIds.map((o) => o.id)} />
+
+      {/* High-signal opportunities (only when they exist) */}
+      {topOpportunities.length > 0 && (
+        <div>
+          <div className="flex items-center justify-between">
+            <h2 className="text-base font-semibold">High-signal opportunities</h2>
+            <Link
+              href="/dashboard/opportunities"
+              className="text-sm text-[var(--color-primary)] hover:underline"
+            >
+              View all
+            </Link>
           </div>
-        ) : (
-          <ul className="mt-4 space-y-2">
-            {recent.map((c) => (
-              <li
-                key={c.id}
-                className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-4"
+          <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {topOpportunities.map((o) => (
+              <Link
+                key={o.id}
+                href={`/dashboard/opportunities/${o.id}`}
+                className="group flex flex-col rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-5 transition-all duration-150 ease-out hover:-translate-y-0.5 hover:border-[var(--color-primary)]/60 hover:shadow-md"
               >
-                <p className="truncate text-sm font-medium">{c.title}</p>
-                <p className="mt-0.5 line-clamp-1 text-xs text-[var(--color-muted-foreground)]">
-                  {c.body}
+                <div className="flex items-center gap-1.5 text-[11px] uppercase tracking-wide text-[var(--color-muted-foreground)]">
+                  <Briefcase className="h-3 w-3" />
+                  {o.industry}
+                </div>
+                <h3 className="mt-1.5 line-clamp-2 text-sm font-semibold leading-snug group-hover:text-[var(--color-primary)]">
+                  {o.title}
+                </h3>
+                <p className="mt-1 line-clamp-2 text-xs text-[var(--color-muted-foreground)]">
+                  {o.summary}
                 </p>
-              </li>
+                <div className="mt-3 flex items-center justify-between border-t border-[var(--color-border)] pt-2">
+                  <span className="inline-flex items-center gap-1 text-xs text-[var(--color-muted-foreground)]">
+                    <Users className="h-3 w-3" /> {o.mentions} complaints
+                  </span>
+                  <span className="text-lg font-bold text-[var(--color-primary)]">
+                    {o.opportunityScore}
+                  </span>
+                </div>
+              </Link>
             ))}
-          </ul>
-        )}
-      </section>
-
-      <section className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-6">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-[12px] bg-[var(--color-primary)]/10 text-[var(--color-primary)]">
-            <Sparkles className="h-5 w-5" />
-          </div>
-          <div>
-            <h2 className="text-base font-semibold">Next: generate opportunities</h2>
-            <p className="text-xs text-[var(--color-muted-foreground)]">
-              Run AI clustering to group your complaints into scored startup
-              opportunities. Existing opportunities are replaced on each run.
-            </p>
           </div>
         </div>
-        <Button asChild variant="outline" className="mt-4">
-          <Link href="/dashboard/opportunities">
-            <Target className="h-4 w-4" /> Run AI clustering
-          </Link>
-        </Button>
-      </section>
+      )}
+
+      {/* Complaints over time chart (keep existing) */}
+      {complaintCount > 0 && (
+        <section className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-6">
+          <h2 className="text-base font-semibold">Complaints over time</h2>
+          <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
+            Bucketed by source date when available; falls back to import date.
+          </p>
+          <div className="mt-4">
+            <ComplaintsChart data={buckets} />
+          </div>
+        </section>
+      )}
+
+      {/* Recent complaints (keep existing, only when complaints exist) */}
+      {complaintCount > 0 && (
+        <section>
+          <div className="flex items-center justify-between">
+            <h2 className="text-base font-semibold">Recent complaints</h2>
+            <Link
+              href="/dashboard/complaints"
+              className="text-sm text-[var(--color-primary)] hover:underline"
+            >
+              View all
+            </Link>
+          </div>
+          {recent.length === 0 ? (
+            <p className="mt-4 text-sm text-[var(--color-muted-foreground)]">
+              No complaints found.
+            </p>
+          ) : (
+            <ul className="mt-4 space-y-2">
+              {recent.map((c) => (
+                <li
+                  key={c.id}
+                  className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-4"
+                >
+                  <p className="truncate text-sm font-medium">{c.title}</p>
+                  <p className="mt-0.5 line-clamp-1 text-xs text-[var(--color-muted-foreground)]">
+                    {c.body}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      )}
     </div>
   );
 }
