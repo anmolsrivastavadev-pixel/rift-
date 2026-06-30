@@ -332,6 +332,34 @@ Post-deploy checks (on the deployed URL):
 
 ---
 
+## 28. M12 — Validation Evidence Log
+
+- [ ] Opportunity detail page shows a Validation Evidence Log section below the Validation Workspace.
+- [ ] Evidence Log has three grouped cards: Conversation counts, Signal quality, Evidence summary.
+- [ ] Numeric fields (Interviews completed, People reporting same pain, People using workaround, People willing to try, People willing to pay) update and persist after refresh.
+- [ ] Numeric fields clamp to 0–20.
+- [ ] Dependent counts never exceed Interviews completed.
+- [ ] Lowering Interviews completed automatically clamps dependent counts down.
+- [ ] Empty numeric input does not store `NaN`.
+- [ ] Select fields (Strongest signal, Biggest concern) update and persist after refresh.
+- [ ] Unknown select values in localStorage fall back to "None yet".
+- [ ] Textarea updates and persists after refresh.
+- [ ] Textarea clamps to 500 characters.
+- [ ] Reset evidence resets only evidence for that opportunity (does not reset checklist, decision status, saved, or DB).
+- [ ] Evidence state is separate per opportunity ID (localStorage key `rift-validation-evidence-${opportunity.id}`).
+- [ ] Evidence Signal label updates deterministically (No evidence → Needs more → Weak → Promising → Mixed → Early).
+- [ ] Evidence Signal copy says it is not an AI score or proof.
+- [ ] Suggested Next Step appears as helper copy only (does not update M11 decision status).
+- [ ] "Saved only in this browser." note appears.
+- [ ] Privacy helper appears ("Store patterns, not personal details…").
+- [ ] No localStorage or hydration errors in browser console.
+- [ ] Decision Board still loads, filters work, status persists.
+- [ ] Copy Validation Brief still works.
+- [ ] Save/unsave, Score Breakdown, Related Opportunities, Prev/Next, and upload flows all still work.
+- [ ] No Prisma schema was changed; no new dependencies; no new Gemini calls.
+
+---
+
 ## Do not run
 
 These are destructive and must never appear in your testing flow:

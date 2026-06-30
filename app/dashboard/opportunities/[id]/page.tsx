@@ -28,6 +28,7 @@ import { NoRelatedEmpty } from "@/components/opportunities/no-related-empty";
 import { PrevNextNav } from "@/components/opportunities/prev-next-nav";
 import { MarketGapHypothesis } from "@/components/opportunities/market-gap-hypothesis";
 import { ValidationWorkspace } from "@/components/opportunities/validation-workspace";
+import { ValidationEvidenceLog } from "@/components/opportunities/validation-evidence-log";
 
 export default async function OpportunityDetailPage({
   params,
@@ -327,6 +328,10 @@ export default async function OpportunityDetailPage({
           riskFlags: op.riskFlags,
         }}
       />
+
+      {/* Full-width Validation Evidence Log — below the Validation Workspace.
+          Local-only (localStorage), no DB. Tracks aggregate validation signals. */}
+      <ValidationEvidenceLog opportunityId={op.id} />
     </div>
   );
 }

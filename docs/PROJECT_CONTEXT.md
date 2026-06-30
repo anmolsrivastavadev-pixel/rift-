@@ -114,7 +114,7 @@ components/
                          example-complaints, complaint-body, empty-states, run-button,
                          market-gap-hypothesis (M9), validation-workspace + validation-checklist
                          + copy-validation-brief (M10), decision-board-client +
-                         decision-status-select (M11)
+                         decision-status-select (M11), validation-evidence-log (M12)
 
 lib/
 ├─ db.ts                 Prisma client singleton (driver-adapter mode)
@@ -130,6 +130,7 @@ lib/
 ├─ text-import.ts       Pure paste/text-file parser → Complaint rows (M8)
 ├─ validation-plan.ts   Pure deterministic helpers for M10 validation workspace
 ├─ decision-board.ts    Pure deterministic helpers for M11 decision board
+├─ validation-evidence.ts  Pure deterministic helpers for M12 evidence log
 ├─ prompts.ts            ⚠ LEGACY/UNUSED — dental-specific prompts from an earlier
 ├─ generated/prisma/    Prisma client output (gitignored — regenerated at build)
 
