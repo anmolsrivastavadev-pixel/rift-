@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { ComplaintsInput } from "@/components/complaints/complaints-input";
 import { ComplaintsList } from "@/components/complaints/complaints-list";
 import { StartFreshButton } from "@/components/complaints/start-fresh-button";
+import { StarterMarkets } from "@/components/complaints/starter-markets";
 
 export default async function ComplaintsPage({
   searchParams,
@@ -45,6 +46,8 @@ export default async function ComplaintsPage({
           Do not include private personal information. Keep the text focused on the problem people are describing.
         </p>
       </section>
+
+      <StarterMarkets />
 
       <section>
         <h2 className="text-base font-semibold">Don't have complaints yet?</h2>

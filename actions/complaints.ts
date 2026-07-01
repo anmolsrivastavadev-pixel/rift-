@@ -208,6 +208,93 @@ export async function loadDemoComplaints(): Promise<UploadResult> {
   };
 }
 
+// ---------------------------------------------------------------------------
+// Starter complaint packs (Quick Ideas mode)
+// ---------------------------------------------------------------------------
+// Each pack contains 15–30 synthetic but realistic complaints for a specific
+// market. Used by the "Want business ideas fast?" section so beginners can
+// explore the Rift workflow without collecting their own data first.
+// ---------------------------------------------------------------------------
+import {
+  getStarterPack,
+  type MarketKey,
+} from "@/lib/starter-complaints";
+
+export type StarterResult = {
+  inserted: number;
+  skipped: number;
+  errors: { row: number; reason: string }[];
+  market: string;
+};
+
+export async function loadStarterComplaints(
+  _prev: StarterResult | null,
+  formData: FormData
+): Promise<StarterResult> {
+  const marketKey = String(formData.get("market") ?? "");
+
+  const pack = getStarterPack(marketKey);
+  if (!pack) {
+    return {
+      inserted: 0,
+      skipped: 0,
+      errors: [{ row: 0, reason: `Unknown market: ${marketKey}` }],
+      market: marketKey,
+    };
+  }
+
+  const valid: { title: string; body: string; sourceDate: Date | null }[] = [];
+  const errors: { row: number; reason: string }[] = [];
+
+  for (let i = 0; i < pack.complaints.length; i++) {
+    const row = pack.complaints[i];
+    const parsed = complaintRowSchema.safeParse({
+      title: row.title,
+      body: row.body,
+    });
+    if (parsed.success) {
+      const { title, body, sourceDate } = parsed.data;
+      valid.push({
+        title: title && title.length ? title : body.slice(0, 80),
+        body,
+        sourceDate: sourceDate ? new Date(sourceDate) : null,
+      });
+    } else {
+      errors.push({
+        row: i + 1,
+        reason: parsed.error.issues[0]?.message ?? "Invalid row",
+      });
+    }
+  }
+
+  if (valid.length === 0) {
+    return { inserted: 0, skipped: pack.complaints.length, errors, market: pack.label };
+  }
+
+  // Dedupe: skip complaints whose body already exists in the database.
+  const bodies = valid.map((r) => r.body);
+  const existing = await prisma.complaint.findMany({
+    where: { body: { in: bodies } },
+    select: { body: true },
+  });
+  const existingBodies = new Set(existing.map((c) => c.body));
+  const toInsert = valid.filter((r) => !existingBodies.has(r.body));
+
+  if (toInsert.length > 0) {
+    await insertValidRows(toInsert);
+  }
+
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/complaints");
+
+  return {
+    inserted: toInsert.length,
+    skipped: valid.length - toInsert.length,
+    errors,
+    market: pack.label,
+  };
+}
+
 /* -------------------------------------------------------------------------
  * Text import (paste text / upload .txt or .md)
  * -------------------------------------------------------------------------

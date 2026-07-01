@@ -43,6 +43,11 @@ export default async function OpportunitiesPage() {
             These ideas are generated from patterns in the complaints you added. Scores help sort ideas. A higher score means Rift saw stronger signals in the complaints, but it does not mean the idea is proven.
           </p>
           <p className="mt-2 text-xs text-[var(--color-muted-foreground)]">
+            Ideas are generated from the complaints currently in this workspace.
+            If you used a starter market pack, treat the results as inspiration.
+            If you pasted real complaints, treat them as stronger evidence.
+          </p>
+          <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
             Start by opening one idea with a high score, then check whether the evidence actually makes sense.
           </p>
         </div>
