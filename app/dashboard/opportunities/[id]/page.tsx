@@ -151,7 +151,7 @@ export default async function OpportunityDetailPage({
             <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
               The repeated problem Rift found in the complaints.
             </p>
-            <p className="mt-2 text-sm leading-relaxed text-[var(--color-muted-foreground)]">
+            <p className="mt-2 text-sm leading-relaxed whitespace-normal break-words text-[var(--color-muted-foreground)]">
               {op.summary}
             </p>
           </section>
@@ -198,7 +198,7 @@ export default async function OpportunityDetailPage({
             <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
               A possible solution someone could build.
             </p>
-            <p className="mt-2 text-sm leading-relaxed text-[var(--color-foreground)]/90">
+            <p className="mt-2 text-sm leading-relaxed whitespace-normal break-words text-[var(--color-foreground)]/90">
               {op.suggestedSoftware}
             </p>
           </section>
@@ -255,16 +255,19 @@ export default async function OpportunityDetailPage({
               <div className="mt-3 space-y-3">
                 <BarRow
                   label="Frequency"
+                  definition="how many complaints mention this type of problem"
                   value={bd.subscores.count}
                   weight={bd.weights?.count ?? 0.4}
                 />
                 <BarRow
                   label="Severity"
+                  definition="how painful or urgent the complaints sound"
                   value={bd.subscores.severity}
                   weight={bd.weights?.severity ?? 0.35}
                 />
                 <BarRow
                   label="Confidence"
+                  definition="how clearly Rift sees this pattern"
                   value={bd.subscores.confidence}
                   weight={bd.weights?.confidence ?? 0.25}
                 />
@@ -386,17 +389,26 @@ function MiniStat({
 
 function BarRow({
   label,
+  definition,
   value,
   weight,
 }: {
   label: string;
+  definition?: string;
   value: number;
   weight: number;
 }) {
   return (
     <div>
       <div className="flex justify-between text-xs text-[var(--color-muted-foreground)]">
-        <span>{label}</span>
+        <span>
+          {label}
+          {definition && (
+            <span className="ml-1 text-[10px] normal-case tracking-normal opacity-70">
+              ({definition})
+            </span>
+          )}
+        </span>
         <span>
           {value}/100 × {Math.round(weight * 100)}%
         </span>

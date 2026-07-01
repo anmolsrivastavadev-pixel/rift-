@@ -52,7 +52,7 @@ export function MarketGapHypothesis({ data }: { data: MarketGapData }) {
           </p>
         ) : null}
         <p className="mt-3 text-xs text-[var(--color-muted-foreground)]">
-          Run AI clustering again to generate market gap hypotheses for this
+          Generate business ideas again to generate market gap hypotheses for this
           opportunity. Market gap, target customer, workarounds, product angle,
           and differentiation are part of the updated AI output.
         </p>
@@ -98,7 +98,7 @@ export function MarketGapHypothesis({ data }: { data: MarketGapData }) {
           <h3 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-[var(--color-primary)]">
             <Sparkles className="h-3.5 w-3.5" /> Why this could matter
           </h3>
-          <p className="mt-1.5 text-sm leading-relaxed text-[var(--color-foreground)]/90">
+          <p className="mt-1.5 text-sm leading-relaxed whitespace-normal break-words text-[var(--color-foreground)]/90">
             {data.reason}
           </p>
         </div>
@@ -124,7 +124,7 @@ function Field({
         <p className="text-[11px] font-medium uppercase tracking-wide text-[var(--color-muted-foreground)]">
           {label}
         </p>
-        <p className="mt-0.5 text-sm leading-relaxed text-[var(--color-foreground)]/90">
+        <p className="mt-0.5 text-sm leading-relaxed whitespace-normal break-words text-[var(--color-foreground)]/90">
           {text}
         </p>
       </div>

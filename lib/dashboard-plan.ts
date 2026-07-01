@@ -47,7 +47,7 @@ export function computeWorkflowSteps(
     {
       id: "generate",
       title: "Generate opportunities",
-      description: "Run AI clustering to turn complaints into scored opportunity hypotheses.",
+      description: "Generate business ideas to turn complaints into scored opportunity hypotheses.",
       status:
         opportunityCount > 0
           ? "done"
@@ -119,7 +119,7 @@ export function computeNextAction(
   if (opportunityCount === 0) {
     return {
       title: "Generate opportunities",
-      description: "Run AI clustering to turn complaints into opportunity hypotheses.",
+      description: "Generate business ideas to turn complaints into opportunity hypotheses.",
       cta: "Go to Opportunities",
       href: "/dashboard/opportunities",
     };

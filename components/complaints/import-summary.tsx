@@ -5,7 +5,7 @@ import type { UploadResult } from "@/lib/schemas";
 
 /* Shared import summaries used by the CSV demo path and the text import path.
  * Kept here so each input method renders consistent success / already-loaded /
- * error messages and a single "next step" CTA to Run AI clustering.
+ * error messages and a single "next step" CTA to Generate business ideas.
  */
 
 export function ImportNextStepLink() {
@@ -16,7 +16,7 @@ export function ImportNextStepLink() {
         href="/dashboard/opportunities"
         className="font-medium text-[var(--color-primary)] hover:underline"
       >
-        Opportunities → Run AI clustering
+        Opportunities → Generate business ideas
       </Link>{" "}
       to turn the complaints into scored startup opportunities.
     </p>
@@ -34,7 +34,7 @@ export function DemoSummary({ result }: { result: UploadResult }) {
         <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
         <div className="space-y-1">
           <p className="font-medium">
-            Demo complaints are already loaded. You can run AI clustering now.
+            Demo complaints are already loaded. You can generate business ideas now.
           </p>
           <p className="text-xs text-[var(--color-muted-foreground)]">
             Demo data is fake and safe to test with.{" "}
@@ -42,7 +42,7 @@ export function DemoSummary({ result }: { result: UploadResult }) {
               href="/dashboard/opportunities"
               className="font-medium text-[var(--color-primary)] hover:underline"
             >
-              Opportunities → Run AI clustering
+              Opportunities → Generate business ideas
             </Link>{" "}
             to generate scored opportunities.
           </p>
@@ -56,8 +56,8 @@ export function DemoSummary({ result }: { result: UploadResult }) {
       <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
       <div className="space-y-1">
         <p className="font-medium">
-          Demo complaints added ({result.inserted}). Now run AI clustering to
-          generate opportunities.
+          Demo complaints added ({result.inserted}). Now generate business ideas to
+          create opportunities.
         </p>
         <p className="text-xs text-[var(--color-muted-foreground)]">
           This is fake demo data, safe to test with. <ImportNextStepLink />
@@ -84,7 +84,7 @@ export function TextImportSummary({
         <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
         <div className="space-y-1">
           <p className="font-medium">
-            These complaints are already loaded. You can run AI clustering now.
+            These complaints are already loaded. You can generate business ideas now.
           </p>
           <ImportNextStepLink />
         </div>
@@ -115,7 +115,7 @@ export function TextImportSummary({
         <p className="font-medium">
           Imported {result.inserted} complaint
           {result.inserted === 1 ? "" : "s"}
-          {fromLabel}. Now run AI clustering to generate opportunities.
+          {fromLabel}. Now generate business ideas to create opportunities.
         </p>
         {result.skipped > 0 && (
           <p className="text-xs">

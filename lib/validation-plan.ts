@@ -32,7 +32,7 @@ export function buildHypothesis(input: ValidationPlanInput): string {
   if (summary && summary.trim()) {
     return `${summary.trim()} A possible product direction: ${suggestedSoftware}.`;
   }
-  return "Run AI clustering again to generate richer validation guidance for this opportunity.";
+  return "Generate business ideas again to create richer validation guidance for this opportunity.";
 }
 
 /* --- Section 2: Who To Interview --- */

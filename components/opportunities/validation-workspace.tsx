@@ -50,14 +50,14 @@ export function ValidationWorkspace({ input }: { input: ValidationPlanInput }) {
         <div className="space-y-6">
           {/* 1. Hypothesis To Test */}
           <Sub icon={Compass} title="Hypothesis To Test">
-            <p className="text-sm leading-relaxed text-[var(--color-foreground)]/90">
+            <p className="text-sm leading-relaxed whitespace-normal break-words text-[var(--color-foreground)]/90">
               {hypothesis}
             </p>
           </Sub>
 
           {/* 2. Who To Interview */}
           <Sub icon={Users} title="Who To Interview">
-            <p className="text-sm text-[var(--color-foreground)]/90">{targetCustomer}</p>
+            <p className="text-sm whitespace-normal break-words text-[var(--color-foreground)]/90">{targetCustomer}</p>
             <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
               {INTERVIEW_HELPER}
             </p>

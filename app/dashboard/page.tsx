@@ -215,7 +215,7 @@ export default async function DashboardPage() {
             Ready to generate business ideas
           </h2>
           <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
-            Run AI clustering to turn complaints into scored business idea hypotheses.
+            Generate business ideas to turn complaints into scored business idea hypotheses.
           </p>
           <Button asChild className="mt-4">
             <Link href="/dashboard/opportunities">

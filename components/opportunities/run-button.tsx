@@ -80,7 +80,7 @@ export function RunOpportunitiesButton() {
               </>
             ) : (
               <>
-                <Sparkles className="h-4 w-4" /> Run AI clustering
+                <Sparkles className="h-4 w-4" /> Generate business ideas
               </>
             )}
           </Button>
