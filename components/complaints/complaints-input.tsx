@@ -15,13 +15,13 @@ import { DemoSummary } from "@/components/complaints/import-summary";
 type Tab = "csv" | "paste" | "file";
 
 const TABS: { id: Tab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
-  { id: "csv", label: "Upload CSV", icon: Upload },
-  { id: "paste", label: "Paste Text", icon: ClipboardPaste },
-  { id: "file", label: "Upload Text File", icon: FileText },
+  { id: "paste", label: "Paste text", icon: ClipboardPaste },
+  { id: "csv", label: "Upload spreadsheet", icon: Upload },
+  { id: "file", label: "Upload text file", icon: FileText },
 ];
 
 export function ComplaintsInput() {
-  const [tab, setTab] = React.useState<Tab>("csv");
+  const [tab, setTab] = React.useState<Tab>("paste");
   const [demoState, demoAction, demoPending] = useActionState<
     UploadResult | null,
     FormData
@@ -74,7 +74,7 @@ export function ComplaintsInput() {
       <div className="flex flex-wrap items-center gap-3 border-t border-[var(--color-border)] pt-4">
         <Button asChild variant="secondary" size="md">
           <Link href="/sample_complaints.csv" download>
-            <Download className="h-4 w-4" /> Download sample CSV
+            <Download className="h-4 w-4" /> Download sample spreadsheet
           </Link>
         </Button>
 

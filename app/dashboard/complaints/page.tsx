@@ -16,7 +16,7 @@ export default async function ComplaintsPage({
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Complaints</h1>
         <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
-          Add market pain by uploading a CSV, pasting raw comments, or uploading
+          Add market pain by uploading a spreadsheet, pasting raw comments, or uploading
           a text file. Rift will turn each complaint or review into a row before
           AI clustering. Uploaded data stays in this MVP project database.
         </p>
@@ -46,15 +46,44 @@ export default async function ComplaintsPage({
       </section>
 
       <section>
+        <h2 className="text-base font-semibold">Don't have complaints yet?</h2>
+        <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
+          That is normal. Here are easy ways to collect your first few:
+        </p>
+        <ul className="mt-3 space-y-2 text-sm text-[var(--color-muted-foreground)]">
+          <li className="flex items-start gap-2">
+            <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-primary)]" />
+            Read app store reviews (1–3 star) and copy any sentence that names a problem
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-primary)]" />
+            Screenshot Reddit, Twitter/X, or forum posts where people complain
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-primary)]" />
+            Note things your friends, coworkers, or customers say annoy them
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-primary)]" />
+            Paste a few complaint sentences — even 5–10 is enough to start
+          </li>
+        </ul>
+        <p className="mt-3 text-xs text-[var(--color-muted-foreground)]">
+          No scraping or automation needed. Collect manually — copy and paste works.
+          Or try the demo data first to see how Rift works.
+        </p>
+      </section>
+
+      <section>
         <h2 className="text-base font-semibold">Add complaints</h2>
         <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
-          Choose an input method below. For CSV, the expected columns are{" "}
+          Choose an input method below. For spreadsheet upload, a CSV is a simple spreadsheet file you can export from Excel, Google Sheets, Airtable, or many review/support tools. The expected columns are{" "}
           <code className="font-mono">body</code> (required); optional{" "}
           <code className="font-mono">title</code>,{" "}
           <code className="font-mono">sourceDate</code> (ISO date). For pasted
           text or <code className="font-mono">.txt</code>/<code>.md</code> files,
           one complaint per line or one per blank-line-separated paragraph.
-          You can also download a sample CSV or use demo data below.
+          You can also download a sample spreadsheet or use demo data below.
         </p>
         <div className="mt-3">
           <ComplaintsInput />

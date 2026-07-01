@@ -15,6 +15,7 @@ It takes customer complaints (uploaded as CSV, pasted text, or text files), runs
 **Key positioning:**
 - Find business ideas from real customer pain.
 - Add complaints, reviews, support tickets, or use demo data. Rift groups repeated problems into business idea hypotheses you can inspect, test, and compare.
+- No complaints yet? Use the demo data, then collect your own from app reviews, Reddit posts, support tickets, or things people say in real life. Even 5–10 sentences is enough.
 - Today, Rift works from data you provide. Public-source scanning from Reddit, reviews, and forums is a future direction.
 
 ---
@@ -22,12 +23,13 @@ It takes customer complaints (uploaded as CSV, pasted text, or text files), runs
 ## Who Rift is for
 
 - **Founders** looking for validated software ideas grounded in real customer pain.
-- Anyone who has (or can scrape) a CSV of customer complaints, reviews, or feedback and wants to know which problems are worth solving next.
+- **Beginners** who have never started a business — Rift explains what complaints are, where to find them, and how to test an idea before building anything.
+- Anyone who has (or can collect) a list of customer complaints, reviews, or feedback and wants to know which problems are worth solving next.
 
 Rift is **not**:
 - a dental-only product,
 - an agent for billing/auth/teams,
-- a no-code scraper.
+- an automatic scraper — you collect complaints manually (copy and paste works).
 
 ---
 

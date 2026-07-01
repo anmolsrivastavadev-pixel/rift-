@@ -168,6 +168,20 @@ The Feedback-Driven First-Time User Clarity Patch has been applied to make the M
 - "Why complaints?" section explains the value of complaint data
 - Honest MVP scope note clarifies current vs future capabilities
 
+The Beginner Business Clarity Patch adds beginner-friendly copy across the app:
+- 3-step beginner guide on the landing page ("Find customer pain" → "Turn repeated problems into ideas" → "Test before you build")
+- Dashboard beginner guide card with 6-step workflow
+- Compare Ideas board explains Pursue/Park/Reject/Undecided in plain English
+- Detail page validation and evidence sections have beginner descriptions
+- CSV always described as "spreadsheet" in user-facing text
+- Tab order prefers paste text → upload spreadsheet → upload text file
+
+The Day 1 Beginner Data Path patches add copy for users who do not yet have complaint data:
+- Landing page beginner guide has a "Don't have complaints yet?" section with manual collection examples
+- Dashboard start-here card explains where to find complaints
+- Complaints page has a "Don't have complaints yet?" section with 4 collection methods
+- No scraping or automation needed — collect manually and copy/paste
+
 `npx tsc --noEmit`, `npm run lint`, and `npm run build` all pass. `npm run start` smoke-tested locally.
 
 ---

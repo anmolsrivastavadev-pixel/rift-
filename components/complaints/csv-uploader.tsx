@@ -31,7 +31,7 @@ export function CsvUploader() {
     const isCsvByName = /\.csv$/i.test(file.name);
     if (!okTypes.includes(file.type) && !isCsvByName) {
       setParseError(
-        `"${file.name}" is not a CSV file. Please upload a .csv file (you selected a ${file.type || "binary"} file).`
+        `"${file.name}" is not a spreadsheet file. Please upload a .csv file (you selected a ${file.type || "binary"} file).`
       );
       setFileName(null);
       return;
@@ -87,7 +87,10 @@ export function CsvUploader() {
           </div>
           <div>
             <p className="text-sm font-medium">
-              Drag &amp; drop a CSV here, or click to browse
+              Drag &amp; drop a spreadsheet here, or click to browse
+            </p>
+            <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
+              A CSV is a simple spreadsheet file. You can export one from Excel, Google Sheets, Airtable, or many review/support tools.
             </p>
             <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
               Required column: <code className="font-mono">body</code>. Optional:{" "}
@@ -130,7 +133,7 @@ export function CsvUploader() {
       {parseError && (
         <div className="flex items-start gap-2 rounded-[12px] border border-[var(--color-danger)]/40 bg-[var(--color-danger)]/10 p-4 text-sm text-[var(--color-danger)]">
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
-          <span>Could not parse the CSV: {parseError}</span>
+          <span>Could not parse the spreadsheet: {parseError}</span>
         </div>
       )}
 
@@ -162,7 +165,7 @@ function UploadSummary({ result }: { result: UploadResult }) {
       <div className="space-y-1">
         <p className="font-medium">
           Imported {result.inserted} complaint{result.inserted === 1 ? "" : "s"}
-          {" "}from CSV. Now run AI clustering to generate opportunities.
+          {" "}from spreadsheet. Now run AI clustering to generate business ideas.
         </p>
         {result.skipped > 0 && (
           <p className="text-xs">Skipped {result.skipped} invalid row(s).</p>

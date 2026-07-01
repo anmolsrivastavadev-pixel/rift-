@@ -48,6 +48,35 @@ export function BeginnerGuide() {
           ))}
         </ol>
 
+        <div className="mt-12 rounded-[12px] border border-dashed border-[var(--color-border)] bg-[var(--color-card)]/60 p-6">
+          <p className="text-sm font-medium">Don't have complaints yet?</p>
+          <ul className="mt-3 space-y-2 text-sm text-[var(--color-muted-foreground)]">
+            <li className="flex items-start gap-2">
+              <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-primary)]" />
+              Start with the built-in demo data to see how it works
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-primary)]" />
+              Read app store reviews (1–3 star) for any product you use
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-primary)]" />
+              Screenshot Reddit, Twitter/X, or forum posts where people complain
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-primary)]" />
+              Note things your friends, coworkers, or customers say annoy them
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-primary)]" />
+              Paste a few complaint sentences — even 5–10 is enough to start
+            </li>
+          </ul>
+          <p className="mt-3 text-xs text-[var(--color-muted-foreground)]">
+            No scraping or automation needed. Collect manually — copy and paste works.
+          </p>
+        </div>
+
         <p className="mt-8 text-center text-sm text-[var(--color-muted-foreground)]">
           Scores are sorting guides, not proof that an idea will work.
         </p>

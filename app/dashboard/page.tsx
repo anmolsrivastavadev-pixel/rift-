@@ -107,6 +107,9 @@ export default async function DashboardPage() {
         <p className="mt-2 text-sm text-[var(--color-muted-foreground)]">
           New to Rift? Use demo data to see how customer complaints become business ideas. Then replace the demo data with complaints, reviews, or support tickets from your own market.
         </p>
+        <p className="mt-2 text-xs text-[var(--color-muted-foreground)]">
+          Don't have complaints yet? No problem — use the demo data to see how Rift works, then come back with your own. You can read app store reviews (1–3 star), screenshot Reddit or forum posts, note things people complain about in real life, or paste support tickets. Even 5–10 sentences is enough to start.
+        </p>
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <Button asChild>
             <Link href="/dashboard/complaints">Use demo data</Link>
