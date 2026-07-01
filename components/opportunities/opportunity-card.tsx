@@ -115,7 +115,7 @@ export function OpportunityCard({ op }: { op: OpportunityCardData }) {
         </div>
 
         <p className="mt-3 text-[10px] leading-snug text-[var(--color-muted-foreground)]">
-          Score combines frequency, severity, and confidence.
+          The score is a rough sorting signal, not proof an idea will work.
         </p>
       </Link>
     </div>

@@ -6,11 +6,16 @@
 
 ## What Rift is
 
-Rift is an **AI-powered Opportunity Intelligence Platform for founders**.
+Rift is an **AI-powered market research tool that helps founders discover business ideas from real customer pain.**
 
-It takes customer complaints (uploaded as a CSV), runs them through Google Gemini to cluster similar complaints into groups, summarises each group into a business problem, and scores each resulting opportunity 0–100 using a deterministic, transparent algorithm. Founders then browse, filter, sort, save, and inspect opportunities that are grounded in real customer text — not invented market stats.
+It takes customer complaints (uploaded as CSV, pasted text, or text files), runs them through Google Gemini to cluster similar complaints into groups, summarises each group into a business problem, and scores each resulting opportunity 0–100 using a deterministic, transparent algorithm. Founders then browse, filter, sort, save, and inspect opportunities that are grounded in real customer text — not invented market stats.
 
-**One sentence pitch:** _Rift helps founders discover business opportunities from real customer complaints._
+**One sentence pitch:** _Rift helps founders discover business ideas from real customer pain._
+
+**Key positioning:**
+- Find business ideas from real customer pain.
+- Add complaints, reviews, support tickets, or use demo data. Rift groups repeated problems into business idea hypotheses you can inspect, test, and compare.
+- Today, Rift works from data you provide. Public-source scanning from Reddit, reviews, and forums is a future direction.
 
 ---
 
@@ -29,27 +34,17 @@ Rift is **not**:
 ## Core product flow
 
 ```
-CSV upload (drag/drop or demo data)
-  → PapaParse on the client
-  → server action validates rows with Zod
-  → valid rows inserted into Complaint table
-        — OR (M8+) —
-  Paste text / upload .txt or .md
-  → client stages raw text or reads the file in-browser
-  → importTextComplaints parses via lib/text-import.ts (split, strip bullets,
-    dedupe, cap length, build titles), re-validates with the SAME Zod schema,
-    dedups against existing bodies in the DB, inserts only missing rows
-  → "Run AI clustering" server action
-        → clean complaints (normalise, dedupe, drop empties)
-        → batch Gemini calls (≤100 complaints each)
-        → tolerant JSON parse (bare array OR {clusters:[]})
-        → cross-batch merge via keyword Jaccard ≥ 0.5
-        → for each cluster: compute Opportunity Score (locally)
-        → insert Opportunity row + link Complaints to it
-  → Dashboard shows opportunities (search/filter/sort/save)
-  → Opportunity detail page (AI reasoning, score breakdown,
-    linked complaints, related opportunities, prev/next)
-  → /saved page lists bookmarked opportunities
+CSV upload, paste text, .txt/.md file, or Use demo data
+  → Complaints stored
+  → Run AI clustering (Gemini)
+  → Opportunities created with deterministic 0–100 scores
+  → Browse/search/filter/sort opportunities
+  → Save/bookmark opportunities
+  → Open detail page (AI reasoning + breakdown + related + prev/next)
+  → Validation Workspace (checklist + copy brief)
+  → Validation Evidence Log (aggregate evidence tracking)
+  → Compare Ideas board (decide: Pursue / Park / Reject)
+  → Deploy to Vercel + Neon
 ```
 
 Score is **never** computed by Gemini. Gemini only provides severity (1–10) and confidence (0–100). The app computes the final 0–100 score in `lib/scoring.ts` so the same dataset always yields the same score.
@@ -81,16 +76,16 @@ Score is **never** computed by Gemini. Gemini only provides severity (1–10) an
 ```
 app/                     Next.js App Router routes
 ├─ layout.tsx            Root layout: Inter font, dark theme, metadata + OG + Twitter
-├─ page.tsx              Landing page (Hero, Features, How-it-works, Footer)
+├─ page.tsx              Landing page (Hero, Features, How-it-works, WhyComplaints, Footer)
 ├─ robots.ts             robots.txt — allows "/", disallows "/dashboard"
 ├─ sitemap.ts            sitemap.xml — only "/"
 ├─ not-found.tsx         Global 404
 ├─ error.tsx             Global error boundary
 └─ dashboard/
-   ├─ layout.tsx         Sidebar shell (Overview/Complaints/Opportunities/Saved)
-   ├─ page.tsx           Overview: 4 KPI cards, complaints-over-time chart, recent list
+   ├─ layout.tsx         Sidebar shell (Home/Complaints/Ideas/Compare Ideas/Saved)
+   ├─ page.tsx           Overview: Start here card, 4 KPI cards, complaints-over-time chart, recent list
    ├─ complaints/
-   │  ├─ page.tsx        Upload UI + complaints list + search (?q=)
+   │  ├─ page.tsx        Upload UI + complaints list + search (?q=) + Why complaints? section
    │  ├─ loading.tsx
    │  └─ error.tsx
    ├─ opportunities/
@@ -101,14 +96,15 @@ app/                     Next.js App Router routes
    │     │               keywords, related, prev/next, sticky right column)
    │     ├─ loading.tsx
    │     └─ not-found.tsx
-   └─ saved/page.tsx     Saved opportunities
+   └─ saved/page.tsx     Saved ideas
 
 components/
 ├─ ui/                   Button, Card, Badge (cva + cn())
 ├─ container.tsx         max-w wrapper
-├─ dashboard/            stat-card, complaints-chart (Recharts), shell
+├─ dashboard/            stat-card, complaints-chart (Recharts), shell, founder-command-client
 ├─ complaints/           csv-uploader, complaints-input (tabs), text-input (paste/file),
 │                        import-summary, complaints-list, complaints-table, complaint-search
+├─ landing/              hero, features, how-it-works, why-complaints, footer
 └─ opportunities/        opportunity-card, opportunity-browser, filters, save-button,
                          related-opportunity-card, no-related-empty, prev-next-nav,
                          example-complaints, complaint-body, empty-states, run-button,

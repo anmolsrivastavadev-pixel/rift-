@@ -10,7 +10,7 @@ export function Footer() {
         <div className="flex items-center gap-2">
           <span className="text-sm font-semibold tracking-tight">Rift</span>
           <span className="text-xs text-[var(--color-muted-foreground)]">
-            Startup opportunities from real market pain
+            Business ideas from real customer pain.
           </span>
         </div>
 

@@ -3,23 +3,23 @@ import { Container } from "@/components/container";
 const steps = [
   {
     n: "01",
-    title: "Add pain data",
-    text: "Upload a CSV of complaints or reviews, or load demo data to explore the flow with zero setup.",
+    title: "Add customer pain",
+    text: "Paste complaints, upload a file, or use demo data.",
   },
   {
     n: "02",
-    title: "AI clusters them",
-    text: "Gemini groups similar complaints and writes a clear problem summary for each cluster.",
+    title: "Generate business ideas",
+    text: "Rift groups repeated problems into scored idea hypotheses.",
   },
   {
     n: "03",
-    title: "Score & rank",
-    text: "Rift scores each opportunity 0–100 from frequency, severity, and confidence — the same data always gives the same score.",
+    title: "Decide what to test",
+    text: "Review evidence, risks, and next steps before pursuing an idea.",
   },
   {
     n: "04",
-    title: "Explore & save",
-    text: "Browse ranked opportunities, read the real complaints behind each one, and save the ideas worth building.",
+    title: "Compare and decide",
+    text: "Review evidence, risks, and next steps. Decide which ideas to pursue, park, or reject.",
   },
 ];
 

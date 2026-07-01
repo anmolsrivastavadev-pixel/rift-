@@ -66,7 +66,7 @@ export function MarketGapHypothesis({ data }: { data: MarketGapData }) {
         <Compass className="h-4 w-4 text-[var(--color-primary)]" /> Market Gap Hypothesis
       </h2>
       <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
-        A hypothesis inferred from the complaints — not proven market research.
+        Why this problem might be worth exploring. This is a hypothesis, not proof.
       </p>
 
       <div className="mt-4 space-y-4">

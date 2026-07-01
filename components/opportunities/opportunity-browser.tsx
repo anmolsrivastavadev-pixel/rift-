@@ -115,8 +115,8 @@ export function OpportunityBrowser({
       />
 
       <p className="text-xs text-[var(--color-muted-foreground)]" aria-live="polite">
-        Showing {filtered.length} of {opportunities.length} opportunit
-        {filtered.length === 1 ? "y" : "ies"}
+        Showing {filtered.length} of {opportunities.length} idea
+        {filtered.length === 1 ? "" : "s"}
       </p>
 
       {filtered.length === 0 ? (

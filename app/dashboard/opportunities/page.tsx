@@ -7,12 +7,11 @@ import { OpportunityBrowser } from "@/components/opportunities/opportunity-brows
 import { Button } from "@/components/ui/button";
 
 export default async function OpportunitiesPage() {
-  const [ops, complaintCount, savedRows] = await Promise.all([
+  const [ops, savedRows] = await Promise.all([
     prisma.opportunity.findMany({
       orderBy: { opportunityScore: "desc" },
       take: 100,
     }),
-    prisma.complaint.count(),
     prisma.savedOpportunity.findMany({ select: { opportunityId: true } }),
   ]);
 
@@ -39,26 +38,22 @@ export default async function OpportunitiesPage() {
     <div className="mx-auto max-w-6xl space-y-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Opportunities</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">Business Ideas</h1>
           <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
-            {complaintCount} complaint{complaintCount === 1 ? "" : "s"} in this
-            workspace analysed into {ops.length} opportunit
-            {ops.length === 1 ? "y" : "ies"}.
+            These ideas are generated from patterns in the complaints you added. Scores are rough signals to help you choose what to inspect first — not proof an idea will work.
           </p>
         </div>
         <Button asChild variant="outline">
           <Link href="/dashboard/opportunities/decision-board">
-            <LayoutGrid className="h-4 w-4" /> Decision Board
+            <LayoutGrid className="h-4 w-4" /> Compare Ideas
           </Link>
         </Button>
       </div>
 
       <section className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-6">
-        <h2 className="text-base font-semibold">AI engine</h2>
+        <h2 className="text-base font-semibold">Generate business ideas</h2>
         <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
-          Run Gemini to cluster the {complaintCount} complaint
-          {complaintCount === 1 ? "" : "s"} in this workspace into scored
-          startup opportunities. Each run replaces the existing opportunities.
+          Group the complaints in this workspace into business idea hypotheses based on repeated pain, severity, and confidence.
         </p>
         <div className="mt-4">
           <RunOpportunitiesButton />

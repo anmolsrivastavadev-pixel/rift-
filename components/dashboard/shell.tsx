@@ -5,8 +5,8 @@ import { Container } from "@/components/container";
 const nav = [
   { href: "/dashboard", label: "Home", icon: LayoutDashboard },
   { href: "/dashboard/complaints", label: "Complaints", icon: Upload },
-  { href: "/dashboard/opportunities", label: "Opportunities", icon: Target },
-  { href: "/dashboard/opportunities/decision-board", label: "Decision Board", icon: LayoutGrid },
+  { href: "/dashboard/opportunities", label: "Ideas", icon: Target },
+  { href: "/dashboard/opportunities/decision-board", label: "Compare Ideas", icon: LayoutGrid },
   { href: "/dashboard/saved", label: "Saved", icon: Bookmark },
 ];
 

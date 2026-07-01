@@ -105,7 +105,7 @@ export default async function OpportunityDetailPage({
       <div>
         <Button asChild variant="ghost" size="sm">
           <Link href="/dashboard/opportunities">
-            <ArrowLeft className="h-4 w-4" /> Back to opportunities
+            <ArrowLeft className="h-4 w-4" /> Back to ideas
           </Link>
         </Button>
       </div>
@@ -148,6 +148,9 @@ export default async function OpportunityDetailPage({
           {/* 1. Problem Summary */}
           <section>
             <h2 className="text-base font-semibold">Problem Summary</h2>
+            <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
+              What people seem to be complaining about.
+            </p>
             <p className="mt-2 text-sm leading-relaxed text-[var(--color-muted-foreground)]">
               {op.summary}
             </p>
@@ -157,8 +160,7 @@ export default async function OpportunityDetailPage({
           <section>
             <h2 className="text-base font-semibold">Evidence From Complaints</h2>
             <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
-              Real, uploaded complaints that the AI grouped into this
-              opportunity. Linked complaints, oldest first.
+              Examples from the complaints you added.
             </p>
             <div className="mt-3">
               <ExampleComplaints items={op.complaints} />
@@ -193,6 +195,9 @@ export default async function OpportunityDetailPage({
               <Lightbulb className="h-4 w-4 text-[var(--color-warning)]" />
               Product Opportunity
             </h2>
+            <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
+              A possible business idea based on the repeated problem.
+            </p>
             <p className="mt-2 text-sm leading-relaxed text-[var(--color-foreground)]/90">
               {op.suggestedSoftware}
             </p>
@@ -244,6 +249,9 @@ export default async function OpportunityDetailPage({
           {bd?.subscores && (
             <section className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-6">
               <h2 className="text-sm font-semibold">Score breakdown</h2>
+              <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
+                The score is a rough sorting signal. It combines how often the problem appears, how painful it seems, and how confident Rift is in the pattern.
+              </p>
               <div className="mt-3 space-y-3">
                 <BarRow
                   label="Frequency"

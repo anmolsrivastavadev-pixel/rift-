@@ -127,6 +127,20 @@ Each milestone:
   - Verified: no stale "Suggested Software" in UI, no "Milestone N" in app code, no `useSyncExternalStore` actual usage (only comments), no overclaiming ("guaranteed/proven/validated opportunity/blue ocean" — the only "proven" hits are in careful disclaimers like "not proven market research"), all local-only features have "Saved only in this browser" or equivalent, `SaveButton` has `aria-pressed`/`aria-label`, `PrevNextNav` has `aria-label`/`aria-disabled`.
 - **Not included:** No schema changes, no AI/scoring changes, no new dependencies, no new features, no redesign, no new routes, no removed routes. Dead-code cleanup was conservative — only the loading skeleton grid was updated to match the actual page.
 
+### Feedback-Driven First-Time User Clarity Patch (Post-M15)
+- **Status:** ✅ Done
+- **Purpose:** Make the MVP understandable for first-time users after real feedback indicated confusion. No schema changes, no AI changes, no scoring changes, no new dependencies, no scraping added.
+- **What was built/fixed:**
+  - Landing Page: updated hero copy "Find business ideas from real customer pain", CTA "Try demo data", added honest MVP scope note, updated features/how-it-works copy.
+  - Dashboard: added "Start here" first-time user card with three CTAs and honest MVP scope note.
+  - Navigation labels: "Opportunities" → "Ideas", "Decision Board" → "Compare Ideas" (routes unchanged).
+  - Opportunities page: heading "Business Ideas", score explanation helper text, updated AI engine copy.
+  - Opportunity detail page: score explanation, updated Market Gap Hypothesis / Validation Workspace / Evidence Log helper text.
+  - Decision Board: renamed to Compare Ideas, updated empty state and header copy.
+  - Empty states: updated across app using action-focused plain English.
+  - Saved page: updated heading to "Saved Ideas" and helper copy.
+- **Not included:** No schema changes, no AI changes, no scoring changes, no new dependencies, no scraping added. Public-source scanning remains future direction only.
+
 ---
 
 ## Current state
@@ -143,6 +157,16 @@ Upload CSV or Use demo data
   → Open detail page (AI reasoning + breakdown + related + prev/next)
   → Deploy to Vercel + Neon
 ```
+
+The Feedback-Driven First-Time User Clarity Patch has been applied to make the MVP understandable for first-time users. Key changes:
+- Landing page clearly explains Rift in plain English ("Find business ideas from real customer pain")
+- Dashboard has a "Start here" first-time user card with clear CTAs
+- Navigation labels updated ("Ideas", "Compare Ideas")
+- Opportunities page heading changed to "Business Ideas" with score explanation
+- Detail page sections have plain-English explanations
+- Empty states use action-focused copy
+- "Why complaints?" section explains the value of complaint data
+- Honest MVP scope note clarifies current vs future capabilities
 
 `npx tsc --noEmit`, `npm run lint`, and `npm run build` all pass. `npm run start` smoke-tested locally.
 

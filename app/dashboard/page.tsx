@@ -101,6 +101,28 @@ export default async function DashboardPage() {
         </p>
       </div>
 
+      {/* First-time user guidance */}
+      <div className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-6">
+        <h2 className="text-base font-semibold">Start here</h2>
+        <p className="mt-2 text-sm text-[var(--color-muted-foreground)]">
+          New to Rift? Use demo data to see how customer complaints become business ideas. Then replace the demo data with complaints, reviews, or support tickets from your own market.
+        </p>
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <Button asChild>
+            <Link href="/dashboard/complaints">Use demo data</Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link href="/dashboard/complaints">Add complaints</Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link href="/dashboard/opportunities">View business ideas</Link>
+          </Button>
+        </div>
+        <p className="mt-4 text-xs text-[var(--color-muted-foreground)]">
+          Current MVP: works from complaints, reviews, support tickets, or demo data you provide. Future direction: scan public sources like Reddit, reviews, and forums to surface market pain automatically.
+        </p>
+      </div>
+
       {/* Project stat cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
@@ -134,11 +156,10 @@ export default async function DashboardPage() {
         <div className="rounded-[12px] border border-dashed border-[var(--color-border)] bg-[var(--color-card)] p-12 text-center">
           <FileText className="mx-auto h-8 w-8 text-[var(--color-muted-foreground)]" />
           <h2 className="mt-4 text-base font-semibold">
-            Start by adding customer complaints
+            No complaints yet
           </h2>
           <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
-            Import complaints from CSV, paste text, upload a text file, or use
-            demo data to begin.
+            Start with demo data or add complaints, reviews, support tickets, or manually collected forum snippets.
           </p>
           <Button asChild className="mt-4">
             <Link href="/dashboard/complaints">
@@ -151,15 +172,14 @@ export default async function DashboardPage() {
         <div className="rounded-[12px] border border-dashed border-[var(--color-border)] bg-[var(--color-card)] p-12 text-center">
           <Target className="mx-auto h-8 w-8 text-[var(--color-muted-foreground)]" />
           <h2 className="mt-4 text-base font-semibold">
-            Ready to generate opportunities
+            Ready to generate business ideas
           </h2>
           <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
-            Run AI clustering to turn complaints into scored opportunity
-            hypotheses.
+            Run AI clustering to turn complaints into scored business idea hypotheses.
           </p>
           <Button asChild className="mt-4">
             <Link href="/dashboard/opportunities">
-              Go to Opportunities <ArrowRight className="h-4 w-4" />
+              Go to Ideas <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>
         </div>

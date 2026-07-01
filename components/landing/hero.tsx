@@ -25,7 +25,7 @@ export function Hero() {
         >
           <span className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1 text-xs text-[var(--color-muted-foreground)]">
             <Sparkles className="h-3.5 w-3.5 text-[var(--color-primary)]" />
-            Startup opportunities from real market pain
+            Find business ideas from real customer pain.
           </span>
         </motion.div>
 
@@ -35,12 +35,11 @@ export function Hero() {
           transition={{ duration: 0.45, ease: "easeOut", delay: 0.05 }}
           className="mt-6 text-balance text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl"
         >
-          Find startup opportunities hiding in
+          Find business ideas from
           <br className="hidden sm:block" />{" "}
           <span className="text-[var(--color-primary)]">
             real customer pain
           </span>
-          .
         </motion.h1>
 
         <motion.p
@@ -49,10 +48,7 @@ export function Hero() {
           transition={{ duration: 0.45, ease: "easeOut", delay: 0.1 }}
           className="mx-auto mt-6 max-w-2xl text-balance text-base text-[var(--color-muted-foreground)] sm:text-lg"
         >
-          Rift turns complaints, reviews, support tickets, and forum posts
-          into evidence-backed product opportunities — scored and ranked so
-          you build what people already want. Try it with demo data in
-          seconds, or upload your own CSV when you&apos;re ready.
+          Rift turns complaints, reviews, support tickets, or demo data into business idea hypotheses you can inspect, test, and compare.
         </motion.p>
 
         <motion.div
@@ -63,13 +59,17 @@ export function Hero() {
         >
           <Button asChild size="lg">
             <Link href="/dashboard/complaints">
-              Try the demo <ArrowRight className="h-4 w-4" />
+              Try demo data <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>
           <Button asChild size="lg" variant="outline">
             <Link href="#how-it-works">How it works</Link>
           </Button>
         </motion.div>
+        <p className="mt-4 text-xs text-[var(--color-muted-foreground)]">
+          Current MVP works from data you provide. Public-source scanning
+          from Reddit, reviews, and forums is a future direction.
+        </p>
       </Container>
     </section>
   );

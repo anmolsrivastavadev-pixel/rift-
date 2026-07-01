@@ -23,6 +23,16 @@ export default async function ComplaintsPage({
       </div>
 
       <section>
+        <h2 className="text-base font-semibold">Why complaints?</h2>
+        <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
+          Complaints reveal repeated pain. Repeated pain is often where useful business ideas begin.
+        </p>
+        <p className="mt-2 text-sm text-[var(--color-muted-foreground)]">
+          You can use product reviews, support tickets, Reddit/forum snippets you manually collect, sales call notes, or the built-in demo data.
+        </p>
+      </section>
+
+      <section>
         <h2 className="text-base font-semibold">Add complaints</h2>
         <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
           Choose an input method below. For CSV, the expected columns are{" "}

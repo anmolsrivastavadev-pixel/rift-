@@ -424,6 +424,25 @@ Post-deploy checks (on the deployed URL):
 
 ---
 
+### 32. Feedback-Driven First-Time User Clarity Patch
+
+- [ ] Landing page hero says "Find business ideas from real customer pain" and leads with "Try demo data".
+- [ ] Landing page has honest MVP scope note below the CTA.
+- [ ] How-it-works section explains demo data is available and mentions future direction.
+- [ ] Dashboard "Start here" card is visible with three CTAs and an honest note about MVP vs future.
+- [ ] Navigation labels read "Ideas" and "Compare Ideas" (routes unchanged).
+- [ ] `/dashboard/opportunities` heading is "Business Ideas" with score explanation helper text.
+- [ ] `/dashboard/opportunities/[id]` has score explanation: "The score is a rough sorting signal...".
+- [ ] `/dashboard/opportunities/decision-board` is labeled "Compare Ideas" with clear subtitle.
+- [ ] Empty states use action-focused plain English ("No business ideas yet", "No saved ideas yet").
+- [ ] No overclaiming language remains ("proven", "guaranteed", "validated opportunity").
+- [ ] All existing functionality still works (no regressions in CSV upload, paste text, demo data, AI clustering, save/unsave, search/filter/sort, Validation Workspace, Evidence Log, Decision Board).
+- [ ] `npm run lint` passes with no errors or warnings.
+- [ ] `npm run build` passes.
+- [ ] No Prisma schema changes, no AI/scoring changes, no new dependencies, no scraping added.
+
+---
+
 ## Do not run
 
 These are destructive and must never appear in your testing flow:

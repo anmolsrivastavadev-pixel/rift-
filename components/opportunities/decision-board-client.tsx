@@ -179,19 +179,19 @@ export function DecisionBoardClient({
         <DecisionBoardHeader />
         <div className="rounded-[12px] border border-dashed border-[var(--color-border)] bg-[var(--color-card)] p-12 text-center">
           <Target className="mx-auto h-10 w-10 text-[var(--color-muted-foreground)]" />
-          <h2 className="mt-4 text-base font-semibold">No opportunities to compare yet</h2>
+          <h2 className="mt-4 text-base font-semibold">No ideas to compare yet</h2>
           <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
-            Add complaints, then run AI clustering to generate opportunities
-            before using the Decision Board.
+            Add complaints, then run AI clustering to generate business ideas
+            before using the Compare Ideas board.
           </p>
-          <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
-            <Button asChild>
-              <Link href="/dashboard/complaints">Go to Complaints</Link>
-            </Button>
-            <Button asChild variant="outline">
-              <Link href="/dashboard/opportunities">Go to Opportunities</Link>
-            </Button>
-          </div>
+       <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+         <Button asChild>
+           <Link href="/dashboard/complaints">Go to Complaints</Link>
+         </Button>
+         <Button asChild variant="outline">
+           <Link href="/dashboard/opportunities">Go to Ideas</Link>
+         </Button>
+       </div>
         </div>
       </div>
     );
@@ -367,19 +367,17 @@ function DecisionBoardHeader() {
     <div>
       <Button asChild variant="ghost" size="sm">
         <Link href="/dashboard/opportunities">
-          <ArrowLeft className="h-4 w-4" /> Back to opportunities
+          <ArrowLeft className="h-4 w-4" /> Back to ideas
         </Link>
       </Button>
       <h1 className="mt-4 text-2xl font-semibold tracking-tight">
-        Opportunity Decision Board
+        Compare Ideas
       </h1>
       <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
-        Compare opportunities by evidence, risk, and testing readiness before
-        deciding what to validate next.
+        Choose whether to pursue, park, reject, or keep reviewing each idea based on the evidence so far.
       </p>
       <p className="mt-2 text-xs text-[var(--color-muted-foreground)]">
-        Saved opportunities are bookmarks. Decision status is your local
-        next-step choice for each opportunity.
+        Saved ideas are bookmarks. Decision status is your local next-step choice for each idea.
       </p>
     </div>
   );

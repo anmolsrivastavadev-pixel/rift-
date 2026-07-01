@@ -30,10 +30,9 @@ export default async function SavedPage() {
   return (
     <div className="mx-auto max-w-6xl space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Saved</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Saved Ideas</h1>
         <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
-          {cards.length} saved opportun{cards.length === 1 ? "ity" : "ies"} in
-          this MVP workspace.
+          Ideas you have bookmarked to revisit later.
         </p>
       </div>
 
