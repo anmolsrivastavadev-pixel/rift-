@@ -44,7 +44,8 @@ export default async function OpportunitiesPage() {
           </p>
           <p className="mt-2 text-xs text-[var(--color-muted-foreground)]">
             Ideas are generated from the complaints currently in this workspace.
-            If you used a starter market pack, treat the results as inspiration.
+            If you used a preset starter pack or typed a custom market name,
+            treat the results as inspiration — not proof of demand.
             If you pasted real complaints, treat them as stronger evidence.
           </p>
           <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">

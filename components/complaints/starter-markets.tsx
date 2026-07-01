@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Zap, Loader2, CheckCircle2 } from "lucide-react";
 import { useActionState } from "react";
 
-import { loadStarterComplaints, type StarterResult } from "@/actions/complaints";
+import { loadStarterComplaints, createCustomStarterComplaints, type StarterResult } from "@/actions/complaints";
 import { MARKET_KEYS, MARKET_LABELS } from "@/lib/starter-complaints";
 import { Button } from "@/components/ui/button";
 
@@ -14,6 +14,11 @@ export function StarterMarkets() {
     loadStarterComplaints,
     null
   );
+  const [customState, customAction, customPending] = useActionState<StarterResult | null, FormData>(
+    createCustomStarterComplaints,
+    null
+  );
+  const [customMarket, setCustomMarket] = React.useState("");
 
   return (
     <section className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-6">
@@ -51,6 +56,36 @@ export function StarterMarkets() {
         ))}
       </div>
 
+      {/* Custom market input */}
+      <div className="mt-4 border-t border-[var(--color-border)] pt-4">
+        <p className="text-sm text-[var(--color-muted-foreground)] mb-2">
+          Don&apos;t see your market? Type any market or niche below to generate
+          brainstorming examples:
+        </p>
+        <form action={customAction} className="flex gap-2">
+          <input
+            name="market"
+            value={customMarket}
+            onChange={(e) => setCustomMarket(e.target.value)}
+            placeholder="e.g. pet grooming, electric bikes, coworking spaces"
+            required
+            minLength={2}
+            maxLength={80}
+            className="flex-1 rounded-[8px] border border-[var(--color-border)] bg-[var(--color-background)] px-3 py-1.5 text-sm text-[var(--color-foreground)] placeholder:text-[var(--color-muted-foreground)]"
+          />
+          <Button type="submit" size="sm" disabled={customPending || customMarket.trim().length < 2}>
+            {customPending ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : null}
+            Generate
+          </Button>
+        </form>
+        <p className="mt-1 text-[11px] text-[var(--color-muted-foreground)]">
+          AI-generated examples — not real data. You can also paste real
+          complaints from your own customers.
+        </p>
+      </div>
+
       <div className="mt-4 rounded-[8px] bg-[var(--color-muted)]/30 p-3 text-xs text-[var(--color-muted-foreground)]">
         <p>
           <strong className="font-medium text-[var(--color-foreground)]">
@@ -66,7 +101,19 @@ export function StarterMarkets() {
         </p>
       </div>
 
+      {pending && (
+        <p className="mt-3 text-sm text-[var(--color-muted-foreground)]">
+          Loading complaints...
+        </p>
+      )}
+      {customPending && (
+        <p className="mt-3 text-sm text-[var(--color-muted-foreground)]">
+          Generating starter complaints for your market...
+        </p>
+      )}
+
       {state && <StarterSummary result={state} />}
+      {customState && <StarterSummary result={customState} />}
 
       <p className="mt-3 text-[11px] text-[var(--color-muted-foreground)]">
         Starter examples are for exploring the workflow. They are not proof of

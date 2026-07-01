@@ -388,3 +388,68 @@ export async function importTextComplaints(
   // loaded — the UI surfaces an informational "already loaded" message.
   return { inserted: toInsert.length, skipped, errors };
 }
+
+export async function createCustomStarterComplaints(
+  _prev: StarterResult | null,
+  formData: FormData
+): Promise<StarterResult> {
+  const market = String(formData.get("market") ?? "").trim();
+  if (market.length < 2) {
+    return { inserted: 0, skipped: 0, errors: [{ row: 0, reason: "Market name must be at least 2 characters." }], market };
+  }
+  if (market.length > 80) {
+    return { inserted: 0, skipped: 0, errors: [{ row: 0, reason: "Market name must be 80 characters or fewer." }], market };
+  }
+
+  // Validate input safety
+  const { validateMarketInput } = await import("@/lib/starter-ai");
+  const validationError = validateMarketInput(market);
+  if (validationError) {
+    return { inserted: 0, skipped: 0, errors: [{ row: 0, reason: validationError }], market };
+  }
+
+  let complaints: { title: string; body: string; sourceDate: Date | null }[];
+  try {
+    const { generateStarterComplaints } = await import("@/lib/starter-ai");
+    const result = await generateStarterComplaints(market);
+    complaints = result.complaints.map((body, i) => ({
+      title: `Starter complaint ${i + 1}`,
+      body,
+      sourceDate: null,
+    }));
+  } catch (err) {
+    console.error("Failed to generate custom starter complaints:", err);
+    return {
+      inserted: 0,
+      skipped: 0,
+      errors: [
+        { row: 0, reason: `Failed to generate starter complaints: ${err instanceof Error ? err.message : String(err)}` },
+      ],
+      market,
+    };
+  }
+
+  if (complaints.length === 0) {
+    return { inserted: 0, skipped: 0, errors: [{ row: 0, reason: "No starter complaints could be generated. Please try a different market name." }], market };
+  }
+
+  const capped = complaints.slice(0, 500);
+
+  // Deduplicate against existing DB bodies
+  const all = await prisma.complaint.findMany({ select: { body: true } });
+  const existingKeys = new Set(all.map((c) => normaliseBodyForKey(c.body)));
+  const toInsert = capped.filter(
+    (r) => !existingKeys.has(normaliseBodyForKey(r.body))
+  );
+
+  const skipped = capped.length - toInsert.length;
+
+  if (toInsert.length > 0) {
+    await insertValidRows(toInsert);
+  }
+
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/complaints");
+
+  return { inserted: toInsert.length, skipped, errors: [], market };
+}
