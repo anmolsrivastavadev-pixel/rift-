@@ -182,6 +182,22 @@ The Day 1 Beginner Data Path patches add copy for users who do not yet have comp
 - Complaints page has a "Don't have complaints yet?" section with 4 collection methods
 - No scraping or automation needed — collect manually and copy/paste
 
+The Start Fresh Test patch addresses workspace-mixing confusion:
+- "Testing a new niche?" section on the Complaints page explains Rift analyzes all current workspace data
+- "Start fresh test" danger button clears complaints, ideas, and saved ideas with confirmation
+- Opportunities page reminds users ideas come from all current workspace complaints
+- No schema/AI/scoring/import/localStorage changes; no auth/multi-workspaces added
+
+### Start Fresh Test Patch (Post-M15)
+- **Status:** ✅ Done
+- **Purpose:** Fix workspace-mixing confusion where old complaints from previous tests mix with new complaints, creating unrelated business ideas. Give users an easy way to clear old data before testing a new niche.
+- **What was built/fixed:**
+  - New server action `clearWorkspace` in `actions/workspace.ts` — deletes all saved opportunities, opportunities, and complaints in the correct order (respecting foreign-key constraints), then revalidates all relevant paths.
+  - New client component `StartFreshButton` in `components/complaints/start-fresh-button.tsx` — danger button with `window.confirm()` before clearing, shows success/error messages.
+  - Complaints page: added "Testing a new niche?" section with explanation and the Start Fresh button.
+  - Opportunities page: added reminder copy near the generation card explaining ideas come from all current workspace complaints.
+- **Not included:** No schema changes, no AI changes, no scoring changes, no new dependencies, no scraping added, no auth added, no multi-workspaces added. localStorage decision/evidence states for old opportunity IDs remain (harmless — old IDs no longer render after clearing).
+
 `npx tsc --noEmit`, `npm run lint`, and `npm run build` all pass. `npm run start` smoke-tested locally.
 
 ---

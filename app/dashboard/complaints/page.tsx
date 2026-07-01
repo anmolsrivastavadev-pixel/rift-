@@ -2,6 +2,7 @@ import { Suspense } from "react";
 
 import { ComplaintsInput } from "@/components/complaints/complaints-input";
 import { ComplaintsList } from "@/components/complaints/complaints-list";
+import { StartFreshButton } from "@/components/complaints/start-fresh-button";
 
 export default async function ComplaintsPage({
   searchParams,
@@ -87,6 +88,22 @@ export default async function ComplaintsPage({
         </p>
         <div className="mt-3">
           <ComplaintsInput />
+        </div>
+      </section>
+
+      <section className="rounded-[12px] border border-dashed border-[var(--color-border)] bg-[var(--color-card)]/60 p-5">
+        <h2 className="text-sm font-semibold">Testing a new niche?</h2>
+        <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
+          Rift analyzes all complaints currently in this MVP workspace. To get
+          clean results, start fresh before adding a new set of complaints.
+        </p>
+        <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
+          Use this when you want to test a new market, like student productivity
+          apps, fitness apps, or restaurant booking tools, without mixing old
+          complaints into the results.
+        </p>
+        <div className="mt-3">
+          <StartFreshButton />
         </div>
       </section>
 

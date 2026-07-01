@@ -46,8 +46,11 @@ CSV upload, paste text, .txt/.md file, or Use demo data
   → Validation Workspace (checklist + copy brief)
   → Validation Evidence Log (aggregate evidence tracking)
   → Compare Ideas board (decide: Pursue / Park / Reject)
+  → Start fresh test (clear workspace for new niche)
   → Deploy to Vercel + Neon
 ```
+
+Rift uses all complaints currently in the workspace. To test one niche cleanly, start fresh first, then add only that niche's complaints.
 
 Score is **never** computed by Gemini. Gemini only provides severity (1–10) and confidence (0–100). The app computes the final 0–100 score in `lib/scoring.ts` so the same dataset always yields the same score.
 
@@ -105,7 +108,8 @@ components/
 ├─ container.tsx         max-w wrapper
 ├─ dashboard/            stat-card, complaints-chart (Recharts), shell, founder-command-client
 ├─ complaints/           csv-uploader, complaints-input (tabs), text-input (paste/file),
-│                        import-summary, complaints-list, complaints-table, complaint-search
+│                        import-summary, complaints-list, complaints-table, complaint-search,
+│                        start-fresh-button (client component for workspace clearing)
 ├─ landing/              hero, features, how-it-works, why-complaints, footer
 └─ opportunities/        opportunity-card, opportunity-browser, filters, save-button,
                          related-opportunity-card, no-related-empty, prev-next-nav,
@@ -136,7 +140,8 @@ actions/
 ├─ complaints.ts        uploadComplaints, loadDemoComplaints, importTextComplaints
 ├─ opportunities.ts    runPipeline, getProcessingStatus, resetOpportunities,
 │                       resetOpportunitiesAction
-└─ saved.ts             saveOpportunity, unsaveOpportunity, saveAction, unsaveAction
+├─ saved.ts             saveOpportunity, unsaveOpportunity, saveAction, unsaveAction
+└─ workspace.ts         clearWorkspace (start fresh test — clears all MVP data)
 
 prisma/
 ├─ schema.prisma

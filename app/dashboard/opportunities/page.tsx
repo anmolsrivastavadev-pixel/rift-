@@ -58,6 +58,11 @@ export default async function OpportunitiesPage() {
         <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
           Group the complaints in this workspace into business idea hypotheses based on repeated pain, severity, and confidence.
         </p>
+        <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
+          Rift generates ideas from all complaints currently in this workspace.
+          For a clean test, start fresh on the Complaints page before adding a
+          new niche.
+        </p>
         <div className="mt-4">
           <RunOpportunitiesButton />
         </div>
