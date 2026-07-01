@@ -108,7 +108,7 @@ export function ValidationEvidenceLog({
         <div>
           <h2 className="text-base font-semibold">Validation Evidence Log</h2>
           <p className="mt-0.5 text-xs text-[var(--color-muted-foreground)]">
-            Track what you learn from real conversations.
+            A place to record what you learn after talking to people.
           </p>
         </div>
         <Button

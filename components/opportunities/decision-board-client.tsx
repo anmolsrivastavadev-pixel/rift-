@@ -377,7 +377,10 @@ function DecisionBoardHeader() {
         Choose whether to pursue, park, reject, or keep reviewing each idea based on the evidence so far.
       </p>
       <p className="mt-2 text-xs text-[var(--color-muted-foreground)]">
-        Saved ideas are bookmarks. Decision status is your local next-step choice for each idea.
+        Pursue = test this idea next. Park = save it for later. Reject = stop spending time on it for now. Undecided = not enough evidence yet.
+      </p>
+      <p className="mt-2 text-xs text-[var(--color-muted-foreground)]">
+        These decisions are for your own thinking. They do not prove whether an idea is good or bad.
       </p>
     </div>
   );

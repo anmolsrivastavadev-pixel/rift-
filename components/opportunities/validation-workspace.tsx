@@ -39,7 +39,7 @@ export function ValidationWorkspace({ input }: { input: ValidationPlanInput }) {
         <div>
           <h2 className="text-base font-semibold">Validation Workspace</h2>
           <p className="mt-0.5 text-xs text-[var(--color-muted-foreground)]">
-            A guide for testing whether the idea is worth pursuing.
+            A simple checklist for testing the idea with real people.
           </p>
         </div>
         <CopyValidationBrief input={input} />

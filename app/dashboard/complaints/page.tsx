@@ -33,6 +33,19 @@ export default async function ComplaintsPage({
       </section>
 
       <section>
+        <h2 className="text-base font-semibold">What counts as a complaint?</h2>
+        <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
+          A complaint is any real customer frustration. You can paste reviews, app-store feedback, support tickets, Reddit/forum snippets you manually collected, interview notes, or use demo data.
+        </p>
+        <p className="mt-2 text-sm text-[var(--color-muted-foreground)]">
+          You are looking for problems people repeat, not random opinions.
+        </p>
+        <p className="mt-2 text-xs text-[var(--color-muted-foreground)]">
+          Do not include private personal information. Keep the text focused on the problem people are describing.
+        </p>
+      </section>
+
+      <section>
         <h2 className="text-base font-semibold">Add complaints</h2>
         <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
           Choose an input method below. For CSV, the expected columns are{" "}

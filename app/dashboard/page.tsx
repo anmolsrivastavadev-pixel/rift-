@@ -123,6 +123,43 @@ export default async function DashboardPage() {
         </p>
       </div>
 
+      {/* Beginner guide */}
+      <div className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-6">
+        <h2 className="text-base font-semibold">What should I do first?</h2>
+        <p className="mt-2 text-sm text-[var(--color-muted-foreground)]">
+          If you do not have your own complaints yet, start with demo data. Once you understand the workflow, replace it with real complaints or reviews from a market you care about.
+        </p>
+        <ol className="mt-4 space-y-2 text-sm text-[var(--color-muted-foreground)]">
+          <li className="flex gap-2">
+            <span className="font-medium text-[var(--color-foreground)]">1.</span>
+            Use demo data
+          </li>
+          <li className="flex gap-2">
+            <span className="font-medium text-[var(--color-foreground)]">2.</span>
+            Generate business ideas
+          </li>
+          <li className="flex gap-2">
+            <span className="font-medium text-[var(--color-foreground)]">3.</span>
+            Open one idea
+          </li>
+          <li className="flex gap-2">
+            <span className="font-medium text-[var(--color-foreground)]">4.</span>
+            Read the evidence and score
+          </li>
+          <li className="flex gap-2">
+            <span className="font-medium text-[var(--color-foreground)]">5.</span>
+            Talk to real people
+          </li>
+          <li className="flex gap-2">
+            <span className="font-medium text-[var(--color-foreground)]">6.</span>
+            Mark the idea as Pursue, Park, or Reject
+          </li>
+        </ol>
+        <p className="mt-4 text-xs text-[var(--color-muted-foreground)]">
+          Plain English: Rift helps you spot repeated problems people complain about, turn them into possible business ideas, then decide which one is worth testing.
+        </p>
+      </div>
+
       {/* Project stat cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard

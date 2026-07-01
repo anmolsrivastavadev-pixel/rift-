@@ -149,7 +149,7 @@ export default async function OpportunityDetailPage({
           <section>
             <h2 className="text-base font-semibold">Problem Summary</h2>
             <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
-              What people seem to be complaining about.
+              The repeated problem Rift found in the complaints.
             </p>
             <p className="mt-2 text-sm leading-relaxed text-[var(--color-muted-foreground)]">
               {op.summary}
@@ -160,7 +160,7 @@ export default async function OpportunityDetailPage({
           <section>
             <h2 className="text-base font-semibold">Evidence From Complaints</h2>
             <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
-              Examples from the complaints you added.
+              Examples from the text you added.
             </p>
             <div className="mt-3">
               <ExampleComplaints items={op.complaints} />
@@ -196,7 +196,7 @@ export default async function OpportunityDetailPage({
               Product Opportunity
             </h2>
             <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
-              A possible business idea based on the repeated problem.
+              A possible solution someone could build.
             </p>
             <p className="mt-2 text-sm leading-relaxed text-[var(--color-foreground)]/90">
               {op.suggestedSoftware}

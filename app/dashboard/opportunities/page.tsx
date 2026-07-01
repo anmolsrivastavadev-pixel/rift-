@@ -40,7 +40,10 @@ export default async function OpportunitiesPage() {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Business Ideas</h1>
           <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
-            These ideas are generated from patterns in the complaints you added. Scores are rough signals to help you choose what to inspect first — not proof an idea will work.
+            These ideas are generated from patterns in the complaints you added. Scores help sort ideas. A higher score means Rift saw stronger signals in the complaints, but it does not mean the idea is proven.
+          </p>
+          <p className="mt-2 text-xs text-[var(--color-muted-foreground)]">
+            Start by opening one idea with a high score, then check whether the evidence actually makes sense.
           </p>
         </div>
         <Button asChild variant="outline">
