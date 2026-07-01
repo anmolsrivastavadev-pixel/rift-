@@ -117,6 +117,13 @@ export function OpportunityCard({ op }: { op: OpportunityCardData }) {
         <p className="mt-3 text-[10px] leading-snug text-[var(--color-muted-foreground)]">
           The score is a rough sorting signal, not proof an idea will work.
         </p>
+
+        <span
+          className="mt-3 inline-flex items-center justify-center gap-1.5 rounded-[8px] border border-[var(--color-border)] bg-[var(--color-background)] px-3 py-1.5 text-xs font-medium text-[var(--color-foreground)] transition-colors group-hover:border-[var(--color-primary)]/40 group-hover:text-[var(--color-primary)]"
+          aria-hidden="true"
+        >
+          Open idea
+        </span>
       </Link>
     </div>
   );

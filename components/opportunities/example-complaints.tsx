@@ -33,12 +33,14 @@ export function ExampleComplaints({ items }: { items: LinkedComplaint[] }) {
 
   return (
     <ul className="space-y-2">
-      {items.map((c) => (
+      {items.map((c, i) => (
         <li
           key={c.id}
           className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-4 transition-shadow duration-150 ease-out hover:shadow-sm"
         >
-          <p className="text-sm font-medium">{c.title}</p>
+          <p className="text-xs font-medium text-[var(--color-muted-foreground)]">
+            Complaint {i + 1}
+          </p>
           <ComplaintBody body={c.body} />
           <p className="mt-2 text-[10px] uppercase tracking-wide text-[var(--color-muted-foreground)]">
             {c.sourceDate
