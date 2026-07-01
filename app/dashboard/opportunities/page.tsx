@@ -59,6 +59,11 @@ export default async function OpportunitiesPage() {
         </Button>
       </div>
 
+      <p className="text-xs text-[var(--color-muted-foreground)]">
+        Not sure which idea to choose? Select 2–3 ideas below and compare them
+        side by side.
+      </p>
+
       <section className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-6">
         <h2 className="text-base font-semibold">Generate business ideas</h2>
         <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">

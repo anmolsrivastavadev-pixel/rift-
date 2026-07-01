@@ -1,5 +1,8 @@
+"use client";
+
+import * as React from "react";
 import Link from "next/link";
-import { Target, Users, AlertTriangle, Briefcase } from "lucide-react";
+import { Target, Users, AlertTriangle, Briefcase, Plus, Check } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { SaveButton } from "@/components/opportunities/save-button";
@@ -15,7 +18,6 @@ export type OpportunityCardData = {
   confidence: number | null;
   keywords: string[];
   suggestedSoftware: string;
-  // M9 — optional market-gap hypothesis preview fields.
   targetCustomer?: string | null;
   productAngle?: string | null;
   createdAt: Date;
@@ -28,17 +30,55 @@ function scoreColor(score: number): string {
   return "text-[var(--color-danger)]";
 }
 
-export function OpportunityCard({ op }: { op: OpportunityCardData }) {
+export function OpportunityCard({
+  op,
+  selected = false,
+  onToggleCompare,
+}: {
+  op: OpportunityCardData;
+  selected?: boolean;
+  onToggleCompare?: (id: string) => void;
+}) {
   const sc = scoreColor(op.opportunityScore);
   const scoreLabel = `Score ${op.opportunityScore} out of 100`;
   return (
     <div
       className={
-        "group relative flex flex-col rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-6 " +
-        "transition-all duration-150 ease-out hover:-translate-y-0.5 hover:border-[var(--color-primary)]/60 hover:shadow-md"
+        "group relative flex flex-col rounded-[12px] border bg-[var(--color-card)] p-6 " +
+        "transition-all duration-150 ease-out hover:-translate-y-0.5 hover:shadow-md " +
+        (selected
+          ? "border-[var(--color-primary)] ring-1 ring-[var(--color-primary)]/30"
+          : "border-[var(--color-border)] hover:border-[var(--color-primary)]/60")
       }
     >
-      <div className="absolute right-4 top-4">
+      <div className="absolute right-4 top-4 flex items-center gap-1.5">
+        {onToggleCompare && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onToggleCompare(op.id);
+            }}
+            className={`inline-flex items-center gap-1 rounded-[8px] border px-2.5 py-1 text-[11px] font-medium transition-colors ${
+              selected
+                ? "border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)]"
+                : "border-[var(--color-border)] bg-[var(--color-background)] text-[var(--color-muted-foreground)] hover:border-[var(--color-primary)]/60 hover:text-[var(--color-primary)]"
+            }`}
+            aria-pressed={selected}
+            aria-label={selected ? "Remove from compare" : "Add to compare"}
+          >
+            {selected ? (
+              <>
+                <Check className="h-3 w-3" /> Added
+              </>
+            ) : (
+              <>
+                <Plus className="h-3 w-3" /> Add to compare
+              </>
+            )}
+          </button>
+        )}
         <SaveButton opportunityId={op.id} saved={op.saved} size="sm" />
       </div>
 
@@ -47,7 +87,7 @@ export function OpportunityCard({ op }: { op: OpportunityCardData }) {
         className="flex flex-1 flex-col"
         aria-label={`Open opportunity: ${op.title}, score ${op.opportunityScore}`}
       >
-        <div className="flex items-start gap-2 pr-8">
+        <div className="flex items-start gap-2 pr-24">
           <div className="min-w-0">
             <div className="flex items-center gap-1.5 text-[11px] uppercase tracking-wide text-[var(--color-muted-foreground)]">
               <Briefcase className="h-3 w-3" />
@@ -64,9 +104,6 @@ export function OpportunityCard({ op }: { op: OpportunityCardData }) {
           <span className="text-[var(--color-foreground)]/80">{op.suggestedSoftware}</span>
         </p>
 
-        {/* Compact M9 market-gap preview. Hidden entirely if the opportunity
-            predates M9 (no targetCustomer + no productAngle) so legacy rows
-            render cleanly. */}
         {(op.targetCustomer || op.productAngle) && (
           <div className="mt-2 space-y-0.5 text-[11px] text-[var(--color-muted-foreground)]">
             {op.targetCustomer && (

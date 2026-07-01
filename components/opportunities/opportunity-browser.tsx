@@ -1,6 +1,8 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
+import { LayoutGrid } from "lucide-react";
 
 import { OpportunityCard } from "@/components/opportunities/opportunity-card";
 import {
@@ -12,8 +14,11 @@ import {
   NoOpportunitiesEmpty,
   NoSearchResultsEmpty,
 } from "@/components/opportunities/empty-states";
+import { Button } from "@/components/ui/button";
 
 type CardData = React.ComponentProps<typeof OpportunityCard>["op"];
+
+const MAX_COMPARE = 3;
 
 /**
  * Client-side browser for opportunities.
@@ -26,6 +31,8 @@ export function OpportunityBrowser({
   opportunities: CardData[];
 }) {
   const [filters, setFilters] = React.useState<FilterState>(DEFAULT_FILTERS);
+  const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
+  const [maxReached, setMaxReached] = React.useState(false);
 
   const setState = React.useCallback(
     (patch: Partial<FilterState> | ((prev: FilterState) => Partial<FilterState>)) =>
@@ -40,6 +47,36 @@ export function OpportunityBrowser({
     () => setFilters(DEFAULT_FILTERS),
     []
   );
+
+  const toggleCompare = React.useCallback((id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+        setMaxReached(false);
+      } else {
+        if (next.size >= MAX_COMPARE) {
+          setMaxReached(true);
+          return prev;
+        }
+        next.add(id);
+        setMaxReached(false);
+      }
+      return next;
+    });
+  }, []);
+
+  const clearSelection = React.useCallback(() => {
+    setSelectedIds(new Set());
+    setMaxReached(false);
+  }, []);
+
+  // Auto-dismiss max-reached message after 3 seconds.
+  React.useEffect(() => {
+    if (!maxReached) return;
+    const t = setTimeout(() => setMaxReached(false), 3000);
+    return () => clearTimeout(t);
+  }, [maxReached]);
 
   const industries = React.useMemo(
     () => Array.from(new Set(opportunities.map((o) => o.industry))).sort(),
@@ -104,6 +141,8 @@ export function OpportunityBrowser({
   if (opportunities.length === 0) {
     return <NoOpportunitiesEmpty />;
   }
+
+  const compareParam = Array.from(selectedIds).join(",");
 
   return (
     <div className="space-y-4">
@@ -183,15 +222,58 @@ export function OpportunityBrowser({
           Scores help you choose what to inspect first. They do not prove an
           idea will work.
         </p>
+        <p className="mt-2 text-[11px] text-[var(--color-muted-foreground)]">
+          Not sure which idea to choose? Select 2–3 ideas and compare them side
+          by side.
+        </p>
       </div>
+
+      {maxReached && (
+        <p className="rounded-[8px] bg-[var(--color-warning)]/10 px-3 py-2 text-xs text-[var(--color-warning)]" role="alert">
+          Compare up to 3 ideas at a time.
+        </p>
+      )}
 
       {filtered.length === 0 ? (
         <NoSearchResultsEmpty onReset={onReset} />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((op) => (
-            <OpportunityCard key={op.id} op={op} />
+            <OpportunityCard
+              key={op.id}
+              op={op}
+              selected={selectedIds.has(op.id)}
+              onToggleCompare={toggleCompare}
+            />
           ))}
+        </div>
+      )}
+
+      {/* Sticky compare tray */}
+      {selectedIds.size > 0 && (
+        <div className="fixed inset-x-0 bottom-0 z-50 border-t border-[var(--color-border)] bg-[var(--color-card)] shadow-lg">
+          <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
+            <div>
+              <p className="text-sm font-medium text-[var(--color-foreground)]">
+                {selectedIds.size} idea{selectedIds.size === 1 ? "" : "s"} selected
+              </p>
+              <p className="text-xs text-[var(--color-muted-foreground)]">
+                Compare 2–3 ideas to choose which one to test first.
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="sm" onClick={clearSelection}>
+                Clear
+              </Button>
+              <Button asChild disabled={selectedIds.size < 2}>
+                <Link
+                  href={`/dashboard/opportunities/decision-board?compare=${compareParam}`}
+                >
+                  <LayoutGrid className="h-4 w-4" /> Compare selected ideas
+                </Link>
+              </Button>
+            </div>
+          </div>
         </div>
       )}
     </div>
