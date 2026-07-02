@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { complaintRowSchema, type UploadResult } from "@/lib/schemas";
 import { parseComplaintsFromText, normaliseBodyForKey } from "@/lib/text-import";
+import { requireUser } from "@/lib/auth/current-user";
 
 const MAX_ROWS = 5000;
 
@@ -37,12 +38,16 @@ function pickField(row: Record<string, unknown>, keys: string[]): string {
 }
 
 function insertValidRows(
-  valid: { title: string; body: string; sourceDate: Date | null }[]
+  valid: { title: string; body: string; sourceDate: Date | null }[],
+  userId: string
 ): Promise<unknown> {
   const CHUNK = 500;
   const inserts = [];
   for (let i = 0; i < valid.length; i += CHUNK) {
-    const batch = valid.slice(i, i + CHUNK);
+    const batch = valid.slice(i, i + CHUNK).map((row) => ({
+      ...row,
+      userId,
+    }));
     inserts.push(prisma.complaint.createMany({ data: batch }));
   }
   return Promise.all(inserts);
@@ -57,6 +62,7 @@ export async function uploadComplaints(
   _prev: UploadResult | null,
   formData: FormData
 ): Promise<UploadResult> {
+  const user = await requireUser();
   const raw = formData.get("data");
   let rows: unknown[] = [];
   try {
@@ -126,7 +132,7 @@ export async function uploadComplaints(
   }
 
   // Insert in chunks to keep query size reasonable.
-  await insertValidRows(valid);
+  await insertValidRows(valid, user.id);
 
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/complaints");
@@ -155,6 +161,7 @@ const DEMO_ROWS: { title: string; body: string; sourceDate: string }[] = [
 ];
 
 export async function loadDemoComplaints(): Promise<UploadResult> {
+  const user = await requireUser();
   const valid: { title: string; body: string; sourceDate: Date | null }[] = [];
   const errors: { row: number; reason: string }[] = [];
 
@@ -185,14 +192,14 @@ export async function loadDemoComplaints(): Promise<UploadResult> {
   // not affect the regular CSV upload pipeline.
   const demoBodies = valid.map((r) => r.body);
   const existing = await prisma.complaint.findMany({
-    where: { body: { in: demoBodies } },
+    where: { body: { in: demoBodies }, userId: user.id },
     select: { body: true },
   });
   const existingBodies = new Set(existing.map((c) => c.body));
   const toInsert = valid.filter((r) => !existingBodies.has(r.body));
 
   if (toInsert.length > 0) {
-    await insertValidRows(toInsert);
+    await insertValidRows(toInsert, user.id);
   }
 
   revalidatePath("/dashboard");
@@ -231,6 +238,7 @@ export async function loadStarterComplaints(
   _prev: StarterResult | null,
   formData: FormData
 ): Promise<StarterResult> {
+  const user = await requireUser();
   const marketKey = String(formData.get("market") ?? "");
 
   const pack = getStarterPack(marketKey);
@@ -274,14 +282,14 @@ export async function loadStarterComplaints(
   // Dedupe: skip complaints whose body already exists in the database.
   const bodies = valid.map((r) => r.body);
   const existing = await prisma.complaint.findMany({
-    where: { body: { in: bodies } },
+    where: { body: { in: bodies }, userId: user.id },
     select: { body: true },
   });
   const existingBodies = new Set(existing.map((c) => c.body));
   const toInsert = valid.filter((r) => !existingBodies.has(r.body));
 
   if (toInsert.length > 0) {
-    await insertValidRows(toInsert);
+    await insertValidRows(toInsert, user.id);
   }
 
   revalidatePath("/dashboard");
@@ -307,6 +315,7 @@ export async function importTextComplaints(
   _prev: UploadResult | null,
   formData: FormData
 ): Promise<UploadResult> {
+  const user = await requireUser();
   const text = String(formData.get("text") ?? "");
 
   if (!text.trim()) {
@@ -367,7 +376,7 @@ export async function importTextComplaints(
   // dedupe against the DB and is unaffected. For MVP-scale workspaces a
   // single select-bodies scan is cheap and matches the pipeline's own
   // `prisma.complaint.findMany` usage.
-  const all = await prisma.complaint.findMany({ select: { body: true } });
+  const all = await prisma.complaint.findMany({ where: { userId: user.id }, select: { body: true } });
   const existingKeys = new Set(all.map((c) => normaliseBodyForKey(c.body)));
   const toInsert = valid.filter(
     (r) => !existingKeys.has(normaliseBodyForKey(r.body))
@@ -378,7 +387,7 @@ export async function importTextComplaints(
   const skipped = capped.length - toInsert.length;
 
   if (toInsert.length > 0) {
-    await insertValidRows(toInsert);
+    await insertValidRows(toInsert, user.id);
   }
 
   revalidatePath("/dashboard");
@@ -393,6 +402,7 @@ export async function createCustomStarterComplaints(
   _prev: StarterResult | null,
   formData: FormData
 ): Promise<StarterResult> {
+  const user = await requireUser();
   const market = String(formData.get("market") ?? "").trim();
   if (market.length < 2) {
     return { inserted: 0, skipped: 0, errors: [{ row: 0, reason: "Market name must be at least 2 characters." }], market };
@@ -436,7 +446,7 @@ export async function createCustomStarterComplaints(
   const capped = complaints.slice(0, 500);
 
   // Deduplicate against existing DB bodies
-  const all = await prisma.complaint.findMany({ select: { body: true } });
+  const all = await prisma.complaint.findMany({ where: { userId: user.id }, select: { body: true } });
   const existingKeys = new Set(all.map((c) => normaliseBodyForKey(c.body)));
   const toInsert = capped.filter(
     (r) => !existingKeys.has(normaliseBodyForKey(r.body))
@@ -445,7 +455,7 @@ export async function createCustomStarterComplaints(
   const skipped = capped.length - toInsert.length;
 
   if (toInsert.length > 0) {
-    await insertValidRows(toInsert);
+    await insertValidRows(toInsert, user.id);
   }
 
   revalidatePath("/dashboard");

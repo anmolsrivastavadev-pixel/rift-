@@ -65,10 +65,10 @@ Either:
 ### 3. Install dependencies
 
 ```bash
-npm install
+pnpm install
 ```
 
-> On React 19 + Recharts the install prints a peer-dep warning. This is expected — `.npmrc` already sets `legacy-peer-deps=true` so the install succeeds.
+> On React 19 + Recharts the install prints a peer-dep warning. This is expected — pnpm handles this gracefully.
 
 ### 4. Configure `.env`
 
@@ -77,8 +77,8 @@ See "Required environment variables" above.
 ### 5. Generate the Prisma client + push the schema
 
 ```bash
-npx prisma generate
-npx prisma db push
+pnpm exec prisma generate
+pnpm exec prisma db push
 ```
 
 `prisma generate` creates the typed client at `lib/generated/prisma/` (gitignored).
@@ -87,7 +87,7 @@ npx prisma db push
 ### 6. Run the dev server
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 Visit http://localhost:3000.
@@ -121,9 +121,9 @@ Visit http://localhost:3000.
 3. On the dashboard, find the **Connection string**.
 4. Use the **pooled** connection string (it includes `-pooler` in the hostname). Append `?sslmode=require`.
 5. Paste it into `.env` locally and into the Vercel env vars (see below).
-6. Run `npx prisma db push` once against the Neon database so tables are created.
+6. Run `pnpm exec prisma db push` once against the Neon database so tables are created.
    ```bash
-   DATABASE_URL="postgresql://USER:PASSWORD@HOST-pooler.neon.tech/DBNAME?sslmode=require" npx prisma db push
+   DATABASE_URL="postgresql://USER:PASSWORD@HOST-pooler.neon.tech/DBNAME?sslmode=require" pnpm exec prisma db push
    ```
 
 ---
@@ -135,7 +135,7 @@ Visit http://localhost:3000.
 3. In the Vercel project settings → **Environment Variables**, add:
    - `DATABASE_URL` — Neon pooled connection string with `?sslmode=require`.
    - `GEMINI_API_KEY` — your Gemini API key.
-4. Build command: leave the default `npm run build` — `package.json` already runs `prisma generate && next build`.
+4. Build command: leave the default `pnpm build` — `package.json` already runs `prisma generate && next build`.
 5. Deploy.
 6. Open the deployed URL and verify:
    - homepage loads,
@@ -157,14 +157,14 @@ Visit http://localhost:3000.
 
 ### Prisma generate issues
 **Symptom:** TypeScript error like `Cannot find module '@/lib/generated/prisma/client'`.
-**Fix:** Run `npx prisma generate`. The `lib/generated/prisma/` folder is gitignored and must be created on every machine/Vercel build. The `build` script already does this — `prisma generate && next build`.
+**Fix:** Run `pnpm exec prisma generate`. The `lib/generated/prisma/` folder is gitignored and must be created on every machine/Vercel build. The `build` script already does this — `prisma generate && next build`.
 
 ### Local PostgreSQL not running
 **Symptom:** Connection refused on `localhost:5432`.
 **Fix:** Start the PostgreSQL service. On Windows: `Get-Service postgresql-*` then `Start-Service postgresql-x64-16`. Verify port 5432 is open.
 
 ### Vercel build fails because env vars are missing
-**Symptom:** `npm run build` fails on Vercel with "Missing required environment variable: DATABASE_URL".
+**Symptom:** `pnpm build` fails on Vercel with "Missing required environment variable: DATABASE_URL".
 **Fix:** Add `DATABASE_URL` and `GEMINI_API_KEY` in Vercel → Project → Settings → Environment Variables. Re-deploy.
 
 ### Accidentally committed `.env`
@@ -205,10 +205,10 @@ prisma/                 schema.prisma + prisma.config.ts
 
 | Script | Purpose |
 |---|---|
-| `npm run dev` | Start the dev server (Turbopack) on port 3000 |
-| `npm run build` | Generate Prisma client + production build |
-| `npm run start` | Start the production server (after `build`) |
-| `npm run lint` | Run ESLint |
+| `pnpm dev` | Start the dev server (Turbopack) on port 3000 |
+| `pnpm build` | Generate Prisma client + production build |
+| `pnpm start` | Start the production server (after `build`) |
+| `pnpm lint` | Run ESLint |
 
 ---
 

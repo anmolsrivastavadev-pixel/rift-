@@ -1,58 +1,82 @@
-import { Upload, Sparkles, LineChart, Target } from "lucide-react";
 import { Container } from "@/components/container";
 
-const features = [
+const modes = [
   {
-    icon: Upload,
-    title: "Turn pain into ideas",
-    text: "Paste complaints, upload a file, or start with demo data.",
+    label: "Quick ideas",
+    description:
+      "Type any market and get starter complaint examples for brainstorming.",
+    highlight: false,
   },
   {
-    icon: Sparkles,
-    title: "AI groups the pain",
-    text: "Gemini groups similar complaints and summarizes the problem for each cluster.",
+    label: "Real research",
+    description:
+      "Paste real reviews, complaints, or support tickets for stronger evidence.",
+    highlight: true,
   },
-  {
-    icon: LineChart,
-    title: "Score and inspect",
-    text: "Get a rough 0–100 score based on frequency, severity, and confidence.",
-  },
-  {
-    icon: Target,
-    title: "Compare and decide",
-    text: "Review evidence, risks, and next steps before deciding what to test.",
-  },
+];
+
+const comparePoints = [
+  "Person",
+  "Problem",
+  "Solution",
+  "Evidence",
+  "Risk",
+  "Next step",
 ];
 
 export function Features() {
   return (
     <section id="features" className="py-20 sm:py-28">
       <Container>
+        {/* Quick ideas vs real research */}
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-            From scattered frustrations to ranked ideas
+            Quick ideas vs real research
           </h2>
-          <p className="mt-4 text-[var(--color-muted-foreground)]">
-            Rift is built around four jobs: gather real pain, cluster it,
-            score it, and decide where to start.
-          </p>
         </div>
 
-        <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {features.map(({ icon: Icon, title, text }) => (
+        <div className="mx-auto mt-10 grid max-w-2xl gap-4 sm:grid-cols-2">
+          {modes.map((m) => (
             <div
-              key={title}
-              className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-6"
+              key={m.label}
+              className={`rounded-[12px] border p-6 text-left ${
+                m.highlight
+                  ? "border-[var(--color-primary)]/30 bg-[var(--color-primary)]/5"
+                  : "border-[var(--color-border)] bg-[var(--color-card)]"
+              }`}
             >
-              <div className="flex h-10 w-10 items-center justify-center rounded-[12px] bg-[var(--color-primary)]/10 text-[var(--color-primary)]">
-                <Icon className="h-5 w-5" />
-              </div>
-              <h3 className="mt-4 text-base font-semibold">{title}</h3>
-              <p className="mt-2 text-sm text-[var(--color-muted-foreground)]">
-                {text}
+              <h3
+                className={`text-base font-semibold ${
+                  m.highlight ? "text-[var(--color-primary)]" : ""
+                }`}
+              >
+                {m.label}
+              </h3>
+              <p className="mt-2 text-sm text-[var(--color-muted-foreground)] leading-relaxed">
+                {m.description}
               </p>
             </div>
           ))}
+        </div>
+
+        {/* Compare ideas */}
+        <div className="mx-auto mt-16 max-w-2xl">
+          <div className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-6">
+            <h3 className="text-base font-semibold">Compare ideas</h3>
+            <p className="mt-2 text-sm text-[var(--color-muted-foreground)]">
+              Compare 2\u20133 ideas side by side by:
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {comparePoints.map((point) => (
+                <span
+                  key={point}
+                  className="rounded-full border border-[var(--color-border)] bg-[var(--color-background)] px-3 py-1 text-xs text-[var(--color-muted-foreground)]"
+                >
+                  {point}
+                </span>
+              ))}
+            </div>
+          </div>
         </div>
       </Container>
     </section>

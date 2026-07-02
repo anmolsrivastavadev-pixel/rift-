@@ -62,7 +62,7 @@ Do **not** do any of the following unless a future milestone explicitly asks:
 - **Do not change the CSV upload pipeline** in `actions/complaints.ts` / `components/complaints/csv-uploader.tsx`. The Zod schema in `lib/schemas.ts` is intentional (empty title/sourceDate strings are treated as absent).
 - **Do not change the cleaning logic** in `lib/cleaning.ts`.
 - **Do not change the search / filter / sort / save logic** in `OpportunityBrowser`, `OpportunityFilters`, or `actions/saved.ts`. Polish (aria labels, focus styles) is OK; behaviour changes are not.
-- **Do not modify the Prisma schema unless the milestone explicitly requires it.** If a milestone genuinely needs a new column, model, or index, run `npx prisma db push` — never run destructive commands (see Database safety below).
+- **Do not modify the Prisma schema unless the milestone explicitly requires it.** If a milestone genuinely needs a new column, model, or index, run `pnpm exec prisma db push` — never run destructive commands (see Database safety below).
 - **Do not remove the driver-adapter setup.** Keep `lib/db.ts` using `new PrismaPg({ connectionString: process.env.DATABASE_URL })` and `new PrismaClient({ adapter })`. Do not revert to the legacy Prisma engine.
 - **Do not move `DATABASE_URL` back into `prisma/schema.prisma`.** The URL lives in `prisma.config.ts`; the schema keeps only the `provider`.
 - **Do not change `package.json` `build` script** (`prisma generate && next build`). The Prisma client output is gitignored and must be regenerated on every build (local + Vercel).
@@ -76,9 +76,9 @@ Do **not** do any of the following unless a future milestone explicitly asks:
 ## Database safety
 
 Allowed commands:
-- `npx prisma generate` (regenerate the TypeScript client)
-- `npx prisma validate` (lint the schema)
-- `npx prisma db push` (apply a schema change non-destructively — only when the milestone explicitly needs it)
+- `pnpm exec prisma generate` (regenerate the TypeScript client)
+- `pnpm exec prisma validate` (lint the schema)
+- `pnpm exec prisma db push` (apply a schema change non-destructively — only when the milestone explicitly needs it)
 
 Forbidden commands — never run these:
 - `prisma db push --force-reset`
@@ -118,9 +118,9 @@ Report, in this order:
    - the scoring logic was not modified,
    - the search/filter/sort/save logic was not modified (unless the milestone explicitly authorised it),
    - no secrets were exposed,
-   - `npx tsc --noEmit` passes,
-   - `npm run lint` passes,
-   - `npm run build` passes (or the only blocker is a clearly identified missing local env var).
+   - `pnpm exec tsc --noEmit` passes,
+   - `pnpm lint` passes,
+   - `pnpm build` passes (or the only blocker is a clearly identified missing local env var).
 8. Then STOP and wait for confirmation. Do not start the next milestone.
 
 ---

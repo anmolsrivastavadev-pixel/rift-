@@ -18,6 +18,7 @@ import {
 import { FounderCommandClient } from "@/components/dashboard/founder-command-client";
 import { Button } from "@/components/ui/button";
 import type { DashboardStats } from "@/lib/dashboard-plan";
+import { requireUser } from "@/lib/auth/current-user";
 
 function bucketByDay(rows: { sourceDate: Date | null }[]): DayBucket[] {
   const map = new Map<string, number>();
@@ -32,6 +33,7 @@ function bucketByDay(rows: { sourceDate: Date | null }[]): DayBucket[] {
 }
 
 export default async function DashboardPage() {
+  const user = await requireUser();
   const [
     complaintCount,
     recent,
@@ -42,20 +44,22 @@ export default async function DashboardPage() {
     topOpportunities,
     opportunityIds,
   ] = await Promise.all([
-    prisma.complaint.count(),
+    prisma.complaint.count({ where: { userId: user.id } }),
     prisma.complaint.findMany({
+      where: { userId: user.id },
       orderBy: { createdAt: "desc" },
       take: 5,
       select: { id: true, title: true, body: true, createdAt: true },
     }),
     prisma.complaint.findMany({
+      where: { userId: user.id, sourceDate: { not: null } },
       select: { sourceDate: true },
-      where: { sourceDate: { not: null } },
     }),
-    prisma.opportunity.count(),
-    prisma.savedOpportunity.count(),
-    prisma.opportunity.aggregate({ _max: { opportunityScore: true } }),
+    prisma.opportunity.count({ where: { userId: user.id } }),
+    prisma.savedOpportunity.count({ where: { userId: user.id } }),
+    prisma.opportunity.aggregate({ _max: { opportunityScore: true }, where: { userId: user.id } }),
     prisma.opportunity.findMany({
+      where: { userId: user.id },
       orderBy: { opportunityScore: "desc" },
       take: 3,
       select: {
@@ -68,6 +72,7 @@ export default async function DashboardPage() {
       },
     }),
     prisma.opportunity.findMany({
+      where: { userId: user.id },
       orderBy: { opportunityScore: "desc" },
       take: 100,
       select: { id: true },

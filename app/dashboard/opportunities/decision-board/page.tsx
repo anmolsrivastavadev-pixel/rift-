@@ -3,16 +3,19 @@ import {
   DecisionBoardClient,
   type DecisionBoardOpportunity,
 } from "@/components/opportunities/decision-board-client";
+import { requireUser } from "@/lib/auth/current-user";
 
 export default async function DecisionBoardPage({
   searchParams,
 }: {
   searchParams: Promise<{ compare?: string }>;
 }) {
+  const user = await requireUser();
   const params = await searchParams;
   const compareParam = params.compare;
 
   const ops = await prisma.opportunity.findMany({
+    where: { userId: user.id },
     orderBy: { opportunityScore: "desc" },
     take: 100,
   });

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { prisma } from "@/lib/db";
+import { requireUser } from "@/lib/auth/current-user";
 
 export type WorkspaceResult = {
   cleared: boolean;
@@ -11,7 +12,7 @@ export type WorkspaceResult = {
 };
 
 /**
- * Clear the entire MVP workspace: saved opportunities, generated opportunities,
+ * Clear the current user's workspace: saved opportunities, generated opportunities,
  * and complaints. Used by the "Start fresh test" button so a user can test a
  * new niche without old data mixing in.
  *
@@ -20,11 +21,12 @@ export type WorkspaceResult = {
  * references Opportunity).
  */
 export async function clearWorkspace(): Promise<WorkspaceResult> {
+  const user = await requireUser();
   try {
     const [saved, opportunities, complaints] = await Promise.all([
-      prisma.savedOpportunity.deleteMany({}),
-      prisma.opportunity.deleteMany({}),
-      prisma.complaint.deleteMany({}),
+      prisma.savedOpportunity.deleteMany({ where: { userId: user.id } }),
+      prisma.opportunity.deleteMany({ where: { userId: user.id } }),
+      prisma.complaint.deleteMany({ where: { userId: user.id } }),
     ]);
 
     revalidatePath("/dashboard");

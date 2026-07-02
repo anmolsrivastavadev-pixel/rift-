@@ -5,14 +5,17 @@ import { prisma } from "@/lib/db";
 import { RunOpportunitiesButton } from "@/components/opportunities/run-button";
 import { OpportunityBrowser } from "@/components/opportunities/opportunity-browser";
 import { Button } from "@/components/ui/button";
+import { requireUser } from "@/lib/auth/current-user";
 
 export default async function OpportunitiesPage() {
+  const user = await requireUser();
   const [ops, savedRows] = await Promise.all([
     prisma.opportunity.findMany({
+      where: { userId: user.id },
       orderBy: { opportunityScore: "desc" },
       take: 100,
     }),
-    prisma.savedOpportunity.findMany({ select: { opportunityId: true } }),
+    prisma.savedOpportunity.findMany({ where: { userId: user.id }, select: { opportunityId: true } }),
   ]);
 
   const savedSet = new Set(savedRows.map((s) => s.opportunityId));

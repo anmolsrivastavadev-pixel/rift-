@@ -8,6 +8,7 @@ import { setProgress, getProgress, type ProcessingStatus } from "@/lib/progress"
 import { cleanComplaints } from "@/lib/cleaning";
 import { clusterComplaints } from "@/lib/ai";
 import { computeOpportunityScore } from "@/lib/scoring";
+import { requireUser } from "@/lib/auth/current-user";
 
 /* -------------------------------------------------------------------------
  * Form-action wrapper for Reset (clientside <form action=...>)
@@ -30,8 +31,12 @@ export async function getProcessingStatus(
  * Keeps complaints so they can be re-clustered.
  * ------------------------------------------------------------------------- */
 export async function resetOpportunities(): Promise<{ deleted: number }> {
-  const deleted = await prisma.opportunity.deleteMany({});
+  const user = await requireUser();
+  const deleted = await prisma.opportunity.deleteMany({
+    where: { userId: user.id },
+  });
   await prisma.complaint.updateMany({
+    where: { userId: user.id },
     data: { opportunityId: null },
   });
   revalidatePath("/dashboard");
@@ -49,6 +54,7 @@ export async function resetOpportunities(): Promise<{ deleted: number }> {
 export async function runPipeline(
   jobId: string
 ): Promise<{ created: number; error?: string }> {
+  const user = await requireUser();
   setProgress(jobId, { stage: "cleaning", message: "Cleaning complaints…", total: 0, done: 0 });
 
   try {
@@ -56,6 +62,7 @@ export async function runPipeline(
     logger.info("pipeline.started", { jobId });
 
     const all = await prisma.complaint.findMany({
+      where: { userId: user.id },
       select: { id: true, body: true },
     });
 
@@ -98,8 +105,13 @@ export async function runPipeline(
     setProgress(jobId, { stage: "generating", message: "Generating opportunities…", total: clusters.length, done: 0 });
 
     // Reset existing opportunities first, so re-runs replace stale data.
-    await prisma.opportunity.deleteMany({});
-    await prisma.complaint.updateMany({ data: { opportunityId: null } });
+    await prisma.opportunity.deleteMany({
+      where: { userId: user.id },
+    });
+    await prisma.complaint.updateMany({
+      where: { userId: user.id },
+      data: { opportunityId: null },
+    });
 
     const created: string[] = [];
 
@@ -120,7 +132,7 @@ export async function runPipeline(
 
       // Trend buckets by complaint source date.
       const linked = await prisma.complaint.findMany({
-        where: { id: { in: complaintIds } },
+        where: { id: { in: complaintIds }, userId: user.id },
         select: { sourceDate: true },
       });
       const trend = bucketTrend(linked.map((c) => c.sourceDate));
@@ -153,11 +165,12 @@ export async function runPipeline(
           validationQuestions: cluster.validationQuestions,
           riskFlags: cluster.riskFlags,
           trend: trend as unknown as object,
+          userId: user.id,
         },
       });
 
       await prisma.complaint.updateMany({
-        where: { id: { in: complaintIds } },
+        where: { id: { in: complaintIds }, userId: user.id },
         data: { opportunityId: op.id },
       });
 

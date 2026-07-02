@@ -7,7 +7,7 @@
 ## Convention
 
 Each milestone:
-1. Ends with a working application (you can `npm run dev` and verify the new feature).
+1. Ends with a working application (you can `pnpm dev` and verify the new feature).
 2. Reports every modified file, every new file, every database change, and how to test.
 3. Stops and waits for the user's confirmation before the next milestone starts.
 4. Does **not** modify AI prompts, scoring logic, the CSV upload pipeline, or the Prisma schema unless the milestone explicitly requires it.
@@ -50,7 +50,7 @@ Each milestone:
 - **Status:** ✅ Done
 - **Purpose:** Bring the MVP to a production-build-quality bar without adding features.
 - **What was built:** Accessibility pass on opportunity components (`aria-label` on icon-only buttons, sliders, selects, related links; `aria-live` on the "Showing X of Y" counter; `aria-disabled` on disabled prev/next; visible focus-visible outlines with primary tint); refined typography (line-clamp on long titles, balanced line-height); global `app/not-found.tsx` and `app/error.tsx` using the design system. No new dependencies.
-- **Not included:** No new features, no UI redesigns, no AI or logic changes. Verified `npx tsc --noEmit`, `npm run lint`, `npm run build` all pass; `npm run start` smoke-tested locally.
+- **Not included:** No new features, no UI redesigns, no AI or logic changes. Verified `pnpm exec tsc --noEmit`, `pnpm lint`, `pnpm build` all pass; `pnpm start` smoke-tested locally.
 
 ### M6 — Production readiness + Vercel/Neon deployment
 - **Status:** ✅ Done
@@ -198,7 +198,7 @@ The Start Fresh Test patch addresses workspace-mixing confusion:
   - Opportunities page: added reminder copy near the generation card explaining ideas come from all current workspace complaints.
 - **Not included:** No schema changes, no AI changes, no scoring changes, no new dependencies, no scraping added, no auth added, no multi-workspaces added. localStorage decision/evidence states for old opportunity IDs remain (harmless — old IDs no longer render after clearing).
 
-`npx tsc --noEmit`, `npm run lint`, and `npm run build` all pass. `npm run start` smoke-tested locally.
+`pnpm exec tsc --noEmit`, `pnpm lint`, and `pnpm build` all pass. `pnpm start` smoke-tested locally.
 
 ---
 

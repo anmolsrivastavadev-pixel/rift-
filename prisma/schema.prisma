@@ -1,6 +1,6 @@
 // Rift — Prisma schema
 // Docs: https://pris.ly/d/prisma-schema
-// Minimal MVP: Complaint, Opportunity, SavedOpportunity only (no auth).
+// MVP with auth: User, Session, Account, Verification, Complaint, Opportunity, SavedOpportunity.
 
 generator client {
   provider = "prisma-client"
@@ -9,6 +9,59 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+}
+
+model User {
+  id                 String             @id @default(cuid())
+  email              String             @unique
+  name               String?
+  emailVerified      Boolean            @default(false)
+  image              String?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  sessions           Session[]
+  accounts           Account[]
+  complaints         Complaint[]
+  opportunities      Opportunity[]
+  savedOpportunities SavedOpportunity[]
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  expiresAt   DateTime
+  token       String   @unique
+  ipAddress   String?
+  userAgent   String?
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Account {
+  id                    String   @id @default(cuid())
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 model Complaint {
@@ -20,10 +73,13 @@ model Complaint {
   severity      Float? // 0.0 .. 100.0 estimated severity
   opportunity   Opportunity? @relation(fields: [opportunityId], references: [id], onDelete: SetNull)
   opportunityId String?
+  userId        String?
+  user          User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
 
   @@index([opportunityId])
+  @@index([userId])
 }
 
 model Opportunity {
@@ -54,19 +110,25 @@ model Opportunity {
   validationQuestions      String[] @default([])
   riskFlags                String[] @default([])
   trend              Json     // [{ date, count }] for the trend chart
+  userId             String?
+  user               User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
   complaints        Complaint[]
   savedOpportunities SavedOpportunity[]
+
+  @@index([userId])
 }
 
 model SavedOpportunity {
   id            String      @id @default(cuid())
   opportunity   Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
   opportunityId String
+  userId        String?
+  user          User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
   note          String?
   createdAt      DateTime    @default(now())
 
-  @@unique([opportunityId]) // one save per opportunity (no users in MVP)
+  @@unique([userId, opportunityId]) // one save per user per opportunity
 }

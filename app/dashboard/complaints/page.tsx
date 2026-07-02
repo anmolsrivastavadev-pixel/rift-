@@ -4,12 +4,14 @@ import { ComplaintsInput } from "@/components/complaints/complaints-input";
 import { ComplaintsList } from "@/components/complaints/complaints-list";
 import { StartFreshButton } from "@/components/complaints/start-fresh-button";
 import { StarterMarkets } from "@/components/complaints/starter-markets";
+import { requireUser } from "@/lib/auth/current-user";
 
 export default async function ComplaintsPage({
   searchParams,
 }: {
   searchParams: Promise<{ q?: string }>;
 }) {
+  const user = await requireUser();
   const sp = await searchParams;
   const query = sp.q ?? "";
 

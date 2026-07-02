@@ -29,17 +29,19 @@ import { PrevNextNav } from "@/components/opportunities/prev-next-nav";
 import { MarketGapHypothesis } from "@/components/opportunities/market-gap-hypothesis";
 import { ValidationWorkspace } from "@/components/opportunities/validation-workspace";
 import { ValidationEvidenceLog } from "@/components/opportunities/validation-evidence-log";
+import { requireUser } from "@/lib/auth/current-user";
 
 export default async function OpportunityDetailPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const user = await requireUser();
   const { id } = await params;
 
   const [op, allOthers, allNeighbours] = await Promise.all([
-    prisma.opportunity.findUnique({
-      where: { id },
+    prisma.opportunity.findFirst({
+      where: { id, userId: user.id },
       include: {
         complaints: {
           orderBy: { createdAt: "asc" },
@@ -56,6 +58,7 @@ export default async function OpportunityDetailPage({
       },
     }),
     prisma.opportunity.findMany({
+      where: { userId: user.id },
       select: {
         id: true,
         title: true,
@@ -66,6 +69,7 @@ export default async function OpportunityDetailPage({
       },
     }),
     prisma.opportunity.findMany({
+      where: { userId: user.id },
       orderBy: { createdAt: "desc" },
       select: { id: true, createdAt: true },
     }),

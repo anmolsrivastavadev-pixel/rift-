@@ -1,6 +1,9 @@
+"use client";
+
 import Link from "next/link";
-import { LayoutDashboard, Upload, Target, Bookmark, LayoutGrid } from "lucide-react";
+import { LayoutDashboard, Upload, Target, Bookmark, LayoutGrid, LogOut, User } from "lucide-react";
 import { Container } from "@/components/container";
+import { authClient } from "@/lib/auth/client";
 
 const nav = [
   { href: "/dashboard", label: "Home", icon: LayoutDashboard },
@@ -10,7 +13,25 @@ const nav = [
   { href: "/dashboard/saved", label: "Saved", icon: Bookmark },
 ];
 
-export function DashboardShell({ children }: { children: React.ReactNode }) {
+interface User {
+  id: string;
+  email: string;
+  name?: string | null;
+  image?: string | null;
+}
+
+async function handleSignOut() {
+  await authClient.signOut();
+  window.location.href = "/";
+}
+
+export function DashboardShell({
+  children,
+  user,
+}: {
+  children: React.ReactNode;
+  user: User;
+}) {
   return (
     <div className="flex min-h-screen w-full">
       {/* Desktop sidebar */}
@@ -34,8 +55,21 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
               </Link>
             ))}
           </nav>
-          <div className="mt-auto px-3 text-xs text-[var(--color-muted-foreground)]">
-            MVP build
+          <div className="mt-auto space-y-3 px-3 pt-4">
+            <div className="flex items-center gap-2 text-xs text-[var(--color-muted-foreground)]">
+              <User className="h-3.5 w-3.5" />
+              <span className="truncate">{user.name || user.email}</span>
+            </div>
+            <button
+              onClick={handleSignOut}
+              className="flex w-full items-center gap-2 rounded-[12px] px-3 py-2 text-sm text-[var(--color-muted-foreground)] transition-colors hover:bg-[var(--color-destructive)]/10 hover:text-[var(--color-destructive)]"
+            >
+              <LogOut className="h-4 w-4" />
+              Sign out
+            </button>
+            <div className="text-xs text-[var(--color-muted-foreground)]">
+              MVP build
+            </div>
           </div>
         </Container>
       </aside>
@@ -61,6 +95,13 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
               </Link>
             ))}
           </nav>
+          <button
+            onClick={handleSignOut}
+            className="ml-auto flex shrink-0 items-center gap-1 rounded-[8px] px-2.5 py-1.5 text-xs text-[var(--color-muted-foreground)] transition-colors hover:bg-[var(--color-destructive)]/10 hover:text-[var(--color-destructive)]"
+          >
+            <LogOut className="h-3.5 w-3.5" />
+            Sign out
+          </button>
         </div>
       </div>
 

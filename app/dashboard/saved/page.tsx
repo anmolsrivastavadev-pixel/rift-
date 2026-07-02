@@ -1,9 +1,12 @@
 import { prisma } from "@/lib/db";
 import { OpportunityCard } from "@/components/opportunities/opportunity-card";
 import { NoSavedEmpty } from "@/components/opportunities/empty-states";
+import { requireUser } from "@/lib/auth/current-user";
 
 export default async function SavedPage() {
+  const user = await requireUser();
   const saved = await prisma.savedOpportunity.findMany({
+    where: { userId: user.id },
     orderBy: { createdAt: "desc" },
     include: { opportunity: true },
   });

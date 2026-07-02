@@ -2,24 +2,24 @@ import { Container } from "@/components/container";
 
 const steps = [
   {
-    n: "01",
-    title: "Add customer pain",
-    text: "Paste complaints, upload a file, or use demo data.",
+    n: "1",
+    title: "Choose a market or paste complaints",
+    text: "Start fast with starter examples, or use real complaints for stronger results.",
   },
   {
-    n: "02",
-    title: "Generate business ideas",
-    text: "Rift groups repeated problems into scored idea hypotheses.",
+    n: "2",
+    title: "Generate business idea hypotheses",
+    text: "Rift groups repeated pain into possible business ideas.",
   },
   {
-    n: "03",
-    title: "Decide what to test",
-    text: "Review evidence, risks, and next steps before pursuing an idea.",
+    n: "3",
+    title: "Compare ideas",
+    text: "Pick 2\u20133 ideas and choose which one to test first.",
   },
   {
-    n: "04",
-    title: "Compare and decide",
-    text: "Review evidence, risks, and next steps. Decide which ideas to pursue, park, or reject.",
+    n: "4",
+    title: "Test with real people",
+    text: "Scores help you inspect ideas. They do not prove demand.",
   },
 ];
 
@@ -29,30 +29,28 @@ export function HowItWorks() {
       <Container>
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-            The breakdown
+            How Rift works
           </h2>
-          <p className="mt-4 text-[var(--color-muted-foreground)]">
-            Four clear stages, end to end. No scraping feeds, no invented
-            market sizes — only the signal in your own data.
-          </p>
         </div>
 
-        <ol className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mx-auto mt-14 grid max-w-3xl gap-4 sm:grid-cols-2">
           {steps.map((s) => (
-            <li
+            <div
               key={s.n}
-              className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-6"
+              className="flex gap-4 rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-5"
             >
-              <span className="text-xs font-medium text-[var(--color-primary)]">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary)]/10 text-sm font-semibold text-[var(--color-primary)]">
                 {s.n}
               </span>
-              <h3 className="mt-3 text-base font-semibold">{s.title}</h3>
-              <p className="mt-2 text-sm text-[var(--color-muted-foreground)]">
-                {s.text}
-              </p>
-            </li>
+              <div>
+                <h3 className="text-sm font-semibold">{s.title}</h3>
+                <p className="mt-1 text-sm text-[var(--color-muted-foreground)] leading-relaxed">
+                  {s.text}
+                </p>
+              </div>
+            </div>
           ))}
-        </ol>
+        </div>
       </Container>
     </section>
   );

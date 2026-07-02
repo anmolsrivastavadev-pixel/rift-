@@ -7,14 +7,14 @@
 ## Pre-flight commands (run before any milestone sign-off)
 
 ```bash
-npx tsc --noEmit       # must exit 0 with no output
-npm run lint           # must exit 0 with no warnings
-npm run build          # must exit 0; routes should compile
-npx prisma validate    # must pass without warnings
-npx prisma generate    # must regenerate lib/generated/prisma cleanly
+pnpm exec tsc --noEmit       # must exit 0 with no output
+pnpm lint           # must exit 0 with no warnings
+pnpm build          # must exit 0; routes should compile
+pnpm exec prisma validate    # must pass without warnings
+pnpm exec prisma generate    # must regenerate lib/generated/prisma cleanly
 ```
 
-For `npm run build`, the expected output ends with:
+For `pnpm build`, the expected output ends with:
 
 ```
 Route (app)
@@ -37,11 +37,11 @@ Route (app)
 
 - [ ] Node.js 18.18+ installed (`node -v`).
 - [ ] PostgreSQL installed and running on `localhost:5432` (or a Neon project).
-- [ ] `npm install` completes (may print ERESOLVE warnings — `.npmrc` sets `legacy-peer-deps=true` so install still succeeds).
+- [ ] `pnpm install` completes (may print peer-dep warnings — pnpm handles these gracefully).
 - [ ] `.env` exists with `DATABASE_URL` and `GEMINI_API_KEY` filled in (use `.env.example` as a template).
-- [ ] `npx prisma generate` runs and creates `lib/generated/prisma/`.
-- [ ] `npx prisma db push` runs and creates the three tables in Postgres.
-- [ ] `npm run dev` boots and prints `✓ Ready in`.
+- [ ] `pnpm exec prisma generate` runs and creates `lib/generated/prisma/`.
+- [ ] `pnpm exec prisma db push` runs and creates the three tables in Postgres.
+- [ ] `pnpm dev` boots and prints `✓ Ready in`.
 - [ ] `curl -I http://localhost:3000/` returns `200`.
 
 ## 2. Environment variables
@@ -191,8 +191,8 @@ Route (app)
 
 ## 21. Production build
 
-- [ ] `npm run build` exits 0.
-- [ ] `npm run start` boots the production server (`✓ Ready in ...`).
+- [ ] `pnpm build` exits 0.
+- [ ] `pnpm start` boots the production server (`✓ Ready in ...`).
 - [ ] `curl -I http://localhost:3000/` returns `200`.
 - [ ] `curl -I http://localhost:3000/dashboard` returns `200`.
 - [ ] `curl -I http://localhost:3000/robots.txt` returns `200`.
@@ -268,7 +268,7 @@ Post-deploy checks (on the deployed URL):
 
 ## 25. M9 — Market Gap Hypothesis
 
-- [ ] `npx prisma validate` passes; `npx prisma generate` regenerates the client; `npx prisma db push` adds the new `Opportunity` columns non-destructively (no data wipe).
+- [ ] `pnpm exec prisma validate` passes; `pnpm exec prisma generate` regenerates the client; `pnpm exec prisma db push` adds the new `Opportunity` columns non-destructively (no data wipe).
 - [ ] Run AI clustering creates opportunities that include `marketGap`, `targetCustomer`, `likelyCurrentWorkarounds`, `whyWorkaroundsFallShort`, `productAngle`, `differentiationAngle`, `validationQuestions`, `riskFlags`.
 - [ ] Opportunity detail page left column reads (in order): Problem Summary → Evidence From Complaints → Product Opportunity → Market Gap Hypothesis → Validation Workspace.
 - [ ] Market Gap Hypothesis section shows the six hypothesis fields with a clear "hypothesis, not proven market research" sub-label.
@@ -437,8 +437,8 @@ Post-deploy checks (on the deployed URL):
 - [ ] Empty states use action-focused plain English ("No business ideas yet", "No saved ideas yet").
 - [ ] No overclaiming language remains ("proven", "guaranteed", "validated opportunity").
 - [ ] All existing functionality still works (no regressions in CSV upload, paste text, demo data, AI clustering, save/unsave, search/filter/sort, Validation Workspace, Evidence Log, Decision Board).
-- [ ] `npm run lint` passes with no errors or warnings.
-- [ ] `npm run build` passes.
+- [ ] `pnpm lint` passes with no errors or warnings.
+- [ ] `pnpm build` passes.
 - [ ] No Prisma schema changes, no AI/scoring changes, no new dependencies, no scraping added.
 
 ---
@@ -451,6 +451,6 @@ These are destructive and must never appear in your testing flow:
 - ❌ `prisma migrate reset`
 - ❌ Any SQL containing `DROP`, `TRUNCATE`, or `DELETE FROM <table>` without a WHERE clause
 - ❌ `git push --force` to a shared branch
-- ❌ `npm audit fix --force` (can break intentional legacy peer deps)
+- ❌ `pnpm audit --fix` (can break intentional legacy peer deps)
 
 If you hit stale test data, prefer the in-app **Reset** button on `/dashboard/opportunities` (which preserves complaints) or `resetOpportunitiesAction` via the API.
