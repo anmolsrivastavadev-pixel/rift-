@@ -37,7 +37,7 @@ export function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, ease: "easeOut" }}
         >
-          <span className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-card)]/80 px-4 py-1.5 text-xs text-[var(--color-muted-foreground)] backdrop-blur-sm">
+          <span className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-white/80 px-4 py-1.5 text-xs text-[var(--color-muted-foreground)] shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)] backdrop-blur-sm">
             <Lightbulb className="h-3.5 w-3.5 text-[var(--color-primary)]" />
             AI idea research from customer pain
           </span>

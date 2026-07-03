@@ -37,9 +37,9 @@ export function HowItWorks() {
           {steps.map((s) => (
             <div
               key={s.n}
-              className="flex gap-4 rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-5"
+              className="flex gap-4 rounded-xl border border-[var(--color-border)] bg-white p-5 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)] transition-all duration-150 ease-out hover:-translate-y-0.5 hover:shadow-[0_4px_12px_0_rgb(0_0_0_/_0.06),0_2px_4px_-2px_rgb(0_0_0_/_0.04)]"
             >
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary)]/10 text-sm font-semibold text-[var(--color-primary)]">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary-soft)] text-sm font-semibold text-[var(--color-primary)] ring-1 ring-[var(--color-primary)]/10">
                 {s.n}
               </span>
               <div>

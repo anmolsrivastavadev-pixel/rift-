@@ -40,15 +40,21 @@ export function OpportunityCard({
   onToggleCompare?: (id: string) => void;
 }) {
   const sc = scoreColor(op.opportunityScore);
+  const bgScore =
+    op.opportunityScore >= 70
+      ? "bg-[var(--color-success-soft)]"
+      : op.opportunityScore >= 40
+        ? "bg-[var(--color-warning-soft)]"
+        : "bg-[var(--color-danger-soft)]";
   const scoreLabel = `Score ${op.opportunityScore} out of 100`;
   return (
     <div
       className={
-        "group relative flex flex-col rounded-2xl border bg-white p-6 shadow-sm " +
-        "transition-all duration-150 ease-out hover:-translate-y-0.5 hover:shadow-md " +
+        "group relative flex flex-col rounded-2xl border bg-white p-6 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)] " +
+        "transition-all duration-150 ease-out hover:-translate-y-0.5 hover:shadow-[0_4px_12px_0_rgb(0_0_0_/_0.06),0_2px_4px_-2px_rgb(0_0_0_/_0.04)] " +
         (selected
           ? "border-[var(--color-primary)] ring-1 ring-[var(--color-primary)]/30"
-          : "border-[var(--color-border)] hover:border-[var(--color-primary)]/60")
+          : "border-[var(--color-border)] hover:border-[var(--color-primary)]/40")
       }
     >
       <div className="absolute right-4 top-4 flex items-center gap-1.5">
@@ -60,10 +66,10 @@ export function OpportunityCard({
               e.stopPropagation();
               onToggleCompare(op.id);
             }}
-            className={`inline-flex items-center gap-1 rounded-lg border px-2.5 py-1 text-[11px] font-medium transition-colors ${
+            className={`inline-flex items-center gap-1 rounded-lg border px-2.5 py-1 text-[11px] font-medium transition-all duration-150 ease-out active:scale-[0.95] ${
               selected
                 ? "border-[var(--color-primary)] bg-[var(--color-primary-soft)] text-[var(--color-primary)]"
-                : "border-[var(--color-border)] bg-white text-[var(--color-muted-foreground)] hover:border-[var(--color-primary)]/60 hover:text-[var(--color-primary)]"
+                : "border-[var(--color-border)] bg-white text-[var(--color-muted-foreground)] hover:border-[var(--color-primary)]/40 hover:text-[var(--color-primary)]"
             }`}
             aria-pressed={selected}
             aria-label={selected ? "Remove from compare" : "Add to compare"}
@@ -87,9 +93,9 @@ export function OpportunityCard({
         className="flex flex-1 flex-col"
         aria-label={`Open opportunity: ${op.title}, score ${op.opportunityScore}`}
       >
-        <div className="flex items-start gap-2 pr-24">
-          <div className="min-w-0">
-            <div className="flex items-center gap-1.5 text-[11px] uppercase tracking-wide text-[var(--color-muted-foreground)]">
+        <div className="flex items-start gap-2 pr-28">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-[var(--color-muted-foreground)]">
               <Briefcase className="h-3 w-3" />
               {op.industry}
             </div>
@@ -141,11 +147,11 @@ export function OpportunityCard({
               value={op.confidence !== null ? `${op.confidence}%` : "—"}
             />
           </div>
-          <div className="ml-3 flex flex-col items-center shrink-0">
-            <div className={`text-2xl font-bold leading-none ${sc}`} aria-label={scoreLabel}>
+          <div className={`ml-3 flex flex-col items-center shrink-0 rounded-xl ${bgScore} px-3 py-2`}>
+            <div className={`text-xl font-bold leading-none ${sc}`} aria-label={scoreLabel}>
               {op.opportunityScore}
             </div>
-            <div className="mt-1 text-[10px] uppercase tracking-wide text-[var(--color-muted-foreground)]">
+            <div className="mt-0.5 text-[9px] uppercase tracking-wider text-[var(--color-muted-foreground)]">
               Score
             </div>
           </div>
@@ -156,7 +162,7 @@ export function OpportunityCard({
         </p>
 
         <span
-          className="mt-3 inline-flex items-center justify-center gap-1.5 rounded-lg border border-[var(--color-border)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--color-foreground)] transition-colors group-hover:border-[var(--color-primary)]/40 group-hover:text-[var(--color-primary)]"
+          className="mt-3 inline-flex items-center justify-center gap-1.5 rounded-lg border border-[var(--color-border)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--color-foreground)] transition-all duration-150 ease-out group-hover:border-[var(--color-primary)]/30 group-hover:bg-[var(--color-primary-soft)] group-hover:text-[var(--color-primary)]"
           aria-hidden="true"
         >
           Open idea

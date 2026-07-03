@@ -27,6 +27,9 @@ export function Footer() {
           </Button>
         </div>
         <div className="mt-10 flex items-center justify-center gap-4">
+          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--color-primary)] text-[11px] font-bold text-white">
+            R
+          </span>
           <span className="text-sm font-semibold tracking-tight">Rift</span>
           <span className="text-xs text-[var(--color-muted-foreground)]">
             Business ideas from real customer pain.

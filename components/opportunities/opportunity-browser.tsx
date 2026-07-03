@@ -159,7 +159,7 @@ export function OpportunityBrowser({
       </p>
 
       {/* Beginner guide — what to do next */}
-      <div className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-5">
+      <div className="rounded-xl border border-[var(--color-border)] bg-white p-5 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)]">
         <h2 className="text-sm font-semibold">What to do next</h2>
         <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
           Start with the highest-scoring idea, then check whether the evidence

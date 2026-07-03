@@ -107,12 +107,19 @@ export default async function DashboardPage() {
       </div>
 
       {/* First-time user guidance */}
-      <div className="rounded-2xl border border-[var(--color-border)] bg-white p-6 shadow-sm">
-        <h2 className="text-base font-semibold">Start here</h2>
-        <p className="mt-2 text-sm text-[var(--color-muted-foreground)]">
-          New to Rift? Use demo data to see how customer complaints become business ideas. Then replace the demo data with complaints, reviews, or support tickets from your own market.
-        </p>
-        <p className="mt-2 text-xs text-[var(--color-muted-foreground)]">
+      <div className="rounded-2xl border border-[var(--color-border)] bg-white p-6 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)] transition-all duration-150 ease-out hover:shadow-[0_4px_12px_0_rgb(0_0_0_/_0.06),0_2px_4px_-2px_rgb(0_0_0_/_0.04)]">
+        <div className="flex items-start gap-4">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--color-primary-soft)] text-[var(--color-primary)] ring-1 ring-[var(--color-primary)]/10">
+            <Target className="h-5 w-5" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <h2 className="text-base font-semibold">Start here</h2>
+            <p className="mt-1.5 text-sm text-[var(--color-muted-foreground)] leading-relaxed">
+              New to Rift? Use demo data to see how customer complaints become business ideas. Then replace the demo data with complaints, reviews, or support tickets from your own market.
+            </p>
+          </div>
+        </div>
+        <p className="mt-3 text-xs text-[var(--color-muted-foreground)]">
           Don't have complaints yet? No problem — use the demo data to see how Rift works, then come back with your own. You can read app store reviews (1–3 star), screenshot Reddit or forum posts, note things people complain about in real life, or paste support tickets. Even 5–10 sentences is enough to start.
         </p>
         <div className="mt-4 flex flex-wrap items-center gap-3">
@@ -132,34 +139,41 @@ export default async function DashboardPage() {
       </div>
 
       {/* Beginner guide */}
-      <div className="rounded-2xl border border-[var(--color-border)] bg-white p-6 shadow-sm">
-        <h2 className="text-base font-semibold">What should I do first?</h2>
-        <p className="mt-2 text-sm text-[var(--color-muted-foreground)]">
-          If you do not have your own complaints yet, start with demo data. Once you understand the workflow, replace it with real complaints or reviews from a market you care about.
-        </p>
+      <div className="rounded-2xl border border-[var(--color-border)] bg-white p-6 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)] transition-all duration-150 ease-out hover:shadow-[0_4px_12px_0_rgb(0_0_0_/_0.06),0_2px_4px_-2px_rgb(0_0_0_/_0.04)]">
+        <div className="flex items-start gap-4">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--color-warning-soft)] text-[var(--color-warning)] ring-1 ring-[var(--color-warning)]/10">
+            <Target className="h-5 w-5" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <h2 className="text-base font-semibold">What should I do first?</h2>
+            <p className="mt-1.5 text-sm text-[var(--color-muted-foreground)] leading-relaxed">
+              If you do not have your own complaints yet, start with demo data. Once you understand the workflow, replace it with real complaints or reviews from a market you care about.
+            </p>
+          </div>
+        </div>
         <ol className="mt-4 space-y-2 text-sm text-[var(--color-muted-foreground)]">
           <li className="flex gap-2">
-            <span className="font-medium text-[var(--color-foreground)]">1.</span>
+            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary-soft)] text-[10px] font-semibold text-[var(--color-primary)]">1</span>
             Use demo data
           </li>
           <li className="flex gap-2">
-            <span className="font-medium text-[var(--color-foreground)]">2.</span>
+            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary-soft)] text-[10px] font-semibold text-[var(--color-primary)]">2</span>
             Generate business ideas
           </li>
           <li className="flex gap-2">
-            <span className="font-medium text-[var(--color-foreground)]">3.</span>
+            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary-soft)] text-[10px] font-semibold text-[var(--color-primary)]">3</span>
             Open one idea
           </li>
           <li className="flex gap-2">
-            <span className="font-medium text-[var(--color-foreground)]">4.</span>
+            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary-soft)] text-[10px] font-semibold text-[var(--color-primary)]">4</span>
             Read the evidence and score
           </li>
           <li className="flex gap-2">
-            <span className="font-medium text-[var(--color-foreground)]">5.</span>
+            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary-soft)] text-[10px] font-semibold text-[var(--color-primary)]">5</span>
             Talk to real people
           </li>
           <li className="flex gap-2">
-            <span className="font-medium text-[var(--color-foreground)]">6.</span>
+            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary-soft)] text-[10px] font-semibold text-[var(--color-primary)]">6</span>
             Mark the idea as Pursue, Park, or Reject
           </li>
         </ol>
@@ -198,8 +212,10 @@ export default async function DashboardPage() {
 
       {/* Empty state: no complaints */}
       {complaintCount === 0 ? (
-        <div className="rounded-2xl border border-dashed border-[var(--color-border)] bg-white p-12 text-center shadow-sm">
-          <FileText className="mx-auto h-8 w-8 text-[var(--color-muted-foreground)]" />
+        <div className="rounded-2xl border border-dashed border-[var(--color-border)] bg-white p-12 text-center shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)] transition-all duration-150 ease-out hover:shadow-[0_4px_12px_0_rgb(0_0_0_/_0.06),0_2px_4px_-2px_rgb(0_0_0_/_0.04)]">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--color-surface)] ring-1 ring-[var(--color-border)]">
+            <FileText className="h-6 w-6 text-[var(--color-muted-foreground)]" />
+          </div>
           <h2 className="mt-4 text-base font-semibold">
             No complaints yet
           </h2>
@@ -214,8 +230,10 @@ export default async function DashboardPage() {
         </div>
       ) : opportunityCount === 0 ? (
         /* Empty state: complaints but no opportunities */
-        <div className="rounded-2xl border border-dashed border-[var(--color-border)] bg-white p-12 text-center shadow-sm">
-          <Target className="mx-auto h-8 w-8 text-[var(--color-muted-foreground)]" />
+        <div className="rounded-2xl border border-dashed border-[var(--color-border)] bg-white p-12 text-center shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)] transition-all duration-150 ease-out hover:shadow-[0_4px_12px_0_rgb(0_0_0_/_0.06),0_2px_4px_-2px_rgb(0_0_0_/_0.04)]">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--color-primary-soft)] ring-1 ring-[var(--color-primary)]/10">
+            <Target className="h-6 w-6 text-[var(--color-primary)]" />
+          </div>
           <h2 className="mt-4 text-base font-semibold">
             Ready to generate business ideas
           </h2>
@@ -240,9 +258,9 @@ export default async function DashboardPage() {
             <h2 className="text-base font-semibold">High-signal opportunities</h2>
             <Link
               href="/dashboard/opportunities"
-              className="text-sm text-[var(--color-primary)] hover:underline"
+              className="text-sm text-[var(--color-primary)] transition-colors duration-150 ease-out hover:text-[var(--color-primary)]/70"
             >
-              View all
+              View all &rarr;
             </Link>
           </div>
           <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -250,9 +268,9 @@ export default async function DashboardPage() {
               <Link
                 key={o.id}
                 href={`/dashboard/opportunities/${o.id}`}
-                className="group flex flex-col rounded-2xl border border-[var(--color-border)] bg-white p-5 shadow-sm transition-all duration-150 ease-out hover:-translate-y-0.5 hover:border-[var(--color-primary)]/60 hover:shadow-md"
+                className="group flex flex-col rounded-2xl border border-[var(--color-border)] bg-white p-5 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)] transition-all duration-150 ease-out hover:-translate-y-0.5 hover:border-[var(--color-primary)]/40 hover:shadow-[0_4px_12px_0_rgb(0_0_0_/_0.06),0_2px_4px_-2px_rgb(0_0_0_/_0.04)]"
               >
-                <div className="flex items-center gap-1.5 text-[11px] uppercase tracking-wide text-[var(--color-muted-foreground)]">
+                <div className="flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-[var(--color-muted-foreground)]">
                   <Briefcase className="h-3 w-3" />
                   {o.industry}
                 </div>
@@ -278,7 +296,7 @@ export default async function DashboardPage() {
 
       {/* Complaints over time chart (keep existing) */}
       {complaintCount > 0 && (
-        <section className="rounded-2xl border border-[var(--color-border)] bg-white p-6 shadow-sm">
+        <section className="rounded-2xl border border-[var(--color-border)] bg-white p-6 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)]">
           <h2 className="text-base font-semibold">Complaints over time</h2>
           <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
             Bucketed by source date when available; falls back to import date.
@@ -296,9 +314,9 @@ export default async function DashboardPage() {
             <h2 className="text-base font-semibold">Recent complaints</h2>
             <Link
               href="/dashboard/complaints"
-              className="text-sm text-[var(--color-primary)] hover:underline"
+              className="text-sm text-[var(--color-primary)] transition-colors duration-150 ease-out hover:text-[var(--color-primary)]/70"
             >
-              View all
+              View all &rarr;
             </Link>
           </div>
           {recent.length === 0 ? (
@@ -310,7 +328,7 @@ export default async function DashboardPage() {
               {recent.map((c) => (
                 <li
                   key={c.id}
-                  className="rounded-2xl border border-[var(--color-border)] bg-white p-4 shadow-sm"
+                  className="rounded-2xl border border-[var(--color-border)] bg-white p-4 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)] transition-all duration-150 ease-out hover:shadow-[0_4px_12px_0_rgb(0_0_0_/_0.06),0_2px_4px_-2px_rgb(0_0_0_/_0.04)]"
                 >
                   <p className="truncate text-sm font-medium">{c.title}</p>
                   <p className="mt-0.5 line-clamp-1 text-xs text-[var(--color-muted-foreground)]">
