@@ -249,115 +249,107 @@ export function DecisionBoardClient({
               </tr>
             </thead>
             <tbody>
-              <CompareRow label="Idea">
-                {filtered.map((op) => (
-                  <td key={op.id} className="py-3 px-4">
-                    <span className={`font-semibold ${scoreColor(op.opportunityScore)}`}>
-                      {op.opportunityScore}
-                    </span>
-                  </td>
+              <CompareRow
+                label="Idea"
+                values={filtered.map((op) => (
+                  <span className={`font-semibold ${scoreColor(op.opportunityScore)}`}>
+                    {op.opportunityScore}
+                  </span>
                 ))}
-              </CompareRow>
-              <CompareRow label="Who it is for">
-                {filtered.map((op) => (
-                  <td key={op.id} className="py-3 px-4 text-[var(--color-muted-foreground)]">
-                    {op.targetCustomer || "—"}
-                  </td>
+              />
+              <CompareRow
+                label="Who it is for"
+                values={filtered.map((op) => (
+                  <span className="text-[var(--color-muted-foreground)]">{op.targetCustomer || "—"}</span>
                 ))}
-              </CompareRow>
-              <CompareRow label="Problem">
-                {filtered.map((op) => (
-                  <td key={op.id} className="py-3 px-4 text-[var(--color-muted-foreground)] line-clamp-3">
-                    {op.summary}
-                  </td>
+              />
+              <CompareRow
+                label="Problem"
+                values={filtered.map((op) => (
+                  <span className="text-[var(--color-muted-foreground)] line-clamp-3">{op.summary}</span>
                 ))}
-              </CompareRow>
-              <CompareRow label="Possible solution">
-                {filtered.map((op) => (
-                  <td key={op.id} className="py-3 px-4 text-[var(--color-muted-foreground)]">
-                    {op.productAngle || op.suggestedSoftware}
-                  </td>
+              />
+              <CompareRow
+                label="Possible solution"
+                values={filtered.map((op) => (
+                  <span className="text-[var(--color-muted-foreground)]">{op.productAngle || op.suggestedSoftware}</span>
                 ))}
-              </CompareRow>
-              <CompareRow label="Evidence strength">
-                {filtered.map((op) => {
+              />
+              <CompareRow
+                label="Evidence strength"
+                values={filtered.map((op) => {
                   const str = evidenceStrength(op.mentions, op.confidence);
                   return (
-                    <td key={op.id} className="py-3 px-4">
+                    <>
                       <span className={`font-medium ${str.color}`}>{str.label}</span>
                       <span className="ml-1 text-[var(--color-muted-foreground)]">
                         ({op.mentions} complaints, {op.confidence ?? "—"}% confidence)
                       </span>
-                    </td>
+                    </>
                   );
                 })}
-              </CompareRow>
-              <CompareRow label="Score">
-                {filtered.map((op) => (
-                  <td key={op.id} className="py-3 px-4">
-                    <span className={`text-lg font-bold ${scoreColor(op.opportunityScore)}`}>
-                      {op.opportunityScore}
-                    </span>
-                  </td>
+              />
+              <CompareRow
+                label="Score"
+                values={filtered.map((op) => (
+                  <span className={`text-lg font-bold ${scoreColor(op.opportunityScore)}`}>
+                    {op.opportunityScore}
+                  </span>
                 ))}
-              </CompareRow>
-              <CompareRow label="Difficulty to test">
-                {filtered.map((op) => (
-                  <td key={op.id} className="py-3 px-4 text-[var(--color-muted-foreground)]">
-                    {difficultyToTest(
-                      op.riskFlags,
-                      !!op.targetCustomer,
-                      !!op.productAngle
-                    )}
-                  </td>
+              />
+              <CompareRow
+                label="Difficulty to test"
+                values={filtered.map((op) => (
+                  <span className="text-[var(--color-muted-foreground)]">
+                    {difficultyToTest(op.riskFlags, !!op.targetCustomer, !!op.productAngle)}
+                  </span>
                 ))}
-              </CompareRow>
-              <CompareRow label="Biggest risk">
-                {filtered.map((op) => (
-                  <td key={op.id} className="py-3 px-4">
-                    {op.riskFlags.length > 0 ? (
-                      <ul className="list-disc pl-4 text-[var(--color-muted-foreground)]">
-                        {op.riskFlags.slice(0, 2).map((r, i) => (
-                          <li key={i}>{r}</li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <span className="text-[var(--color-muted-foreground)]">—</span>
-                    )}
-                  </td>
-                ))}
-              </CompareRow>
-              <CompareRow label="Suggested next step">
-                {filtered.map((op) => {
+              />
+              <CompareRow
+                label="Biggest risk"
+                values={filtered.map((op) =>
+                  op.riskFlags.length > 0 ? (
+                    <ul className="list-disc pl-4 text-[var(--color-muted-foreground)]">
+                      {op.riskFlags.slice(0, 2).map((r, i) => (
+                        <li key={i}>{r}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <span className="text-[var(--color-muted-foreground)]">—</span>
+                  )
+                )}
+              />
+              <CompareRow
+                label="Suggested next step"
+                values={filtered.map((op) => {
                   const ev = evidenceHydrated ? evidenceSnapshots[op.id] : undefined;
                   return (
-                    <td key={op.id} className="py-3 px-4 text-[var(--color-muted-foreground)]">
+                    <span className="text-[var(--color-muted-foreground)]">
                       {ev && ev.interviewsCompleted > 0
                         ? computeSuggestedNextStep(ev)
                         : "Start interviews to learn more"}
-                    </td>
+                    </span>
                   );
                 })}
-              </CompareRow>
-              <CompareRow label="Decision">
-                {filtered.map((op) => {
+              />
+              <CompareRow
+                label="Decision"
+                values={filtered.map((op) => {
                   const status = resolveStatus(op.id);
                   return (
-                    <td key={op.id} className="py-3 px-4">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[11px] text-[var(--color-muted-foreground)]">
-                          {hydrated ? DECISION_LABELS[status] : "—"}
-                        </span>
-                        <DecisionStatusSelect
-                          opportunityId={op.id}
-                          value={status}
-                          onChange={(s) => setStatus(op.id, s)}
-                        />
-                      </div>
-                    </td>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[11px] text-[var(--color-muted-foreground)]">
+                        {hydrated ? DECISION_LABELS[status] : "—"}
+                      </span>
+                      <DecisionStatusSelect
+                        opportunityId={op.id}
+                        value={status}
+                        onChange={(s) => setStatus(op.id, s)}
+                      />
+                    </div>
                   );
                 })}
-              </CompareRow>
+              />
             </tbody>
           </table>
         </div>
@@ -620,19 +612,20 @@ function Stat({
 
 function CompareRow({
   label,
-  children,
+  values,
 }: {
   label: string;
-  children: React.ReactNode;
+  values: React.ReactNode[];
 }) {
-  const childArray = React.Children.toArray(children);
   return (
     <tr className="border-b border-[var(--color-border)]">
       <td className="py-3 pr-4 font-medium text-[var(--color-muted-foreground)] whitespace-nowrap">
         {label}
       </td>
-      {childArray.map((child, i) => (
-        <td key={i}>{child}</td>
+      {values.map((value, i) => (
+        <td key={i} className="py-3 px-4 align-top text-sm text-[var(--color-foreground)]">
+          {value}
+        </td>
       ))}
     </tr>
   );

@@ -64,7 +64,7 @@ export function Features() {
           <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.3),0_1px_2px_-1px_rgb(0_0_0_/_0.2)]">
             <h3 className="text-base font-semibold text-[var(--color-foreground)]">Compare ideas</h3>
             <p className="mt-2 text-sm text-[var(--color-muted-foreground)]">
-              Compare 2\u20133 ideas side by side by:
+              Compare 2 to 3 ideas side by side by:
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
               {comparePoints.map((point) => (

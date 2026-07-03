@@ -14,7 +14,7 @@ const steps = [
   {
     n: "3",
     title: "Compare ideas",
-    text: "Pick 2\u20133 ideas and choose which one to test first.",
+    text: "Pick 2 to 3 ideas and choose which one to test first.",
   },
   {
     n: "4",
