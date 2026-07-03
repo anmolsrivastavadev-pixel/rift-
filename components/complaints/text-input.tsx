@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { TextImportSummary } from "@/components/complaints/import-summary";
 
 const inputCls =
-  "h-9 w-full rounded-xl border border-[var(--color-border)] bg-white px-2 text-sm text-[var(--color-foreground)] outline-none focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20";
+  "h-9 w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] px-2 text-sm text-[var(--color-foreground)] outline-none focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20";
 
 /* One component powers both the Paste Text and Upload Text File tabs. They
  * share the same source-type / source-label UI and the same server action
@@ -121,7 +121,7 @@ export function TextInput({ mode }: { mode: "paste" | "file" }) {
               "One complaint per line, or one paragraph per complaint separated by a blank line.\n\n- The onboarding takes way too long.\n- Pricing is confusing and hidden behind too many pages.\n- I can’t tell which plan I should choose."
             }
             rows={10}
-            className="w-full rounded-2xl border border-[var(--color-border)] bg-white p-3 text-sm text-[var(--color-foreground)] outline-none focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20"
+            className="w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-3 text-sm text-[var(--color-foreground)] outline-none focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20"
             onInput={(e) => {
               const t = e.currentTarget;
               const hidden = document.getElementById("rift-text-data") as HTMLInputElement | null;
@@ -138,7 +138,7 @@ export function TextInput({ mode }: { mode: "paste" | "file" }) {
           <button
             type="button"
             onClick={() => fileRef.current?.click()}
-            className="flex w-full flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-[var(--color-border)] bg-white p-8 text-center shadow-sm transition-colors hover:border-[var(--color-primary)]/60 focus-visible:outline focus-visible:[outline-offset:2px] focus-visible:[outline-color:var(--color-primary)]"
+            className="flex w-full flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-[var(--color-border)] bg-[var(--color-card)] p-8 text-center shadow-sm transition-colors hover:border-[var(--color-primary)]/60 focus-visible:outline focus-visible:[outline-offset:2px] focus-visible:[outline-color:var(--color-primary)]"
           >
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
               <Upload className="h-5 w-5" />

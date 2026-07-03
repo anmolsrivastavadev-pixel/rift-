@@ -45,7 +45,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 }
 
 const inputCls =
-  "h-9 w-full rounded-xl border border-[var(--color-border)] bg-white px-2 text-sm text-[var(--color-foreground)] outline-none transition-all duration-150 ease-out focus:border-[var(--color-primary)] focus:shadow-[0_0_0_3px_rgba(59,130,246,0.2)]";
+  "h-9 w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] px-2 text-sm text-[var(--color-foreground)] outline-none transition-all duration-150 ease-out focus:border-[var(--color-primary)] focus:shadow-[0_0_0_3px_rgba(59,130,246,0.2)]";
 
 export function OpportunityFilters({
   state,
@@ -61,7 +61,7 @@ export function OpportunityFilters({
   onReset: () => void;
 }) {
   return (
-    <div className="rounded-2xl border border-[var(--color-border)] bg-white p-4 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)]">
+    <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-4 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)]">
       <div className="grid gap-4 lg:grid-cols-[1fr_auto_auto_auto_auto] lg:items-end">
         <Field label="Search">
           <input
@@ -146,7 +146,7 @@ export function OpportunityFilters({
           type="button"
           onClick={onReset}
           aria-label="Reset all filters"
-          className="inline-flex items-center gap-1.5 rounded-xl border border-[var(--color-border)] bg-white px-3 py-2 text-xs text-[var(--color-muted-foreground)] transition-colors duration-150 ease-out hover:text-[var(--color-foreground)] focus-visible:border-[var(--color-primary)] focus-visible:outline focus-visible:[outline-offset:2px] focus-visible:[outline-color:var(--color-primary)]"
+          className="inline-flex items-center gap-1.5 rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-2 text-xs text-[var(--color-muted-foreground)] transition-colors duration-150 ease-out hover:text-[var(--color-foreground)] focus-visible:border-[var(--color-primary)] focus-visible:outline focus-visible:[outline-offset:2px] focus-visible:[outline-color:var(--color-primary)]"
         >
           <RotateCcw className="h-3 w-3" /> Reset filters
         </button>

@@ -67,7 +67,7 @@ export default async function OpportunitiesPage() {
         side by side.
       </p>
 
-      <section className="rounded-2xl border border-[var(--color-border)] bg-white p-6 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)]">
+      <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)]">
         <h2 className="text-base font-semibold">Generate business ideas</h2>
         <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
           Group the complaints in this workspace into business idea hypotheses based on repeated pain, severity, and confidence.

@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 
 export function NoOpportunitiesEmpty() {
   return (
-    <div className="rounded-2xl border border-dashed border-[var(--color-border)] bg-white p-12 text-center shadow-sm">
+    <div className="rounded-2xl border border-dashed border-[var(--color-border)] bg-[var(--color-card)] p-12 text-center shadow-sm">
         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
         <Target className="h-6 w-6" />
       </div>
@@ -37,7 +37,7 @@ export function NoOpportunitiesEmpty() {
 
 export function NoSearchResultsEmpty({ onReset }: { onReset: () => void }) {
   return (
-    <div className="rounded-2xl border border-dashed border-[var(--color-border)] bg-white p-12 text-center shadow-sm">
+    <div className="rounded-2xl border border-dashed border-[var(--color-border)] bg-[var(--color-card)] p-12 text-center shadow-sm">
         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--color-surface)] text-[var(--color-muted-foreground)]">
         <SearchX className="h-6 w-6" />
       </div>
@@ -54,7 +54,7 @@ export function NoSearchResultsEmpty({ onReset }: { onReset: () => void }) {
 
 export function NoSavedEmpty() {
   return (
-    <div className="rounded-2xl border border-dashed border-[var(--color-border)] bg-white p-12 text-center shadow-sm">
+    <div className="rounded-2xl border border-dashed border-[var(--color-border)] bg-[var(--color-card)] p-12 text-center shadow-sm">
         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--color-surface)] text-[var(--color-muted-foreground)]">
         <BookmarkX className="h-6 w-6" />
       </div>

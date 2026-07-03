@@ -39,9 +39,9 @@ export default function SignUpPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center px-4">
-      <div className="w-full max-w-sm rounded-2xl border border-[var(--color-border)] bg-white p-8 shadow-lg shadow-slate-200/40">
+      <div className="w-full max-w-sm rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-8 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.3),0_1px_2px_-1px_rgb(0_0_0_/_0.2)]">
         <div className="text-center">
-          <h1 className="text-2xl font-semibold tracking-tight">Rift</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-[var(--color-foreground)]">Rift</h1>
           <p className="mt-2 text-sm text-[var(--color-muted-foreground)]">
             Create your account
           </p>
@@ -49,7 +49,7 @@ export default function SignUpPage() {
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <div>
-            <label htmlFor="name" className="block text-sm font-medium">
+            <label htmlFor="name" className="block text-sm font-medium text-[var(--color-foreground)]">
               Name
             </label>
             <input
@@ -57,12 +57,12 @@ export default function SignUpPage() {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="mt-1 block w-full rounded-[10px] border border-[var(--color-border)] bg-solid px-3 py-2 text-sm text-[var(--color-foreground)] outline-none focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20"
+              className="mt-1 block w-full rounded-[10px] border border-[var(--color-border)] bg-[var(--color-background)] px-3 py-2 text-sm text-[var(--color-foreground)] placeholder:text-[var(--color-muted-foreground)] outline-none focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20"
             />
           </div>
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium">
+            <label htmlFor="email" className="block text-sm font-medium text-[var(--color-foreground)]">
               Email
             </label>
             <input
@@ -71,12 +71,12 @@ export default function SignUpPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 block w-full rounded-[10px] border border-[var(--color-border)] bg-solid px-3 py-2 text-sm text-[var(--color-foreground)] outline-none focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20"
+              className="mt-1 block w-full rounded-[10px] border border-[var(--color-border)] bg-[var(--color-background)] px-3 py-2 text-sm text-[var(--color-foreground)] placeholder:text-[var(--color-muted-foreground)] outline-none focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20"
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-bold">
+            <label htmlFor="password" className="block text-sm font-bold text-[var(--color-foreground)]">
               Password
             </label>
             <input
@@ -86,7 +86,7 @@ export default function SignUpPage() {
               minLength={8}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 block w-full rounded-[10px] border border-[var(--color-border)] bg-solid px-3 py-2 text-sm text-[var(--color-foreground)] outline-none focus:border-[var(--color-primary)] focus:ring-2 hover:border-gray-300"
+              className="mt-1 block w-full rounded-[10px] border border-[var(--color-border)] bg-[var(--color-background)] px-3 py-2 text-sm text-[var(--color-foreground)] placeholder:text-[var(--color-muted-foreground)] outline-none focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20"
             />
           </div>
 
@@ -94,14 +94,14 @@ export default function SignUpPage() {
             <p className="text-sm text-[var(--color-danger)]">{error}</p>
           )}
 
-          <Button type="submit" disabled={loading} className="w-full h-11 rounded-xl font-semibold text-base bg-blue-600 hover:bg-blue-500 transition-colors">
+          <Button type="submit" disabled={loading} className="w-full">
             {loading ? "Creating account…" : "Sign up"}
           </Button>
         </form>
 
         <p className="mt-4 text-center text-sm text-[var(--color-muted-foreground)]">
-          Already have an account?{' '}
-          <Link href="/sign-in" className="text-blue-600 font-medium hover:underline transition-colors">
+          Already have an account?{" "}
+          <Link href="/sign-in" className="text-[var(--color-primary)] font-medium hover:underline transition-colors">
             Sign in
           </Link>
         </p>

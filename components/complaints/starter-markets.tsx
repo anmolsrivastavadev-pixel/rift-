@@ -21,7 +21,7 @@ export function StarterMarkets() {
   const [customMarket, setCustomMarket] = React.useState("");
 
   return (
-    <section className="rounded-2xl border border-[var(--color-border)] bg-white p-6 shadow-sm">
+    <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-sm">
       <div className="flex items-start gap-3">
         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
           <Zap className="h-4 w-4" />
@@ -71,7 +71,7 @@ export function StarterMarkets() {
             required
             minLength={2}
             maxLength={80}
-            className="flex-1 rounded-xl border border-[var(--color-border)] bg-white px-3 py-1.5 text-sm text-[var(--color-foreground)] placeholder:text-[var(--color-muted-foreground)] focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20 outline-none"
+            className="flex-1 rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-sm text-[var(--color-foreground)] placeholder:text-[var(--color-muted-foreground)] focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20 outline-none"
           />
           <Button type="submit" size="sm" disabled={customPending || customMarket.trim().length < 2}>
             {customPending ? (

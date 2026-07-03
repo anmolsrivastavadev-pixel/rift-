@@ -33,7 +33,7 @@ export function ComplaintsInput() {
       <div
         role="tablist"
         aria-label="Input method"
-        className="flex flex-wrap gap-2 rounded-2xl border border-[var(--color-border)] bg-white p-1.5 shadow-sm"
+        className="flex flex-wrap gap-2 rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-1.5 shadow-sm"
       >
         {TABS.map(({ id, label, icon: Icon }) => {
           const active = tab === id;

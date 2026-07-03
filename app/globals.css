@@ -2,27 +2,27 @@
 
 /* ----------------------------------------------------------------------------
    Rift design tokens (Tailwind v4 @theme)
-   Light, bright, minimal palette per project spec.
+   Dark, premium, founder-friendly palette.
  ---------------------------------------------------------------------------- */
 @theme {
-  /* Surfaces - bright minimal */
-  --color-background: #ffffff;
-  --color-surface: #f8f9fb;
-  --color-card: #ffffff;
-  --color-border: #e9ecf0;
-  --color-foreground: #0f172a;
-  --color-muted-foreground: #64748b;
+  /* Surfaces - dark minimal */
+  --color-background: #09090b;
+  --color-surface: rgba(255, 255, 255, 0.04);
+  --color-card: #111113;
+  --color-border: rgba(255, 255, 255, 0.10);
+  --color-foreground: #fafafa;
+  --color-muted-foreground: #a1a1aa;
 
   /* Accents */
   --color-primary: #3b82f6;
-  --color-primary-soft: #eff6ff;
+  --color-primary-soft: rgba(59, 130, 246, 0.12);
   --color-primary-foreground: #ffffff;
   --color-success: #22c55e;
-  --color-success-soft: #f0fdf4;
+  --color-success-soft: rgba(34, 197, 94, 0.12);
   --color-warning: #f59e0b;
-  --color-warning-soft: #fffbeb;
+  --color-warning-soft: rgba(245, 158, 11, 0.12);
   --color-danger: #ef4444;
-  --color-danger-soft: #fef2f2;
+  --color-danger-soft: rgba(239, 68, 68, 0.12);
 
   /* Radius */
   --radius: 0.75rem;
@@ -34,9 +34,9 @@
   --font-mono: ui-monospace, SFMono-Regular, monospace;
 
   /* Shadows */
-  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.04), 0 1px 2px -1px rgb(0 0 0 / 0.06);
-  --shadow-card-hover: 0 4px 12px 0 rgb(0 0 0 / 0.06), 0 2px 4px -2px rgb(0 0 0 / 0.04);
-  --shadow-elevated: 0 8px 24px 0 rgb(0 0 0 / 0.08), 0 2px 8px 0 rgb(0 0 0 / 0.04);
+  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.3), 0 1px 2px -1px rgb(0 0 0 / 0.2);
+  --shadow-card-hover: 0 4px 12px 0 rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+  --shadow-elevated: 0 8px 24px 0 rgb(0 0 0 / 0.5), 0 2px 8px 0 rgb(0 0 0 / 0.3);
 }
 
 /* ----------------------------------------------------------------------------
@@ -48,7 +48,7 @@
   }
 
   html {
-    color-scheme: light;
+    color-scheme: dark;
     scroll-behavior: smooth;
   }
 
@@ -58,6 +58,7 @@
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
   }
 
   :focus-visible {
@@ -122,16 +123,16 @@
     background: linear-gradient(
       90deg,
       var(--color-surface) 25%,
-      var(--color-border) 50%,
+      rgba(255, 255, 255, 0.08) 50%,
       var(--color-surface) 75%
     );
     background-size: 200% 100%;
     animation: shimmer 2s ease-in-out infinite;
   }
 
-  /* Glass-morphism surface */
+  /* Glass-morphism surface (dark) */
   .glass {
-    background-color: rgb(255 255 255 / 0.7);
+    background-color: rgba(255, 255, 255, 0.04);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
   }
@@ -166,43 +167,4 @@
   .card-shadow:hover {
     box-shadow: var(--shadow-card-hover);
   }
-}
-
-/* ----------------------------------------------------------------------------
-   Landing page dark theme
-   Applied via .landing-dark wrapper on the public landing page only.
-   Dashboard is unaffected.
- ---------------------------------------------------------------------------- */
-.landing-dark {
-  --color-background: #09090b;
-  --color-surface: rgba(255, 255, 255, 0.04);
-  --color-card: #111113;
-  --color-border: rgba(255, 255, 255, 0.10);
-  --color-foreground: #fafafa;
-  --color-muted-foreground: #a1a1aa;
-
-  --color-primary: #3b82f6;
-  --color-primary-soft: rgba(59, 130, 246, 0.12);
-  --color-primary-foreground: #ffffff;
-  --color-success: #22c55e;
-  --color-success-soft: rgba(34, 197, 94, 0.12);
-  --color-warning: #f59e0b;
-  --color-warning-soft: rgba(245, 158, 11, 0.12);
-  --color-danger: #ef4444;
-  --color-danger-soft: rgba(239, 68, 68, 0.12);
-
-  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.3), 0 1px 2px -1px rgb(0 0 0 / 0.2);
-  --shadow-card-hover: 0 4px 12px 0 rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
-
-  background-color: var(--color-background);
-  color: var(--color-foreground);
-}
-
-.landing-dark * {
-  border-color: var(--color-border);
-}
-
-.landing-dark ::selection {
-  background-color: var(--color-primary-soft);
-  color: var(--color-primary);
 }

@@ -115,7 +115,7 @@ export default async function OpportunityDetailPage({
       </div>
 
       {/* Header */}
-      <header className="rounded-2xl border border-[var(--color-border)] bg-white p-6 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)]">
+      <header className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)]">
         <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-[var(--color-muted-foreground)]">
           <Briefcase className="h-3.5 w-3.5" />
           {op.industry}
@@ -194,7 +194,7 @@ export default async function OpportunityDetailPage({
               The wedge/narrow entry point lives in the Market Gap Hypothesis
               section as "Product Angle" (productAngle) so the two never show
               the same content. suggestedSoftware is always non-null. */}
-          <section className="rounded-2xl border border-[var(--color-border)] bg-white p-6 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)]">
+          <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)]">
             <h2 className="flex items-center gap-2 text-sm font-semibold">
               <Lightbulb className="h-4 w-4 text-[var(--color-warning)]" />
               Product Opportunity
@@ -224,7 +224,7 @@ export default async function OpportunityDetailPage({
         {/* RIGHT column — sticky on large screens */}
         <aside className="space-y-6 lg:sticky lg:top-6 lg:self-start">
           {/* Opportunity Score hero */}
-          <div className="rounded-2xl border border-[var(--color-border)] bg-white p-6 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)] text-center">
+          <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)] text-center">
             <p className="text-xs uppercase tracking-wide text-[var(--color-muted-foreground)]">
               Opportunity score
             </p>
@@ -251,7 +251,7 @@ export default async function OpportunityDetailPage({
 
           {/* Score Breakdown + plain-English explanation */}
           {bd?.subscores && (
-            <section className="rounded-2xl border border-[var(--color-border)] bg-white p-6 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)]">
+            <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)]">
               <h2 className="text-sm font-semibold">Score breakdown</h2>
               <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
                 The score is a rough sorting signal. It combines how often the problem appears, how painful it seems, and how confident Rift is in the pattern.
@@ -292,7 +292,7 @@ export default async function OpportunityDetailPage({
           )}
 
           {/* Related Opportunities */}
-          <section className="rounded-2xl border border-[var(--color-border)] bg-white p-6 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)]">
+          <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)]">
             <h2 className="flex items-center gap-2 text-sm font-semibold">
               <Layers className="h-4 w-4 text-[var(--color-primary)]" />
               Related opportunities
@@ -383,7 +383,7 @@ function MiniStat({
   value: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-center rounded-2xl border border-[var(--color-border)] bg-white p-3 text-center shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)]">
+    <div className="flex flex-col items-center rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-3 text-center shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)]">
       <Icon className="h-3.5 w-3.5 text-[var(--color-muted-foreground)]" />
       <span className="mt-1 text-sm font-medium">{value}</span>
       <span className="text-[10px] text-[var(--color-muted-foreground)]">{label}</span>

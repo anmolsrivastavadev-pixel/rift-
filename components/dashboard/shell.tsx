@@ -38,7 +38,7 @@ export function DashboardShell({
   return (
     <div className="flex min-h-screen w-full">
       {/* Desktop sidebar */}
-      <aside className="sticky top-0 hidden h-screen w-60 shrink-0 border-r border-[var(--color-border)] bg-[rgb(255_255_255_/_0.7)] py-6 backdrop-blur-xl md:block">
+      <aside className="sticky top-0 hidden h-screen w-60 shrink-0 border-r border-[var(--color-border)] bg-[var(--color-background)] py-6 md:block">
         <Container className="flex h-full flex-col gap-1">
           <Link
             href="/"
@@ -58,8 +58,8 @@ export function DashboardShell({
                   href={href}
                   className={`group flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition-all duration-150 ease-out ${
                     isActive
-                      ? "bg-white text-[var(--color-foreground)] shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04)] font-medium"
-                      : "text-[var(--color-muted-foreground)] hover:bg-white/60 hover:text-[var(--color-foreground)] hover:shadow-[0_1px_3px_0_rgb(0_0_0_/_0.02)]"
+                      ? "bg-[var(--color-card)] text-[var(--color-foreground)] shadow-sm font-medium"
+                      : "text-[var(--color-muted-foreground)] hover:bg-[var(--color-card)]/60 hover:text-[var(--color-foreground)]"
                   }`}
                 >
                   <Icon className={`h-4 w-4 transition-colors duration-150 ease-out ${
@@ -74,7 +74,7 @@ export function DashboardShell({
             })}
           </nav>
           <div className="mt-auto space-y-2.5 px-3 pt-4">
-            <div className="flex items-center gap-2.5 rounded-xl bg-[var(--color-surface)] px-3 py-2.5">
+            <div className="flex items-center gap-2.5 rounded-xl bg-[var(--color-card)] px-3 py-2.5">
               <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
                 <User className="h-3.5 w-3.5" />
               </div>
@@ -102,7 +102,7 @@ export function DashboardShell({
       </aside>
 
       {/* Mobile top nav */}
-      <div className="fixed inset-x-0 top-0 z-50 border-b border-[var(--color-border)] bg-[rgba(255,255,255,0.85)] backdrop-blur-lg md:hidden">
+      <div className="fixed inset-x-0 top-0 z-50 border-b border-[var(--color-border)] bg-[var(--color-background)]/85 backdrop-blur-lg md:hidden">
         <div className="flex items-center gap-1 overflow-x-auto px-4 py-2">
           <Link
             href="/"
@@ -121,8 +121,8 @@ export function DashboardShell({
                   href={href}
                   className={`flex shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs transition-all duration-150 ease-out ${
                     isActive
-                      ? "bg-white text-[var(--color-foreground)] shadow-sm font-medium"
-                      : "text-[var(--color-muted-foreground)] hover:bg-white/60 hover:text-[var(--color-foreground)]"
+                      ? "bg-[var(--color-card)] text-[var(--color-foreground)] shadow-sm font-medium"
+                      : "text-[var(--color-muted-foreground)] hover:bg-[var(--color-card)]/60 hover:text-[var(--color-foreground)]"
                   }`}
                 >
                   <Icon className={`h-3.5 w-3.5 ${isActive ? "text-[var(--color-primary)]" : ""}`} />

@@ -45,7 +45,7 @@ export function Hero() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, ease: "easeOut", delay: 0.05 }}
-          className="mt-6 max-w-4xl mx-auto text-balance text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl text-[var(--color-foreground)]"
+          className="mx-auto max-w-5xl text-balance text-3xl font-semibold tracking-tight sm:text-4xl md:text-5xl lg:text-6xl leading-tight sm:leading-tight text-[var(--color-foreground)]"
         >
           Turn complaints into business ideas{" "}
           <span className="text-[var(--color-primary)]">worth testing.</span>

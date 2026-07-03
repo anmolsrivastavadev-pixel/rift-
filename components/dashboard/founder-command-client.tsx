@@ -166,7 +166,7 @@ export function FounderCommandClient({
       {stats.opportunityCount > 0 && (
         <div className="grid gap-4 lg:grid-cols-2">
           {/* Decision summary */}
-          <div className="rounded-xl border border-[var(--color-border)] bg-white p-5 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)]">
+          <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-5 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)]">
             <h3 className="text-sm font-semibold">Decision status</h3>
             <p className="mt-0.5 text-xs text-[var(--color-muted-foreground)]">
               {hydrated
@@ -188,7 +188,7 @@ export function FounderCommandClient({
           </div>
 
           {/* Evidence summary */}
-          <div className="rounded-xl border border-[var(--color-border)] bg-white p-5 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)]">
+          <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-5 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)]">
             <h3 className="text-sm font-semibold">Evidence so far</h3>
             <p className="mt-0.5 text-xs text-[var(--color-muted-foreground)]">
               {hydrated
@@ -237,7 +237,7 @@ function WorkflowStepCard({
   const Icon = meta.icon;
 
   return (
-    <div className="flex flex-col rounded-xl border border-[var(--color-border)] bg-white p-4 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)] transition-all duration-150 ease-out hover:-translate-y-0.5 hover:shadow-[0_4px_12px_0_rgb(0_0_0_/_0.06),0_2px_4px_-2px_rgb(0_0_0_/_0.04)]">
+    <div className="flex flex-col rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-4 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)] transition-all duration-150 ease-out hover:-translate-y-0.5 hover:shadow-[0_4px_12px_0_rgb(0_0_0_/_0.06),0_2px_4px_-2px_rgb(0_0_0_/_0.04)]">
       <div className="flex items-center gap-1.5">
         <Icon className={`h-3.5 w-3.5 ${meta.color}`} />
         <span className={`text-[10px] uppercase tracking-wide ${meta.color}`}>
@@ -278,7 +278,7 @@ function SnapshotCount({
             ? "text-[var(--color-muted-foreground)]"
             : "text-[var(--color-foreground)]";
   return (
-    <div className="rounded-lg border border-[var(--color-border)] bg-white p-2">
+    <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] p-2">
       <p className={`text-lg font-bold ${colorClass}`}>{value}</p>
       <p className="text-[10px] text-[var(--color-muted-foreground)]">{label}</p>
     </div>

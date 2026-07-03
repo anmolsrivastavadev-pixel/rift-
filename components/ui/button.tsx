@@ -12,11 +12,11 @@ const buttonVariants = cva(
         primary:
           "bg-[var(--color-primary)] text-[var(--color-primary-foreground)] shadow-sm hover:brightness-110 hover:shadow-md",
         secondary:
-          "bg-[var(--color-surface)] text-[var(--color-foreground)] border border-[var(--color-border)] hover:bg-white hover:border-[var(--color-border)]",
+          "bg-[var(--color-surface)] text-[var(--color-foreground)] border border-[var(--color-border)] hover:bg-[var(--color-card)] hover:border-[var(--color-border)]",
         ghost:
           "text-[var(--color-foreground)] hover:bg-[var(--color-surface)]",
         outline:
-          "border border-[var(--color-border)] text-[var(--color-foreground)] bg-white hover:bg-[var(--color-surface)] hover:border-[var(--color-border)]",
+          "border border-[var(--color-border)] text-[var(--color-foreground)] bg-[var(--color-card)] hover:bg-[var(--color-surface)] hover:border-[var(--color-border)]",
         danger:
           "bg-[var(--color-danger)] text-white shadow-sm hover:brightness-110 hover:shadow-md",
       },

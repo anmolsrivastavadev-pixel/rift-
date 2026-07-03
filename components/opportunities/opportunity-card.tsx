@@ -50,7 +50,7 @@ export function OpportunityCard({
   return (
     <div
       className={
-        "group relative flex flex-col rounded-2xl border bg-white p-6 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)] " +
+        "group relative flex flex-col rounded-2xl border bg-[var(--color-card)] p-6 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)] " +
         "transition-all duration-150 ease-out hover:-translate-y-0.5 hover:shadow-[0_4px_12px_0_rgb(0_0_0_/_0.06),0_2px_4px_-2px_rgb(0_0_0_/_0.04)] " +
         (selected
           ? "border-[var(--color-primary)] ring-1 ring-[var(--color-primary)]/30"
@@ -69,7 +69,7 @@ export function OpportunityCard({
             className={`inline-flex items-center gap-1 rounded-lg border px-2.5 py-1 text-[11px] font-medium transition-all duration-150 ease-out active:scale-[0.95] ${
               selected
                 ? "border-[var(--color-primary)] bg-[var(--color-primary-soft)] text-[var(--color-primary)]"
-                : "border-[var(--color-border)] bg-white text-[var(--color-muted-foreground)] hover:border-[var(--color-primary)]/40 hover:text-[var(--color-primary)]"
+                : "border-[var(--color-border)] bg-[var(--color-card)] text-[var(--color-muted-foreground)] hover:border-[var(--color-primary)]/40 hover:text-[var(--color-primary)]"
             }`}
             aria-pressed={selected}
             aria-label={selected ? "Remove from compare" : "Add to compare"}
@@ -162,7 +162,7 @@ export function OpportunityCard({
         </p>
 
         <span
-          className="mt-3 inline-flex items-center justify-center gap-1.5 rounded-lg border border-[var(--color-border)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--color-foreground)] transition-all duration-150 ease-out group-hover:border-[var(--color-primary)]/30 group-hover:bg-[var(--color-primary-soft)] group-hover:text-[var(--color-primary)]"
+          className="mt-3 inline-flex items-center justify-center gap-1.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-xs font-medium text-[var(--color-foreground)] transition-all duration-150 ease-out group-hover:border-[var(--color-primary)]/30 group-hover:bg-[var(--color-primary-soft)] group-hover:text-[var(--color-primary)]"
           aria-hidden="true"
         >
           Open idea
