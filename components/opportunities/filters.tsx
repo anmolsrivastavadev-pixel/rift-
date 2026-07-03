@@ -45,7 +45,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 }
 
 const inputCls =
-  "h-9 w-full rounded-[10px] border border-[var(--color-border)] bg-[var(--color-background)] px-2 text-sm text-[var(--color-foreground)] outline-none focus:border-[var(--color-primary)]";
+  "h-9 w-full rounded-xl border border-[var(--color-border)] bg-white px-2 text-sm text-[var(--color-foreground)] outline-none focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20";
 
 export function OpportunityFilters({
   state,
@@ -61,7 +61,7 @@ export function OpportunityFilters({
   onReset: () => void;
 }) {
   return (
-    <div className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-4">
+    <div className="rounded-2xl border border-[var(--color-border)] bg-white p-4 shadow-sm">
       <div className="grid gap-4 lg:grid-cols-[1fr_auto_auto_auto_auto] lg:items-end">
         <Field label="Search">
           <input
@@ -146,7 +146,7 @@ export function OpportunityFilters({
           type="button"
           onClick={onReset}
           aria-label="Reset all filters"
-          className="inline-flex items-center gap-1.5 rounded-[10px] border border-[var(--color-border)] bg-[var(--color-background)] px-3 py-2 text-xs text-[var(--color-muted-foreground)] transition-colors duration-150 ease-out hover:text-[var(--color-foreground)] focus-visible:border-[var(--color-primary)] focus-visible:outline focus-visible:[outline-offset:2px] focus-visible:[outline-color:var(--color-primary)]"
+          className="inline-flex items-center gap-1.5 rounded-xl border border-[var(--color-border)] bg-white px-3 py-2 text-xs text-[var(--color-muted-foreground)] transition-colors duration-150 ease-out hover:text-[var(--color-foreground)] focus-visible:border-[var(--color-primary)] focus-visible:outline focus-visible:[outline-offset:2px] focus-visible:[outline-color:var(--color-primary)]"
         >
           <RotateCcw className="h-3 w-3" /> Reset filters
         </button>

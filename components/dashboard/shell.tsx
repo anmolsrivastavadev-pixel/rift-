@@ -35,7 +35,7 @@ export function DashboardShell({
   return (
     <div className="flex min-h-screen w-full">
       {/* Desktop sidebar */}
-      <aside className="sticky top-0 hidden h-screen w-60 shrink-0 border-r border-[var(--color-border)] bg-[var(--color-background)] py-6 md:block">
+      <aside className="sticky top-0 hidden h-screen w-60 shrink-0 border-r border-[var(--color-border)] bg-[var(--color-surface)] py-6 md:block">
         <Container className="flex h-full flex-col gap-1">
           <Link
             href="/"
@@ -48,7 +48,7 @@ export function DashboardShell({
               <Link
                 key={href}
                 href={href}
-                className="flex items-center gap-3 rounded-[12px] px-3 py-2 text-sm text-[var(--color-muted-foreground)] transition-colors hover:bg-[var(--color-card)] hover:text-[var(--color-foreground)] focus-visible:outline focus-visible:[outline-offset:2px] focus-visible:[outline-color:var(--color-primary)]"
+                className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-[var(--color-muted-foreground)] transition-colors hover:bg-white hover:text-[var(--color-foreground)] focus-visible:outline focus-visible:[outline-offset:2px] focus-visible:[outline-color:var(--color-primary)]"
               >
                 <Icon className="h-4 w-4" />
                 {label}
@@ -62,7 +62,7 @@ export function DashboardShell({
             </div>
             <button
               onClick={handleSignOut}
-              className="flex w-full items-center gap-2 rounded-[12px] px-3 py-2 text-sm text-[var(--color-muted-foreground)] transition-colors hover:bg-[var(--color-destructive)]/10 hover:text-[var(--color-destructive)]"
+              className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-[var(--color-muted-foreground)] transition-colors hover:bg-[var(--color-danger)]/10 hover:text-[var(--color-danger)]"
             >
               <LogOut className="h-4 w-4" />
               Sign out
@@ -75,7 +75,7 @@ export function DashboardShell({
       </aside>
 
       {/* Mobile top nav */}
-      <div className="fixed inset-x-0 top-0 z-50 border-b border-[var(--color-border)] bg-[var(--color-background)] md:hidden">
+      <div className="fixed inset-x-0 top-0 z-50 border-b border-[var(--color-border)] bg-[var(--color-surface)] md:hidden">
         <div className="flex items-center gap-1 overflow-x-auto px-4 py-2">
           <Link
             href="/"
@@ -88,7 +88,7 @@ export function DashboardShell({
               <Link
                 key={href}
                 href={href}
-                className="flex shrink-0 items-center gap-1.5 rounded-[8px] px-2.5 py-1.5 text-xs text-[var(--color-muted-foreground)] transition-colors hover:bg-[var(--color-card)] hover:text-[var(--color-foreground)]"
+                className="flex shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs text-[var(--color-muted-foreground)] transition-colors hover:bg-white hover:text-[var(--color-foreground)]"
               >
                 <Icon className="h-3.5 w-3.5" />
                 {label}
@@ -97,7 +97,7 @@ export function DashboardShell({
           </nav>
           <button
             onClick={handleSignOut}
-            className="ml-auto flex shrink-0 items-center gap-1 rounded-[8px] px-2.5 py-1.5 text-xs text-[var(--color-muted-foreground)] transition-colors hover:bg-[var(--color-destructive)]/10 hover:text-[var(--color-destructive)]"
+            className="ml-auto flex shrink-0 items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs text-[var(--color-muted-foreground)] transition-colors hover:bg-[var(--color-danger)]/10 hover:text-[var(--color-danger)]"
           >
             <LogOut className="h-3.5 w-3.5" />
             Sign out

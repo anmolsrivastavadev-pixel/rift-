@@ -34,7 +34,7 @@ export function ValidationWorkspace({ input }: { input: ValidationPlanInput }) {
   const risks = buildRisksToTest(input);
 
   return (
-    <section className="rounded-[12px] border border-[var(--color-border)] bg-[var(--card)] p-6 space-y-6">
+    <section className="rounded-2xl border border-[var(--color-border)] bg-white p-6 shadow-sm space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--color-border)] pb-4">
         <div>
           <h2 className="text-base font-semibold">Validation Workspace</h2>

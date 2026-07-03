@@ -67,7 +67,7 @@ export default async function OpportunitiesPage() {
         side by side.
       </p>
 
-      <section className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-6">
+      <section className="rounded-2xl border border-[var(--color-border)] bg-white p-6 shadow-sm">
         <h2 className="text-base font-semibold">Generate business ideas</h2>
         <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
           Group the complaints in this workspace into business idea hypotheses based on repeated pain, severity, and confidence.

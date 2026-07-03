@@ -18,13 +18,13 @@ export function StatCard({
   return (
     <div
       className={cn(
-        "rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-6",
+        "rounded-2xl border border-[var(--color-border)] bg-white shadow-sm p-6",
         className
       )}
     >
       <div className="flex items-center gap-3">
         {Icon ? (
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-[var(--color-primary)]/10 text-[var(--color-primary)]">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
             <Icon className="h-4 w-4" />
           </div>
         ) : null}
@@ -32,7 +32,7 @@ export function StatCard({
           {label}
         </p>
       </div>
-      <p className="mt-3 text-3xl font-semibold tracking-tight">{value}</p>
+        <p className="mt-3 text-3xl font-semibold tracking-tight text-[var(--color-foreground)]">{value}</p>
       {hint && (
         <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
           {hint}

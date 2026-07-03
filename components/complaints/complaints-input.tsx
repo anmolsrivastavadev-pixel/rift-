@@ -33,7 +33,7 @@ export function ComplaintsInput() {
       <div
         role="tablist"
         aria-label="Input method"
-        className="flex flex-wrap gap-2 rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-1.5"
+        className="flex flex-wrap gap-2 rounded-2xl border border-[var(--color-border)] bg-white p-1.5 shadow-sm"
       >
         {TABS.map(({ id, label, icon: Icon }) => {
           const active = tab === id;
@@ -46,10 +46,10 @@ export function ComplaintsInput() {
               aria-controls={`rift-input-panel-${id}`}
               id={`rift-input-tab-${id}`}
               onClick={() => setTab(id)}
-              className={`inline-flex items-center gap-1.5 rounded-[10px] px-3 py-2 text-sm transition-colors duration-150 ease-out focus-visible:outline focus-visible:[outline-offset:2px] focus-visible:[outline-color:var(--color-primary)] ${
+              className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm transition-colors duration-150 ease-out focus-visible:outline focus-visible:[outline-offset:2px] focus-visible:[outline-color:var(--color-primary)] ${
                 active
-                  ? "bg-[var(--color-primary)] text-[var(--color-primary-foreground)]"
-                  : "text-[var(--color-muted-foreground)] hover:bg-[var(--color-background)] hover:text-[var(--color-foreground)]"
+                  ? "bg-[var(--color-primary)] text-white"
+                  : "text-[var(--color-muted-foreground)] hover:bg-[var(--color-surface)] hover:text-[var(--color-foreground)]"
               }`}
             >
               <Icon className="h-4 w-4" />

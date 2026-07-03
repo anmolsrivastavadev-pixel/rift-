@@ -76,13 +76,13 @@ export function CsvUploader() {
             const f = e.dataTransfer.files?.[0];
             if (f) handleFile(f);
           }}
-          className={`flex w-full flex-col items-center justify-center gap-3 rounded-[12px] border border-dashed p-10 text-center transition-colors ${
+          className={`flex w-full flex-col items-center justify-center gap-3 rounded-2xl border border-dashed p-10 text-center shadow-sm transition-colors ${
             dragOver
-              ? "border-[var(--color-primary)] bg-[var(--color-primary)]/5"
-              : "border-[var(--color-border)] bg-[var(--color-card)]"
+              ? "border-[var(--color-primary)] bg-[var(--color-primary-soft)]"
+              : "border-[var(--color-border)] bg-white"
           }`}
         >
-          <div className="flex h-12 w-12 items-center justify-center rounded-[12px] bg-[var(--color-primary)]/10 text-[var(--color-primary)]">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
             <Upload className="h-6 w-6" />
           </div>
           <div>

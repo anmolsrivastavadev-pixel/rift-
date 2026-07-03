@@ -2,41 +2,48 @@
 
 /* ----------------------------------------------------------------------------
    Rift design tokens (Tailwind v4 @theme)
-   Dark mode by default. Palette per project spec.
----------------------------------------------------------------------------- */
+   Light, bright, minimal palette per project spec.
+ ---------------------------------------------------------------------------- */
 @theme {
-  /* Surfaces */
-  --color-background: #09090b;
-  --color-card: #18181b;
-  --color-border: #27272a;
-  --color-foreground: #fafafa;
-  --color-muted-foreground: #a1a1aa;
+  /* Surfaces - bright minimal */
+  --color-background: #ffffff;
+  --color-surface: #f8f9fb;
+  --color-card: #ffffff;
+  --color-border: #e9ecf0;
+  --color-foreground: #0f172a;
+  --color-muted-foreground: #64748b;
 
   /* Accents */
-  --color-primary: #2563eb;
+  --color-primary: #3b82f6;
+  --color-primary-soft: #eff6ff;
   --color-primary-foreground: #ffffff;
   --color-success: #22c55e;
+  --color-success-soft: #f0fdf4;
   --color-warning: #f59e0b;
+  --color-warning-soft: #fffbeb;
   --color-danger: #ef4444;
+  --color-danger-soft: #fef2f2;
 
-  /* Radius scale (12px base per spec) */
+  /* Radius */
   --radius: 0.75rem;
+  --radius-2xl: 1rem;
+  --radius-3xl: 1.25rem;
 
-  /* Fonts (Inter via next/font) */
+  /* Fonts */
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, monospace;
 }
 
 /* ----------------------------------------------------------------------------
-   Base styles
----------------------------------------------------------------------------- */
+   base styles
+ ---------------------------------------------------------------------------- */
 @layer base {
   * {
     border-color: var(--color-border);
   }
 
   html {
-    color-scheme: dark;
+    color-scheme: light;
   }
 
   body {
@@ -55,8 +62,8 @@
 }
 
 /* ----------------------------------------------------------------------------
-   Landing page polish
----------------------------------------------------------------------------- */
+   Utilities
+ ---------------------------------------------------------------------------- */
 @layer utilities {
   .text-balance {
     text-wrap: balance;
@@ -66,11 +73,11 @@
   @keyframes drift {
     0%, 100% {
       transform: translate(-50%, -50%) scale(1);
-      opacity: 0.15;
+      opacity: 0.10;
     }
     50% {
       transform: translate(-50%, -60%) scale(1.05);
-      opacity: 0.1;
+      opacity: 0.07;
     }
   }
 
@@ -78,7 +85,7 @@
     animation: drift 8s ease-in-out infinite;
   }
 
-  /* Gentle fade-up for sections on scroll (CSS only) */
+  /* Gentle fade-up for sections */
   @keyframes fade-up {
     from {
       opacity: 0;

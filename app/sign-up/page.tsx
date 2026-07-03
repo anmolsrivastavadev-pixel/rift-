@@ -18,36 +18,36 @@ export default function SignUpPage() {
     setLoading(true);
 
     try {
-      const { error } = await authClient.signUp.email({
+      const { error: authError } = await authClient.signUp.email({
         email,
         password,
         name,
       });
 
-      if (error) {
-        setError(error.message || "Sign up failed");
+      if (authError) {
+        setError(authError.message || "Sign up failed");
         setLoading(false);
         return;
       }
 
       window.location.href = "/dashboard";
     } catch {
-      setError("Something went wrong");
+      setError("Something went wrong.");
       setLoading(false);
     }
   }
 
   return (
     <div className="flex min-h-screen items-center justify-center px-4">
-      <div className="w-full max-w-sm space-y-6">
+      <div className="w-full max-w-sm rounded-2xl border border-[var(--color-border)] bg-white p-8 shadow-lg shadow-slate-200/40">
         <div className="text-center">
           <h1 className="text-2xl font-semibold tracking-tight">Rift</h1>
           <p className="mt-2 text-sm text-[var(--color-muted-foreground)]">
-            Create an account
+            Create your account
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <div>
             <label htmlFor="name" className="block text-sm font-medium">
               Name
@@ -57,7 +57,7 @@ export default function SignUpPage() {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="mt-1 block w-full rounded-[12px] border border-[var(--color-border)] bg-[var(--color-background)] px-3 py-2 text-sm text-[var(--color-foreground)] outline-none focus:border-[var(--color-primary)]"
+              className="mt-1 block w-full rounded-[10px] border border-[var(--color-border)] bg-solid px-3 py-2 text-sm text-[var(--color-foreground)] outline-none focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20"
             />
           </div>
 
@@ -71,12 +71,12 @@ export default function SignUpPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 block w-full rounded-[12px] border border-[var(--color-border)] bg-[var(--color-background)] px-3 py-2 text-sm text-[var(--color-foreground)] outline-none focus:border-[var(--color-primary)]"
+              className="mt-1 block w-full rounded-[10px] border border-[var(--color-border)] bg-solid px-3 py-2 text-sm text-[var(--color-foreground)] outline-none focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20"
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium">
+            <label htmlFor="password" className="block text-sm font-bold">
               Password
             </label>
             <input
@@ -86,25 +86,22 @@ export default function SignUpPage() {
               minLength={8}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 block w-full rounded-[12px] border border-[var(--color-border)] bg-[var(--color-background)] px-3 py-2 text-sm text-[var(--color-foreground)] outline-none focus:border-[var(--color-primary)]"
+              className="mt-1 block w-full rounded-[10px] border border-[var(--color-border)] bg-solid px-3 py-2 text-sm text-[var(--color-foreground)] outline-none focus:border-[var(--color-primary)] focus:ring-2 hover:border-gray-300"
             />
           </div>
 
           {error && (
-            <p className="text-sm text-[var(--color-destructive)]">{error}</p>
+            <p className="text-sm text-[var(--color-danger)]">{error}</p>
           )}
 
-          <Button type="submit" disabled={loading} className="w-full">
+          <Button type="submit" disabled={loading} className="w-full h-11 rounded-xl font-semibold text-base bg-blue-600 hover:bg-blue-500 transition-colors">
             {loading ? "Creating account…" : "Sign up"}
           </Button>
         </form>
 
-        <p className="text-center text-sm text-[var(--color-muted-foreground)]">
-          Already have an account?{" "}
-          <Link
-            href="/sign-in"
-            className="text-[var(--color-primary)] hover:underline"
-          >
+        <p className="mt-4 text-center text-sm text-[var(--color-muted-foreground)]">
+          Already have an account?{' '}
+          <Link href="/sign-in" className="text-blue-600 font-medium hover:underline transition-colors">
             Sign in
           </Link>
         </p>

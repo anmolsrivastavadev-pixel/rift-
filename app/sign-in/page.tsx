@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "@/lib/auth/client";
 import { Button } from "@/components/ui/button";
 
 export default function SignInPage() {
@@ -17,20 +17,20 @@ export default function SignInPage() {
     setLoading(true);
 
     try {
-      const { error } = await authClient.signIn.email({
+      const { error: authError } = await authClient.signIn.email({
         email,
         password,
       });
 
-      if (error) {
-        setError(error.message || "Sign in failed");
+      if (authError) {
+        setError(authError.message || "Sign in failed");
         setLoading(false);
         return;
       }
 
       window.location.href = "/dashboard";
     } catch {
-      setError("Something went wrong");
+      setError("Something went wrong. Please try again.");
       setLoading(false);
     }
   }
@@ -56,7 +56,7 @@ export default function SignInPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 block w-full rounded-[12px] border border-[var(--color-border)] bg-[var(--color-background)] px-3 py-2 text-sm text-[var(--color-foreground)] outline-none focus:border-[var(--color-primary)]"
+              className="mt-1 block w-full rounded-[10px] border border-[var(--color-border)] bg-white px-3 py-2 text-sm text-[var(--color-foreground)] outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]"
             />
           </div>
 
@@ -70,12 +70,12 @@ export default function SignInPage() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 block w-full rounded-[12px] border border-[var(--color-border)] bg-[var(--color-background)] px-3 py-2 text-sm text-[var(--color-foreground)] outline-none focus:border-[var(--color-primary)]"
+              className="mt-1 block w-full rounded-[10px] border border-[var(--color-border)] bg-white px-3 py-2 text-sm text-[var(--color-foreground)] outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]"
             />
           </div>
 
           {error && (
-            <p className="text-sm text-[var(--color-destructive)]">{error}</p>
+            <p className="text-sm text-[var(--color-danger)]">{error}</p>
           )}
 
           <Button type="submit" disabled={loading} className="w-full">
@@ -85,10 +85,7 @@ export default function SignInPage() {
 
         <p className="text-center text-sm text-[var(--color-muted-foreground)]">
           Don&apos;t have an account?{" "}
-          <Link
-            href="/sign-up"
-            className="text-[var(--color-primary)] hover:underline"
-          >
+          <Link href="/sign-up" className="text-[var(--color-primary)] hover:underline">
             Sign up
           </Link>
         </p>
