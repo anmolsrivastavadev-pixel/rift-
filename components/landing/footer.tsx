@@ -7,7 +7,7 @@ export function Footer() {
   return (
     <footer className="border-t border-[var(--color-border)]">
       <Container className="py-16 sm:py-20 text-center">
-        <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+        <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl text-[var(--color-foreground)]">
           Ready to find your first idea?
         </h2>
         <p className="mx-auto mt-4 max-w-md text-sm text-[var(--color-muted-foreground)]">
@@ -30,7 +30,7 @@ export function Footer() {
           <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--color-primary)] text-[11px] font-bold text-white">
             R
           </span>
-          <span className="text-sm font-semibold tracking-tight">Rift</span>
+          <span className="text-sm font-semibold tracking-tight text-[var(--color-foreground)]">Rift</span>
           <span className="text-xs text-[var(--color-muted-foreground)]">
             Business ideas from real customer pain.
           </span>

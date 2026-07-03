@@ -30,7 +30,7 @@ export function Features() {
       <Container>
         {/* Quick ideas vs real research */}
         <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+          <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl text-[var(--color-foreground)]">
             Quick ideas vs real research
           </h2>
         </div>
@@ -39,15 +39,15 @@ export function Features() {
           {modes.map((m) => (
             <div
               key={m.label}
-              className={`rounded-xl border p-6 text-left shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)] transition-all duration-150 ease-out hover:-translate-y-0.5 hover:shadow-[0_4px_12px_0_rgb(0_0_0_/_0.06),0_2px_4px_-2px_rgb(0_0_0_/_0.04)] ${
+              className={`rounded-xl border p-6 text-left shadow-[0_1px_3px_0_rgb(0_0_0_/_0.3),0_1px_2px_-1px_rgb(0_0_0_/_0.2)] transition-all duration-150 ease-out hover:-translate-y-0.5 hover:shadow-[0_4px_12px_0_rgb(0_0_0_/_0.4),0_2px_4px_-2px_rgb(0_0_0_/_0.3)] ${
                 m.highlight
                   ? "border-[var(--color-primary)]/30 bg-[var(--color-primary)]/5"
-                  : "border-[var(--color-border)] bg-white"
+                  : "border-[var(--color-border)] bg-[var(--color-card)]"
               }`}
             >
               <h3
                 className={`text-base font-semibold ${
-                  m.highlight ? "text-[var(--color-primary)]" : ""
+                  m.highlight ? "text-[var(--color-primary)]" : "text-[var(--color-foreground)]"
                 }`}
               >
                 {m.label}
@@ -61,8 +61,8 @@ export function Features() {
 
         {/* Compare ideas */}
         <div className="mx-auto mt-16 max-w-2xl">
-          <div className="rounded-xl border border-[var(--color-border)] bg-white p-6 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)]">
-            <h3 className="text-base font-semibold">Compare ideas</h3>
+          <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.3),0_1px_2px_-1px_rgb(0_0_0_/_0.2)]">
+            <h3 className="text-base font-semibold text-[var(--color-foreground)]">Compare ideas</h3>
             <p className="mt-2 text-sm text-[var(--color-muted-foreground)]">
               Compare 2\u20133 ideas side by side by:
             </p>

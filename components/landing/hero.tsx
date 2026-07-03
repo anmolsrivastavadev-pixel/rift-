@@ -9,35 +9,32 @@ import { Button } from "@/components/ui/button";
 export function Hero() {
   return (
     <section className="relative overflow-hidden">
-      {/* Subtle background glow */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10"
-      >
+      {/* Background glow */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
         <div
-          className="absolute left-1/2 top-0 h-[500px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl"
+          className="absolute left-1/2 top-0 h-[600px] w-[900px] -translate-x-1/2 -translate-y-1/3 rounded-full blur-3xl"
           style={{
             background:
-              "radial-gradient(ellipse at center, rgba(37,99,235,0.15) 0%, transparent 70%)",
+              "radial-gradient(ellipse at center, rgba(59,130,246,0.15) 0%, transparent 70%)",
           }}
         />
         <div
-          className="absolute right-0 bottom-0 h-[300px] w-[300px] translate-x-1/4 translate-y-1/4 rounded-full blur-3xl"
+          className="absolute -bottom-32 left-1/3 h-[400px] w-[400px] -translate-x-1/2 rounded-full blur-3xl"
           style={{
             background:
-              "radial-gradient(ellipse at center, rgba(34,197,94,0.06) 0%, transparent 70%)",
+              "radial-gradient(ellipse at center, rgba(59,130,246,0.06) 0%, transparent 70%)",
           }}
         />
       </div>
 
-      <Container className="pt-20 pb-16 sm:pt-28 sm:pb-20 text-center">
+      <Container className="pt-24 pb-16 sm:pt-32 sm:pb-20 text-center">
         {/* Eyebrow */}
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, ease: "easeOut" }}
         >
-          <span className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-white/80 px-4 py-1.5 text-xs text-[var(--color-muted-foreground)] shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)] backdrop-blur-sm">
+          <span className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-1.5 text-xs text-[var(--color-muted-foreground)] backdrop-blur-sm">
             <Lightbulb className="h-3.5 w-3.5 text-[var(--color-primary)]" />
             AI idea research from customer pain
           </span>
@@ -48,7 +45,7 @@ export function Hero() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, ease: "easeOut", delay: 0.05 }}
-          className="mt-6 max-w-3xl mx-auto text-balance text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl"
+          className="mt-6 max-w-4xl mx-auto text-balance text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl text-[var(--color-foreground)]"
         >
           Turn complaints into business ideas{" "}
           <span className="text-[var(--color-primary)]">worth testing.</span>
@@ -74,13 +71,13 @@ export function Hero() {
           className="mt-10 flex flex-wrap items-center justify-center gap-3"
         >
           <Button asChild size="lg">
-            <Link href="/sign-up">
-              Get started <ArrowRight className="h-4 w-4" />
+            <Link href="/dashboard/complaints">
+              Start with a market <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>
           <Button asChild size="lg" variant="outline">
-            <Link href="/sign-in">
-              Sign in
+            <Link href="/dashboard/complaints">
+              Paste complaints
             </Link>
           </Button>
         </motion.div>
@@ -90,7 +87,7 @@ export function Hero() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.4, delay: 0.25 }}
-          className="mt-5 text-xs text-[var(--color-muted-foreground)]/80"
+          className="mt-5 text-xs text-[var(--color-muted-foreground)]/70"
         >
           Free to try. No card required. Starter examples are for brainstorming
           — real complaints give stronger results.
@@ -114,17 +111,17 @@ export function Hero() {
                   <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--color-primary)]/10 text-[10px] font-semibold text-[var(--color-primary)]">
                     1
                   </span>
-                  <span className="text-xs font-medium">Input</span>
+                  <span className="text-xs font-medium text-[var(--color-foreground)]">Input</span>
                 </div>
                 <p className="text-sm text-[var(--color-muted-foreground)]">
                   &quot;dog groomers&quot; or paste real complaints
                 </p>
               </div>
               {/* Arrow */}
-              <div className="hidden sm:flex items-center justify-center text-[var(--color-muted-foreground)]/40">
+              <div className="hidden sm:flex items-center justify-center text-[var(--color-muted-foreground)]/30">
                 <ArrowRight className="h-4 w-4" />
               </div>
-              <div className="flex sm:hidden items-center justify-center text-[var(--color-muted-foreground)]/40">
+              <div className="flex sm:hidden items-center justify-center text-[var(--color-muted-foreground)]/30">
                 <span className="rotate-90"><ArrowRight className="h-4 w-4" /></span>
               </div>
               {/* Step 2 */}
@@ -133,17 +130,17 @@ export function Hero() {
                   <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--color-primary)]/10 text-[10px] font-semibold text-[var(--color-primary)]">
                     2
                   </span>
-                  <span className="text-xs font-medium">Pain found</span>
+                  <span className="text-xs font-medium text-[var(--color-foreground)]">Pain found</span>
                 </div>
                 <p className="text-sm text-[var(--color-muted-foreground)]">
                   missed bookings, unclear pricing, no reminders
                 </p>
               </div>
               {/* Arrow */}
-              <div className="hidden sm:flex items-center justify-center text-[var(--color-muted-foreground)]/40">
+              <div className="hidden sm:flex items-center justify-center text-[var(--color-muted-foreground)]/30">
                 <ArrowRight className="h-4 w-4" />
               </div>
-              <div className="flex sm:hidden items-center justify-center text-[var(--color-muted-foreground)]/40">
+              <div className="flex sm:hidden items-center justify-center text-[var(--color-muted-foreground)]/30">
                 <span className="rotate-90"><ArrowRight className="h-4 w-4" /></span>
               </div>
               {/* Step 3 */}

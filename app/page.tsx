@@ -6,12 +6,14 @@ import { Footer } from "@/components/landing/footer";
 
 export default function HomePage() {
   return (
-    <main className="flex-1">
-      <Hero />
-      <HowItWorks />
-      <Features />
-      <WhyComplaints />
-      <Footer />
-    </main>
+    <div className="landing-dark flex min-h-screen flex-col">
+      <main className="flex-1">
+        <Hero />
+        <HowItWorks />
+        <Features />
+        <WhyComplaints />
+        <Footer />
+      </main>
+    </div>
   );
 }
