@@ -39,6 +39,7 @@ Route (app)
 - [ ] PostgreSQL installed and running on `localhost:5432` (or a Neon project).
 - [ ] `pnpm install` completes (may print peer-dep warnings — pnpm handles these gracefully).
 - [ ] `.env` exists with `DATABASE_URL` and `GEMINI_API_KEY` filled in (use `.env.example` as a template).
+- [ ] `.env` exists with `BETTER_AUTH_URL` and `BETTER_AUTH_SECRET` filled in for local auth.
 - [ ] `pnpm exec prisma generate` runs and creates `lib/generated/prisma/`.
 - [ ] `pnpm exec prisma db push` runs and creates the three tables in Postgres.
 - [ ] `pnpm dev` boots and prints `✓ Ready in`.
@@ -48,6 +49,8 @@ Route (app)
 
 - [ ] `DATABASE_URL` is set in `.env` (local) and in Vercel env vars (production).
 - [ ] `GEMINI_API_KEY` is set in `.env` (local) and in Vercel env vars (production).
+- [ ] `BETTER_AUTH_URL` is set to the app origin with no trailing slash (`http://localhost:3000` locally; deployed origin on Vercel).
+- [ ] `BETTER_AUTH_SECRET` is set locally and in Vercel env vars.
 - [ ] `.env` is **not** staged for commit (`git status` should not list `.env`).
 - [ ] `.env.example` **is** committable (gitignored with `!.env.example` exception).
 - [ ] No source file imports `process.env.DATABASE_URL` or `process.env.GEMINI_API_KEY` from a `"use client"` file. (Quick audit: `grep -r "process.env" --include="*.tsx" --include="*.ts" app/ components/` should only show hits in `lib/db.ts` and `lib/ai.ts`, plus JSDoc comments inside `lib/generated/prisma/`.)
@@ -213,6 +216,9 @@ Pre-deploy checks:
 Vercel env vars to add:
 - [ ] `DATABASE_URL` — Neon pooled connection string with `?sslmode=require`.
 - [ ] `GEMINI_API_KEY` — your Gemini API key.
+- [ ] `BETTER_AUTH_URL` — deployed site origin with no trailing slash.
+- [ ] `BETTER_AUTH_SECRET` — long random secret.
+- [ ] Preview deployments have these env vars available in the Preview environment; set `BETTER_AUTH_URL` to the preview deployment origin.
 
 Post-deploy checks (on the deployed URL):
 - [ ] `/` loads (landing page).

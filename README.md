@@ -31,12 +31,16 @@ cp .env.example .env
 |---|---|---|
 | `DATABASE_URL` | PostgreSQL connection string | local Postgres, or Neon pooled URL |
 | `GEMINI_API_KEY` | Google Gemini API key (server-only) | https://aistudio.google.com/apikey |
+| `BETTER_AUTH_URL` | Better Auth app origin, with no trailing slash | local app URL, Vercel production URL, or preview URL |
+| `BETTER_AUTH_SECRET` | Better Auth secret for sessions/tokens | generate a long random string |
 
 Example local `.env`:
 
 ```
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/rift?schema=public"
 GEMINI_API_KEY="your_key_here"
+BETTER_AUTH_URL="http://localhost:3000"
+BETTER_AUTH_SECRET="replace-with-a-long-random-secret"
 ```
 
 Example Neon `.env` (production):
@@ -44,6 +48,8 @@ Example Neon `.env` (production):
 ```
 DATABASE_URL="postgresql://USER:PASSWORD@HOST.neon.tech/DBNAME?sslmode=require"
 GEMINI_API_KEY="your_key_here"
+BETTER_AUTH_URL="https://your-app.vercel.app"
+BETTER_AUTH_SECRET="replace-with-a-long-random-secret"
 ```
 
 > Never commit `.env`. The `.gitignore` is already configured to ignore it.
@@ -135,13 +141,17 @@ Visit http://localhost:3000.
 3. In the Vercel project settings → **Environment Variables**, add:
    - `DATABASE_URL` — Neon pooled connection string with `?sslmode=require`.
    - `GEMINI_API_KEY` — your Gemini API key.
+   - `BETTER_AUTH_URL` — the deployed site origin with no trailing slash, for example `https://your-app.vercel.app`.
+   - `BETTER_AUTH_SECRET` — a long random secret.
 4. Build command: leave the default `pnpm build` — `package.json` already runs `prisma generate && next build`.
 5. Deploy.
 6. Open the deployed URL and verify:
    - homepage loads,
    - `/dashboard` loads,
    - `/dashboard/complaints` lets you upload the sample CSV,
-   - `/dashboard/opportunities` lets you run AI clustering.
+    - `/dashboard/opportunities` lets you run AI clustering.
+
+For Vercel Preview deployments, make sure these environment variables are available to the Preview environment too. Set `BETTER_AUTH_URL` to the preview deployment origin with no trailing slash.
 
 ---
 

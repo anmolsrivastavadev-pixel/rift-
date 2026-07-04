@@ -303,8 +303,12 @@ All actions are `"use server"` files. They import `prisma` from `lib/db.ts` and 
 | `DATABASE_URL` | PostgreSQL connection string (driver adapter uses it). | `postgresql://postgres:postgres@localhost:5432/rift?schema=public` |
 | `GEMINI_API_KEY` | Google Gemini API key (server-only). Get one free at https://aistudio.google.com/apikey. | `your_gemini_api_key_here` |
 | `GEMINI_MODEL` | Optional. Defaults to `gemini-2.5-flash` in `lib/ai.ts`. | `gemini-2.5-flash` |
+| `BETTER_AUTH_URL` | Better Auth app origin, no trailing slash. Set to the deployed site origin on Vercel. | `http://localhost:3000` |
+| `BETTER_AUTH_SECRET` | Better Auth secret for sessions/tokens. | `replace-with-a-long-random-secret` |
 
-**Both env vars are server-only.** They are read exclusively in `lib/db.ts` and `lib/ai.ts`. No client component imports them. See `.env.example` for placeholder examples; never commit `.env`.
+`DATABASE_URL`, `GEMINI_API_KEY`, `BETTER_AUTH_URL`, and `BETTER_AUTH_SECRET` are server-only. No client component imports them. See `.env.example` for placeholder examples; never commit `.env`.
+
+On Vercel, set `BETTER_AUTH_URL` to the deployed site origin with no trailing slash. For Preview deployments, ensure the same required env vars are available to the Preview environment and set `BETTER_AUTH_URL` to the preview deployment origin.
 
 For Neon (production) use the **pooled** connection string and append `?sslmode=require`:
 ```
