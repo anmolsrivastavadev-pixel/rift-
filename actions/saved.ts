@@ -4,11 +4,15 @@ import { revalidatePath } from "next/cache";
 
 import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/auth/current-user";
+import { requireOwnedProject } from "@/lib/projects";
 
 /* -------------------------------------------------------------------------
  * Saved opportunity actions.
  * Uses the existing SavedOpportunity model with @@unique([userId, opportunityId])
- * so one save per user per opportunity.
+ * so one save per user per opportunity. M16A: every action is project-scoped —
+ * the action first verifies the project is owned by the user, then checks the
+ * opportunity also belongs to that same project. A user can never save or
+ * unsave an opportunity that belongs to another user's project.
  * ------------------------------------------------------------------------- */
 
 export async function saveOpportunity(
@@ -16,23 +20,27 @@ export async function saveOpportunity(
   formData: FormData
 ): Promise<{ saved: boolean; error?: string }> {
   const user = await requireUser();
+  const project = await requireOwnedProject(String(formData.get("projectId") ?? ""), user);
   const id = String(formData.get("opportunityId") ?? "");
   if (!id) return { saved: false, error: "Missing opportunity id" };
-  
-  // Verify the opportunity belongs to the current user
+
+  // Verify the opportunity belongs to the current user AND the current project.
   const opportunity = await prisma.opportunity.findFirst({
-    where: { id, userId: user.id },
+    where: { id, userId: user.id, projectId: project.id },
   });
   if (!opportunity) {
     return { saved: false, error: "Opportunity not found" };
   }
 
   try {
-    await prisma.savedOpportunity.upsert({
-      where: { userId_opportunityId: { userId: user.id, opportunityId: id } },
-      create: { opportunityId: id, userId: user.id },
-      update: {},
+    const existing = await prisma.savedOpportunity.findFirst({
+      where: { opportunityId: id, userId: user.id, projectId: project.id },
     });
+    if (!existing) {
+      await prisma.savedOpportunity.create({
+        data: { opportunityId: id, userId: user.id, projectId: project.id },
+      });
+    }
   } catch (err) {
     return {
       saved: false,
@@ -51,11 +59,12 @@ export async function unsaveOpportunity(
   formData: FormData
 ): Promise<{ saved: boolean; error?: string }> {
   const user = await requireUser();
+  const project = await requireOwnedProject(String(formData.get("projectId") ?? ""), user);
   const id = String(formData.get("opportunityId") ?? "");
   if (!id) return { saved: false, error: "Missing opportunity id" };
   try {
     await prisma.savedOpportunity.deleteMany({
-      where: { opportunityId: id, userId: user.id },
+      where: { opportunityId: id, userId: user.id, projectId: project.id },
     });
   } catch (err) {
     return {

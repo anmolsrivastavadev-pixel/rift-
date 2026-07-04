@@ -36,7 +36,9 @@ Rift is **not**:
 ## Core product flow
 
 ```
-CSV upload, paste text, .txt/.md file, or Use demo data
+Sign in
+  → Select or create a Project / Market Test
+  → CSV upload, paste text, .txt/.md file, or Use demo data
   → Complaints stored
   → Run AI clustering (Gemini)
   → Opportunities created with deterministic 0–100 scores
@@ -46,11 +48,11 @@ CSV upload, paste text, .txt/.md file, or Use demo data
   → Validation Workspace (checklist + copy brief)
   → Validation Evidence Log (aggregate evidence tracking)
   → Compare Ideas board (decide: Pursue / Park / Reject)
-  → Start fresh test (clear workspace for new niche)
+  → Start fresh test (clear current project for a new niche)
   → Deploy to Vercel + Neon
 ```
 
-Rift uses all complaints currently in the workspace. To test one niche cleanly, start fresh first, then add only that niche's complaints.
+Rift uses all complaints currently in the selected project. To test one niche cleanly, create/select a separate project or start fresh inside the current project.
 
 Score is **never** computed by Gemini. Gemini only provides severity (1–10) and confidence (0–100). The app computes the final 0–100 score in `lib/scoring.ts` so the same dataset always yields the same score.
 
@@ -87,7 +89,7 @@ app/                     Next.js App Router routes
 ├─ not-found.tsx         Global 404
 ├─ error.tsx             Global error boundary
 └─ dashboard/
-   ├─ layout.tsx         Sidebar shell (Home/Complaints/Ideas/Compare Ideas/Saved)
+   ├─ layout.tsx         Sidebar shell (Home/Complaints/Ideas/Compare Ideas/Saved) + project selector
    ├─ page.tsx           Overview: Start here card, 4 KPI cards, complaints-over-time chart, recent list
    ├─ complaints/
    │  ├─ page.tsx        Upload UI + complaints list + search (?q=) + Why complaints? section
@@ -120,6 +122,7 @@ components/
 
 lib/
 ├─ db.ts                 Prisma client singleton (driver-adapter mode)
+├─ projects.ts           Project ownership helpers + project-aware href helper
 ├─ ai.ts                 Single Gemini service: clustering + summaries, batching, merge
 ├─ ai-schema.ts          Zod schema for Gemini JSON output
 ├─ cleaning.ts          Stage 1: normalise + dedupe complaints
@@ -137,15 +140,19 @@ lib/
 ├─ generated/prisma/    Prisma client output (gitignored — regenerated at build)
 
 actions/
-├─ complaints.ts        uploadComplaints, loadDemoComplaints, importTextComplaints
+├─ complaints.ts        project-scoped uploadComplaints, loadDemoComplaints, importTextComplaints
 ├─ opportunities.ts    runPipeline, getProcessingStatus, resetOpportunities,
-│                       resetOpportunitiesAction
-├─ saved.ts             saveOpportunity, unsaveOpportunity, saveAction, unsaveAction
-└─ workspace.ts         clearWorkspace (start fresh test — clears all MVP data)
+│                       resetOpportunitiesAction (project-scoped)
+├─ projects.ts          createProject (M16A name-only project creation)
+├─ saved.ts             project-scoped saveOpportunity, unsaveOpportunity, saveAction, unsaveAction
+└─ workspace.ts         clearWorkspace (start fresh test — clears current project data)
 
 prisma/
 ├─ schema.prisma
 └─ (migrations/ — created on first `prisma migrate dev`)
+
+scripts/
+└─ backfill-default-projects.ts  M16A one-off nullable projectId backfill
 
 public/
 ├─ sample_complaints.csv  10 fake complaints — served as a static asset
@@ -158,76 +165,16 @@ public/
 
 ## Database models (as actually defined in `prisma/schema.prisma`)
 
-```prisma
-generator client {
-  provider = "prisma-client"
-  output   = "../lib/generated/prisma"
-}
+Rift now has auth and project-scoped market tests:
 
-datasource db {
-  provider = "postgresql"
-  // NO url here — provided via prisma.config.ts (driver-adapter setup)
-}
+- `User` — Better Auth user plus relations to sessions/accounts/projects and owned app data.
+- `Session`, `Account`, `Verification` — Better Auth tables. Do not change auth config for M16A work.
+- `Project` — M16A project / market test. Required `userId`, `User` relation with `onDelete: Cascade`, optional `description`, `createdAt`, `updatedAt`, and `@@index([userId])`.
+- `Complaint` — complaint row with nullable `userId` and nullable `projectId` during the M16A migration. `projectId` has an optional `Project` relation with `onDelete: SetNull` and `@@index([projectId])`.
+- `Opportunity` — generated idea row with nullable `userId` and nullable `projectId` during the M16A migration. `projectId` has an optional `Project` relation with `onDelete: SetNull` and `@@index([projectId])`.
+- `SavedOpportunity` — saved/bookmarked idea with nullable `userId` and nullable `projectId` during the M16A migration. It keeps `@@unique([userId, opportunityId])`, has `@@index([projectId])`, and its project relation uses `onDelete: SetNull`.
 
-model Complaint {
-  id            String       @id @default(cuid())
-  title         String
-  body          String
-  sourceDate    DateTime?
-  sentiment     Float?       // -1..1 (unused; reserved for future)
-  severity      Float?       // 0..100 (unused; reserved for future)
-  opportunity   Opportunity? @relation(fields: [opportunityId], references: [id], onDelete: SetNull)
-  opportunityId String?
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-  @@index([opportunityId])
-}
-
-model Opportunity {
-  id                 String   @id @default(cuid())
-  title              String
-  summary            String
-  industry           String
-  keywords           String[]
-  opportunityScore   Int      // 0..100, computed locally
-  scoreBreakdown     Json     // full breakdown object from lib/scoring.ts
-  mentions           Int      // number of complaints in this cluster
-  growth             Float    // ratio last/first bucket, clamped 0..5
-  competition        String   // currently hardcoded "Medium" (reserved)
-  sentiment          Float?   // reserved
-  severity           Float?   // 1..10, from Gemini
-  confidence         Int?     // 0..100, from Gemini
-  reason             String?  // Gemini reasoning, grounded in complaints
-  suggestedSoftware  String   // kept for backwards compat; UI prefers productAngle
-  // M9 — complaint-grounded market-gap hypothesis (all optional so legacy
-  // rows render without crashing). UI prefers productAngle and falls back
-  // to suggestedSoftware.
-  marketGap                String?
-  targetCustomer           String?
-  likelyCurrentWorkarounds String?
-  whyWorkaroundsFallShort  String?
-  productAngle             String?
-  differentiationAngle     String?
-  validationQuestions      String[] @default([])
-  riskFlags                String[] @default([])
-  trend              Json     // [{ date, count }] for trend chart
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
-  complaints        Complaint[]
-  savedOpportunities SavedOpportunity[]
-}
-
-model SavedOpportunity {
-  id            String      @id @default(cuid())
-  opportunity   Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
-  opportunityId String
-  note          String?
-  createdAt      DateTime    @default(now())
-  @@unique([opportunityId])  // one global save per opportunity (no auth in MVP)
-}
-```
-
-Three models. No `User`. No auth. No `UploadHistory` table — upload history is not persisted (deliberately out of scope).
+All application reads/writes for complaints, opportunities, and saved opportunities must filter by both `userId` and the selected `projectId`. Legacy rows with `userId = null` are left alone by the M16A backfill. There is still no `UploadHistory` table; upload history remains future work.
 
 ---
 
@@ -287,21 +234,23 @@ The full breakdown (`weights`, `inputs`, `subscores`, `final`) is stored on the 
 
 ## AI pipeline (`lib/ai.ts` + `actions/opportunities.ts`)
 
-`runPipeline(jobId)`:
-1. Loads all complaints from the DB (`Complaint.findMany`).
+`runPipeline(formData)`:
+1. Verifies the signed-in user and selected project, then loads that user's complaints for the current project.
 2. **Stage 1 — cleaning** (`lib/cleaning.ts`): normalise whitespace, drop rows <3 chars or duplicates.
 3. **Stage 2 — clustering** (`lib/ai.ts:clusterComplaints`): batch Gemini calls; tolerant JSON parse; cross-batch merge.
 4. **Stage 3 — opportunity generation**: for each cluster, link its complaints, compute the Opportunity Score locally, build the trend `[{date, count}]`, persist an `Opportunity` row (including the M9 market-gap hypothesis fields returned by Gemini — `marketGap`, `targetCustomer`, `likelyCurrentWorkarounds`, `whyWorkaroundsFallShort`, `productAngle`, `differentiationAngle`, `validationQuestions`, `riskFlags`; missing optional strings stored as `null`, `productAngle` falls back to `suggestedSoftware`), set `Complaint.opportunityId`.
 5. **Stage 4 — revalidation**: `revalidatePath` for dashboard, opportunities, and complaints routes so caches refresh.
-6. Progress is tracked in `lib/progress.ts` (in-memory, keyed by jobId, 10-min TTL) so the client `RunOpportunitiesButton` can poll `getProcessingStatus(jobId)` and render stages + progress bars.
+6. Progress is tracked in `lib/progress.ts` (in-memory, keyed by jobId, 10-min TTL) so the client `RunOpportunitiesButton` can poll `getProcessingStatus(jobId, projectId)` and render stages + progress bars.
 
-The pipeline **deletes existing opportunities before inserting new ones** (re-run replaces stale data). Complaints themselves are preserved (only `opportunityId` is cleared then relinked).
+The pipeline **deletes existing opportunities in the current project before inserting new ones** (re-run replaces stale data for that project only). Complaints themselves are preserved (only `opportunityId` is cleared then relinked).
 
 > Do NOT change the Gemini prompt unless a future milestone explicitly instructs you to. Do NOT make Gemini compute the score.
 
 ---
 
 ## Current routes
+
+Dashboard routes use query-param project routing in M16A: `?projectId=...`. If the query param is omitted, the user's oldest project is used (or `Default project` is created for first use). Unowned project IDs must not expose data.
 
 | Route | Type | Renders |
 |---|---|---|
@@ -320,6 +269,7 @@ The pipeline **deletes existing opportunities before inserting new ones** (re-ru
 
 ## Current key components
 
+- `ProjectSelector` (`components/dashboard/project-selector.tsx`) — client. Native select plus name-only new-project form. Uses server-provided project list/current default and navigates by changing `?projectId=...`.
 - `OpportunityBrowser` (`components/opportunities/opportunity-browser.tsx`) — client. Holds all filter/sort/search state in `useState`; everything operates on the already-loaded dataset; **no DB calls** while interacting. Emits `aria-live` count.
 - `OpportunityFilters` (`components/opportunities/filters.tsx`) — client. Search input, Industry select, 3 range sliders, sort select, Reset button. All inputs have `aria-label`s + visible focus.
 - `OpportunityCard` (`components/opportunities/opportunity-card.tsx`) — server. Card with title, score (color-coded), industry, Product Opportunity (stored as `suggestedSoftware`), keywords (max 4), 3 mini-stats, save button, and a compact score helper line. Title uses `line-clamp-2`, Product Opportunity uses `line-clamp-1`. Hover animation: `hover:-translate-y-0.5 hover:shadow-md` (150ms ease-out).
@@ -336,9 +286,11 @@ The pipeline **deletes existing opportunities before inserting new ones** (re-ru
 
 | File | Actions |
 |---|---|
-| `actions/complaints.ts` | `uploadComplaints(prev, formData)`, `loadDemoComplaints()` (form-action compatible). Both share `insertValidRows()` for chunked inserts. |
-| `actions/opportunities.ts` | `runPipeline(jobId)`, `getProcessingStatus(jobId)`, `resetOpportunities()`, `resetOpportunitiesAction()` (form-action wrapper). |
-| `actions/saved.ts` | `saveOpportunity(prev, formData)`, `unsaveOpportunity(prev, formData)`, `saveAction(formData)`, `unsaveAction(formData)` (form-action wrappers). |
+| `actions/complaints.ts` | `uploadComplaints(prev, formData)`, `loadDemoComplaints(prev, formData)`, starter/demo actions, `importTextComplaints(prev, formData)`. All require a user and owned project. |
+| `actions/opportunities.ts` | `runPipeline(formData)`, `getProcessingStatus(jobId, projectId)`, `resetOpportunities(formData)`, `resetOpportunitiesAction(formData)`. All require a user and owned project. |
+| `actions/projects.ts` | `createProject(prev, formData)` for M16A name-only project creation. |
+| `actions/saved.ts` | `saveOpportunity(prev, formData)`, `unsaveOpportunity(prev, formData)`, `saveAction(formData)`, `unsaveAction(formData)`. All require a user and owned project. |
+| `actions/workspace.ts` | `clearWorkspace(projectId)` clears only saved opportunities, opportunities, and complaints for the current user's current project. |
 
 All actions are `"use server"` files. They import `prisma` from `lib/db.ts` and `revalidatePath` from `next/cache`.
 
@@ -363,20 +315,21 @@ DATABASE_URL="postgresql://USER:PASSWORD@HOST.neon.tech/DBNAME?sslmode=require"
 
 ## Important product decisions
 
-1. **No authentication in MVP.** One global save per opportunity (enforced via `@@unique([opportunityId])`).
-2. **No market stats from AI.** The Gemini prompt explicitly forbids inventing market size or statistics; every AI conclusion must be grounded in the uploaded complaints.
-3. **Scores are deterministic and local.** Gemini returns severity + confidence; the app computes the 0–100 score via fixed formulas. Same dataset → same score, always.
-4. **Re-running the AI pipeline is destructive for opportunities.** It deletes existing opportunities, unlinks all complaints, then regenerates. Complaints themselves are never deleted by the pipeline.
-5. **Demo data path.** `loadDemoComplaints` inserts the same 10 fictional complaints as `/public/sample_complaints.csv`. Lets new users explore Rift without needing a real CSV.
-6. **Driver-adapter Prisma.** No query engine binary is shipped; `lib/generated/prisma` is pure TypeScript. Build script `prisma generate && next build` is mandatory on Vercel because the generated client is gitignored.
-7. **Dark mode by default.** `html { color-scheme: dark }` + token CSS palette in `app/globals.css`. No light-mode toggle in MVP.
+1. **Authentication exists.** Better Auth owns `User`, `Session`, `Account`, and `Verification`; do not change auth config for M16A work.
+2. **Projects are the market-test boundary.** Complaints, opportunities, saved opportunities, demo dedupe, AI runs, and Start Fresh are scoped by both `userId` and `projectId`.
+3. **No market stats from AI.** The Gemini prompt explicitly forbids inventing market size or statistics; every AI conclusion must be grounded in the uploaded complaints.
+4. **Scores are deterministic and local.** Gemini returns severity + confidence; the app computes the 0–100 score via fixed formulas. Same dataset → same score, always.
+5. **Re-running the AI pipeline is destructive only for current-project opportunities.** It deletes existing opportunities in the selected project, unlinks that project's complaints, then regenerates. Other projects are untouched.
+6. **Demo data path.** `loadDemoComplaints` inserts the same 10 fictional complaints as `/public/sample_complaints.csv`. M16A dedupe is project-scoped so the same demo rows can be loaded into separate projects.
+7. **Driver-adapter Prisma.** No query engine binary is shipped; `lib/generated/prisma` is pure TypeScript. Build script `prisma generate && next build` is mandatory on Vercel because the generated client is gitignored.
+8. **Dark mode by default.** `html { color-scheme: dark }` + token CSS palette in `app/globals.css`. No light-mode toggle in MVP.
 
 ---
 
 ## Known constraints
 
 - **In-memory progress tracker** (`lib/progress.ts`) is process-local — fine for single-instance Vercel/Neon MVP; multi-instance deployments would need a shared store.
-- **No auth** → "saved" state is global per opportunity, not per user. Acceptable for MVP demo.
+- **M16A nullable projectId** → `projectId` stays nullable for the first migration/backfill so existing rows do not break. Future M16 steps may make it required after legacy data is handled.
 - **Upload history is not persisted** in the DB. There is no `Upload` model by design.
 - **Severity/sentiment on `Complaint`** are nullable reserved fields — the current pipeline does not populate them.
 - **Competition on `Opportunity`** is hardcoded to `"Medium"`. Reserved for future work.
@@ -389,7 +342,6 @@ DATABASE_URL="postgresql://USER:PASSWORD@HOST.neon.tech/DBNAME?sslmode=require"
 
 Do NOT build these unless a future milestone explicitly requests them:
 
-- Authentication / user accounts
 - Billing / subscriptions / Stripe
 - Multi-user teams / workspaces
 - Email or in-app notifications

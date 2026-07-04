@@ -10,10 +10,12 @@ type State = { saved: boolean; error?: string } | null;
 
 export function SaveButton({
   opportunityId,
+  projectId,
   saved,
   size = "md",
 }: {
   opportunityId: string;
+  projectId: string;
   saved: boolean;
   size?: "sm" | "md";
 }) {
@@ -39,6 +41,7 @@ export function SaveButton({
   return (
     <form action={formAction}>
       <input type="hidden" name="opportunityId" value={opportunityId} />
+      <input type="hidden" name="projectId" value={projectId} />
       <button
         type="submit"
         disabled={pending}

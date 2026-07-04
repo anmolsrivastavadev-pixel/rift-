@@ -6,6 +6,7 @@ import { Target, Users, AlertTriangle, Briefcase, Plus, Check } from "lucide-rea
 
 import { Badge } from "@/components/ui/badge";
 import { SaveButton } from "@/components/opportunities/save-button";
+import { projectHref } from "@/lib/project-href";
 
 export type OpportunityCardData = {
   id: string;
@@ -32,10 +33,12 @@ function scoreColor(score: number): string {
 
 export function OpportunityCard({
   op,
+  projectId,
   selected = false,
   onToggleCompare,
 }: {
   op: OpportunityCardData;
+  projectId: string;
   selected?: boolean;
   onToggleCompare?: (id: string) => void;
 }) {
@@ -85,11 +88,16 @@ export function OpportunityCard({
             )}
           </button>
         )}
-        <SaveButton opportunityId={op.id} saved={op.saved} size="sm" />
+        <SaveButton
+          opportunityId={op.id}
+          projectId={projectId}
+          saved={op.saved}
+          size="sm"
+        />
       </div>
 
       <Link
-        href={`/dashboard/opportunities/${op.id}`}
+        href={projectHref(`/dashboard/opportunities/${op.id}`, projectId)}
         className="flex flex-1 flex-col"
         aria-label={`Open opportunity: ${op.title}, score ${op.opportunityScore}`}
       >

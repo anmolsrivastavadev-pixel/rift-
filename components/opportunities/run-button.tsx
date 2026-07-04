@@ -34,18 +34,17 @@ const ORDER: (keyof typeof STAGE_META)[] = [
   "complete",
 ];
 
-export function RunOpportunitiesButton() {
+export function RunOpportunitiesButton({ projectId }: { projectId: string }) {
   const jobId = React.useId().replace(/[:]/g, "");
   const [status, setStatus] = React.useState<ProcessingStatus | null>(null);
   const [running, setRunning] = React.useState(false);
-  const startedRef = React.useRef(false);
 
   // Poll for progress once running.
   React.useEffect(() => {
     if (!running) return;
     let alive = true;
     const id = setInterval(async () => {
-      const s = await getProcessingStatus(jobId);
+      const s = await getProcessingStatus(jobId, projectId);
       if (!alive) return;
       setStatus(s);
       if (s?.stage === "complete" || s?.stage === "error") {
@@ -57,15 +56,14 @@ export function RunOpportunitiesButton() {
       alive = false;
       clearInterval(id);
     };
-  }, [running, jobId]);
+  }, [running, jobId, projectId]);
 
   const [, action, pending] = useActionState<
     { created: number; error?: string } | null,
     FormData
-  >(async () => {
+  >(async (_prev, formData) => {
     setRunning(true);
-    startedRef.current = true;
-    return await runPipeline(jobId);
+    return await runPipeline(formData);
   }, null);
 
   return (
@@ -73,6 +71,7 @@ export function RunOpportunitiesButton() {
       <div className="flex flex-wrap items-center gap-3">
         <form action={action}>
           <input type="hidden" name="jobId" value={jobId} />
+          <input type="hidden" name="projectId" value={projectId} />
           <Button type="submit" disabled={pending || running}>
             {pending || running ? (
               <>
@@ -87,6 +86,7 @@ export function RunOpportunitiesButton() {
         </form>
 
         <form action={resetOpportunitiesAction}>
+          <input type="hidden" name="projectId" value={projectId} />
           <Button type="submit" variant="outline" disabled={pending || running}>
             Reset
           </Button>

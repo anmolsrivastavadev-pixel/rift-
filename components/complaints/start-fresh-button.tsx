@@ -7,9 +7,9 @@ import { clearWorkspace, type WorkspaceResult } from "@/actions/workspace";
 import { Button } from "@/components/ui/button";
 
 const CONFIRM_TEXT =
-  "This will delete the current MVP workspace data: complaints, generated ideas, and saved ideas. Use this only before starting a fresh test.";
+  "This will delete this project's complaints, generated ideas, and saved ideas. Other projects will not be changed.";
 
-export function StartFreshButton() {
+export function StartFreshButton({ projectId }: { projectId: string }) {
   const [pending, setPending] = React.useState(false);
   const [result, setResult] = React.useState<WorkspaceResult | null>(null);
 
@@ -20,7 +20,7 @@ export function StartFreshButton() {
     setPending(true);
     setResult(null);
     try {
-      const res = await clearWorkspace();
+      const res = await clearWorkspace(projectId);
       setResult(res);
     } finally {
       setPending(false);
@@ -48,12 +48,12 @@ export function StartFreshButton() {
       </Button>
       <p className="text-xs text-[var(--color-muted-foreground)]">
         Clears current complaints, generated ideas, and saved ideas from this
-        MVP workspace so you can test a new niche cleanly.
+        project so you can test a new niche cleanly.
       </p>
       {result?.cleared && (
         <p className="text-xs text-green-600 dark:text-green-400">
-          Workspace cleared. Add complaints for one niche, then generate business
-          ideas.
+          {result.projectName ?? "Project"} cleared. Add complaints for one niche,
+          then generate business ideas.
         </p>
       )}
       {result?.error && (

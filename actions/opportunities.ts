@@ -9,40 +9,49 @@ import { cleanComplaints } from "@/lib/cleaning";
 import { clusterComplaints } from "@/lib/ai";
 import { computeOpportunityScore } from "@/lib/scoring";
 import { requireUser } from "@/lib/auth/current-user";
+import { requireOwnedProject } from "@/lib/projects";
 
 /* -------------------------------------------------------------------------
- * Form-action wrapper for Reset (clientside <form action=...>)
+ * Form-action wrapper for Reset (clientside <form action=...>).
+ * Accepts FormData so the project id can be sent as a hidden input. M16A:
+ * project-scoped reset only — never touches another user's or another
+ * project's opportunities / complaints.
  * ------------------------------------------------------------------------- */
-export async function resetOpportunitiesAction(): Promise<void> {
-  await resetOpportunities();
+export async function resetOpportunitiesAction(formData: FormData): Promise<void> {
+  await resetOpportunities(formData);
 }
 
 /* -------------------------------------------------------------------------
  * Status polling (read state set by runPipeline)
  * ------------------------------------------------------------------------- */
 export async function getProcessingStatus(
-  jobId: string
+  jobId: string,
+  projectId: string
 ): Promise<ProcessingStatus | null> {
+  const user = await requireUser();
+  await requireOwnedProject(projectId, user);
   return getProgress(jobId);
 }
 
 /* -------------------------------------------------------------------------
- * Reset any existing opportunities + unlink all complaints.
- * Keeps complaints so they can be re-clustered.
+ * Reset any existing opportunities + unlink all complaints for the current
+ * project. Keeps complaints so they can be re-clustered. M16A: scoped to the
+ * project only — other projects are untouched.
  * ------------------------------------------------------------------------- */
-export async function resetOpportunities(): Promise<{ deleted: number }> {
+export async function resetOpportunities(formData: FormData): Promise<{ deleted: number }> {
   const user = await requireUser();
+  const project = await requireOwnedProject(String(formData.get("projectId") ?? ""), user);
   const deleted = await prisma.opportunity.deleteMany({
-    where: { userId: user.id },
+    where: { userId: user.id, projectId: project.id },
   });
   await prisma.complaint.updateMany({
-    where: { userId: user.id },
+    where: { userId: user.id, projectId: project.id },
     data: { opportunityId: null },
   });
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/opportunities");
   revalidatePath("/dashboard/complaints");
-  logger.info("pipeline.reset", { deleted: deleted.count });
+  logger.info("pipeline.reset", { deleted: deleted.count, projectId: project.id });
   return { deleted: deleted.count };
 }
 
@@ -50,19 +59,28 @@ export async function resetOpportunities(): Promise<{ deleted: number }> {
  * The full AI pipeline:
  *   cleaning -> clustering -> opportunity generation -> saving
  * Designed to run as a Server Action. Progress is tracked by jobId.
+ *
+ * M16A: `projectId` selects which project's complaints get clustered; the
+ * resulting Opportunities are scoped to that same project. Scoring, cleaning,
+ * clustering, and prompts are unchanged — only the data plumbing moves.
  * ------------------------------------------------------------------------- */
 export async function runPipeline(
-  jobId: string
+  formData: FormData
 ): Promise<{ created: number; error?: string }> {
   const user = await requireUser();
+  const project = await requireOwnedProject(String(formData.get("projectId") ?? ""), user);
+  const jobId = String(formData.get("jobId") ?? "");
+  if (!jobId) {
+    return { created: 0, error: "Missing processing job id." };
+  }
   setProgress(jobId, { stage: "cleaning", message: "Cleaning complaints…", total: 0, done: 0 });
 
   try {
     /* --- Stage 1: Cleaning --- */
-    logger.info("pipeline.started", { jobId });
+    logger.info("pipeline.started", { jobId, projectId: project.id });
 
     const all = await prisma.complaint.findMany({
-      where: { userId: user.id },
+      where: { userId: user.id, projectId: project.id },
       select: { id: true, body: true },
     });
 
@@ -105,11 +123,12 @@ export async function runPipeline(
     setProgress(jobId, { stage: "generating", message: "Generating opportunities…", total: clusters.length, done: 0 });
 
     // Reset existing opportunities first, so re-runs replace stale data.
+    // M16A: scoped to this project so other projects' opportunities survive.
     await prisma.opportunity.deleteMany({
-      where: { userId: user.id },
+      where: { userId: user.id, projectId: project.id },
     });
     await prisma.complaint.updateMany({
-      where: { userId: user.id },
+      where: { userId: user.id, projectId: project.id },
       data: { opportunityId: null },
     });
 
@@ -132,7 +151,7 @@ export async function runPipeline(
 
       // Trend buckets by complaint source date.
       const linked = await prisma.complaint.findMany({
-        where: { id: { in: complaintIds }, userId: user.id },
+        where: { id: { in: complaintIds }, userId: user.id, projectId: project.id },
         select: { sourceDate: true },
       });
       const trend = bucketTrend(linked.map((c) => c.sourceDate));
@@ -166,11 +185,12 @@ export async function runPipeline(
           riskFlags: cluster.riskFlags,
           trend: trend as unknown as object,
           userId: user.id,
+          projectId: project.id,
         },
       });
 
       await prisma.complaint.updateMany({
-        where: { id: { in: complaintIds }, userId: user.id },
+        where: { id: { in: complaintIds }, userId: user.id, projectId: project.id },
         data: { opportunityId: op.id },
       });
 

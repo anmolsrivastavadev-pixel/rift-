@@ -16,7 +16,7 @@ import type { UploadResult } from "@/lib/schemas";
 import { Button } from "@/components/ui/button";
 import { ImportNextStepLink } from "@/components/complaints/import-summary";
 
-export function CsvUploader() {
+export function CsvUploader({ projectId }: { projectId: string }) {
   const inputRef = React.useRef<HTMLInputElement>(null);
   const [dragOver, setDragOver] = React.useState(false);
   const [fileName, setFileName] = React.useState<string | null>(null);
@@ -60,6 +60,7 @@ export function CsvUploader() {
   return (
     <div className="space-y-4">
       <form id="rift-upload-form" action={action} className="space-y-4">
+        <input type="hidden" name="projectId" value={projectId} />
         <input type="hidden" name="data" id="rift-upload-data" />
 
         <button
@@ -137,12 +138,18 @@ export function CsvUploader() {
         </div>
       )}
 
-      {state && <UploadSummary result={state} />}
+      {state && <UploadSummary result={state} projectId={projectId} />}
     </div>
   );
 }
 
-function UploadSummary({ result }: { result: UploadResult }) {
+function UploadSummary({
+  result,
+  projectId,
+}: {
+  result: UploadResult;
+  projectId: string;
+}) {
   if (result.inserted === 0 && result.errors.length > 0) {
     return (
       <div className="flex items-start gap-2 rounded-[12px] border border-[var(--color-danger)]/40 bg-[var(--color-danger)]/10 p-4 text-sm text-[var(--color-danger)]">
@@ -170,7 +177,7 @@ function UploadSummary({ result }: { result: UploadResult }) {
         {result.skipped > 0 && (
           <p className="text-xs">Skipped {result.skipped} invalid row(s).</p>
         )}
-        <ImportNextStepLink />
+        <ImportNextStepLink projectId={projectId} />
       </div>
     </div>
   );

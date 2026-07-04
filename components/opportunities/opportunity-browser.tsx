@@ -15,6 +15,7 @@ import {
   NoSearchResultsEmpty,
 } from "@/components/opportunities/empty-states";
 import { Button } from "@/components/ui/button";
+import { projectHref } from "@/lib/project-href";
 
 type CardData = React.ComponentProps<typeof OpportunityCard>["op"];
 
@@ -27,8 +28,10 @@ const MAX_COMPARE = 3;
  */
 export function OpportunityBrowser({
   opportunities,
+  projectId,
 }: {
   opportunities: CardData[];
+  projectId: string;
 }) {
   const [filters, setFilters] = React.useState<FilterState>(DEFAULT_FILTERS);
   const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
@@ -139,7 +142,7 @@ export function OpportunityBrowser({
   }, [filters, opportunities]);
 
   if (opportunities.length === 0) {
-    return <NoOpportunitiesEmpty />;
+    return <NoOpportunitiesEmpty projectId={projectId} />;
   }
 
   const compareParam = Array.from(selectedIds).join(",");
@@ -242,6 +245,7 @@ export function OpportunityBrowser({
             <OpportunityCard
               key={op.id}
               op={op}
+              projectId={projectId}
               selected={selectedIds.has(op.id)}
               onToggleCompare={toggleCompare}
             />
@@ -267,7 +271,10 @@ export function OpportunityBrowser({
               </Button>
               <Button asChild disabled={selectedIds.size < 2}>
                 <Link
-                  href={`/dashboard/opportunities/decision-board?compare=${compareParam}`}
+                  href={projectHref(
+                    `/dashboard/opportunities/decision-board?compare=${compareParam}`,
+                    projectId
+                  )}
                 >
                   <LayoutGrid className="h-4 w-4" /> Compare selected ideas
                 </Link>

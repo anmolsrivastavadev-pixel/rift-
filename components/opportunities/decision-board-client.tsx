@@ -32,6 +32,7 @@ import {
   EVIDENCE_SIGNAL_LABELS,
   type EvidenceState,
 } from "@/lib/validation-evidence";
+import { projectHref } from "@/lib/project-href";
 
 export type DecisionBoardOpportunity = {
   id: string;
@@ -161,9 +162,11 @@ function useEvidenceSnapshots(opportunityIds: string[]): {
 export function DecisionBoardClient({
   opportunities,
   isCompareMode = false,
+  projectId,
 }: {
   opportunities: DecisionBoardOpportunity[];
   isCompareMode?: boolean;
+  projectId: string;
 }) {
   const ids = React.useMemo(() => opportunities.map((o) => o.id), [opportunities]);
   const { statuses, hydrated, setStatus } = useDecisionStatuses(ids);
@@ -193,7 +196,7 @@ export function DecisionBoardClient({
   if (opportunities.length === 0) {
     return (
       <div className="mx-auto max-w-6xl space-y-8">
-        <DecisionBoardHeader isCompareMode={isCompareMode} />
+        <DecisionBoardHeader isCompareMode={isCompareMode} projectId={projectId} />
         <div className="rounded-[12px] border border-dashed border-[var(--color-border)] bg-[var(--color-card)] p-12 text-center">
           <Target className="mx-auto h-10 w-10 text-[var(--color-muted-foreground)]" />
           <h2 className="mt-4 text-base font-semibold">No ideas to compare yet</h2>
@@ -204,10 +207,14 @@ export function DecisionBoardClient({
           </p>
           <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
             <Button asChild>
-              <Link href="/dashboard/complaints">Go to Complaints</Link>
+              <Link href={projectHref("/dashboard/complaints", projectId)}>
+                Go to Complaints
+              </Link>
             </Button>
             <Button asChild variant="outline">
-              <Link href="/dashboard/opportunities">Go to Ideas</Link>
+              <Link href={projectHref("/dashboard/opportunities", projectId)}>
+                Go to Ideas
+              </Link>
             </Button>
           </div>
         </div>
@@ -218,7 +225,7 @@ export function DecisionBoardClient({
   if (isCompareMode) {
     return (
       <div className="mx-auto max-w-6xl space-y-8">
-        <DecisionBoardHeader isCompareMode={isCompareMode} />
+        <DecisionBoardHeader isCompareMode={isCompareMode} projectId={projectId} />
 
         <p className="text-xs text-[var(--color-muted-foreground)]">
           Compare these ideas side by side. Pick the one with the clearest
@@ -239,7 +246,7 @@ export function DecisionBoardClient({
                     className="py-3 px-4 text-left font-medium text-[var(--color-foreground)]"
                   >
                     <Link
-                      href={`/dashboard/opportunities/${op.id}`}
+                      href={projectHref(`/dashboard/opportunities/${op.id}`, projectId)}
                       className="hover:text-[var(--color-primary)] hover:underline"
                     >
                       {op.title}
@@ -367,7 +374,7 @@ export function DecisionBoardClient({
 
   return (
     <div className="mx-auto max-w-6xl space-y-8">
-      <DecisionBoardHeader isCompareMode={false} />
+        <DecisionBoardHeader isCompareMode={false} projectId={projectId} />
 
       {/* Summary cards */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
@@ -433,7 +440,7 @@ export function DecisionBoardClient({
                   </div>
                   <h3 className="mt-1 line-clamp-2 text-sm font-semibold leading-snug">
                     <Link
-                      href={`/dashboard/opportunities/${op.id}`}
+                      href={projectHref(`/dashboard/opportunities/${op.id}`, projectId)}
                       className="hover:text-[var(--color-primary)] hover:underline"
                     >
                       {op.title}
@@ -499,6 +506,7 @@ export function DecisionBoardClient({
                 opportunityId={op.id}
                 evidence={evidenceHydrated ? evidenceSnapshots[op.id] : undefined}
                 hydrated={evidenceHydrated}
+                projectId={projectId}
               />
 
               {/* Decision status selector */}
@@ -530,11 +538,17 @@ export function DecisionBoardClient({
   );
 }
 
-function DecisionBoardHeader({ isCompareMode }: { isCompareMode: boolean }) {
+function DecisionBoardHeader({
+  isCompareMode,
+  projectId,
+}: {
+  isCompareMode: boolean;
+  projectId: string;
+}) {
   return (
     <div>
       <Button asChild variant="ghost" size="sm">
-        <Link href="/dashboard/opportunities">
+        <Link href={projectHref("/dashboard/opportunities", projectId)}>
           <ArrowLeft className="h-4 w-4" /> Back to ideas
         </Link>
       </Button>
@@ -635,10 +649,12 @@ function EvidenceSnapshot({
   opportunityId,
   evidence,
   hydrated,
+  projectId,
 }: {
   opportunityId: string;
   evidence?: EvidenceState;
   hydrated: boolean;
+  projectId: string;
 }) {
   const hasEvidence = hydrated && evidence && evidence.interviewsCompleted > 0;
 
@@ -668,7 +684,10 @@ function EvidenceSnapshot({
         </p>
       )}
       <Link
-        href={`/dashboard/opportunities/${opportunityId}#validation-evidence-log`}
+        href={projectHref(
+          `/dashboard/opportunities/${opportunityId}#validation-evidence-log`,
+          projectId
+        )}
         className="mt-1.5 inline-block text-[11px] text-[var(--color-primary)] hover:underline"
       >
         Open evidence log

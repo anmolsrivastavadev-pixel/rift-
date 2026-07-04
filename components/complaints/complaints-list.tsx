@@ -3,11 +3,18 @@ import { ComplaintsTable } from "@/components/complaints/complaints-table";
 import { ComplaintSearch } from "@/components/complaints/complaint-search";
 import { requireUser } from "@/lib/auth/current-user";
 
-export async function ComplaintsList({ query }: { query: string }) {
+export async function ComplaintsList({
+  query,
+  projectId,
+}: {
+  query: string;
+  projectId: string;
+}) {
   const user = await requireUser();
   const rows = await prisma.complaint.findMany({
     where: {
       userId: user.id,
+      projectId,
       ...(query
         ? {
             OR: [

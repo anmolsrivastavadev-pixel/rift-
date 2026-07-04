@@ -20,7 +20,7 @@ const TABS: { id: Tab; label: string; icon: React.ComponentType<{ className?: st
   { id: "file", label: "Upload text file", icon: FileText },
 ];
 
-export function ComplaintsInput() {
+export function ComplaintsInput({ projectId }: { projectId: string }) {
   const [tab, setTab] = React.useState<Tab>("paste");
   const [demoState, demoAction, demoPending] = useActionState<
     UploadResult | null,
@@ -65,9 +65,9 @@ export function ComplaintsInput() {
         id={`rift-input-panel-${tab}`}
         aria-labelledby={`rift-input-tab-${tab}`}
       >
-        {tab === "csv" && <CsvUploader />}
-        {tab === "paste" && <TextInput mode="paste" />}
-        {tab === "file" && <TextInput mode="file" />}
+        {tab === "csv" && <CsvUploader projectId={projectId} />}
+        {tab === "paste" && <TextInput mode="paste" projectId={projectId} />}
+        {tab === "file" && <TextInput mode="file" projectId={projectId} />}
       </div>
 
       {/* Onboarding helpers — shared across all tabs */}
@@ -79,6 +79,7 @@ export function ComplaintsInput() {
         </Button>
 
         <form action={demoAction}>
+          <input type="hidden" name="projectId" value={projectId} />
           <Button type="submit" variant="outline" disabled={demoPending}>
             {demoPending ? (
               <>
@@ -93,7 +94,7 @@ export function ComplaintsInput() {
         </form>
       </div>
 
-      {demoState && <DemoSummary result={demoState} />}
+      {demoState && <DemoSummary result={demoState} projectId={projectId} />}
     </div>
   );
 }

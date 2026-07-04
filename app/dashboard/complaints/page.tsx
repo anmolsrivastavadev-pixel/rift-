@@ -5,15 +5,21 @@ import { ComplaintsList } from "@/components/complaints/complaints-list";
 import { StartFreshButton } from "@/components/complaints/start-fresh-button";
 import { StarterMarkets } from "@/components/complaints/starter-markets";
 import { requireUser } from "@/lib/auth/current-user";
+import { getProjectOrDefault } from "@/lib/projects";
+
+function firstParam(value: string | string[] | undefined): string | undefined {
+  return Array.isArray(value) ? value[0] : value;
+}
 
 export default async function ComplaintsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string | string[]; projectId?: string | string[] }>;
 }) {
   const user = await requireUser();
   const sp = await searchParams;
-  const query = sp.q ?? "";
+  const project = await getProjectOrDefault(firstParam(sp.projectId), user);
+  const query = firstParam(sp.q) ?? "";
 
   return (
     <div className="mx-auto max-w-5xl space-y-8">
@@ -23,6 +29,9 @@ export default async function ComplaintsPage({
           Add market pain by uploading a spreadsheet, pasting raw comments, or uploading
           a text file. Rift will turn each complaint or review into a row before
           AI clustering. Uploaded data stays in this MVP project database.
+        </p>
+        <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
+          Project: <span className="font-medium text-[var(--color-foreground)]">{project.name}</span>
         </p>
       </div>
 
@@ -49,7 +58,7 @@ export default async function ComplaintsPage({
         </p>
       </section>
 
-      <StarterMarkets />
+      <StarterMarkets projectId={project.id} />
 
       <section>
         <h2 className="text-base font-semibold">Don't have complaints yet?</h2>
@@ -92,15 +101,15 @@ export default async function ComplaintsPage({
           You can also download a sample spreadsheet or use demo data below.
         </p>
         <div className="mt-3">
-          <ComplaintsInput />
+          <ComplaintsInput projectId={project.id} />
         </div>
       </section>
 
       <section className="rounded-[12px] border border-dashed border-[var(--color-border)] bg-[var(--color-card)]/60 p-5">
         <h2 className="text-sm font-semibold">Testing a new niche?</h2>
         <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
-          Rift analyzes all complaints currently in this MVP workspace. To get
-          clean results, start fresh before adding a new set of complaints.
+          Rift analyzes all complaints currently in this project. To get clean
+          results, start fresh before adding a new set of complaints.
         </p>
         <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
           Use this when you want to test a new market, like student productivity
@@ -108,7 +117,7 @@ export default async function ComplaintsPage({
           complaints into the results.
         </p>
         <div className="mt-3">
-          <StartFreshButton />
+          <StartFreshButton projectId={project.id} />
         </div>
       </section>
 
@@ -116,7 +125,7 @@ export default async function ComplaintsPage({
         <h2 className="text-base font-semibold">All complaints</h2>
         <div className="mt-3">
           <Suspense fallback={<ComplaintsSkeleton />}>
-            <ComplaintsList query={query} />
+            <ComplaintsList query={query} projectId={project.id} />
           </Suspense>
         </div>
       </section>

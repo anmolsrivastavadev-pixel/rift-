@@ -1,6 +1,6 @@
 // Rift — Prisma schema
 // Docs: https://pris.ly/d/prisma-schema
-// MVP with auth: User, Session, Account, Verification, Complaint, Opportunity, SavedOpportunity.
+// MVP with auth: User, Session, Account, Verification, Project, Complaint, Opportunity, SavedOpportunity.
 
 generator client {
   provider = "prisma-client"
@@ -21,9 +21,28 @@ model User {
   updatedAt          DateTime           @updatedAt
   sessions           Session[]
   accounts           Account[]
+  projects           Project[]
   complaints         Complaint[]
   opportunities      Opportunity[]
   savedOpportunities SavedOpportunity[]
+}
+
+// M16A — Multi-Project Market Tests. Lets a user split market tests into
+// separate projects so complaints, generated ideas, saved ideas, and Start
+// Fresh behaviour do not mix. Every project belongs to exactly one user.
+model Project {
+  id                 String             @id @default(cuid())
+  name               String
+  description        String?
+  userId              String
+  user                User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  complaints         Complaint[]
+  opportunities      Opportunity[]
+  savedOpportunities SavedOpportunity[]
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+
+  @@index([userId])
 }
 
 model Session {
@@ -75,11 +94,14 @@ model Complaint {
   opportunityId String?
   userId        String?
   user          User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  projectId     String?
+  project       Project?  @relation(fields: [projectId], references: [id], onDelete: SetNull)
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
 
   @@index([opportunityId])
   @@index([userId])
+  @@index([projectId])
 }
 
 model Opportunity {
@@ -112,6 +134,8 @@ model Opportunity {
   trend              Json     // [{ date, count }] for the trend chart
   userId             String?
   user               User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  projectId          String?
+  project            Project?  @relation(fields: [projectId], references: [id], onDelete: SetNull)
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
@@ -119,6 +143,7 @@ model Opportunity {
   savedOpportunities SavedOpportunity[]
 
   @@index([userId])
+  @@index([projectId])
 }
 
 model SavedOpportunity {
@@ -127,8 +152,11 @@ model SavedOpportunity {
   opportunityId String
   userId        String?
   user          User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  projectId     String?
+  project       Project?    @relation(fields: [projectId], references: [id], onDelete: SetNull)
   note          String?
   createdAt      DateTime    @default(now())
 
   @@unique([userId, opportunityId]) // one save per user per opportunity
+  @@index([projectId])
 }

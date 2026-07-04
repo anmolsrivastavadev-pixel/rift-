@@ -2,17 +2,41 @@ import { prisma } from "@/lib/db";
 import { OpportunityCard } from "@/components/opportunities/opportunity-card";
 import { NoSavedEmpty } from "@/components/opportunities/empty-states";
 import { requireUser } from "@/lib/auth/current-user";
+import { getProjectOrDefault } from "@/lib/projects";
 
-export default async function SavedPage() {
+function firstParam(value: string | string[] | undefined): string | undefined {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+export default async function SavedPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ projectId?: string | string[] }>;
+}) {
   const user = await requireUser();
+  const project = await getProjectOrDefault(
+    firstParam((await searchParams).projectId),
+    user
+  );
   const saved = await prisma.savedOpportunity.findMany({
-    where: { userId: user.id },
+    where: {
+      userId: user.id,
+      projectId: project.id,
+      opportunity: { is: { userId: user.id, projectId: project.id } },
+    },
     orderBy: { createdAt: "desc" },
-    include: { opportunity: true },
+    include: {
+      opportunity: true,
+    },
   });
 
   const cards = saved
-    .filter((s) => s.opportunity != null)
+    .filter(
+      (s) =>
+        s.opportunity != null &&
+        s.opportunity.userId === user.id &&
+        s.opportunity.projectId === project.id
+    )
     .map((s) => ({
       id: s.opportunity.id,
       title: s.opportunity.title,
@@ -37,14 +61,17 @@ export default async function SavedPage() {
         <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
           Ideas you have bookmarked to revisit later.
         </p>
+        <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
+          Project: <span className="font-medium text-[var(--color-foreground)]">{project.name}</span>
+        </p>
       </div>
 
       {cards.length === 0 ? (
-        <NoSavedEmpty />
+        <NoSavedEmpty projectId={project.id} />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {cards.map((op) => (
-            <OpportunityCard key={op.id} op={op} />
+            <OpportunityCard key={op.id} op={op} projectId={project.id} />
           ))}
         </div>
       )}

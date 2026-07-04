@@ -145,10 +145,12 @@ Each milestone:
 
 ## Current state
 
-The MVP core workflow is complete and ships cleanly:
+The MVP core workflow is complete and now supports separate signed-in, project-scoped market tests:
 
 ```
-Upload CSV or Use demo data
+Sign in
+  → Select/create a project
+  → Upload CSV, paste text, upload text file, use demo/starter data
   → Complaints stored
   → Run AI clustering (Gemini)
   → Opportunities created with deterministic 0–100 scores
@@ -157,6 +159,8 @@ Upload CSV or Use demo data
   → Open detail page (AI reasoning + breakdown + related + prev/next)
   → Deploy to Vercel + Neon
 ```
+
+Data for complaints, generated ideas, and saved ideas is scoped by both `userId` and `projectId`. Start Fresh clears only the current project.
 
 The Feedback-Driven First-Time User Clarity Patch has been applied to make the MVP understandable for first-time users. Key changes:
 - Landing page clearly explains Rift in plain English ("Find business ideas from real customer pain")
@@ -200,42 +204,51 @@ The Start Fresh Test patch addresses workspace-mixing confusion:
 
 `pnpm exec tsc --noEmit`, `pnpm lint`, and `pnpm build` all pass. `pnpm start` smoke-tested locally.
 
+### M16A — Multi-Project Market Tests Foundation
+- **Status:** ✅ Done
+- **Purpose:** Let signed-in users create and switch between separate market-test projects so complaints, generated ideas, saved ideas, demo/starter data, and Start Fresh behavior do not mix across niches.
+- **What was built:** Additive `Project` schema with required `userId`, user relation cascade, project relations on `Complaint`, `Opportunity`, and `SavedOpportunity` using nullable `projectId` plus `onDelete: SetNull`; `User.projects`; projectId indexes; one-off `scripts/backfill-default-projects.ts`; project ownership helpers in `lib/projects.ts`; project-aware links via `projectHref`; minimal dashboard project selector and name-only project creation; project-scoped complaint imports/demo/starter actions, AI run/reset actions, save/unsave actions, and Start Fresh; dashboard, complaints, ideas, detail, compare, and saved pages read `?projectId=...` and filter by both `userId` and `projectId`.
+- **Important behavior:** Missing `projectId` uses the user's oldest project or creates `Default project`; unowned project IDs do not expose data; direct opportunity detail links without `projectId` resolve the project from the owned opportunity; related ideas and prev/next stay within the same project; demo dedupe is project-scoped; Start Fresh clears only the current project.
+- **Not included:** No project rename/delete/archive, no upload history, no nested project routes, no moving validation checklist/evidence/decision localStorage to the DB, no billing/teams/public sharing/scraping/market-size estimates/fake metrics/fake guarantees, no auth config changes, no middleware/proxy changes, no Gemini prompt/schema changes, no scoring changes, no cleaning/parsing changes, no deployment env var changes.
+
 ---
 
 ## Future / post-MVP milestones (not started)
 
 Do **not** start any of these without an explicit user prompt. They appear here only for visibility.
 
-> Note: M7–M15 are complete — see "Completed milestones" above. The items below are post-MVP and start at M16.
+> Note: M7–M16A are complete — see "Completed milestones" above. The items below are future work and must not be started without an explicit user prompt.
 
-### M16 — Authentication & user accounts
-- Per-user saved opportunities, upload ownership, private dashboards.
-- Likely tech: NextAuth or Clerk; new `User` model + FK on `SavedOpportunity` and a new `UploadHistory`.
+### M16B — Project management polish
+- Project rename/delete/archive and duplicate-name handling.
 
-### M17 — Upload history & re-runs
+### M16C — Persist validation workspace state
+- Move validation checklist, validation evidence, and decision status from localStorage to authenticated, project-scoped database tables.
+
+### M16D — Upload history & re-runs
 - Persist each upload as a row in the DB; let users reopen past analyses and compare AI re-runs.
 - Requires a new `Upload` model (file name, date, complaint count, opportunities generated, processing status).
 
-### M18 — Comparison & multi-opportunity tools
+### M17 — Comparison & multi-opportunity tools
 - Side-by-side comparison view for 2–3 opportunities; export to PDF/CSV.
 
-### M19 — Notification & in-app messaging
+### M18 — Notification & in-app messaging
 - Server-side status when long jobs complete; optional email digest.
 
-### M20 — Multi-source ingestion / scraping (if explicitly approved)
+### M19 — Multi-source ingestion / scraping (if explicitly approved)
 - Auto-pull complaints from review sites, app stores, forums. **Out of scope for MVP** — must not be added automatically.
 
-### M21 — Light mode + theming
+### M20 — Light mode + theming
 - Toggle light/dark; persist preference locally. Pure UX; no schema changes.
 
-### M22 — Prompt experimentation
+### M21 — Prompt experimentation
 - A/B different Gemini prompts and track quality. **Must not change the production prompt or scoring weights without explicit sign-off.**
 
 ---
 
 ## Standing rules per milestone
 
-- Do not add authentication, billing, teams, notifications, or automatic scraping as MVP requirements.
+- Do not change auth config or add billing, teams, notifications, or automatic scraping as MVP requirements.
 - Do not change AI prompts unless the milestone explicitly asks for it.
 - Do not change scoring logic unless the milestone explicitly asks for it.
 - Keep the MVP focused on proving the core workflow (upload → cluster → score → browse → save → detail → deploy).

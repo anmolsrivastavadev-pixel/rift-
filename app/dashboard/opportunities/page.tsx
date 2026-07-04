@@ -6,16 +6,32 @@ import { RunOpportunitiesButton } from "@/components/opportunities/run-button";
 import { OpportunityBrowser } from "@/components/opportunities/opportunity-browser";
 import { Button } from "@/components/ui/button";
 import { requireUser } from "@/lib/auth/current-user";
+import { getProjectOrDefault, projectHref } from "@/lib/projects";
 
-export default async function OpportunitiesPage() {
+function firstParam(value: string | string[] | undefined): string | undefined {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+export default async function OpportunitiesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ projectId?: string | string[] }>;
+}) {
   const user = await requireUser();
+  const project = await getProjectOrDefault(
+    firstParam((await searchParams).projectId),
+    user
+  );
   const [ops, savedRows] = await Promise.all([
     prisma.opportunity.findMany({
-      where: { userId: user.id },
+      where: { userId: user.id, projectId: project.id },
       orderBy: { opportunityScore: "desc" },
       take: 100,
     }),
-    prisma.savedOpportunity.findMany({ where: { userId: user.id }, select: { opportunityId: true } }),
+    prisma.savedOpportunity.findMany({
+      where: { userId: user.id, projectId: project.id },
+      select: { opportunityId: true },
+    }),
   ]);
 
   const savedSet = new Set(savedRows.map((s) => s.opportunityId));
@@ -45,8 +61,11 @@ export default async function OpportunitiesPage() {
           <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
             These ideas are generated from patterns in the complaints you added. Scores help sort ideas. A higher score means Rift saw stronger signals in the complaints, but it does not mean the idea is proven.
           </p>
+          <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
+            Project: <span className="font-medium text-[var(--color-foreground)]">{project.name}</span>
+          </p>
           <p className="mt-2 text-xs text-[var(--color-muted-foreground)]">
-            Ideas are generated from the complaints currently in this workspace.
+            Ideas are generated from the complaints currently in this project.
             If you used a preset starter pack or typed a custom market name,
             treat the results as inspiration — not proof of demand.
             If you pasted real complaints, treat them as stronger evidence.
@@ -56,7 +75,7 @@ export default async function OpportunitiesPage() {
           </p>
         </div>
         <Button asChild variant="outline">
-          <Link href="/dashboard/opportunities/decision-board">
+          <Link href={projectHref("/dashboard/opportunities/decision-board", project.id)}>
             <LayoutGrid className="h-4 w-4" /> Compare Ideas
           </Link>
         </Button>
@@ -70,19 +89,19 @@ export default async function OpportunitiesPage() {
       <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)]">
         <h2 className="text-base font-semibold">Generate business ideas</h2>
         <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
-          Group the complaints in this workspace into business idea hypotheses based on repeated pain, severity, and confidence.
+          Group this project's complaints into business idea hypotheses based on repeated pain, severity, and confidence.
         </p>
         <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
-          Rift generates ideas from all complaints currently in this workspace.
+          Rift generates ideas from all complaints currently in this project.
           For a clean test, start fresh on the Complaints page before adding a
           new niche.
         </p>
         <div className="mt-4">
-          <RunOpportunitiesButton />
+          <RunOpportunitiesButton projectId={project.id} />
         </div>
       </section>
 
-      <OpportunityBrowser opportunities={cards} />
+      <OpportunityBrowser opportunities={cards} projectId={project.id} />
     </div>
   );
 }

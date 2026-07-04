@@ -19,6 +19,11 @@ import { FounderCommandClient } from "@/components/dashboard/founder-command-cli
 import { Button } from "@/components/ui/button";
 import type { DashboardStats } from "@/lib/dashboard-plan";
 import { requireUser } from "@/lib/auth/current-user";
+import { getProjectOrDefault, projectHref } from "@/lib/projects";
+
+function firstParam(value: string | string[] | undefined): string | undefined {
+  return Array.isArray(value) ? value[0] : value;
+}
 
 function bucketByDay(rows: { sourceDate: Date | null }[]): DayBucket[] {
   const map = new Map<string, number>();
@@ -32,8 +37,16 @@ function bucketByDay(rows: { sourceDate: Date | null }[]): DayBucket[] {
     .sort((a, b) => a.date.localeCompare(b.date));
 }
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ projectId?: string | string[] }>;
+}) {
   const user = await requireUser();
+  const project = await getProjectOrDefault(
+    firstParam((await searchParams).projectId),
+    user
+  );
   const [
     complaintCount,
     recent,
@@ -44,22 +57,25 @@ export default async function DashboardPage() {
     topOpportunities,
     opportunityIds,
   ] = await Promise.all([
-    prisma.complaint.count({ where: { userId: user.id } }),
+    prisma.complaint.count({ where: { userId: user.id, projectId: project.id } }),
     prisma.complaint.findMany({
-      where: { userId: user.id },
+      where: { userId: user.id, projectId: project.id },
       orderBy: { createdAt: "desc" },
       take: 5,
       select: { id: true, title: true, body: true, createdAt: true },
     }),
     prisma.complaint.findMany({
-      where: { userId: user.id, sourceDate: { not: null } },
+      where: { userId: user.id, projectId: project.id, sourceDate: { not: null } },
       select: { sourceDate: true },
     }),
-    prisma.opportunity.count({ where: { userId: user.id } }),
-    prisma.savedOpportunity.count({ where: { userId: user.id } }),
-    prisma.opportunity.aggregate({ _max: { opportunityScore: true }, where: { userId: user.id } }),
+    prisma.opportunity.count({ where: { userId: user.id, projectId: project.id } }),
+    prisma.savedOpportunity.count({ where: { userId: user.id, projectId: project.id } }),
+    prisma.opportunity.aggregate({
+      _max: { opportunityScore: true },
+      where: { userId: user.id, projectId: project.id },
+    }),
     prisma.opportunity.findMany({
-      where: { userId: user.id },
+      where: { userId: user.id, projectId: project.id },
       orderBy: { opportunityScore: "desc" },
       take: 3,
       select: {
@@ -72,7 +88,7 @@ export default async function DashboardPage() {
       },
     }),
     prisma.opportunity.findMany({
-      where: { userId: user.id },
+      where: { userId: user.id, projectId: project.id },
       orderBy: { opportunityScore: "desc" },
       take: 100,
       select: { id: true },
@@ -89,6 +105,10 @@ export default async function DashboardPage() {
     highestScore,
   };
 
+  // The FounderCommandClient only reads opportunityIds for localStorage-derived
+  // summaries; pass the project-scoped set so those summaries match the page.
+  const projectId = project.id;
+
   return (
     <div className="mx-auto max-w-6xl space-y-8">
       {/* Header */}
@@ -97,8 +117,11 @@ export default async function DashboardPage() {
           Founder Command Center
         </h1>
         <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
+          Project: <span className="font-medium text-[var(--color-foreground)]">{project.name}</span>
+        </p>
+        <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
           Track your opportunity discovery workflow from raw complaints to
-          validated next steps.
+          validated next steps. Data shown here is scoped to this project only.
         </p>
         <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
           Rift helps you move from customer pain signals to opportunities,
@@ -124,13 +147,13 @@ export default async function DashboardPage() {
         </p>
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <Button asChild>
-            <Link href="/dashboard/complaints">Use demo data</Link>
+            <Link href={projectHref("/dashboard/complaints", project.id)}>Use demo data</Link>
           </Button>
           <Button asChild variant="outline">
-            <Link href="/dashboard/complaints">Add complaints</Link>
+            <Link href={projectHref("/dashboard/complaints", project.id)}>Add complaints</Link>
           </Button>
           <Button asChild variant="outline">
-            <Link href="/dashboard/opportunities">View business ideas</Link>
+            <Link href={projectHref("/dashboard/opportunities", project.id)}>View business ideas</Link>
           </Button>
         </div>
         <p className="mt-4 text-xs text-[var(--color-muted-foreground)]">
@@ -223,14 +246,14 @@ export default async function DashboardPage() {
             Start with demo data or add complaints, reviews, support tickets, or manually collected forum snippets.
           </p>
           <Button asChild className="mt-4">
-            <Link href="/dashboard/complaints">
+            <Link href={projectHref("/dashboard/complaints", projectId)}>
               Go to Complaints <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>
         </div>
       ) : opportunityCount === 0 ? (
         /* Empty state: complaints but no opportunities */
-        <div className="rounded-2xl border border-dashed border-[var(--color-border)] bg-[var(--color-card)] p-12 text-center shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)] transition-all duration-150 ease-out hover:shadow-[0_4px_12px_0_rgb(0_0_0_/_0.06),0_2px_4px_-2px_rgb(0_0_0_/_0.04)]">
+        <div className="rounded-2xl border border-dashed border-[var(--color-border)] bg-[var(--color-card)] p-12 text-center shadow-[0_1px_3px_0_rgb(0_0_0/_0.04),0_1px_2px_-1px_rgb(0_0_0/_0.06)] transition-all duration-150 ease-out hover:shadow-[0_4px_12px_0_rgb(0_0_0/_0.06),0_2px_4px_-2px_rgb(0_0_0/_0.04)]">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--color-primary-soft)] ring-1 ring-[var(--color-primary)]/10">
             <Target className="h-6 w-6 text-[var(--color-primary)]" />
           </div>
@@ -241,7 +264,7 @@ export default async function DashboardPage() {
             Generate business ideas to turn complaints into scored business idea hypotheses.
           </p>
           <Button asChild className="mt-4">
-            <Link href="/dashboard/opportunities">
+            <Link href={projectHref("/dashboard/opportunities", projectId)}>
               Go to Ideas <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>
@@ -249,7 +272,11 @@ export default async function DashboardPage() {
       ) : null}
 
       {/* Client-side workflow + next action + decision/evidence snapshot */}
-      <FounderCommandClient stats={stats} opportunityIds={opportunityIds.map((o) => o.id)} />
+      <FounderCommandClient
+        stats={stats}
+        opportunityIds={opportunityIds.map((o) => o.id)}
+        projectId={projectId}
+      />
 
       {/* High-signal opportunities (only when they exist) */}
       {topOpportunities.length > 0 && (
@@ -257,7 +284,7 @@ export default async function DashboardPage() {
           <div className="flex items-center justify-between">
             <h2 className="text-base font-semibold">High-signal opportunities</h2>
             <Link
-              href="/dashboard/opportunities"
+              href={projectHref("/dashboard/opportunities", projectId)}
               className="text-sm text-[var(--color-primary)] transition-colors duration-150 ease-out hover:text-[var(--color-primary)]/70"
             >
               View all &rarr;
@@ -267,8 +294,8 @@ export default async function DashboardPage() {
             {topOpportunities.map((o) => (
               <Link
                 key={o.id}
-                href={`/dashboard/opportunities/${o.id}`}
-                className="group flex flex-col rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-5 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)] transition-all duration-150 ease-out hover:-translate-y-0.5 hover:border-[var(--color-primary)]/40 hover:shadow-[0_4px_12px_0_rgb(0_0_0_/_0.06),0_2px_4px_-2px_rgb(0_0_0_/_0.04)]"
+                href={projectHref(`/dashboard/opportunities/${o.id}`, projectId)}
+                className="group flex flex-col rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-5 shadow-[0_1px_3px_0_rgb(0_0_0/_0.04),0_1px_2px_-1px_rgb(0_0_0/_0.06)] transition-all duration-150 ease-out hover:-translate-y-0.5 hover:border-[var(--color-primary)]/40 hover:shadow-[0_4px_12px_0_rgb(0_0_0/_0.06),0_2px_4px_-2px_rgb(0_0_0/_0.04)]"
               >
                 <div className="flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-[var(--color-muted-foreground)]">
                   <Briefcase className="h-3 w-3" />
@@ -313,7 +340,7 @@ export default async function DashboardPage() {
           <div className="flex items-center justify-between">
             <h2 className="text-base font-semibold">Recent complaints</h2>
             <Link
-              href="/dashboard/complaints"
+              href={projectHref("/dashboard/complaints", projectId)}
               className="text-sm text-[var(--color-primary)] transition-colors duration-150 ease-out hover:text-[var(--color-primary)]/70"
             >
               View all &rarr;

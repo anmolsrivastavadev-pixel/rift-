@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { LayoutDashboard, Upload, Target, Bookmark, LayoutGrid, LogOut, User, ChevronRight } from "lucide-react";
 import { Container } from "@/components/container";
 import { authClient } from "@/lib/auth/client";
+import { projectHref } from "@/lib/project-href";
+import { ProjectSelector, type ProjectOption } from "@/components/dashboard/project-selector";
 
 const nav = [
   { href: "/dashboard", label: "Home", icon: LayoutDashboard },
@@ -29,11 +31,22 @@ async function handleSignOut() {
 export function DashboardShell({
   children,
   user,
+  projects,
+  currentProjectId,
 }: {
   children: React.ReactNode;
   user: User;
+  projects: ProjectOption[];
+  currentProjectId: string;
 }) {
   const pathname = usePathname();
+  const search = useSearchParams();
+  // Carry project context through internal links, but don't propagate unknown
+  // project ids from manually edited URLs.
+  const queryProjectId = search.get("projectId");
+  const projectId = queryProjectId && projects.some((project) => project.id === queryProjectId)
+    ? queryProjectId
+    : currentProjectId;
 
   return (
     <div className="flex min-h-screen w-full">
@@ -49,13 +62,21 @@ export function DashboardShell({
             </span>
             Rift
           </Link>
-          <nav className="mt-8 flex flex-col gap-0.5" aria-label="Dashboard navigation">
+
+          <div className="mt-6 border-b border-[var(--color-border)] pb-4">
+            <ProjectSelector
+              projects={projects}
+              currentProjectId={currentProjectId}
+            />
+          </div>
+
+          <nav className="mt-4 flex flex-col gap-0.5" aria-label="Dashboard navigation">
             {nav.map(({ href, label, icon: Icon }) => {
               const isActive = pathname === href || (href !== "/dashboard" && pathname.startsWith(href));
               return (
                 <Link
                   key={href}
-                  href={href}
+                  href={projectHref(href, projectId)}
                   className={`group flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition-all duration-150 ease-out ${
                     isActive
                       ? "bg-[var(--color-card)] text-[var(--color-foreground)] shadow-sm font-medium"
@@ -118,7 +139,7 @@ export function DashboardShell({
               return (
                 <Link
                   key={href}
-                  href={href}
+                  href={projectHref(href, projectId)}
                   className={`flex shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs transition-all duration-150 ease-out ${
                     isActive
                       ? "bg-[var(--color-card)] text-[var(--color-foreground)] shadow-sm font-medium"
@@ -139,9 +160,16 @@ export function DashboardShell({
             Sign out
           </button>
         </div>
+        {/* Mobile project selector row */}
+        <div className="border-t border-[var(--color-border)] px-4 py-2">
+          <ProjectSelector
+            projects={projects}
+            currentProjectId={currentProjectId}
+          />
+        </div>
       </div>
 
-      <div className="flex-1 pt-12 md:pt-0">
+      <div className="flex-1 pt-20 md:pt-0">
         <main className="px-6 py-10">{children}</main>
       </div>
     </div>

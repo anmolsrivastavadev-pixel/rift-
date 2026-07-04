@@ -4,18 +4,27 @@ import {
   type DecisionBoardOpportunity,
 } from "@/components/opportunities/decision-board-client";
 import { requireUser } from "@/lib/auth/current-user";
+import { getProjectOrDefault } from "@/lib/projects";
+
+function firstParam(value: string | string[] | undefined): string | undefined {
+  return Array.isArray(value) ? value[0] : value;
+}
 
 export default async function DecisionBoardPage({
   searchParams,
 }: {
-  searchParams: Promise<{ compare?: string }>;
+  searchParams: Promise<{
+    compare?: string | string[];
+    projectId?: string | string[];
+  }>;
 }) {
   const user = await requireUser();
   const params = await searchParams;
-  const compareParam = params.compare;
+  const project = await getProjectOrDefault(firstParam(params.projectId), user);
+  const compareParam = firstParam(params.compare);
 
   const ops = await prisma.opportunity.findMany({
-    where: { userId: user.id },
+    where: { userId: user.id, projectId: project.id },
     orderBy: { opportunityScore: "desc" },
     take: 100,
   });
@@ -56,6 +65,7 @@ export default async function DecisionBoardPage({
     <DecisionBoardClient
       opportunities={opportunities}
       isCompareMode={isCompareMode}
+      projectId={project.id}
     />
   );
 }

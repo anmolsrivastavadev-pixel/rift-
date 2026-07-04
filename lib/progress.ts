@@ -1,6 +1,6 @@
 /* In-memory progress tracker for long-running server actions.
  * The client generates a jobId, submits the form with it, and polls
- * getProcessingStatus(jobId) while the action updates progress here.
+ * getProcessingStatus(jobId, projectId) while the action updates progress here.
  *
  * Note: this is process-local, so it works in single-instance dev/deploys.
  * Entries expire after 10 minutes to avoid unbounded growth.

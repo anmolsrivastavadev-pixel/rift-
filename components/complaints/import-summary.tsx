@@ -2,24 +2,25 @@ import Link from "next/link";
 import { CheckCircle2, AlertTriangle } from "lucide-react";
 
 import type { UploadResult } from "@/lib/schemas";
+import { projectHref } from "@/lib/project-href";
 
 /* Shared import summaries used by the CSV demo path and the text import path.
  * Kept here so each input method renders consistent success / already-loaded /
  * error messages and a single "next step" CTA to Generate business ideas.
  */
 
-export function ImportNextStepLink() {
+export function ImportNextStepLink({ projectId }: { projectId: string }) {
   return (
-    <p className="text-xs text-[var(--color-muted-foreground)]">
+    <span className="block text-xs text-[var(--color-muted-foreground)]">
       Next: head to{" "}
       <Link
-        href="/dashboard/opportunities"
+        href={projectHref("/dashboard/opportunities", projectId)}
         className="font-medium text-[var(--color-primary)] hover:underline"
       >
         Opportunities → Generate business ideas
       </Link>{" "}
       to turn the complaints into scored startup opportunities.
-    </p>
+    </span>
   );
 }
 
@@ -27,7 +28,13 @@ export function ImportNextStepLink() {
  * fail (rows are hardcoded), so inserted === 0 means every demo row was
  * already in the database — surface an informational message, not an error.
  */
-export function DemoSummary({ result }: { result: UploadResult }) {
+export function DemoSummary({
+  result,
+  projectId,
+}: {
+  result: UploadResult;
+  projectId: string;
+}) {
   if (result.inserted === 0) {
     return (
       <div className="flex items-start gap-2 rounded-[12px] border border-[var(--color-primary)]/40 bg-[var(--color-primary)]/10 p-4 text-sm text-[var(--color-primary)]">
@@ -39,7 +46,7 @@ export function DemoSummary({ result }: { result: UploadResult }) {
           <p className="text-xs text-[var(--color-muted-foreground)]">
             Demo data is fake and safe to test with.{" "}
             <Link
-              href="/dashboard/opportunities"
+              href={projectHref("/dashboard/opportunities", projectId)}
               className="font-medium text-[var(--color-primary)] hover:underline"
             >
               Opportunities → Generate business ideas
@@ -60,7 +67,7 @@ export function DemoSummary({ result }: { result: UploadResult }) {
           create opportunities.
         </p>
         <p className="text-xs text-[var(--color-muted-foreground)]">
-          This is fake demo data, safe to test with. <ImportNextStepLink />
+          This is fake demo data, safe to test with. <ImportNextStepLink projectId={projectId} />
         </p>
       </div>
     </div>
@@ -71,9 +78,11 @@ export function DemoSummary({ result }: { result: UploadResult }) {
 export function TextImportSummary({
   result,
   sourceLabel,
+  projectId,
 }: {
   result: UploadResult;
   sourceLabel?: string;
+  projectId: string;
 }) {
   const fromLabel = sourceLabel ? ` from ${sourceLabel}` : "";
 
@@ -86,7 +95,7 @@ export function TextImportSummary({
           <p className="font-medium">
             These complaints are already loaded. You can generate business ideas now.
           </p>
-          <ImportNextStepLink />
+          <ImportNextStepLink projectId={projectId} />
         </div>
       </div>
     );
@@ -123,7 +132,7 @@ export function TextImportSummary({
             {" "}(too short, invalid, or already loaded).
           </p>
         )}
-        <ImportNextStepLink />
+        <ImportNextStepLink projectId={projectId} />
       </div>
     </div>
   );

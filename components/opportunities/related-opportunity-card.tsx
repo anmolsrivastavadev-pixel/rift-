@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Briefcase, Target } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
+import { projectHref } from "@/lib/project-href";
 
 /* Small related-opportunity card. Shows:
  *   title, industry, opportunity score, shared keyword count (if any), link.
@@ -10,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 export function RelatedOpportunityCard({
   op,
   shared,
+  projectId,
 }: {
   op: {
     id: string;
@@ -18,10 +20,11 @@ export function RelatedOpportunityCard({
     opportunityScore: number;
   };
   shared: number;
+  projectId: string;
 }) {
   return (
     <Link
-      href={`/dashboard/opportunities/${op.id}`}
+      href={projectHref(`/dashboard/opportunities/${op.id}`, projectId)}
       className="group block rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-4 transition-shadow duration-150 ease-out hover:shadow-md focus-visible:outline focus-visible:[outline-offset:2px] focus-visible:[outline-color:var(--color-primary)]"
       aria-label={`Open related opportunity: ${op.title}, score ${op.opportunityScore}${shared > 0 ? `, ${shared} shared keyword${shared === 1 ? "" : "s"}` : ""}`}
     >

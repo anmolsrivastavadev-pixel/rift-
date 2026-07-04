@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowLeft, ArrowRight } from "lucide-react";
+import { projectHref } from "@/lib/project-href";
 
 /* Prev / Next navigation, ordered by createdAt DESC.
  * Buttons disabled when no neighbour exists.
@@ -7,9 +8,11 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 export function PrevNextNav({
   prevId,
   nextId,
+  projectId,
 }: {
   prevId: string | null;
   nextId: string | null;
+  projectId: string;
 }) {
   const base =
     "inline-flex items-center gap-1.5 rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-2 text-sm transition-colors duration-150 ease-out";
@@ -19,7 +22,10 @@ export function PrevNextNav({
   return (
     <nav aria-label="Opportunity navigation" className="mt-6 flex items-center justify-between gap-3">
       {prevId ? (
-        <Link href={`/dashboard/opportunities/${prevId}`} className={`${base} ${enabledCls}`}>
+        <Link
+          href={projectHref(`/dashboard/opportunities/${prevId}`, projectId)}
+          className={`${base} ${enabledCls}`}
+        >
           <ArrowLeft className="h-4 w-4" /> Previous
         </Link>
       ) : (
@@ -29,7 +35,10 @@ export function PrevNextNav({
       )}
       <span className="text-xs text-[var(--color-muted-foreground)]">By created date</span>
       {nextId ? (
-        <Link href={`/dashboard/opportunities/${nextId}`} className={`${base} ${enabledCls}`}>
+        <Link
+          href={projectHref(`/dashboard/opportunities/${nextId}`, projectId)}
+          className={`${base} ${enabledCls}`}
+        >
           Next <ArrowRight className="h-4 w-4" />
         </Link>
       ) : (

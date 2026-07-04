@@ -6,6 +6,7 @@ import { prisma } from "@/lib/db";
 import { complaintRowSchema, type UploadResult } from "@/lib/schemas";
 import { parseComplaintsFromText, normaliseBodyForKey } from "@/lib/text-import";
 import { requireUser } from "@/lib/auth/current-user";
+import { requireOwnedProject } from "@/lib/projects";
 
 const MAX_ROWS = 5000;
 
@@ -39,7 +40,8 @@ function pickField(row: Record<string, unknown>, keys: string[]): string {
 
 function insertValidRows(
   valid: { title: string; body: string; sourceDate: Date | null }[],
-  userId: string
+  userId: string,
+  projectId: string
 ): Promise<unknown> {
   const CHUNK = 500;
   const inserts = [];
@@ -47,6 +49,7 @@ function insertValidRows(
     const batch = valid.slice(i, i + CHUNK).map((row) => ({
       ...row,
       userId,
+      projectId,
     }));
     inserts.push(prisma.complaint.createMany({ data: batch }));
   }
@@ -63,6 +66,7 @@ export async function uploadComplaints(
   formData: FormData
 ): Promise<UploadResult> {
   const user = await requireUser();
+  const project = await requireOwnedProject(String(formData.get("projectId") ?? ""), user);
   const raw = formData.get("data");
   let rows: unknown[] = [];
   try {
@@ -132,7 +136,7 @@ export async function uploadComplaints(
   }
 
   // Insert in chunks to keep query size reasonable.
-  await insertValidRows(valid, user.id);
+  await insertValidRows(valid, user.id, project.id);
 
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/complaints");
@@ -160,8 +164,12 @@ const DEMO_ROWS: { title: string; body: string; sourceDate: string }[] = [
   { title: "Crashes on big files", body: "The app crashes whenever I upload files larger than 50MB.", sourceDate: "2025-02-02" },
 ];
 
-export async function loadDemoComplaints(): Promise<UploadResult> {
+export async function loadDemoComplaints(
+  _prev: UploadResult | null,
+  formData: FormData
+): Promise<UploadResult> {
   const user = await requireUser();
+  const project = await requireOwnedProject(String(formData.get("projectId") ?? ""), user);
   const valid: { title: string; body: string; sourceDate: Date | null }[] = [];
   const errors: { row: number; reason: string }[] = [];
 
@@ -188,18 +196,19 @@ export async function loadDemoComplaints(): Promise<UploadResult> {
 
   // Never insert duplicate demo rows. Match on the exact demo body text so
   // re-clicking "Use demo data" is idempotent: only complaints that are not
-  // already present get inserted. This is a demo-data convenience and does
-  // not affect the regular CSV upload pipeline.
+  // already present get inserted. M16A: dedupe is project-scoped so the same
+  // demo complaints can exist in two different projects — that is the whole
+  // point of having separate market tests.
   const demoBodies = valid.map((r) => r.body);
   const existing = await prisma.complaint.findMany({
-    where: { body: { in: demoBodies }, userId: user.id },
+    where: { body: { in: demoBodies }, userId: user.id, projectId: project.id },
     select: { body: true },
   });
   const existingBodies = new Set(existing.map((c) => c.body));
   const toInsert = valid.filter((r) => !existingBodies.has(r.body));
 
   if (toInsert.length > 0) {
-    await insertValidRows(toInsert, user.id);
+    await insertValidRows(toInsert, user.id, project.id);
   }
 
   revalidatePath("/dashboard");
@@ -239,6 +248,7 @@ export async function loadStarterComplaints(
   formData: FormData
 ): Promise<StarterResult> {
   const user = await requireUser();
+  const project = await requireOwnedProject(String(formData.get("projectId") ?? ""), user);
   const marketKey = String(formData.get("market") ?? "");
 
   const pack = getStarterPack(marketKey);
@@ -279,17 +289,18 @@ export async function loadStarterComplaints(
     return { inserted: 0, skipped: pack.complaints.length, errors, market: pack.label };
   }
 
-  // Dedupe: skip complaints whose body already exists in the database.
+  // Dedupe: skip complaints whose body already exists in this project.
+  // M16A: project-scoped so starter packs can be loaded into multiple projects.
   const bodies = valid.map((r) => r.body);
   const existing = await prisma.complaint.findMany({
-    where: { body: { in: bodies }, userId: user.id },
+    where: { body: { in: bodies }, userId: user.id, projectId: project.id },
     select: { body: true },
   });
   const existingBodies = new Set(existing.map((c) => c.body));
   const toInsert = valid.filter((r) => !existingBodies.has(r.body));
 
   if (toInsert.length > 0) {
-    await insertValidRows(toInsert, user.id);
+    await insertValidRows(toInsert, user.id, project.id);
   }
 
   revalidatePath("/dashboard");
@@ -316,6 +327,7 @@ export async function importTextComplaints(
   formData: FormData
 ): Promise<UploadResult> {
   const user = await requireUser();
+  const project = await requireOwnedProject(String(formData.get("projectId") ?? ""), user);
   const text = String(formData.get("text") ?? "");
 
   if (!text.trim()) {
@@ -367,16 +379,18 @@ export async function importTextComplaints(
     return { inserted: 0, skipped: capped.length, errors };
   }
 
-  // Never insert complaints that are already in the database. Comparison is
+  // Never insert complaints that are already in this project. Comparison is
   // case- AND whitespace-insensitive (trim + lowercase + collapse internal
   // whitespace to single spaces), so a stored "The onboarding takes way too
   // long." also blocks an incoming "the ONBOARDING takes  way too long.".
   // Stored bodies keep their original user-submitted form; only the
   // comparison key is normalised. M8 text import only — CSV upload does not
-  // dedupe against the DB and is unaffected. For MVP-scale workspaces a
-  // single select-bodies scan is cheap and matches the pipeline's own
-  // `prisma.complaint.findMany` usage.
-  const all = await prisma.complaint.findMany({ where: { userId: user.id }, select: { body: true } });
+  // dedupe against the DB and is unaffected. M16A: dedupe is project-scoped so
+  // the same body can exist across the user's other projects.
+  const all = await prisma.complaint.findMany({
+    where: { userId: user.id, projectId: project.id },
+    select: { body: true },
+  });
   const existingKeys = new Set(all.map((c) => normaliseBodyForKey(c.body)));
   const toInsert = valid.filter(
     (r) => !existingKeys.has(normaliseBodyForKey(r.body))
@@ -387,7 +401,7 @@ export async function importTextComplaints(
   const skipped = capped.length - toInsert.length;
 
   if (toInsert.length > 0) {
-    await insertValidRows(toInsert, user.id);
+    await insertValidRows(toInsert, user.id, project.id);
   }
 
   revalidatePath("/dashboard");
@@ -403,6 +417,7 @@ export async function createCustomStarterComplaints(
   formData: FormData
 ): Promise<StarterResult> {
   const user = await requireUser();
+  const project = await requireOwnedProject(String(formData.get("projectId") ?? ""), user);
   const market = String(formData.get("market") ?? "").trim();
   if (market.length < 2) {
     return { inserted: 0, skipped: 0, errors: [{ row: 0, reason: "Market name must be at least 2 characters." }], market };
@@ -445,8 +460,11 @@ export async function createCustomStarterComplaints(
 
   const capped = complaints.slice(0, 500);
 
-  // Deduplicate against existing DB bodies
-  const all = await prisma.complaint.findMany({ where: { userId: user.id }, select: { body: true } });
+  // Deduplicate against existing DB bodies (project-scoped — M16A)
+  const all = await prisma.complaint.findMany({
+    where: { userId: user.id, projectId: project.id },
+    select: { body: true },
+  });
   const existingKeys = new Set(all.map((c) => normaliseBodyForKey(c.body)));
   const toInsert = capped.filter(
     (r) => !existingKeys.has(normaliseBodyForKey(r.body))
@@ -455,7 +473,7 @@ export async function createCustomStarterComplaints(
   const skipped = capped.length - toInsert.length;
 
   if (toInsert.length > 0) {
-    await insertValidRows(toInsert, user.id);
+    await insertValidRows(toInsert, user.id, project.id);
   }
 
   revalidatePath("/dashboard");

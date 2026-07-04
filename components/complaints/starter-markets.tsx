@@ -8,8 +8,9 @@ import { useActionState } from "react";
 import { loadStarterComplaints, createCustomStarterComplaints, type StarterResult } from "@/actions/complaints";
 import { MARKET_KEYS, MARKET_LABELS } from "@/lib/starter-complaints";
 import { Button } from "@/components/ui/button";
+import { projectHref } from "@/lib/project-href";
 
-export function StarterMarkets() {
+export function StarterMarkets({ projectId }: { projectId: string }) {
   const [state, action, pending] = useActionState<StarterResult | null, FormData>(
     loadStarterComplaints,
     null
@@ -40,6 +41,7 @@ export function StarterMarkets() {
       <div className="mt-4 flex flex-wrap gap-2">
         {MARKET_KEYS.map((key) => (
           <form key={key} action={action}>
+            <input type="hidden" name="projectId" value={projectId} />
             <input type="hidden" name="market" value={key} />
             <Button
               type="submit"
@@ -63,6 +65,7 @@ export function StarterMarkets() {
           brainstorming examples:
         </p>
         <form action={customAction} className="flex gap-2">
+          <input type="hidden" name="projectId" value={projectId} />
           <input
             name="market"
             value={customMarket}
@@ -112,8 +115,8 @@ export function StarterMarkets() {
         </p>
       )}
 
-      {state && <StarterSummary result={state} />}
-      {customState && <StarterSummary result={customState} />}
+      {state && <StarterSummary result={state} projectId={projectId} />}
+      {customState && <StarterSummary result={customState} projectId={projectId} />}
 
       <p className="mt-3 text-[11px] text-[var(--color-muted-foreground)]">
         Starter examples are for exploring the workflow. They are not proof of
@@ -124,7 +127,13 @@ export function StarterMarkets() {
   );
 }
 
-function StarterSummary({ result }: { result: StarterResult }) {
+function StarterSummary({
+  result,
+  projectId,
+}: {
+  result: StarterResult;
+  projectId: string;
+}) {
   if (result.inserted === 0 && result.errors.length === 0) {
     return (
       <div className="mt-4 flex items-start gap-2 rounded-[12px] border border-[var(--color-primary)]/40 bg-[var(--color-primary)]/10 p-4 text-sm text-[var(--color-primary)]">
@@ -136,7 +145,7 @@ function StarterSummary({ result }: { result: StarterResult }) {
           <p className="text-xs text-[var(--color-muted-foreground)]">
             Head to{" "}
             <Link
-              href="/dashboard/opportunities"
+              href={projectHref("/dashboard/opportunities", projectId)}
               className="font-medium text-[var(--color-primary)] hover:underline"
             >
               Ideas → Generate business ideas
@@ -176,7 +185,7 @@ function StarterSummary({ result }: { result: StarterResult }) {
           These are synthetic starter examples for exploring the workflow. Now
           go to{" "}
           <Link
-            href="/dashboard/opportunities"
+            href={projectHref("/dashboard/opportunities", projectId)}
             className="font-medium text-[var(--color-primary)] hover:underline"
           >
             Ideas → Generate business ideas

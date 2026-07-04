@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Target, SearchX, BookmarkX, Sparkles, Upload } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { projectHref } from "@/lib/project-href";
 
 /**
  * Empty states for the opportunities workspace.
@@ -9,7 +10,7 @@ import { Button } from "@/components/ui/button";
  * Each state tells the user what to do next.
  */
 
-export function NoOpportunitiesEmpty() {
+export function NoOpportunitiesEmpty({ projectId }: { projectId: string }) {
   return (
     <div className="rounded-2xl border border-dashed border-[var(--color-border)] bg-[var(--color-card)] p-12 text-center shadow-sm">
         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
@@ -21,12 +22,12 @@ export function NoOpportunitiesEmpty() {
       </p>
       <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
         <Button asChild>
-          <Link href="/dashboard/complaints">
+          <Link href={projectHref("/dashboard/complaints", projectId)}>
             <Sparkles className="h-4 w-4" /> Use Demo Data
           </Link>
         </Button>
         <Button asChild variant="outline">
-          <Link href="/dashboard/complaints">
+          <Link href={projectHref("/dashboard/complaints", projectId)}>
             <Upload className="h-4 w-4" /> Add complaints
           </Link>
         </Button>
@@ -52,7 +53,7 @@ export function NoSearchResultsEmpty({ onReset }: { onReset: () => void }) {
   );
 }
 
-export function NoSavedEmpty() {
+export function NoSavedEmpty({ projectId }: { projectId: string }) {
   return (
     <div className="rounded-2xl border border-dashed border-[var(--color-border)] bg-[var(--color-card)] p-12 text-center shadow-sm">
         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--color-surface)] text-[var(--color-muted-foreground)]">
@@ -63,7 +64,9 @@ export function NoSavedEmpty() {
         Save ideas you want to revisit later.
       </p>
       <Button asChild className="mt-4">
-        <Link href="/dashboard/opportunities">Browse opportunities</Link>
+        <Link href={projectHref("/dashboard/opportunities", projectId)}>
+          Browse opportunities
+        </Link>
       </Button>
     </div>
   );

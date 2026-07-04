@@ -4,30 +4,38 @@ import { revalidatePath } from "next/cache";
 
 import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/auth/current-user";
+import { requireOwnedProject } from "@/lib/projects";
 
 export type WorkspaceResult = {
   cleared: boolean;
   deleted: { saved: number; opportunities: number; complaints: number };
+  projectName?: string;
   error?: string;
 };
 
 /**
- * Clear the current user's workspace: saved opportunities, generated opportunities,
- * and complaints. Used by the "Start fresh test" button so a user can test a
- * new niche without old data mixing in.
+ * M16A — Clear the current user's CURRENT PROJECT only: saved opportunities,
+ * generated opportunities, and complaints scoped to that project. Used by the
+ * "Start fresh test" button so a user can test a new niche without mixing old
+ * data — but now without deleting every other project's work.
  *
  * Order matters: savedOpportunities → opportunities → complaints because of
  * foreign-key constraints (SavedOpportunity references Opportunity, Complaint
- * references Opportunity).
+ * references Opportunity). The user's other projects are never touched.
  */
-export async function clearWorkspace(): Promise<WorkspaceResult> {
+export async function clearWorkspace(projectId: string): Promise<WorkspaceResult> {
   const user = await requireUser();
+  const project = await requireOwnedProject(projectId, user);
   try {
-    const [saved, opportunities, complaints] = await Promise.all([
-      prisma.savedOpportunity.deleteMany({ where: { userId: user.id } }),
-      prisma.opportunity.deleteMany({ where: { userId: user.id } }),
-      prisma.complaint.deleteMany({ where: { userId: user.id } }),
-    ]);
+    const saved = await prisma.savedOpportunity.deleteMany({
+      where: { userId: user.id, projectId: project.id },
+    });
+    const opportunities = await prisma.opportunity.deleteMany({
+      where: { userId: user.id, projectId: project.id },
+    });
+    const complaints = await prisma.complaint.deleteMany({
+      where: { userId: user.id, projectId: project.id },
+    });
 
     revalidatePath("/dashboard");
     revalidatePath("/dashboard/complaints");
@@ -42,6 +50,7 @@ export async function clearWorkspace(): Promise<WorkspaceResult> {
         opportunities: opportunities.count,
         complaints: complaints.count,
       },
+      projectName: project.name,
     };
   } catch (err) {
     return {

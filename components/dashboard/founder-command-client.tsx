@@ -29,6 +29,7 @@ import {
   type WorkflowStepStatus,
 } from "@/lib/dashboard-plan";
 import { Button } from "@/components/ui/button";
+import { projectHref } from "@/lib/project-href";
 
 /* Read-only client component for the Founder Command Center.
  * Reads decision statuses + evidence from localStorage (never writes).
@@ -38,9 +39,11 @@ import { Button } from "@/components/ui/button";
 export function FounderCommandClient({
   stats,
   opportunityIds,
+  projectId,
 }: {
   stats: DashboardStats;
   opportunityIds: string[];
+  projectId: string;
 }) {
   const [local, setLocal] = React.useState<LocalSummary>({
     hasEvidence: false,
@@ -145,7 +148,7 @@ export function FounderCommandClient({
             </p>
           </div>
           <Button asChild size="sm">
-            <Link href={nextAction.href}>
+            <Link href={projectHref(nextAction.href, projectId)}>
               {nextAction.cta} <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </Button>
@@ -157,7 +160,7 @@ export function FounderCommandClient({
         <h2 className="text-base font-semibold">Opportunity workflow</h2>
         <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           {steps.map((step) => (
-            <WorkflowStepCard key={step.id} step={step} />
+            <WorkflowStepCard key={step.id} step={step} projectId={projectId} />
           ))}
         </div>
       </div>
@@ -180,7 +183,7 @@ export function FounderCommandClient({
               <SnapshotCount label="Undecided" value={hydrated ? decisionCounts.undecided : "—"} accent="muted" />
             </div>
             <Link
-              href="/dashboard/opportunities/decision-board"
+              href={projectHref("/dashboard/opportunities/decision-board", projectId)}
               className="mt-3 inline-block text-xs text-[var(--color-primary)] hover:underline"
             >
               Open Decision Board →
@@ -202,7 +205,7 @@ export function FounderCommandClient({
               <SnapshotCount label="Needs more" value={hydrated ? evidenceCounts.needsMore : "—"} accent="warning" />
             </div>
             <Link
-              href="/dashboard/opportunities"
+              href={projectHref("/dashboard/opportunities", projectId)}
               className="mt-3 inline-block text-xs text-[var(--color-primary)] hover:underline"
             >
               Review Opportunities →
@@ -221,8 +224,10 @@ export function FounderCommandClient({
 
 function WorkflowStepCard({
   step,
+  projectId,
 }: {
   step: import("@/lib/dashboard-plan").WorkflowStep;
+  projectId: string;
 }) {
   const statusMeta: Record<
     WorkflowStepStatus,
@@ -249,7 +254,7 @@ function WorkflowStepCard({
         {step.description}
       </p>
       <Link
-        href={step.href}
+        href={projectHref(step.href, projectId)}
         className="mt-2 inline-block text-[11px] text-[var(--color-primary)] hover:underline"
       >
         {step.cta} →

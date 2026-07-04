@@ -23,7 +23,13 @@ const inputCls =
  * share the same source-type / source-label UI and the same server action
  * (importTextComplaints), so parsing + dedup + insertion logic is reused.
  */
-export function TextInput({ mode }: { mode: "paste" | "file" }) {
+export function TextInput({
+  mode,
+  projectId,
+}: {
+  mode: "paste" | "file";
+  projectId: string;
+}) {
   const [sourceType, setSourceType] = React.useState<SourceType>(SOURCE_TYPES[0]);
   const [sourceLabel, setSourceLabel] = React.useState("");
   const [fileName, setFileName] = React.useState<string | null>(null);
@@ -71,6 +77,7 @@ export function TextInput({ mode }: { mode: "paste" | "file" }) {
 
   return (
     <form action={action} className="space-y-4">
+      <input type="hidden" name="projectId" value={projectId} />
       <input type="hidden" name="text" id="rift-text-data" />
 
       <div className="grid gap-4 sm:grid-cols-2">
@@ -192,7 +199,13 @@ export function TextInput({ mode }: { mode: "paste" | "file" }) {
         )}
       </Button>
 
-      {state && <TextImportSummary result={state} sourceLabel={summaryLabel} />}
+      {state && (
+        <TextImportSummary
+          result={state}
+          sourceLabel={summaryLabel}
+          projectId={projectId}
+        />
+      )}
     </form>
   );
 }

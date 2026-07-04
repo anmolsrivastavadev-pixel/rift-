@@ -30,20 +30,42 @@ import { MarketGapHypothesis } from "@/components/opportunities/market-gap-hypot
 import { ValidationWorkspace } from "@/components/opportunities/validation-workspace";
 import { ValidationEvidenceLog } from "@/components/opportunities/validation-evidence-log";
 import { requireUser } from "@/lib/auth/current-user";
+import { projectHref } from "@/lib/project-href";
+import { requireOwnedProject } from "@/lib/projects";
+
+function firstParam(value: string | string[] | undefined): string | undefined {
+  return Array.isArray(value) ? value[0] : value;
+}
 
 export default async function OpportunityDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ projectId?: string | string[] }>;
 }) {
   const user = await requireUser();
   const { id } = await params;
+  const requestedProjectId = firstParam((await searchParams).projectId);
+
+  let projectId = requestedProjectId;
+  if (!projectId) {
+    const ownedOpportunity = await prisma.opportunity.findFirst({
+      where: { id, userId: user.id },
+      select: { projectId: true },
+    });
+    if (!ownedOpportunity?.projectId) notFound();
+    projectId = ownedOpportunity.projectId;
+  }
+
+  const project = await requireOwnedProject(projectId, user);
 
   const [op, allOthers, allNeighbours] = await Promise.all([
     prisma.opportunity.findFirst({
-      where: { id, userId: user.id },
+      where: { id, userId: user.id, projectId: project.id },
       include: {
         complaints: {
+          where: { userId: user.id, projectId: project.id },
           orderBy: { createdAt: "asc" },
           take: 5,
           select: {
@@ -54,11 +76,14 @@ export default async function OpportunityDetailPage({
             createdAt: true,
           },
         },
-        savedOpportunities: { select: { id: true } },
+        savedOpportunities: {
+          where: { userId: user.id, projectId: project.id },
+          select: { id: true },
+        },
       },
     }),
     prisma.opportunity.findMany({
-      where: { userId: user.id },
+      where: { userId: user.id, projectId: project.id },
       select: {
         id: true,
         title: true,
@@ -69,7 +94,7 @@ export default async function OpportunityDetailPage({
       },
     }),
     prisma.opportunity.findMany({
-      where: { userId: user.id },
+      where: { userId: user.id, projectId: project.id },
       orderBy: { createdAt: "desc" },
       select: { id: true, createdAt: true },
     }),
@@ -108,7 +133,7 @@ export default async function OpportunityDetailPage({
       {/* Back */}
       <div>
         <Button asChild variant="ghost" size="sm">
-          <Link href="/dashboard/opportunities">
+          <Link href={projectHref("/dashboard/opportunities", project.id)}>
             <ArrowLeft className="h-4 w-4" /> Back to ideas
           </Link>
         </Button>
@@ -144,7 +169,7 @@ export default async function OpportunityDetailPage({
         </div>
       </header>
 
-      <PrevNextNav prevId={prevId} nextId={nextId} />
+      <PrevNextNav prevId={prevId} nextId={nextId} projectId={project.id} />
 
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_420px]">
         {/* LEFT column */}
@@ -311,6 +336,7 @@ export default async function OpportunityDetailPage({
                       opportunityScore: r.opportunityScore,
                     }}
                     shared={shared}
+                    projectId={project.id}
                   />
                 ))
               )}
