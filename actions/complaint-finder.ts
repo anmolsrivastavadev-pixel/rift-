@@ -14,6 +14,7 @@ import {
 import { requireUser } from "@/lib/auth/current-user";
 import { requireOwnedProject } from "@/lib/projects";
 import { trackProductEvent } from "@/lib/product-events";
+import { checkComplaintQuota, checkFinderSearchQuota } from "@/lib/quotas";
 
 const MAX_INSERT = 200;
 
@@ -61,6 +62,13 @@ export async function findComplaintsAction(
       ...base,
       errors: ["Type a keyword between 2 and 80 characters (e.g. “fitness apps”)."],
     };
+  }
+
+  // M26 — search quota BEFORE any external fetches: a search spends
+  // Reddit/HN/Tavily/Gemini budget regardless of how many rows it inserts.
+  const searchQuota = await checkFinderSearchQuota(user);
+  if (!searchQuota.ok) {
+    return { ...base, errors: [searchQuota.message] };
   }
 
   const [reddit, appStore, hackerNews, web] = await Promise.all([
@@ -126,6 +134,19 @@ export async function findComplaintsAction(
   );
 
   if (toInsert.length > 0) {
+    // M26 — per-project complaint cap (post-dedupe).
+    const quota = await checkComplaintQuota(user, project.id, toInsert.length);
+    if (!quota.ok) {
+      return {
+        ...base,
+        skipped: found.length,
+        redditFound: reddit.complaints.length,
+        appStoreFound: appStore.complaints.length,
+        hackerNewsFound: hackerNews.complaints.length,
+        webFound: web.complaints.length,
+        errors: [quota.message],
+      };
+    }
     // M16D — record this find as one import history row and link the
     // complaints back to it.
     const complaintImport = await prisma.complaintImport.create({

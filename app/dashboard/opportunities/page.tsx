@@ -7,6 +7,7 @@ import { OpportunityBrowser } from "@/components/opportunities/opportunity-brows
 import { Button } from "@/components/ui/button";
 import { requireUser } from "@/lib/auth/current-user";
 import { getProjectOrDefault, projectHref } from "@/lib/projects";
+import { getUsageSummary } from "@/lib/quotas";
 
 function firstParam(value: string | string[] | undefined): string | undefined {
   return Array.isArray(value) ? value[0] : value;
@@ -22,7 +23,7 @@ export default async function OpportunitiesPage({
     firstParam((await searchParams).projectId),
     user
   );
-  const [ops, savedRows, complaintCount] = await Promise.all([
+  const [ops, savedRows, complaintCount, usage] = await Promise.all([
     prisma.opportunity.findMany({
       where: { userId: user.id, projectId: project.id },
       orderBy: { opportunityScore: "desc" },
@@ -35,9 +36,22 @@ export default async function OpportunitiesPage({
     prisma.complaint.count({
       where: { userId: user.id, projectId: project.id },
     }),
+    getUsageSummary(user),
   ]);
 
   const savedSet = new Set(savedRows.map((s) => s.opportunityId));
+
+  // M26 — free-plan usage line under the run button. Hidden for pro/admin.
+  const usageLine =
+    usage.plan === "free" ? (
+      <p className="mt-2 text-xs text-[var(--color-muted-foreground)]">
+        {usage.ideaRunsThisMonth} of {usage.limits.ideaRunsPerMonth} free idea
+        runs used this month.{" "}
+        <Link href="/pricing" className="underline hover:text-[var(--color-foreground)]">
+          See plans
+        </Link>
+      </p>
+    ) : null;
 
   const cards = ops.map((o) => ({
     id: o.id,
@@ -98,6 +112,7 @@ export default async function OpportunitiesPage({
           </p>
           <div className="mt-4">
             <RunOpportunitiesButton projectId={project.id} />
+            {usageLine}
           </div>
         </section>
       ) : (
@@ -109,6 +124,7 @@ export default async function OpportunitiesPage({
           </p>
           <div className="mt-4">
             <RunOpportunitiesButton projectId={project.id} />
+            {usageLine}
           </div>
         </details>
       )}
