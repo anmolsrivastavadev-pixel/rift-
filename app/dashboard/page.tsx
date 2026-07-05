@@ -7,7 +7,11 @@ import {
   ComplaintsChart,
   type DayBucket,
 } from "@/components/dashboard/complaints-chart";
-import { FounderCommandClient } from "@/components/dashboard/founder-command-client";
+import {
+  FounderCommandClient,
+  type DecisionCounts,
+} from "@/components/dashboard/founder-command-client";
+import { isValidDecisionStatus } from "@/lib/decision-board";
 import { Button } from "@/components/ui/button";
 import type { DashboardStats } from "@/lib/dashboard-plan";
 import { requireUser } from "@/lib/auth/current-user";
@@ -97,8 +101,24 @@ export default async function DashboardPage({
     highestScore,
   };
 
-  // The FounderCommandClient only reads opportunityIds for localStorage-derived
-  // summaries; pass the project-scoped set so those summaries match the page.
+  // M16C — decision counts come from the database (per user, per project), so
+  // the Founder Command Center shows the same summary on every device.
+  const ids = opportunityIds.map((o) => o.id);
+  const workspaces = ids.length
+    ? await prisma.validationWorkspace.findMany({
+        where: { userId: user.id, opportunityId: { in: ids } },
+        select: { decisionStatus: true },
+      })
+    : [];
+  const decisionCounts: DecisionCounts = { pursue: 0, park: 0, reject: 0, undecided: 0 };
+  for (const w of workspaces) {
+    if (isValidDecisionStatus(w.decisionStatus) && w.decisionStatus !== "undecided") {
+      decisionCounts[w.decisionStatus]++;
+    }
+  }
+  decisionCounts.undecided =
+    ids.length - decisionCounts.pursue - decisionCounts.park - decisionCounts.reject;
+
   const projectId = project.id;
 
   return (
@@ -177,10 +197,10 @@ export default async function DashboardPage({
         </div>
       ) : null}
 
-      {/* Client-side workflow + next action + decision/evidence snapshot */}
+      {/* Workflow + next action + decision snapshot (DB-backed since M16C) */}
       <FounderCommandClient
         stats={stats}
-        opportunityIds={opportunityIds.map((o) => o.id)}
+        decisionCounts={decisionCounts}
         projectId={projectId}
       />
 

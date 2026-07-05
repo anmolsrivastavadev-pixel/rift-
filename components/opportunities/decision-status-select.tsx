@@ -3,16 +3,16 @@
 import * as React from "react";
 
 import {
-  decisionStorageKey,
   DECISION_STATUSES,
   DECISION_LABELS,
-  isValidDecisionStatus,
   type DecisionStatus,
 } from "@/lib/decision-board";
+import { setDecisionStatus as saveDecisionStatus } from "@/actions/validation";
 
-/* Compact native select for choosing a local decision status per opportunity.
- * Reads localStorage after mount; writes after hydration. No
- * useSyncExternalStore, no hydration crash. Keyed per opportunity ID.
+/* Compact native select for choosing a decision status per opportunity.
+ * M16C: statuses are database-backed — the server page loads them and passes
+ * them into `useDecisionStatuses`; changes update local state instantly and
+ * are persisted through a server action.
  */
 export function DecisionStatusSelect({
   opportunityId,
@@ -39,43 +39,29 @@ export function DecisionStatusSelect({
   );
 }
 
-/* Hook: loads all decision statuses from localStorage for a set of
- * opportunity IDs. Returns a map + a setter that persists to localStorage.
- * SSR-safe (returns all-undecided until hydration).
+/* Hook: holds the decision statuses for a set of opportunities, seeded from
+ * the database via the server page. `setStatus` updates local state
+ * immediately (instant UI) and persists through the setDecisionStatus server
+ * action. `hydrated` is kept for API compatibility and is always true — the
+ * server-provided state is available on first render.
  */
-export function useDecisionStatuses(opportunityIds: string[]): {
+export function useDecisionStatuses(
+  initialStatuses: Record<string, DecisionStatus>
+): {
   statuses: Record<string, DecisionStatus>;
   hydrated: boolean;
   setStatus: (id: string, status: DecisionStatus) => void;
 } {
-  const [statuses, setStatuses] = React.useState<Record<string, DecisionStatus>>({});
-  const [hydrated, setHydrated] = React.useState(false);
-
-  // Read from localStorage after mount.
-  React.useEffect(() => {
-    const map: Record<string, DecisionStatus> = {};
-    try {
-      for (const id of opportunityIds) {
-        const raw = window.localStorage.getItem(decisionStorageKey(id));
-        if (isValidDecisionStatus(raw)) {
-          map[id] = raw;
-        }
-      }
-    } catch {
-      // localStorage unavailable — start with all undecided.
-    }
-    setStatuses(map); // eslint-disable-line react-hooks/set-state-in-effect
-    setHydrated(true);
-  }, [opportunityIds]);
+  const [statuses, setStatuses] =
+    React.useState<Record<string, DecisionStatus>>(initialStatuses);
 
   function setStatus(id: string, status: DecisionStatus) {
     setStatuses((prev) => ({ ...prev, [id]: status }));
-    try {
-      window.localStorage.setItem(decisionStorageKey(id), status);
-    } catch {
-      // private mode / quota — fail silently.
-    }
+    void saveDecisionStatus(id, status).catch(() => {
+      // Offline / transient failure — the selection stays visible locally and
+      // the next change retries the save.
+    });
   }
 
-  return { statuses, hydrated, setStatus };
+  return { statuses, hydrated: true, setStatus };
 }

@@ -101,6 +101,15 @@ export default async function OpportunityDetailPage({
 
   if (!op) notFound();
 
+  // M16C — load the saved validation checklist for this user + opportunity.
+  const workspace = await prisma.validationWorkspace.findUnique({
+    where: { userId_opportunityId: { userId: user.id, opportunityId: op.id } },
+    select: { validationChecklist: true },
+  });
+  const initialChecklist = Array.isArray(workspace?.validationChecklist)
+    ? (workspace.validationChecklist as unknown[]).map(Boolean)
+    : null;
+
   const bd = op.scoreBreakdown as {
     weights?: { count: number; severity: number; confidence: number };
     inputs?: { complaintCount: number; severity: number; confidence: number };
@@ -349,6 +358,7 @@ export default async function OpportunityDetailPage({
           has room to breathe. Owns interview questions + risks (rendered once,
           not duplicated as standalone sections). */}
       <ValidationWorkspace
+        initialChecklist={initialChecklist}
         input={{
           id: op.id,
           title: op.title,

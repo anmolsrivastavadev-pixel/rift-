@@ -25,6 +25,7 @@ model User {
   complaints         Complaint[]
   opportunities      Opportunity[]
   savedOpportunities SavedOpportunity[]
+  validationWorkspaces ValidationWorkspace[]
 }
 
 // M16A — Multi-Project Market Tests. Lets a user split market tests into
@@ -42,6 +43,7 @@ model Project {
   complaints         Complaint[]
   opportunities      Opportunity[]
   savedOpportunities SavedOpportunity[]
+  validationWorkspaces ValidationWorkspace[]
   createdAt           DateTime           @default(now())
   updatedAt           DateTime           @updatedAt
 
@@ -144,9 +146,39 @@ model Opportunity {
 
   complaints        Complaint[]
   savedOpportunities SavedOpportunity[]
+  validationWorkspaces ValidationWorkspace[]
 
   @@index([userId])
   @@index([projectId])
+}
+
+// M16C — Database-backed Validation Workspace state. One row per user per
+// opportunity. Replaces the old localStorage-only checklist/decision storage
+// so progress survives refreshes, browsers, and devices.
+// - decisionStatus: "undecided" | "pursue" | "park" | "reject"
+// - validationChecklist: boolean[] mirroring VALIDATION_CHECKLIST_ITEMS
+// - validationEvidence: reserved (the evidence-log UI was removed in an
+//   earlier UX patch; kept nullable so no future migration is needed)
+// Cascades: deleting the user, the project, or the opportunity removes the
+// workspace row — so M16B3 permanent project delete cleans this up for free.
+model ValidationWorkspace {
+  id                  String      @id @default(cuid())
+  userId              String
+  user                User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projectId           String?
+  project             Project?    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  opportunityId       String
+  opportunity         Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  decisionStatus      String      @default("undecided")
+  validationChecklist Json?
+  validationEvidence  Json?
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+
+  @@unique([userId, opportunityId]) // one workspace per user per opportunity
+  @@index([userId, projectId])
+  @@index([projectId])
+  @@index([opportunityId])
 }
 
 model SavedOpportunity {

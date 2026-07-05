@@ -1,95 +1,43 @@
 "use client";
 
-import * as React from "react";
 import { ArrowRight, Info } from "lucide-react";
 import Link from "next/link";
 
 import {
-  decisionStorageKey,
-  isValidDecisionStatus,
-  type DecisionStatus,
-} from "@/lib/decision-board";
-import {
   computeNextAction,
   type DashboardStats,
-  type LocalSummary,
 } from "@/lib/dashboard-plan";
 import { Button } from "@/components/ui/button";
 import { projectHref } from "@/lib/project-href";
 
+export type DecisionCounts = {
+  pursue: number;
+  park: number;
+  reject: number;
+  undecided: number;
+};
+
 /* Read-only client component for the Founder Command Center.
- * Reads decision statuses from localStorage (never writes).
- * Passes the local summary + server stats into the pure helpers to compute
- * the recommended next action.
+ * M16C: decision counts come from the database via the server page (no more
+ * localStorage reads), so the summary is identical on every device.
+ * Passes the summary + server stats into the pure helpers to compute the
+ * recommended next action.
  */
 export function FounderCommandClient({
   stats,
-  opportunityIds,
+  decisionCounts,
   projectId,
 }: {
   stats: DashboardStats;
-  opportunityIds: string[];
+  decisionCounts: DecisionCounts;
   projectId: string;
 }) {
-  const [local, setLocal] = React.useState<LocalSummary>({
-    hasNonUndecidedDecision: false,
-    hasPursue: false,
+  const decided =
+    decisionCounts.pursue + decisionCounts.park + decisionCounts.reject;
+  const nextAction = computeNextAction(stats, {
+    hasNonUndecidedDecision: decided > 0,
+    hasPursue: decisionCounts.pursue > 0,
   });
-  const [hydrated, setHydrated] = React.useState(false);
-  const [decisionCounts, setDecisionCounts] = React.useState({
-    pursue: 0,
-    park: 0,
-    reject: 0,
-    undecided: 0,
-  });
-
-  const readAll = React.useCallback(() => {
-    let hasNonUndecided = false;
-    let hasPursue = false;
-    const dc = { pursue: 0, park: 0, reject: 0, undecided: 0 };
-
-    try {
-      for (const id of opportunityIds) {
-        const dRaw = window.localStorage.getItem(decisionStorageKey(id));
-        const status: DecisionStatus = isValidDecisionStatus(dRaw)
-          ? dRaw
-          : "undecided";
-        dc[status]++;
-        if (status !== "undecided") hasNonUndecided = true;
-        if (status === "pursue") hasPursue = true;
-      }
-    } catch {
-      // localStorage unavailable
-    }
-    return { hasNonUndecided, hasPursue, dc };
-  }, [opportunityIds]);
-
-  React.useEffect(() => {
-    const result = readAll();
-    setLocal({ // eslint-disable-line react-hooks/set-state-in-effect
-      hasNonUndecidedDecision: result.hasNonUndecided,
-      hasPursue: result.hasPursue,
-    });
-    setDecisionCounts(result.dc);
-    setHydrated(true);
-  }, [readAll]);
-
-  // Refresh on window focus.
-  React.useEffect(() => {
-    if (!hydrated) return;
-    const onFocus = () => {
-      const result = readAll();
-      setLocal({
-        hasNonUndecidedDecision: result.hasNonUndecided,
-        hasPursue: result.hasPursue,
-      });
-      setDecisionCounts(result.dc);
-    };
-    window.addEventListener("focus", onFocus);
-    return () => window.removeEventListener("focus", onFocus);
-  }, [hydrated, readAll]);
-
-  const nextAction = computeNextAction(stats, local);
 
   return (
     <div className="space-y-8">
@@ -116,10 +64,10 @@ export function FounderCommandClient({
         <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-5 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)]">
           <h3 className="text-sm font-semibold">Decision status</h3>
           <div className="mt-3 grid grid-cols-4 gap-2 text-center">
-            <SnapshotCount label="Pursue" value={hydrated ? decisionCounts.pursue : "—"} accent="success" />
-            <SnapshotCount label="Park" value={hydrated ? decisionCounts.park : "—"} accent="warning" />
-            <SnapshotCount label="Reject" value={hydrated ? decisionCounts.reject : "—"} accent="danger" />
-            <SnapshotCount label="Undecided" value={hydrated ? decisionCounts.undecided : "—"} accent="muted" />
+            <SnapshotCount label="Pursue" value={decisionCounts.pursue} accent="success" />
+            <SnapshotCount label="Park" value={decisionCounts.park} accent="warning" />
+            <SnapshotCount label="Reject" value={decisionCounts.reject} accent="danger" />
+            <SnapshotCount label="Undecided" value={decisionCounts.undecided} accent="muted" />
           </div>
           <Link
             href={projectHref("/dashboard/opportunities/decision-board", projectId)}
@@ -131,7 +79,7 @@ export function FounderCommandClient({
       )}
 
       <p className="flex items-center gap-1 text-[11px] text-[var(--color-muted-foreground)]">
-        <Info className="h-3 w-3" /> Decisions are saved only in this browser.
+        <Info className="h-3 w-3" /> Decisions are saved to your account.
       </p>
     </div>
   );

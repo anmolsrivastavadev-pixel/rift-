@@ -5,6 +5,7 @@ import {
 } from "@/components/opportunities/decision-board-client";
 import { requireUser } from "@/lib/auth/current-user";
 import { getProjectOrDefault } from "@/lib/projects";
+import { isValidDecisionStatus, type DecisionStatus } from "@/lib/decision-board";
 
 function firstParam(value: string | string[] | undefined): string | undefined {
   return Array.isArray(value) ? value[0] : value;
@@ -44,6 +45,21 @@ export default async function DecisionBoardPage({
     }
   }
 
+  // M16C — load saved decision statuses for these opportunities from the DB.
+  const workspaces = await prisma.validationWorkspace.findMany({
+    where: {
+      userId: user.id,
+      opportunityId: { in: filteredOps.map((o) => o.id) },
+    },
+    select: { opportunityId: true, decisionStatus: true },
+  });
+  const initialStatuses: Record<string, DecisionStatus> = {};
+  for (const w of workspaces) {
+    if (isValidDecisionStatus(w.decisionStatus)) {
+      initialStatuses[w.opportunityId] = w.decisionStatus;
+    }
+  }
+
   const opportunities: DecisionBoardOpportunity[] = filteredOps.map((o) => ({
     id: o.id,
     title: o.title,
@@ -66,6 +82,7 @@ export default async function DecisionBoardPage({
       opportunities={opportunities}
       isCompareMode={isCompareMode}
       projectId={project.id}
+      initialStatuses={initialStatuses}
     />
   );
 }

@@ -21,9 +21,9 @@ export const DECISION_LABELS: Record<DecisionStatus, string> = {
   reject: "Reject",
 };
 
-export function decisionStorageKey(opportunityId: string): string {
-  return `rift-opportunity-decision-${opportunityId}`;
-}
+/* The old `rift-opportunity-decision-<id>` localStorage keys are read ONLY by
+ * the one-time M16C migration (components/dashboard/validation-state-migrator.tsx).
+ * Decision state is database-backed now (ValidationWorkspace). */
 
 export function isValidDecisionStatus(value: string | null | undefined): value is DecisionStatus {
   return value != null && (DECISION_STATUSES as string[]).includes(value);

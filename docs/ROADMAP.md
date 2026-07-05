@@ -232,16 +232,20 @@ The Start Fresh Test patch addresses workspace-mixing confusion:
 - **Important behavior:** Delete is intentionally harder than archive (archived-only + typed name confirmation). There is NO undo after delete. Active projects cannot be deleted — archive/restore behavior from M16B2 is unchanged. No schema changes were needed; M16B3 reuses `Project.archivedAt` from M16B2.
 - **Not included:** No deleting active projects, no bulk delete, no undo/restore after delete, no project sharing/teams/billing, no upload history, no scraping, no new AI calls, no new dependencies, no nested project routes, no auth/route-protection changes, no Gemini prompt/scoring/parsing/cleaning changes.
 
+### M16C — Persist Validation Workspace state
+- **Status:** ✅ Done
+- **Purpose:** Move Validation Workspace progress (testing checklist + decision status) from localStorage into the authenticated database so it survives refreshes, browsers, and devices, per user and per project.
+- **What was built:** New `ValidationWorkspace` Prisma model (one row per user per opportunity via `@@unique([userId, opportunityId])`; `decisionStatus` string defaulting to "undecided", `validationChecklist` Json `boolean[]`, reserved nullable `validationEvidence`; Cascade relations to User/Project/Opportunity so M16B3 permanent delete cleans it up automatically; applied with `prisma db push`). New `actions/validation.ts` server actions (`setDecisionStatus`, `saveValidationChecklist`, `migrateValidationState`) — each verifies the opportunity belongs to the session user and derives `projectId` server-side. Pages now load validation state server-side and pass it in: opportunity detail → checklist, decision board → statuses, dashboard home → decision counts. `ValidationChecklist` saves with a 600ms debounce and flushes pending saves on unmount; `useDecisionStatuses` updates local state instantly and persists per change; `FounderCommandClient` no longer reads localStorage at all. One-time migrator (`components/dashboard/validation-state-migrator.tsx`, mounted in the dashboard layout) copies old localStorage keys into the DB per user per browser — only inserting missing rows, never overwriting — then never runs again.
+- **Important behavior:** UI is unchanged apart from "Saved only in this browser." captions becoming "Saved to your account." / "Decisions are saved to your account." Old localStorage keys are left in place but never read outside the migrator. The evidence-log UI was removed in an earlier UX patch, so there is no evidence state to persist — the column exists for the future only.
+- **Not included:** No UI redesign, no notifications/collaboration/billing/uploads/scraping, no new AI calls, no new dependencies, no Gemini prompt/scoring/parsing/cleaning changes, no auth or archive/delete behavior changes.
+
 ---
 
 ## Future / post-MVP milestones (not started)
 
 Do **not** start any of these without an explicit user prompt. They appear here only for visibility.
 
-> Note: M7–M16B3 are complete (M16B — rename, duplicate names, archive/restore, permanent delete — is fully done). The items below are future work and must not be started without an explicit user prompt.
-
-### M16C — Persist validation workspace state
-- Move validation checklist, validation evidence, and decision status from localStorage to authenticated, project-scoped database tables.
+> Note: M7–M16C are complete — see "Completed milestones" above. The items below are future work and must not be started without an explicit user prompt.
 
 ### M16D — Upload history & re-runs
 - Persist each upload as a row in the DB; let users reopen past analyses and compare AI re-runs.

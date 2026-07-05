@@ -107,7 +107,7 @@ export function buildRisksToTest(input: ValidationPlanInput): string[] {
   return FALLBACK_RISKS;
 }
 
-/* --- Section 7: Validation Checklist (interactive, localStorage) --- */
+/* --- Section 7: Validation Checklist (interactive, DB-backed since M16C) --- */
 
 export const VALIDATION_CHECKLIST_ITEMS = [
   "Identify 5 target users.",
@@ -119,9 +119,9 @@ export const VALIDATION_CHECKLIST_ITEMS = [
   "Decide: pursue, park, or reject.",
 ] as const;
 
-export function checklistStorageKey(opportunityId: string): string {
-  return `rift-validation-checklist-${opportunityId}`;
-}
+/* The old `rift-validation-checklist-<id>` localStorage keys are read ONLY by
+ * the one-time M16C migration (components/dashboard/validation-state-migrator.tsx).
+ * Checklist state is database-backed now (ValidationWorkspace). */
 
 /* --- Section 8: Copy Validation Brief --- */
 

@@ -1,4 +1,5 @@
 import { DashboardShell } from "@/components/dashboard/shell";
+import { ValidationStateMigrator } from "@/components/dashboard/validation-state-migrator";
 import { requireUser } from "@/lib/auth/current-user";
 import {
   getProjectOrDefault,
@@ -23,6 +24,7 @@ export default async function DashboardLayout({
       archivedProjects={archivedProjects}
       currentProjectId={project.id}
     >
+      <ValidationStateMigrator userId={user.id} />
       {children}
     </DashboardShell>
   );

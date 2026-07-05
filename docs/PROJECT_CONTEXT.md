@@ -145,6 +145,7 @@ actions/
 │                       resetOpportunitiesAction (project-scoped)
 ├─ projects.ts          createProject (M16A) + renameProject (M16B1) + archive/unarchive (M16B2) + deleteArchivedProject (M16B3), duplicate-name validation
 ├─ saved.ts             project-scoped saveOpportunity, unsaveOpportunity, saveAction, unsaveAction
+├─ validation.ts        M16C DB-backed Validation Workspace: setDecisionStatus, saveValidationChecklist, migrateValidationState
 └─ workspace.ts         clearWorkspace (start fresh test — clears current project data)
 
 prisma/
@@ -173,8 +174,11 @@ Rift now has auth and project-scoped market tests:
 - `Complaint` — complaint row with nullable `userId` and nullable `projectId` during the M16A migration. `projectId` has an optional `Project` relation with `onDelete: SetNull` and `@@index([projectId])`.
 - `Opportunity` — generated idea row with nullable `userId` and nullable `projectId` during the M16A migration. `projectId` has an optional `Project` relation with `onDelete: SetNull` and `@@index([projectId])`.
 - `SavedOpportunity` — saved/bookmarked idea with nullable `userId` and nullable `projectId` during the M16A migration. It keeps `@@unique([userId, opportunityId])`, has `@@index([projectId])`, and its project relation uses `onDelete: SetNull`.
+- `ValidationWorkspace` — M16C database-backed Validation Workspace state: one row per user per opportunity (`@@unique([userId, opportunityId])`) holding `decisionStatus` ("undecided" | "pursue" | "park" | "reject"), `validationChecklist` (Json `boolean[]` mirroring `VALIDATION_CHECKLIST_ITEMS`), and a reserved nullable `validationEvidence` Json column (the evidence-log UI was removed in an earlier UX patch). All three relations (`user`, `project`, `opportunity`) use `onDelete: Cascade`, so M16B3 permanent project delete removes validation state automatically.
 
 All application reads/writes for complaints, opportunities, and saved opportunities must filter by both `userId` and the selected `projectId`. Legacy rows with `userId = null` are left alone by the M16A backfill. There is still no `UploadHistory` table; upload history remains future work.
+
+Validation Workspace state (testing checklist + decision status) is database-backed since M16C: pages load it server-side and pass it into the client components, writes go through `actions/validation.ts` (checklist writes are debounced client-side). localStorage is used ONLY by the one-time migrator (`components/dashboard/validation-state-migrator.tsx`), which copies old `rift-opportunity-decision-*` / `rift-validation-checklist-*` keys into the DB on first dashboard load per user per browser — inserting only rows that don't exist yet, never overwriting database data.
 
 ---
 
@@ -290,6 +294,7 @@ Dashboard routes use query-param project routing in M16A: `?projectId=...`. If t
 | `actions/opportunities.ts` | `runPipeline(formData)`, `getProcessingStatus(jobId, projectId)`, `resetOpportunities(formData)`, `resetOpportunitiesAction(formData)`. All require a user and owned project. |
 | `actions/projects.ts` | `createProject(prev, formData)` (M16A), `renameProject(prev, formData)` (M16B1), `archiveProject(prev, formData)` and `unarchiveProject(prev, formData)` (M16B2). All verify ownership server-side. Create/rename trim the name, enforce required/max-60-char names, and reject duplicate project names per user (case-insensitive, app-level — no DB unique constraint). Archive sets `archivedAt`, refuses to archive the last active project ("You need at least one active project."), and redirects to the oldest remaining active project; unarchive clears `archivedAt` and redirects into the restored project. `deleteArchivedProject(prev, formData)` (M16B3) permanently deletes an ARCHIVED project only: it requires the user to type the project name exactly (`confirmName`), rejects active projects ("Archive this project before deleting it."), and deletes saved ideas → complaints → ideas → the project row in one transaction, every statement filtered by the current user's id and the project id. There is no undo. |
 | `actions/saved.ts` | `saveOpportunity(prev, formData)`, `unsaveOpportunity(prev, formData)`, `saveAction(formData)`, `unsaveAction(formData)`. All require a user and owned project. |
+| `actions/validation.ts` | M16C: `setDecisionStatus(opportunityId, status)`, `saveValidationChecklist(opportunityId, checked)`, `migrateValidationState(entries)`. All verify the opportunity belongs to the session user server-side before upserting the `ValidationWorkspace` row; `projectId` is copied from the owned opportunity, never from the client. Migration only inserts rows that don't already exist. |
 | `actions/workspace.ts` | `clearWorkspace(projectId)` clears only saved opportunities, opportunities, and complaints for the current user's current project. |
 
 All actions are `"use server"` files. They import `prisma` from `lib/db.ts` and `revalidatePath` from `next/cache`.

@@ -22,12 +22,20 @@ import { CopyValidationBrief } from "@/components/opportunities/copy-validation-
 
 /* Validation Workspace — a lightweight, deterministic validation guide
  * rendered on the opportunity detail page. Uses only existing M9 fields +
- * deterministic fallback copy. No Gemini, no DB writes, no auth.
+ * deterministic fallback copy. No Gemini. The interactive checklist is
+ * database-backed since M16C (state loaded by the server page and passed in
+ * via `initialChecklist`).
  *
  * This component owns the rendering of validation questions and risk flags so
  * the detail page does NOT render them separately (avoiding duplicates).
  */
-export function ValidationWorkspace({ input }: { input: ValidationPlanInput }) {
+export function ValidationWorkspace({
+  input,
+  initialChecklist,
+}: {
+  input: ValidationPlanInput;
+  initialChecklist: boolean[] | null;
+}) {
   const hypothesis = buildHypothesis(input);
   const targetCustomer = buildTargetCustomer(input);
   const questions = buildInterviewQuestions(input);
@@ -114,8 +122,11 @@ export function ValidationWorkspace({ input }: { input: ValidationPlanInput }) {
             </ul>
           </Sub>
 
-          {/* 7. Validation Checklist (interactive, localStorage) */}
-          <ValidationChecklist opportunityId={input.id} />
+          {/* 7. Validation Checklist (interactive, database-backed) */}
+          <ValidationChecklist
+            opportunityId={input.id}
+            initialChecked={initialChecklist}
+          />
         </div>
       </div>
     </details>

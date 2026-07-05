@@ -103,13 +103,14 @@ export function DecisionBoardClient({
   opportunities,
   isCompareMode = false,
   projectId,
+  initialStatuses,
 }: {
   opportunities: DecisionBoardOpportunity[];
   isCompareMode?: boolean;
   projectId: string;
+  initialStatuses: Record<string, DecisionStatus>;
 }) {
-  const ids = React.useMemo(() => opportunities.map((o) => o.id), [opportunities]);
-  const { statuses, hydrated, setStatus } = useDecisionStatuses(ids);
+  const { statuses, hydrated, setStatus } = useDecisionStatuses(initialStatuses);
   const [filter, setFilter] = React.useState<FilterValue>("all");
 
   const resolveStatus = (id: string): DecisionStatus =>
@@ -278,7 +279,7 @@ export function DecisionBoardClient({
         </div>
 
         <p className="flex items-center gap-1 text-[11px] text-[var(--color-muted-foreground)]">
-          <Info className="h-3 w-3" /> Decisions are saved only in this browser.
+          <Info className="h-3 w-3" /> Decisions are saved to your account.
         </p>
       </div>
     );
@@ -430,7 +431,7 @@ export function DecisionBoardClient({
       )}
 
       <p className="flex items-center gap-1 text-[11px] text-[var(--color-muted-foreground)]">
-        <Info className="h-3 w-3" /> Decisions are saved only in this browser.
+        <Info className="h-3 w-3" /> Decisions are saved to your account.
       </p>
     </div>
   );
