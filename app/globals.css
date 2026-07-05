@@ -168,3 +168,19 @@
     box-shadow: var(--shadow-card-hover);
   }
 }
+
+/* M29 — print styles for the public share page ("Save as PDF"). Forces a
+   clean white document and hides interactive chrome. Scoped to .share-report
+   so the rest of the app prints untouched. */
+@media print {
+  .share-report,
+  .share-report * {
+    background: #fff !important;
+    color: #111 !important;
+    border-color: #d4d4d8 !important;
+    box-shadow: none !important;
+  }
+  .print-hide {
+    display: none !important;
+  }
+}
