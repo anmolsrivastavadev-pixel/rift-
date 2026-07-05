@@ -23,11 +23,13 @@ function firstParam(value: string | string[] | undefined): string | undefined {
   return Array.isArray(value) ? value[0] : value;
 }
 
-function bucketByDay(rows: { sourceDate: Date | null }[]): DayBucket[] {
+// Buckets by the day each complaint was ADDED to Rift (createdAt), not the
+// date parsed from the original source — imported reviews can carry years-old
+// source dates that make the chart look wrong.
+function bucketByDay(rows: { createdAt: Date }[]): DayBucket[] {
   const map = new Map<string, number>();
   for (const r of rows) {
-    const d = r.sourceDate ?? new Date();
-    const key = d.toISOString().slice(0, 10);
+    const key = r.createdAt.toISOString().slice(0, 10);
     map.set(key, (map.get(key) ?? 0) + 1);
   }
   return Array.from(map.entries())
@@ -63,8 +65,8 @@ export default async function DashboardPage({
       select: { id: true, title: true, body: true, createdAt: true },
     }),
     prisma.complaint.findMany({
-      where: { userId: user.id, projectId: project.id, sourceDate: { not: null } },
-      select: { sourceDate: true },
+      where: { userId: user.id, projectId: project.id },
+      select: { createdAt: true },
     }),
     prisma.opportunity.count({ where: { userId: user.id, projectId: project.id } }),
     prisma.savedOpportunity.count({ where: { userId: user.id, projectId: project.id } }),
@@ -273,7 +275,7 @@ export default async function DashboardPage({
         <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)]">
           <h2 className="text-base font-semibold">Complaints over time</h2>
           <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
-            Bucketed by source date when available; falls back to import date.
+            Grouped by the day each complaint was added to this project.
           </p>
           <div className="mt-4">
             <ComplaintsChart data={buckets} />

@@ -288,7 +288,7 @@ Dashboard routes use query-param project routing in M16A: `?projectId=...`. If t
 - `RunOpportunitiesButton` (`components/opportunities/run-button.tsx`) — client. Triggers `runPipeline`; renders ProgressPanel that polls `getProcessingStatus(jobId)` every 1 s; disables itself while pending.
 - `PrevNextNav` (`components/opportunities/prev-next-nav.tsx`) — server. Prev/Next by `createdAt DESC`. Disabled states use `aria-disabled="true" role="link"` so screen readers announce them as intentionally disabled.
 - `RelatedOpportunityCard` (`components/opportunities/related-opportunity-card.tsx`) — server. Mini card with `aria-label` describing the destination and shared keyword count.
-- `ComplaintsChart` (`components/dashboard/complaints-chart.tsx`) — client Recharts bar chart, buckets by `sourceDate`.
+- `ComplaintsChart` (`components/dashboard/complaints-chart.tsx`) — client Recharts bar chart. Buckets by `createdAt` (the day the complaint was added to Rift); per-idea trend charts in the pipeline do the same. `sourceDate` is still stored but no longer drives charts, since imported reviews can carry years-old source dates.
 - `CsvUploader` (`components/complaints/csv-uploader.tsx`) — client. Drag/drop + PapaParse + `useActionState`; **also** renders the "Download sample CSV" link (`/sample_complaints.csv`, `download` attribute) and a "Use demo data" form that calls `loadDemoComplaints`.
 
 ---

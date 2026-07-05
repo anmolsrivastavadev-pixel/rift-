@@ -188,12 +188,13 @@ export async function runPipeline(
         confidence: cluster.confidence,
       });
 
-      // Trend buckets by complaint source date.
+      // Trend buckets by the day each complaint was added to Rift (not the
+      // parsed source date, which can be years old and made charts look wrong).
       const linked = await prisma.complaint.findMany({
         where: { id: { in: complaintIds }, userId: user.id, projectId: project.id },
-        select: { sourceDate: true },
+        select: { createdAt: true },
       });
-      const trend = bucketTrend(linked.map((c) => c.sourceDate));
+      const trend = bucketTrend(linked.map((c) => c.createdAt));
 
       const op = await prisma.opportunity.create({
         data: {
