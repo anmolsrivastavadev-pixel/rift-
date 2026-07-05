@@ -10,6 +10,7 @@ import { clusterComplaints } from "@/lib/ai";
 import { computeOpportunityScore } from "@/lib/scoring";
 import { requireUser } from "@/lib/auth/current-user";
 import { requireOwnedProject } from "@/lib/projects";
+import { trackProductEvent } from "@/lib/product-events";
 
 /* -------------------------------------------------------------------------
  * Form-action wrapper for Reset (clientside <form action=...>).
@@ -93,6 +94,11 @@ export async function runPipeline(
       .catch(() => {
         // History bookkeeping must never mask the real pipeline error.
       });
+    await trackProductEvent({
+      userId: user.id,
+      projectId: project.id,
+      type: "ideas_generation_failed",
+    });
   };
 
   try {
@@ -249,6 +255,12 @@ export async function runPipeline(
           // History bookkeeping must never fail a successful run.
         });
     }
+    await trackProductEvent({
+      userId: user.id,
+      projectId: project.id,
+      type: "ideas_generated",
+      metadata: { inputComplaints: all.length, ideasCreated: created.length },
+    });
 
     revalidatePath("/dashboard");
     revalidatePath("/dashboard/opportunities");

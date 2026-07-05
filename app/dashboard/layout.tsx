@@ -1,6 +1,7 @@
 import { DashboardShell } from "@/components/dashboard/shell";
 import { ValidationStateMigrator } from "@/components/dashboard/validation-state-migrator";
 import { requireUser } from "@/lib/auth/current-user";
+import { isAdminEmail } from "@/lib/admin";
 import {
   getProjectOrDefault,
   listProjectsForUser,
@@ -23,6 +24,7 @@ export default async function DashboardLayout({
       projects={projects}
       archivedProjects={archivedProjects}
       currentProjectId={project.id}
+      isAdmin={isAdminEmail(user.email)}
     >
       <ValidationStateMigrator userId={user.id} />
       {children}

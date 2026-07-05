@@ -11,6 +11,7 @@ import {
 } from "@/lib/complaint-finder";
 import { requireUser } from "@/lib/auth/current-user";
 import { requireOwnedProject } from "@/lib/projects";
+import { trackProductEvent } from "@/lib/product-events";
 
 const MAX_INSERT = 200;
 
@@ -132,6 +133,13 @@ export async function findComplaintsAction(
         })),
       });
     }
+    // M19 — usage metadata only (source + count), never complaint text.
+    await trackProductEvent({
+      userId: user.id,
+      projectId: project.id,
+      type: "complaints_added",
+      metadata: { sourceType: "finder", complaintCount: toInsert.length },
+    });
   }
 
   revalidatePath("/dashboard");

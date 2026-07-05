@@ -7,6 +7,7 @@ import { complaintRowSchema, type UploadResult } from "@/lib/schemas";
 import { parseComplaintsFromText, normaliseBodyForKey } from "@/lib/text-import";
 import { requireUser } from "@/lib/auth/current-user";
 import { requireOwnedProject } from "@/lib/projects";
+import { trackProductEvent } from "@/lib/product-events";
 
 const MAX_ROWS = 5000;
 
@@ -73,6 +74,13 @@ async function recordImport(
   const row = await prisma.complaintImport.create({
     data: { userId, projectId, sourceType, label, complaintCount },
     select: { id: true },
+  });
+  // M19 — usage metadata only (source + count), never complaint text.
+  await trackProductEvent({
+    userId,
+    projectId,
+    type: "complaints_added",
+    metadata: { sourceType, complaintCount },
   });
   return row.id;
 }

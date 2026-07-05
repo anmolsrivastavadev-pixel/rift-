@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/auth/current-user";
 import { projectHref } from "@/lib/project-href";
+import { trackProductEvent } from "@/lib/product-events";
 
 /* M16A/M16B1/M16B2 — Minimal project management server actions.
  *
@@ -101,6 +102,7 @@ export async function createProject(
     data: { name, userId: user.id },
     select: { id: true, name: true, description: true, createdAt: true },
   });
+  await trackProductEvent({ userId: user.id, projectId: project.id, type: "project_created" });
 
   revalidatePath("/dashboard");
   revalidatePath("/dashboard", "layout");
@@ -151,6 +153,7 @@ export async function renameProject(
     data: { name },
     select: { id: true, name: true, description: true, createdAt: true },
   });
+  await trackProductEvent({ userId: user.id, projectId: project.id, type: "project_renamed" });
 
   revalidatePath("/dashboard");
   revalidatePath("/dashboard", "layout");
@@ -199,6 +202,7 @@ export async function archiveProject(
       where: { id: owned.id },
       data: { archivedAt: new Date() },
     });
+    await trackProductEvent({ userId: user.id, projectId: owned.id, type: "project_archived" });
   }
 
   revalidatePath("/dashboard");
@@ -238,6 +242,7 @@ export async function unarchiveProject(
       where: { id: owned.id },
       data: { archivedAt: null },
     });
+    await trackProductEvent({ userId: user.id, projectId: owned.id, type: "project_restored" });
   }
 
   revalidatePath("/dashboard");
@@ -295,6 +300,7 @@ export async function deleteArchivedProject(
     prisma.complaintImport.deleteMany({ where: scoped }),
     prisma.project.deleteMany({ where: { id: owned.id, userId: user.id } }),
   ]);
+  await trackProductEvent({ userId: user.id, type: "project_deleted" });
 
   revalidatePath("/dashboard");
   revalidatePath("/dashboard", "layout");

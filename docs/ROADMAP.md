@@ -258,13 +258,20 @@ The Start Fresh Test patch addresses workspace-mixing confusion:
 - **What was built:** Pure Markdown builders in `lib/reports.ts` (project report: summary counts, top 5 ideas by score, saved ideas, decisions, recent imports/runs, next-step; idea report: summary, score + subscores, why-this-exists, up to 5 evidence quotes from the idea's own linked complaints, decision + checklist status, next step). Server actions `getProjectReport(projectId)` / `getIdeaReport(opportunityId)` in `actions/reports.ts` verify ownership before reading anything and only include the current user's current project/idea data — no invented evidence. `components/reports/export-buttons.tsx` renders small secondary "Export report"/"Copy report" buttons (dashboard home) and "Export idea"/"Copy idea report" (idea detail sidebar): download is a client-side Blob with a safe slugified filename (`rift-project-fitness.md`, `rift-idea-ai-fitness-coach.md`), copy uses the clipboard API with inline success/failure notices.
 - **Not included:** No public share pages/URLs, no PDF, no email sending, no Notion/Google Docs integrations, no file storage, reports are NOT saved to the database, no new dependencies, no schema changes, no Gemini/scoring/parsing/auth changes.
 
+### M19 — Lightweight first-party analytics + beta insights
+- **Status:** ✅ Done
+- **Purpose:** Let the founder see whether real users are progressing through Rift (create project → add complaints → find ideas → open/save → decide → export) without any third-party analytics.
+- **What was built:** Additive `ProductEvent` model (userId required, optional projectId/opportunityId with `SetNull`, string `type`, small sanitized Json `metadata`, createdAt). `lib/product-events.ts` `trackProductEvent()` — server-only, sanitizes metadata to ≤10 flat keys with 120-char string caps, swallows all failures so analytics can never break an action. Events tracked: project_created/renamed/archived/restored/deleted, complaints_added (source + count), ideas_generated / ideas_generation_failed, idea_opened (detail page), idea_saved/idea_unsaved, decision_set, checklist_updated (post-debounce), project_exported/idea_exported. `lib/admin.ts` reads `RIFT_ADMIN_EMAILS` (comma-separated, case-insensitive, nothing hardcoded). `/dashboard/beta-insights` — admin-only (everyone else gets notFound()): six total counters, an 8-step usage funnel (distinct-user counts), and the 25 most recent events with user email, project name, and sanitized metadata. Admin-only "Beta insights" sidebar link.
+- **Privacy:** events store metadata/counts only — never complaint text, exported report contents, AI prompts, or raw AI output. `.env.example` documents `RIFT_ADMIN_EMAILS`.
+- **Not included:** No Mixpanel/PostHog/GA or any third-party tool, no charts library, no cohorts/date filters, no notifications/billing/teams/scraping/sharing, no new dependencies, no auth overhaul, no Gemini/scoring/parsing changes.
+
 ---
 
 ## Future / post-MVP milestones (not started)
 
 Do **not** start any of these without an explicit user prompt. They appear here only for visibility.
 
-> Note: M7–M18 are complete — see "Completed milestones" above. The items below are future work and must not be started without an explicit user prompt.
+> Note: M7–M19 are complete — see "Completed milestones" above. The items below are future work and must not be started without an explicit user prompt.
 
 ### Future — PDF/CSV export of comparisons
 - Side-by-side comparison export to PDF/CSV. (Markdown export shipped in M18.)

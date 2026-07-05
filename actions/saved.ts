@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/auth/current-user";
 import { requireOwnedProject } from "@/lib/projects";
+import { trackProductEvent } from "@/lib/product-events";
 
 /* -------------------------------------------------------------------------
  * Saved opportunity actions.
@@ -40,6 +41,12 @@ export async function saveOpportunity(
       await prisma.savedOpportunity.create({
         data: { opportunityId: id, userId: user.id, projectId: project.id },
       });
+      await trackProductEvent({
+        userId: user.id,
+        projectId: project.id,
+        opportunityId: id,
+        type: "idea_saved",
+      });
     }
   } catch (err) {
     return {
@@ -63,9 +70,17 @@ export async function unsaveOpportunity(
   const id = String(formData.get("opportunityId") ?? "");
   if (!id) return { saved: false, error: "Missing opportunity id" };
   try {
-    await prisma.savedOpportunity.deleteMany({
+    const removed = await prisma.savedOpportunity.deleteMany({
       where: { opportunityId: id, userId: user.id, projectId: project.id },
     });
+    if (removed.count > 0) {
+      await trackProductEvent({
+        userId: user.id,
+        projectId: project.id,
+        opportunityId: id,
+        type: "idea_unsaved",
+      });
+    }
   } catch (err) {
     return {
       saved: false,

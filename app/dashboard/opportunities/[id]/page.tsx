@@ -29,6 +29,7 @@ import { PrevNextNav } from "@/components/opportunities/prev-next-nav";
 import { MarketGapHypothesis } from "@/components/opportunities/market-gap-hypothesis";
 import { ValidationWorkspace } from "@/components/opportunities/validation-workspace";
 import { ExportButtons } from "@/components/reports/export-buttons";
+import { trackProductEvent } from "@/lib/product-events";
 import { requireUser } from "@/lib/auth/current-user";
 import { projectHref } from "@/lib/project-href";
 import { requireOwnedProject } from "@/lib/projects";
@@ -101,6 +102,14 @@ export default async function OpportunityDetailPage({
   ]);
 
   if (!op) notFound();
+
+  // M19 — usage event (metadata only, fails silently, never blocks the page).
+  await trackProductEvent({
+    userId: user.id,
+    projectId: project.id,
+    opportunityId: op.id,
+    type: "idea_opened",
+  });
 
   // M16C — load the saved validation checklist for this user + opportunity.
   const workspace = await prisma.validationWorkspace.findUnique({

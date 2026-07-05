@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/auth/current-user";
 import { isValidDecisionStatus, type DecisionStatus } from "@/lib/decision-board";
 import { VALIDATION_CHECKLIST_ITEMS } from "@/lib/validation-plan";
+import { trackProductEvent } from "@/lib/product-events";
 
 /* M16C — Database-backed Validation Workspace state.
  *
@@ -59,6 +60,13 @@ export async function setDecisionStatus(
       decisionStatus: status,
     },
   });
+  await trackProductEvent({
+    userId: user.id,
+    projectId: opportunity.projectId,
+    opportunityId: opportunity.id,
+    type: "decision_set",
+    metadata: { status },
+  });
   return { ok: true };
 }
 
@@ -84,6 +92,13 @@ export async function saveValidationChecklist(
       opportunityId: opportunity.id,
       validationChecklist: clean,
     },
+  });
+  await trackProductEvent({
+    userId: user.id,
+    projectId: opportunity.projectId,
+    opportunityId: opportunity.id,
+    type: "checklist_updated",
+    metadata: { done: clean.filter(Boolean).length, total: clean.length },
   });
   return { ok: true };
 }

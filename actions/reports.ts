@@ -10,6 +10,7 @@ import {
   buildIdeaReport,
   slugifyForFilename,
 } from "@/lib/reports";
+import { trackProductEvent } from "@/lib/product-events";
 
 /* M18 — Private Markdown export.
  *
@@ -98,6 +99,13 @@ export async function getProjectReport(projectId: string): Promise<ExportResult>
     recentRuns: runs,
   });
 
+  // M19 — event metadata only; the report contents are never logged.
+  await trackProductEvent({
+    userId: user.id,
+    projectId: project.id,
+    type: "project_exported",
+  });
+
   return {
     ok: true,
     markdown,
@@ -168,6 +176,14 @@ export async function getIdeaReport(opportunityId: string): Promise<ExportResult
         : null,
     checklistDone: checklist.filter(Boolean).length,
     checklistTotal: VALIDATION_CHECKLIST_ITEMS.length,
+  });
+
+  // M19 — event metadata only; the report contents are never logged.
+  await trackProductEvent({
+    userId: user.id,
+    projectId: op.projectId,
+    opportunityId: op.id,
+    type: "idea_exported",
   });
 
   return {

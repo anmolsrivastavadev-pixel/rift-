@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { LayoutDashboard, Upload, Target, Bookmark, LayoutGrid, LogOut, User, ChevronRight } from "lucide-react";
+import { LayoutDashboard, Upload, Target, Bookmark, LayoutGrid, LogOut, User, ChevronRight, BarChart3 } from "lucide-react";
 import { Container } from "@/components/container";
 import { authClient } from "@/lib/auth/client";
 import { projectHref } from "@/lib/project-href";
@@ -34,15 +34,21 @@ export function DashboardShell({
   projects,
   archivedProjects,
   currentProjectId,
+  isAdmin = false,
 }: {
   children: React.ReactNode;
   user: User;
   projects: ProjectOption[];
   archivedProjects: ProjectOption[];
   currentProjectId: string;
+  isAdmin?: boolean;
 }) {
   const pathname = usePathname();
   const search = useSearchParams();
+  // M19 — admin-only Beta insights link; hidden for everyone else.
+  const navItems = isAdmin
+    ? [...nav, { href: "/dashboard/beta-insights", label: "Beta insights", icon: BarChart3 }]
+    : nav;
   // Carry project context through internal links, but don't propagate unknown
   // project ids from manually edited URLs.
   const queryProjectId = search.get("projectId");
@@ -74,7 +80,7 @@ export function DashboardShell({
           </div>
 
           <nav className="mt-4 flex flex-col gap-0.5" aria-label="Dashboard navigation">
-            {nav.map(({ href, label, icon: Icon }) => {
+            {navItems.map(({ href, label, icon: Icon }) => {
               const isActive = pathname === href || (href !== "/dashboard" && pathname.startsWith(href));
               return (
                 <Link
@@ -134,7 +140,7 @@ export function DashboardShell({
             </span>
           </Link>
           <nav className="flex items-center gap-1" aria-label="Mobile dashboard navigation">
-            {nav.map(({ href, label, icon: Icon }) => {
+            {navItems.map(({ href, label, icon: Icon }) => {
               const isActive = pathname === href || (href !== "/dashboard" && pathname.startsWith(href));
               return (
                 <Link

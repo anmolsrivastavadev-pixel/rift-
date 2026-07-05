@@ -28,6 +28,7 @@ model User {
   validationWorkspaces ValidationWorkspace[]
   complaintImports   ComplaintImport[]
   aiRuns             AIRun[]
+  productEvents      ProductEvent[]
 }
 
 // M16A — Multi-Project Market Tests. Lets a user split market tests into
@@ -48,6 +49,7 @@ model Project {
   validationWorkspaces ValidationWorkspace[]
   complaintImports   ComplaintImport[]
   aiRuns             AIRun[]
+  productEvents      ProductEvent[]
   createdAt           DateTime           @default(now())
   updatedAt           DateTime           @updatedAt
 
@@ -158,10 +160,32 @@ model Opportunity {
   complaints        Complaint[]
   savedOpportunities SavedOpportunity[]
   validationWorkspaces ValidationWorkspace[]
+  productEvents     ProductEvent[]
 
   @@index([userId])
   @@index([projectId])
   @@index([aiRunId])
+}
+
+// M19 — First-party product events for private beta insights. Metadata and
+// counts only: NEVER complaint text, exported report contents, AI prompts, or
+// raw AI output. Optional project/opportunity links use SetNull so deleting a
+// project keeps the usage record without the reference.
+model ProductEvent {
+  id            String       @id @default(cuid())
+  userId        String
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projectId     String?
+  project       Project?     @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  opportunityId String?
+  opportunity   Opportunity? @relation(fields: [opportunityId], references: [id], onDelete: SetNull)
+  type          String
+  metadata      Json?
+  createdAt     DateTime     @default(now())
+
+  @@index([userId])
+  @@index([type])
+  @@index([createdAt])
 }
 
 // M16D — Import/upload history. One row per successful complaint import
