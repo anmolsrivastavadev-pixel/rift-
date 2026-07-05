@@ -115,7 +115,9 @@ export default async function PricingPage() {
           </div>
 
           <div className="mx-auto mt-12 grid max-w-3xl gap-6 sm:grid-cols-2">
-            <Card>
+            {/* Card's default bg-white is a landing-era leftover — force the
+                dark theme card color so text stays readable. */}
+            <Card className="bg-[var(--color-card)]">
               <CardHeader>
                 <CardTitle>Free</CardTitle>
                 <CardDescription>
@@ -152,7 +154,7 @@ export default async function PricingPage() {
               </CardContent>
             </Card>
 
-            <Card className="border-[var(--color-primary)]">
+            <Card className="bg-[var(--color-card)] border-[var(--color-primary)]">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle>Pro</CardTitle>
