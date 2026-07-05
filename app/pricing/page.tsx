@@ -17,6 +17,11 @@ import {
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { PLANS, PRO_PRICE_LABEL } from "@/lib/plans";
 import { getEffectivePlan } from "@/lib/quotas";
+import { isBillingEnabled } from "@/lib/stripe";
+import {
+  ManageSubscriptionButton,
+  UpgradeButton,
+} from "@/components/billing/billing-buttons";
 
 export const metadata: Metadata = {
   title: "Pricing — Rift",
@@ -43,13 +48,28 @@ function FeatureList({ items }: { items: string[] }) {
 }
 
 function ProCta({ signedIn, plan }: { signedIn: boolean; plan: "free" | "pro" }) {
-  // M28 wires the real Upgrade / Manage subscription buttons here once
-  // Stripe keys are configured. Until then, honest "coming soon" copy.
   if (!signedIn) {
     return (
       <Button asChild className="mt-6 w-full">
         <Link href="/sign-up">Create a free account</Link>
       </Button>
+    );
+  }
+  // M28 — real buttons only when Stripe keys are configured; honest
+  // "coming soon" copy otherwise.
+  if (isBillingEnabled()) {
+    if (plan === "pro") {
+      return (
+        <div className="mt-6 space-y-3">
+          <Badge variant="success">You&apos;re on Pro</Badge>
+          <ManageSubscriptionButton />
+        </div>
+      );
+    }
+    return (
+      <div className="mt-6">
+        <UpgradeButton />
+      </div>
     );
   }
   if (plan === "pro") {
