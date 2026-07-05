@@ -13,7 +13,7 @@ import { ImportNextStepLink } from "@/components/complaints/import-summary";
 
 /* Keyword complaint finder — the "1-click" path for beginners who have no
  * CSV. Type a niche (e.g. "fitness apps") and Rift pulls real complaints from
- * Reddit and App Store reviews into the current project.
+ * Reddit, App Store reviews, and Hacker News into the current project.
  */
 export function ComplaintFinder({ projectId }: { projectId: string }) {
   const [result, action, pending] = useActionState<
@@ -53,8 +53,8 @@ export function ComplaintFinder({ projectId }: { projectId: string }) {
       </form>
 
       <p className="text-xs text-[var(--color-muted-foreground)]">
-        Rift searches Reddit and App Store reviews for real frustrations about
-        your niche. No spreadsheet needed.
+        Rift searches Reddit, App Store reviews, and Hacker News for real
+        frustrations about your niche. No spreadsheet needed.
       </p>
 
       {result && !pending && <FinderSummary result={result} projectId={projectId} />}
@@ -69,7 +69,8 @@ function FinderSummary({
   result: FindComplaintsResult;
   projectId: string;
 }) {
-  const found = result.redditFound + result.appStoreFound;
+  const found =
+    result.redditFound + result.appStoreFound + result.hackerNewsFound;
 
   if (result.inserted === 0) {
     return (
@@ -102,7 +103,8 @@ function FinderSummary({
         </p>
         <p className="text-xs text-[var(--color-muted-foreground)]">
           {result.redditFound} from Reddit, {result.appStoreFound} from App Store
-          reviews{result.skipped > 0 ? `, ${result.skipped} skipped (duplicates)` : ""}.
+          reviews, {result.hackerNewsFound} from Hacker News
+          {result.skipped > 0 ? `, ${result.skipped} skipped (duplicates)` : ""}.
         </p>
         {result.errors.map((e, i) => (
           <p key={i} className="text-xs text-[var(--color-muted-foreground)]">

@@ -8,6 +8,7 @@ import { normaliseBodyForKey } from "@/lib/text-import";
 import {
   fetchRedditComplaints,
   fetchAppStoreComplaints,
+  fetchHackerNewsComplaints,
 } from "@/lib/complaint-finder";
 import { requireUser } from "@/lib/auth/current-user";
 import { requireOwnedProject } from "@/lib/projects";
@@ -20,14 +21,16 @@ export interface FindComplaintsResult {
   skipped: number;
   redditFound: number;
   appStoreFound: number;
+  hackerNewsFound: number;
   errors: string[];
   keyword: string;
 }
 
 /* Server action: type a niche keyword (e.g. "fitness apps") and Rift fetches
- * real complaints from Reddit search + App Store reviews, then imports them
- * into the current project using the same validation + dedupe rules as the
- * paste-text path. The CSV pipeline and AI pipeline are untouched.
+ * real complaints from Reddit search + App Store reviews + Hacker News, then
+ * imports them into the current project using the same validation + dedupe
+ * rules as the paste-text path. The CSV pipeline and AI pipeline are
+ * untouched.
  */
 export async function findComplaintsAction(
   _prev: FindComplaintsResult | null,
@@ -45,6 +48,7 @@ export async function findComplaintsAction(
     skipped: 0,
     redditFound: 0,
     appStoreFound: 0,
+    hackerNewsFound: 0,
     errors: [],
     keyword,
   };
@@ -56,16 +60,22 @@ export async function findComplaintsAction(
     };
   }
 
-  const [reddit, appStore] = await Promise.all([
+  const [reddit, appStore, hackerNews] = await Promise.all([
     fetchRedditComplaints(keyword),
     fetchAppStoreComplaints(keyword),
+    fetchHackerNewsComplaints(keyword),
   ]);
 
   const errors: string[] = [];
   if (reddit.error) errors.push(reddit.error);
   if (appStore.error) errors.push(appStore.error);
+  if (hackerNews.error) errors.push(hackerNews.error);
 
-  const found = [...reddit.complaints, ...appStore.complaints];
+  const found = [
+    ...reddit.complaints,
+    ...appStore.complaints,
+    ...hackerNews.complaints,
+  ];
   if (found.length === 0) {
     return {
       ...base,
@@ -150,6 +160,7 @@ export async function findComplaintsAction(
     skipped: found.length - toInsert.length,
     redditFound: reddit.complaints.length,
     appStoreFound: appStore.complaints.length,
+    hackerNewsFound: hackerNews.complaints.length,
     errors,
     keyword,
   };
