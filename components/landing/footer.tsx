@@ -20,7 +20,30 @@ export function Footer() {
             </Link>
           </Button>
         </div>
-        <div className="mt-10 flex items-center justify-center gap-4">
+        <nav
+          aria-label="Footer"
+          className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm"
+        >
+          <Link
+            href="/sign-in"
+            className="text-[var(--color-muted-foreground)] transition-colors hover:text-[var(--color-foreground)]"
+          >
+            Sign in
+          </Link>
+          <Link
+            href="/sign-up"
+            className="text-[var(--color-muted-foreground)] transition-colors hover:text-[var(--color-foreground)]"
+          >
+            Create account
+          </Link>
+          <Link
+            href="/#how-it-works"
+            className="text-[var(--color-muted-foreground)] transition-colors hover:text-[var(--color-foreground)]"
+          >
+            How it works
+          </Link>
+        </nav>
+        <div className="mt-8 flex items-center justify-center gap-4">
           <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--color-primary)] text-[11px] font-bold text-white">
             R
           </span>

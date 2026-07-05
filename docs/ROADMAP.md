@@ -288,13 +288,24 @@ The Start Fresh Test patch addresses workspace-mixing confusion:
   - `docs/TESTING_CHECKLIST.md` predates M16C and still references "Saved only in this browser." captions that no longer exist; superseded by `docs/BETA_QA_CHECKLIST.md` for beta QA.
 - **Not changed:** Gemini prompt, scoring, cleaning/parsing, auth/Better Auth config, ownership rules, schema (no schema changes in M21). No billing/scraping/sharing/notifications/new dependencies.
 
+### M22 — Complaint finder: Reddit OAuth (403 fix)
+- **Status:** ✅ Done
+- **Purpose:** The complaint finder's Reddit source always failed with "Reddit search failed (HTTP 403)" — Reddit now blocks unauthenticated requests to the public `www.reddit.com/search.json` endpoint from server/datacenter IPs. Fix it with Reddit's official OAuth API instead of scraping workarounds.
+- **What was built:** `lib/complaint-finder.ts` now authenticates via Reddit's OAuth2 client_credentials flow when `REDDIT_CLIENT_ID`/`REDDIT_CLIENT_SECRET` are set (create a "script" app at https://www.reddit.com/prefs/apps): app-only token from `www.reddit.com/api/v1/access_token` (Basic auth, form-encoded), cached in module memory with the response's `expires_in` minus a 60s margin, search via `oauth.reddit.com/search` with a Bearer token; on HTTP 401 the cached token is invalidated and the search retried once. Optional `REDDIT_USER_AGENT` sets the descriptive User-Agent Reddit asks for. Without credentials the finder still tries the public endpoint and, on 403, the error message now tells the founder to set the env vars. 429 gets a "rate limit, try again in a minute" hint. Error strings and logs contain env-var names and HTTP statuses only — never the secret or token. Documented in `.env.example`, the env table in `docs/PROJECT_CONTEXT.md`, and `docs/BETA_QA_CHECKLIST.md`.
+- **Not changed:** Gemini prompt, scoring, CSV/paste pipeline, App Store fetcher, `actions/complaint-finder.ts`, the finder UI component, Prisma schema, auth. No new dependencies (built-in `fetch` + `Buffer`). The fail-soft source contract (`{ complaints, error? }`) is preserved — a dead Reddit source still never breaks App Store results.
+
+### Post-M21 — Beta launch prep + landing polish (small pass, no milestone number)
+- **Status:** ✅ Done
+- **What was done:** New `docs/LAUNCH_RUNBOOK.md` (ordered founder playbook: Vercel env setup → production QA → flip invite-only → invite testers with a message template → week-one monitoring → rollback). Landing/SEO polish: `metadataBase` from `BETTER_AUTH_URL`; metadata retitled from "Opportunity Intelligence Platform" to "Rift — Turn complaints into business ideas" with description matching the hero; new `app/opengraph-image.tsx` (next/og, no dependency) so shared links render a real social card; new slim sticky `components/landing/nav.tsx` (logo + Sign in + Get started — previously there was NO way to reach sign-in from the landing page); footer gained Sign in / Create account / How it works links; hero trust line changed from "Free to try. No card required." to "Free during the private beta."; auth-page "Rift" headings link back home; `/beta-access` added to robots disallow.
+- **Not included:** No Privacy/Terms pages (pre-public-launch work, listed in the runbook), no invite-code field on sign-up (gating stays post-signup via `/beta-access`), no product/schema/AI changes.
+
 ---
 
 ## Future / post-MVP milestones (not started)
 
 Do **not** start any of these without an explicit user prompt. They appear here only for visibility.
 
-> Note: M7–M21 are complete — see "Completed milestones" above. The items below are future work and must not be started without an explicit user prompt.
+> Note: M7–M22 are complete — see "Completed milestones" above. The items below are future work and must not be started without an explicit user prompt.
 
 ### Future — PDF/CSV export of comparisons
 - Side-by-side comparison export to PDF/CSV. (Markdown export shipped in M18.)

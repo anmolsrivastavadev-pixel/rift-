@@ -8,24 +8,28 @@ const inter = Inter({
   display: "swap",
 });
 
+const title = "Rift — Turn complaints into business ideas";
 const description =
-  "Rift helps founders discover business opportunities from real customer complaints.";
+  "Type a market or paste real complaints. Rift finds repeated problems and turns them into ideas you can compare.";
 
 export const metadata: Metadata = {
+  // Reuses the canonical app origin so OG images and sitemap URLs absolutize
+  // to the deployed domain on Vercel without a separate env var.
+  metadataBase: new URL(process.env.BETTER_AUTH_URL ?? "http://localhost:3000"),
   title: {
-    default: "Rift — Opportunity Intelligence Platform",
+    default: title,
     template: "%s · Rift",
   },
   description,
   openGraph: {
-    title: "Rift — Opportunity Intelligence Platform",
+    title,
     description,
     siteName: "Rift",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Rift — Opportunity Intelligence Platform",
+    title,
     description,
   },
 };

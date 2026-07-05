@@ -39,7 +39,11 @@ export default function SignInPage() {
     <div className="flex min-h-screen items-center justify-center px-4">
       <div className="w-full max-w-sm space-y-6">
         <div className="text-center">
-          <h1 className="text-2xl font-semibold tracking-tight">Rift</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            <Link href="/" className="hover:text-[var(--color-primary)]">
+              Rift
+            </Link>
+          </h1>
           <p className="mt-2 text-sm text-[var(--color-muted-foreground)]">
             Sign in to your account
           </p>

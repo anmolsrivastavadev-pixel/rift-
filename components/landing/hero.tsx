@@ -83,7 +83,7 @@ export function Hero() {
           transition={{ duration: 0.4, delay: 0.25 }}
           className="mt-5 text-xs text-[var(--color-muted-foreground)]/70"
         >
-          Free to try. No card required.
+          Free during the private beta.
         </motion.p>
 
         {/* Product visual — mini workflow */}

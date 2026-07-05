@@ -41,7 +41,11 @@ export default function SignUpPage() {
     <div className="flex min-h-screen items-center justify-center px-4">
       <div className="w-full max-w-sm rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-8 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.3),0_1px_2px_-1px_rgb(0_0_0_/_0.2)]">
         <div className="text-center">
-          <h1 className="text-2xl font-semibold tracking-tight text-[var(--color-foreground)]">Rift</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-[var(--color-foreground)]">
+            <Link href="/" className="hover:text-[var(--color-primary)]">
+              Rift
+            </Link>
+          </h1>
           <p className="mt-2 text-sm text-[var(--color-muted-foreground)]">
             Create your account
           </p>
