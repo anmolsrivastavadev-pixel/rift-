@@ -197,19 +197,19 @@ export function DecisionBoardClient({
               <CompareRow
                 label="Who it is for"
                 values={filtered.map((op) => (
-                  <span className="text-[var(--color-muted-foreground)]">{op.targetCustomer || "—"}</span>
+                  <span key={op.id} className="text-[var(--color-muted-foreground)]">{op.targetCustomer || "—"}</span>
                 ))}
               />
               <CompareRow
                 label="Problem"
                 values={filtered.map((op) => (
-                  <span className="text-[var(--color-muted-foreground)] line-clamp-3">{op.summary}</span>
+                  <span key={op.id} className="text-[var(--color-muted-foreground)] line-clamp-3">{op.summary}</span>
                 ))}
               />
               <CompareRow
                 label="Possible solution"
                 values={filtered.map((op) => (
-                  <span className="text-[var(--color-muted-foreground)]">{op.productAngle || op.suggestedSoftware}</span>
+                  <span key={op.id} className="text-[var(--color-muted-foreground)]">{op.productAngle || op.suggestedSoftware}</span>
                 ))}
               />
               <CompareRow
@@ -217,19 +217,19 @@ export function DecisionBoardClient({
                 values={filtered.map((op) => {
                   const str = evidenceStrength(op.mentions, op.confidence);
                   return (
-                    <>
+                    <React.Fragment key={op.id}>
                       <span className={`font-medium ${str.color}`}>{str.label}</span>
                       <span className="ml-1 text-[var(--color-muted-foreground)]">
                         ({op.mentions} complaints, {op.confidence ?? "—"}% confidence)
                       </span>
-                    </>
+                    </React.Fragment>
                   );
                 })}
               />
               <CompareRow
                 label="Score"
                 values={filtered.map((op) => (
-                  <span className={`text-lg font-bold ${scoreColor(op.opportunityScore)}`}>
+                  <span key={op.id} className={`text-lg font-bold ${scoreColor(op.opportunityScore)}`}>
                     {op.opportunityScore}
                   </span>
                 ))}
@@ -237,7 +237,7 @@ export function DecisionBoardClient({
               <CompareRow
                 label="Difficulty to test"
                 values={filtered.map((op) => (
-                  <span className="text-[var(--color-muted-foreground)]">
+                  <span key={op.id} className="text-[var(--color-muted-foreground)]">
                     {difficultyToTest(op.riskFlags, !!op.targetCustomer, !!op.productAngle)}
                   </span>
                 ))}
@@ -246,13 +246,13 @@ export function DecisionBoardClient({
                 label="Biggest risk"
                 values={filtered.map((op) =>
                   op.riskFlags.length > 0 ? (
-                    <ul className="list-disc pl-4 text-[var(--color-muted-foreground)]">
+                    <ul key={op.id} className="list-disc pl-4 text-[var(--color-muted-foreground)]">
                       {op.riskFlags.slice(0, 2).map((r, i) => (
                         <li key={i}>{r}</li>
                       ))}
                     </ul>
                   ) : (
-                    <span className="text-[var(--color-muted-foreground)]">—</span>
+                    <span key={op.id} className="text-[var(--color-muted-foreground)]">—</span>
                   )
                 )}
               />
@@ -261,7 +261,7 @@ export function DecisionBoardClient({
                 values={filtered.map((op) => {
                   const status = resolveStatus(op.id);
                   return (
-                    <div className="flex items-center gap-2">
+                    <div key={op.id} className="flex items-center gap-2">
                       <span className="text-[11px] text-[var(--color-muted-foreground)]">
                         {hydrated ? DECISION_LABELS[status] : "—"}
                       </span>

@@ -206,20 +206,21 @@ export default async function DashboardPage({
         />
       </div>
 
-      {/* M17 — first-run onboarding: one card, one clear next action.
-          Replaces the old pair of dashed empty-state blocks. Hidden once the
-          user has complaints, ideas, and any testing progress. */}
-      <OnboardingCard
-        state={{ complaintCount, opportunityCount, hasTestingProgress }}
-        projectId={projectId}
-      />
-
-      {/* Workflow + next action + decision snapshot (DB-backed since M16C) */}
-      <FounderCommandClient
-        stats={stats}
-        decisionCounts={decisionCounts}
-        projectId={projectId}
-      />
+      {/* M17/M21 — exactly ONE guidance block, never two competing CTAs:
+          the onboarding card while the first-run steps are incomplete, the
+          Founder Command next-action + decision snapshot afterwards. */}
+      {complaintCount > 0 && opportunityCount > 0 && hasTestingProgress ? (
+        <FounderCommandClient
+          stats={stats}
+          decisionCounts={decisionCounts}
+          projectId={projectId}
+        />
+      ) : (
+        <OnboardingCard
+          state={{ complaintCount, opportunityCount, hasTestingProgress }}
+          projectId={projectId}
+        />
+      )}
 
       {/* M16D — what data was added + when ideas were generated */}
       <ProjectHistory imports={recentImports} runs={recentRuns} />

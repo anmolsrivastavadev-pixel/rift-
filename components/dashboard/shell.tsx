@@ -169,8 +169,10 @@ export function DashboardShell({
             Sign out
           </button>
         </div>
-        {/* Mobile project selector row */}
-        <div className="space-y-2 border-t border-[var(--color-border)] px-4 py-2">
+        {/* Mobile project selector row. max-h + scroll so an expanded
+            create/rename/archive or feedback form can never push the fixed
+            header past the viewport with no way to reach its buttons. */}
+        <div className="max-h-[70vh] space-y-2 overflow-y-auto border-t border-[var(--color-border)] px-4 py-2">
           <ProjectSelector
             projects={projects}
             archivedProjects={archivedProjects}

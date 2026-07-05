@@ -319,8 +319,12 @@ All actions are `"use server"` files. They import `prisma` from `lib/db.ts` and 
 | `GEMINI_MODEL` | Optional. Defaults to `gemini-2.5-flash` in `lib/ai.ts`. | `gemini-2.5-flash` |
 | `BETTER_AUTH_URL` | Better Auth app origin, no trailing slash. Set to the deployed site origin on Vercel. | `http://localhost:3000` |
 | `BETTER_AUTH_SECRET` | Better Auth secret for sessions/tokens. | `replace-with-a-long-random-secret` |
+| `RIFT_ADMIN_EMAILS` | M19/M20. Comma-separated, case-insensitive admin allowlist: grants `/dashboard/beta-insights` access and always bypasses the beta gate. Empty = no admins. | `you@example.com` |
+| `RIFT_BETA_MODE` | M20. `off`/unset = dashboard open to all signed-in users. `invite_only` = only admins + emails on the Beta access list; others land on `/beta-access`. | `off` |
 
-`DATABASE_URL`, `GEMINI_API_KEY`, `BETTER_AUTH_URL`, and `BETTER_AUTH_SECRET` are server-only. No client component imports them. See `.env.example` for placeholder examples; never commit `.env`.
+All of these are server-only. No client component imports them. See `.env.example` for placeholder examples; never commit `.env`. On Vercel, set `RIFT_ADMIN_EMAILS` (and `RIFT_BETA_MODE` when running the invite-only beta) in the project's environment variables.
+
+Schema workflow: this project uses `prisma db push` (no migration files since the driver-adapter setup). The safe command for applying additive schema changes is `pnpm exec prisma db push` followed by `pnpm exec prisma generate`. Never use `--force-reset`, `migrate reset`, or any drop/truncate command.
 
 On Vercel, set `BETTER_AUTH_URL` to the deployed site origin with no trailing slash. For Preview deployments, ensure the same required env vars are available to the Preview environment and set `BETTER_AUTH_URL` to the preview deployment origin.
 

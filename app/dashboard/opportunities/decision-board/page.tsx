@@ -79,6 +79,9 @@ export default async function DecisionBoardPage({
 
   return (
     <DecisionBoardClient
+      // Remount when the project changes so client state (statuses seeded
+      // from the server) never carries over from another project.
+      key={project.id}
       opportunities={opportunities}
       isCompareMode={isCompareMode}
       projectId={project.id}

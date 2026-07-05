@@ -271,13 +271,30 @@ The Start Fresh Test patch addresses workspace-mixing confusion:
 - **What was built:** `RIFT_BETA_MODE` env flag ("off"/unset = app behaves exactly as before; "invite_only" = the dashboard layout calls `requireBetaAccess(user)` after `requireUser()`). New `BetaAccess` model (unique normalized lowercase email, status "invited"/"active"/"revoked"; admins from `RIFT_ADMIN_EMAILS` never need a row and can never be locked out) and `BetaFeedback` model (type bug/confusing/idea/praise/other, optional 1–5 rating, message ≤2000 chars, optional pagePath/projectId — project attached only if owned). `lib/beta-access.ts` helpers; invited users are auto-promoted to "active" with `acceptedAt` on first entry; blocked users land on `/beta-access` (shows their signed-in email, "Ask the founder to add this email to the beta." — no email sending, no fake "invite sent"). Admin "Beta access" section on Beta insights (add tester / revoke / restore via `actions/beta.ts`, admin verified server-side) plus a "Recent feedback" inbox (type, rating, message, user email, project, page, date). Compact Feedback widget in the dashboard shell (desktop sidebar + mobile row) via `submitBetaFeedback`. Product events: beta_access_granted, beta_access_revoked, beta_feedback_submitted (feedback text is never logged into events).
 - **Not included:** No email sending, no billing/subscriptions/teams, no public sharing, no screenshot upload, no support chat, no third-party tools, no new dependencies, no Better Auth config changes, no Gemini/scoring/parsing changes.
 
+### M21 — Beta hardening + bug bash
+- **Status:** ✅ Done (code fixes + build verification; on-device manual QA is tracked in `docs/BETA_QA_CHECKLIST.md`)
+- **Purpose:** Stability pass before real private beta testers. No new product features.
+- **Bugs found & fixed:**
+  1. **Stale client state on soft navigation (real data bug):** the Compare Ideas board kept the previous project's decision statuses when switching projects, and the testing checklist kept the previous idea's ticks when using Prev/Next (React preserves client-component state across same-route navigations). Fixed by keying `DecisionBoardClient` by project id and `ValidationChecklist` by opportunity id so they remount with fresh server-seeded state.
+  2. **Duplicate competing CTAs on the dashboard:** the M17 onboarding card and the Founder Command "Next step" card showed the same action at once. Now exactly one renders — onboarding until complaints + ideas + testing progress exist, Founder Command afterwards.
+  3. **Raw internals leaked in errors:** the pipeline catch-all surfaced raw Gemini/provider error text to users, and custom starter generation embedded `err.message`. Both now show friendly messages ("Idea generation failed. Please try again in a moment."); real errors still go to server logs and the AIRun row for admins.
+  4. **Confusing beta status label:** invited-but-never-signed-in testers displayed as "Access active"; now "Invited — not signed in yet".
+  5. **Mobile fixed-header overflow:** an expanded project create/rename/archive or feedback form could push the fixed mobile header past the viewport with unreachable buttons; the row now caps at 70vh and scrolls.
+  6. **Repo hygiene / docs-env mismatch:** `.gitignore` now excludes local AI-tool configs (`.commandcode/`, `opencode.json`) and `*.lnk`; the env table in `docs/PROJECT_CONTEXT.md` was missing `RIFT_ADMIN_EMAILS`/`RIFT_BETA_MODE` and now documents the safe `prisma db push` workflow.
+- **Also added:** `docs/BETA_QA_CHECKLIST.md` — the founder's manual pre-beta checklist (env, auth/beta access, projects, complaints, generation, detail, validation persistence, saved, compare, export, history, insights, feedback, mobile, security, Vercel).
+- **Known issues (documented, not built):**
+  - Server actions are not beta-gated: a revoked tester who keeps a tab open could still submit actions on their own data until they navigate (page-level gate then blocks them). Low risk — acceptable for beta; revisit if needed.
+  - `idea_opened` fires on every detail render (including prev/next), so per-user event volume is chatty; fine at beta scale.
+  - `docs/TESTING_CHECKLIST.md` predates M16C and still references "Saved only in this browser." captions that no longer exist; superseded by `docs/BETA_QA_CHECKLIST.md` for beta QA.
+- **Not changed:** Gemini prompt, scoring, cleaning/parsing, auth/Better Auth config, ownership rules, schema (no schema changes in M21). No billing/scraping/sharing/notifications/new dependencies.
+
 ---
 
 ## Future / post-MVP milestones (not started)
 
 Do **not** start any of these without an explicit user prompt. They appear here only for visibility.
 
-> Note: M7–M20 are complete — see "Completed milestones" above. The items below are future work and must not be started without an explicit user prompt.
+> Note: M7–M21 are complete — see "Completed milestones" above. The items below are future work and must not be started without an explicit user prompt.
 
 ### Future — PDF/CSV export of comparisons
 - Side-by-side comparison export to PDF/CSV. (Markdown export shipped in M18.)

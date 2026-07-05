@@ -23,6 +23,11 @@
 # misc
 .DS_Store
 *.pem
+*.lnk
+
+# local AI tooling configs (not part of the app)
+.commandcode/
+opencode.json
 
 # debug
 npm-debug.log*

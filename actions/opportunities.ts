@@ -270,11 +270,14 @@ export async function runPipeline(
     logger.info("pipeline.completed", { created: created.length });
     return { created: created.length };
   } catch (err) {
+    // Log + store the real error (admins can see it on the AIRun row), but
+    // never surface raw provider/internal messages to the user.
     const message = err instanceof Error ? err.message : String(err);
+    const friendly = "Idea generation failed. Please try again in a moment.";
     logger.error("pipeline.failed", { jobId, error: message });
-    setProgress(jobId, { stage: "error", error: message, message: "Pipeline failed." });
+    setProgress(jobId, { stage: "error", error: friendly, message: "Pipeline failed." });
     await failRun(message);
-    return { created: 0, error: message };
+    return { created: 0, error: friendly };
   }
 }
 

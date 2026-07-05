@@ -122,8 +122,11 @@ export function ValidationWorkspace({
             </ul>
           </Sub>
 
-          {/* 7. Validation Checklist (interactive, database-backed) */}
+          {/* 7. Validation Checklist (interactive, database-backed).
+              Keyed by opportunity so prev/next navigation between ideas never
+              carries one idea's checked state onto another. */}
           <ValidationChecklist
+            key={input.id}
             opportunityId={input.id}
             initialChecked={initialChecklist}
           />

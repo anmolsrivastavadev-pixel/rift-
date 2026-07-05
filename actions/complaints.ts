@@ -264,10 +264,7 @@ export async function loadDemoComplaints(
 // market. Used by the "Want business ideas fast?" section so beginners can
 // explore the Rift workflow without collecting their own data first.
 // ---------------------------------------------------------------------------
-import {
-  getStarterPack,
-  type MarketKey,
-} from "@/lib/starter-complaints";
+import { getStarterPack } from "@/lib/starter-complaints";
 
 export type StarterResult = {
   inserted: number;
@@ -484,12 +481,13 @@ export async function createCustomStarterComplaints(
       sourceDate: null,
     }));
   } catch (err) {
+    // Log the real error server-side; never expose provider internals.
     console.error("Failed to generate custom starter complaints:", err);
     return {
       inserted: 0,
       skipped: 0,
       errors: [
-        { row: 0, reason: `Failed to generate starter complaints: ${err instanceof Error ? err.message : String(err)}` },
+        { row: 0, reason: "Could not generate starter complaints right now. Try again, or pick a ready-made market below." },
       ],
       market,
     };

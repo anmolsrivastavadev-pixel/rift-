@@ -225,10 +225,16 @@ export default async function BetaInsightsPage() {
                   className={
                     row.status === "revoked"
                       ? "text-[var(--color-danger)]"
-                      : "text-[var(--color-success)]"
+                      : row.status === "invited"
+                        ? "text-[var(--color-warning)]"
+                        : "text-[var(--color-success)]"
                   }
                 >
-                  {row.status === "revoked" ? "Access revoked" : "Access active"}
+                  {row.status === "revoked"
+                    ? "Access revoked"
+                    : row.status === "invited"
+                      ? "Invited — not signed in yet"
+                      : "Access active"}
                 </span>
                 {row.status === "revoked" ? (
                   <form action={reactivateBetaTester}>
