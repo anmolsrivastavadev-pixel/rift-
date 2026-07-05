@@ -18,6 +18,8 @@ In Vercel → Project → Settings → Environment Variables (Production):
 | `BETTER_AUTH_SECRET` | long random secret (should already be set) |
 | `RIFT_ADMIN_EMAILS` | **your email** (comma-separate to add more admins) |
 | `RIFT_BETA_MODE` | `off` — leave off until Step 4 |
+| `TAVILY_API_KEY` | optional but recommended — enables the complaint finder's whole-web source (free key from app.tavily.com) |
+| `REDDIT_CLIENT_ID` / `REDDIT_CLIENT_SECRET` | optional — enables the finder's Reddit source from Vercel IPs (see `.env.example`) |
 
 Then **Redeploy** (env changes only apply to new deployments).
 

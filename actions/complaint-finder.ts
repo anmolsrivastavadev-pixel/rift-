@@ -9,6 +9,7 @@ import {
   fetchRedditComplaints,
   fetchAppStoreComplaints,
   fetchHackerNewsComplaints,
+  fetchWebComplaints,
 } from "@/lib/complaint-finder";
 import { requireUser } from "@/lib/auth/current-user";
 import { requireOwnedProject } from "@/lib/projects";
@@ -22,6 +23,7 @@ export interface FindComplaintsResult {
   redditFound: number;
   appStoreFound: number;
   hackerNewsFound: number;
+  webFound: number;
   errors: string[];
   keyword: string;
 }
@@ -49,6 +51,7 @@ export async function findComplaintsAction(
     redditFound: 0,
     appStoreFound: 0,
     hackerNewsFound: 0,
+    webFound: 0,
     errors: [],
     keyword,
   };
@@ -60,21 +63,24 @@ export async function findComplaintsAction(
     };
   }
 
-  const [reddit, appStore, hackerNews] = await Promise.all([
+  const [reddit, appStore, hackerNews, web] = await Promise.all([
     fetchRedditComplaints(keyword),
     fetchAppStoreComplaints(keyword),
     fetchHackerNewsComplaints(keyword),
+    fetchWebComplaints(keyword),
   ]);
 
   const errors: string[] = [];
   if (reddit.error) errors.push(reddit.error);
   if (appStore.error) errors.push(appStore.error);
   if (hackerNews.error) errors.push(hackerNews.error);
+  if (web.error) errors.push(web.error);
 
   const found = [
     ...reddit.complaints,
     ...appStore.complaints,
     ...hackerNews.complaints,
+    ...web.complaints,
   ];
   if (found.length === 0) {
     return {
@@ -161,6 +167,7 @@ export async function findComplaintsAction(
     redditFound: reddit.complaints.length,
     appStoreFound: appStore.complaints.length,
     hackerNewsFound: hackerNews.complaints.length,
+    webFound: web.complaints.length,
     errors,
     keyword,
   };

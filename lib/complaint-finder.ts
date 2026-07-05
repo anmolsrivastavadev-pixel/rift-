@@ -1,6 +1,6 @@
 /* Keyword complaint finder — fetch helpers for Reddit search, App Store
- * reviews, and Hacker News. Server-only (called from
- * actions/complaint-finder.ts). No Gemini, no DB. Every function fails soft:
+ * reviews, Hacker News, and the whole web (Tavily). Server-only (called from
+ * actions/complaint-finder.ts). No DB. Every function fails soft:
  * network/parse errors return an empty list plus an error message so one dead
  * source never breaks the whole search.
  *
@@ -8,15 +8,23 @@
  * REDDIT_CLIENT_ID/REDDIT_CLIENT_SECRET are set; otherwise falls back to the
  * public endpoint, which Reddit often blocks (403) from server IPs.
  * Hacker News: Algolia search API — free, no key or approval needed.
+ * Web (M30): Tavily search API (TAVILY_API_KEY) finds complaint-shaped pages
+ * across the whole indexed web; Gemini then EXTRACTS verbatim complaint
+ * passages from those pages (lib/web-complaint-extract.ts — isolated from the
+ * clustering prompt in lib/ai.ts).
  */
 
 import { logger } from "@/lib/logger";
+import {
+  extractComplaintsFromPages,
+  type WebPageText,
+} from "@/lib/web-complaint-extract";
 
 export interface FoundComplaint {
   title: string;
   body: string;
   sourceDate: string | null; // ISO string when known
-  source: "reddit" | "appstore" | "hackernews";
+  source: "reddit" | "appstore" | "hackernews" | "web";
 }
 
 export interface SourceResult {
@@ -296,6 +304,107 @@ export async function fetchAppStoreComplaints(
     return {
       complaints: [],
       error: `App Store search failed (${err instanceof Error ? err.message : "unknown error"}).`,
+    };
+  }
+}
+
+/* ---------------------------------------------------------------- Web (Tavily) */
+
+const TAVILY_SEARCH_URL = "https://api.tavily.com/search";
+const TAVILY_MAX_RESULTS = 8;
+const TAVILY_PAGE_TEXT_CAP = 4000;
+
+interface TavilyResult {
+  title?: string;
+  url?: string;
+  content?: string;
+  raw_content?: string | null;
+  published_date?: string;
+}
+
+/**
+ * M30 — whole-web source. Tavily searches the entire indexed web for
+ * complaint-shaped pages about the keyword; Gemini extracts the verbatim
+ * complaint passages. Requires TAVILY_API_KEY; without it (or on any
+ * failure) this fails soft with a per-source error like the other sources.
+ */
+export async function fetchWebComplaints(keyword: string): Promise<SourceResult> {
+  const apiKey = process.env.TAVILY_API_KEY?.trim();
+  if (!apiKey) {
+    return {
+      complaints: [],
+      error:
+        "Web search is not configured (set TAVILY_API_KEY — see .env.example).",
+    };
+  }
+
+  let results: TavilyResult[];
+  try {
+    const res = await fetch(TAVILY_SEARCH_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        api_key: apiKey,
+        query: `"${keyword}" complaints problems frustrating`,
+        search_depth: "basic",
+        max_results: TAVILY_MAX_RESULTS,
+        include_raw_content: true,
+      }),
+      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+      cache: "no-store",
+    });
+    // Error strings name statuses and env vars only — never the key.
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json = (await res.json()) as { results?: TavilyResult[] };
+    results = json.results ?? [];
+  } catch (err) {
+    let msg = err instanceof Error ? err.message : "unknown error";
+    if (msg === "HTTP 401" || msg === "HTTP 403") {
+      msg += " — check TAVILY_API_KEY";
+    }
+    return { complaints: [], error: `Web search failed (${msg}).` };
+  }
+
+  const pages: WebPageText[] = results
+    .map((r) => ({
+      url: r.url ?? "",
+      title: cleanText(r.title ?? ""),
+      text: cleanText(r.raw_content || r.content || "").slice(
+        0,
+        TAVILY_PAGE_TEXT_CAP
+      ),
+    }))
+    .filter((p) => p.text.length >= 100);
+
+  if (pages.length === 0) {
+    return { complaints: [], error: "Web search found no readable pages." };
+  }
+
+  try {
+    const extracted = await extractComplaintsFromPages(keyword, pages);
+    const publishedByIndex = results.find((r) => r.published_date)?.published_date;
+    const complaints: FoundComplaint[] = extracted.complaints.map((c) => ({
+      title: cleanText(c.title).slice(0, 200),
+      body: cleanText(c.body).slice(0, 5000),
+      // Page-level dates rarely map to individual passages; only use one when
+      // Tavily supplied it, otherwise leave null (import date is used).
+      sourceDate: publishedByIndex ?? null,
+      source: "web",
+    }));
+    logger.info("web_finder.done", {
+      keyword,
+      pages: pages.length,
+      complaints: complaints.length,
+    });
+    return { complaints };
+  } catch (err) {
+    logger.error("web_finder.extract_failed", {
+      keyword,
+      error: err instanceof Error ? err.message : String(err),
+    });
+    return {
+      complaints: [],
+      error: "Web extraction failed — try again in a moment.",
     };
   }
 }

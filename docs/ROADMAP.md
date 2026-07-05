@@ -333,8 +333,9 @@ Do **not** start any of these without an explicit user prompt for that specific 
 ### M29 — Public share links or better reports
 - Read-only public share pages for idea/project reports (builds on the M18 Markdown builders in `lib/reports.ts`), and/or richer export formats (PDF/CSV of comparisons). First deliberately public surface for user content — needs its own privacy review.
 
-### M30 — Auto complaint discovery / Complaint Finder v2
-- Scheduled or broader automatic discovery on top of the existing Reddit + App Store + Hacker News sources in `lib/complaint-finder.ts`. Highest external risk on the list (source ToS, IP blocking, rate limits) — scope carefully and keep fail-soft per-source behavior.
+### M30 — Complaint Finder v2 (PARTIALLY BUILT EARLY, founder decision, July 2026)
+- **Shipped early (before beta launch):** whole-web source via Tavily search API (`fetchWebComplaints` in `lib/complaint-finder.ts`; `TAVILY_API_KEY`; Gemini extracts verbatim complaint passages via the isolated `lib/web-complaint-extract.ts` — clustering prompt/scoring untouched; fail-soft like every other source) + one-click niche suggestion chips in the finder (`lib/niche-suggestions.ts`, curated list, no AI) so beginners never face a blank input.
+- **Remaining future scope:** scheduled/zero-input automatic discovery. Highest external risk on the list (source ToS, IP blocking, rate limits, AI cost) — scope carefully and keep fail-soft per-source behavior. Do not start without an explicit prompt.
 
 ---
 

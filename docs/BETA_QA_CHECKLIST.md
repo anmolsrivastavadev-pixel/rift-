@@ -15,6 +15,7 @@ need a second account are marked **[2nd account]**.
 - [ ] Vercel has `RIFT_ADMIN_EMAILS` = your email (comma-separated for more).
 - [ ] Vercel has `RIFT_BETA_MODE` = `off` (or `invite_only` when gating).
 - [ ] Vercel has `REDDIT_CLIENT_ID` + `REDDIT_CLIENT_SECRET` (optional `REDDIT_USER_AGENT`) so the complaint finder's Reddit search works from Vercel IPs (M22).
+- [ ] Vercel has `TAVILY_API_KEY` so the complaint finder's whole-web source works (M30).
 - [ ] `pnpm build` succeeds locally; Vercel production build succeeds.
 
 ## Auth and beta access
@@ -48,6 +49,8 @@ need a second account are marked **[2nd account]**.
 - [ ] Complaint finder (keyword) imports and reports counts.
 - [ ] Complaint finder with Reddit creds set: a common keyword (e.g. "fitness") reports "N from Reddit" with N > 0. With creds removed, the Reddit error line names the env vars instead of a bare HTTP 403; App Store results still import.
 - [ ] Complaint finder reports "K from Hacker News" with K > 0 for a tech-ish keyword (e.g. "fitness apps") — works with no env vars (M23).
+- [ ] Complaint finder with `TAVILY_API_KEY` set: reports "N from the web" with N > 0 and imported web complaints read as real verbatim passages. Without the key, the web line says "Web search is not configured (set TAVILY_API_KEY…)" and other sources still import (M30).
+- [ ] Niche suggestion chips ("Not sure? Try one of these:") fill the input and run the search on click; "more" rotates the suggestions (M30).
 - [ ] CSV upload works; bad CSV shows a readable error, not a crash.
 - [ ] Search (`?q=`) filters the complaints list.
 
