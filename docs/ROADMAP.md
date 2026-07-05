@@ -305,33 +305,36 @@ The Start Fresh Test patch addresses workspace-mixing confusion:
 - **What was done:** New `docs/LAUNCH_RUNBOOK.md` (ordered founder playbook: Vercel env setup → production QA → flip invite-only → invite testers with a message template → week-one monitoring → rollback). Landing/SEO polish: `metadataBase` from `BETTER_AUTH_URL`; metadata retitled from "Opportunity Intelligence Platform" to "Rift — Turn complaints into business ideas" with description matching the hero; new `app/opengraph-image.tsx` (next/og, no dependency) so shared links render a real social card; new slim sticky `components/landing/nav.tsx` (logo + Sign in + Get started — previously there was NO way to reach sign-in from the landing page); footer gained Sign in / Create account / How it works links; hero trust line changed from "Free to try. No card required." to "Free during the private beta."; auth-page "Rift" headings link back home; `/beta-access` added to robots disallow.
 - **Not included:** No Privacy/Terms pages (pre-public-launch work, listed in the runbook), no invite-code field on sign-up (gating stays post-signup via `/beta-access`), no product/schema/AI changes.
 
+### M25 — Pricing page + plan design
+- **Status:** ✅ Done (July 2026, built in the M25–M29 one-run push; M24 skipped by founder decision)
+- **What was built:** `lib/plans.ts` (free: 3 active projects, 10 idea runs/mo, 20 finder searches/mo, 1,000 complaints/project; pro: 100/500/1,000/20,000; Pro = $9/month), public `/pricing` page (Free vs Pro cards, honest copy, no fake urgency; CTA adapts to signed-out / free / pro / billing-disabled states), Pricing links in landing nav + footer + sitemap. Admins from `RIFT_ADMIN_EMAILS` always resolve to pro limits.
+
+### M26 — Usage limits / quotas
+- **Status:** ✅ Done (July 2026)
+- **What was built:** `lib/quotas.ts` — all counts derived from existing rows (`Project.archivedAt`, `AIRun`, `ComplaintImport sourceType="finder"`, `Complaint`), UTC calendar-month windows, friendly limit messages pointing at the Pricing page. Enforcement wraps existing actions only: `createProject` (replaces the M16A 100-cap, which became pro's cap), `runPipeline` (checked before any progress/history rows), all five complaint import actions (checked post-dedupe so re-imports never trip), and the complaint finder (search quota before external fetches + complaint cap before insert). Usage line ("N of 10 free idea runs used this month") on the Ideas page for free-plan users. Known generous quirk: zero-result finder searches record no import row, so they don't count.
+
+### M27 — Pre-billing prerequisites
+- **Status:** ✅ Done (July 2026)
+- **What was built:** `/privacy` + `/terms` (plain-English, linked from footer and sign-up agree-line), `lib/email.ts` (Resend HTTP API via fetch — no SDK; key-gated on `RESEND_API_KEY`; `EMAIL_FROM` optional), Better Auth `emailAndPassword.sendResetPassword` registered only when email is enabled, `/forgot-password` (neutral anti-enumeration copy) + `/reset-password` pages, sign-in page split into a server wrapper + `components/auth/sign-in-form.tsx` so "Forgot password?" only renders when reset emails can actually send. Domain steps documented in the runbook (no code needed — metadata derives from `BETTER_AUTH_URL`).
+
+### M28 — Billing with Stripe
+- **Status:** ✅ Done (July 2026, founder-authorized)
+- **What was built:** `stripe` dependency (the only new package), `lib/stripe.ts` (key-gated on `STRIPE_SECRET_KEY` + `STRIPE_PRICE_PRO_MONTHLY`), `actions/billing.ts` (checkout session in subscription mode + billing portal; both redirect to Stripe), `app/api/stripe/webhook/route.ts` — signature-verified, and the **single writer of `User.plan`** (`checkout.session.completed`, `customer.subscription.updated`, `.deleted`; active/trialing/past_due ⇒ pro). User gained `plan`/`stripeCustomerId`/`stripeSubscriptionId`/`planUpdatedAt`. Product events `subscription_started`/`subscription_canceled` on real transitions only.
+
+### M29 — Public share links + print-to-PDF reports
+- **Status:** ✅ Done (July 2026 — both variants shipped)
+- **What was built:** `ShareLink` model (32-hex crypto-random token, all relations `onDelete: Cascade` so a public URL can never outlive its data; M16B3's manual delete transaction clears them too), `actions/share.ts` (create reuses the live link per target; revoke sets `revokedAt`), report data assembly extracted verbatim to `lib/report-data.ts` (Markdown export output unchanged), public `/share/[token]` page (no auth, revoked/unknown ⇒ 404, `robots` noindex + `/share` disallowed), "Save as PDF" print button + scoped `@media print` CSS, Share/Revoke buttons beside the existing export buttons on the dashboard and idea detail pages.
+
 ---
 
 ## Planned milestones (founder-approved sequence, July 2026)
 
 Do **not** start any of these without an explicit user prompt for that specific milestone. The ORDER is deliberate — do not jump ahead (especially not to Stripe).
 
-> Note: M7–M23 are complete — see "Completed milestones" above. M22/M23 were the complaint-finder Reddit OAuth + Hacker News work, which is why this plan starts at M24.
-
-> **Gate before M24:** the private beta must actually be launched first (see `docs/LAUNCH_RUNBOOK.md` Steps 1–5: env vars, production QA, invite-only mode, 3–5 real testers). M24's scope IS their feedback — it cannot be written in advance.
+> Note: M7–M23 and M25–M29 are complete — see "Completed milestones" above. M25–M29 were built in one founder-approved run in July 2026.
 
 ### M24 — Feedback fixes from first testers
-- Scope decided by ~1 week of real usage: the Beta insights funnel (where users drop off) + the feedback inbox. Fix reported bugs and confusion points only — no speculative features.
-
-### M25 — Pricing page + plan design
-- Public pricing page and plan matrix: what's free, what's paid, which limits differ. Design/copy only — no enforcement, no payments, no billing dependency. Copy stays honest (no fake urgency or invented "most popular" pressure).
-
-### M26 — Usage limits / quotas
-- Enforce the M25 plan design app-side: e.g. AI runs per month, complaints per project, projects per user. Generous free tier; friendly limit messages ("You've used your 10 free idea runs this month"). Derive counts from existing `AIRun`/`ComplaintImport` history where possible before adding any new model.
-
-### M27 — Pre-billing prerequisites
-- Privacy Policy + Terms pages (linked from footer and sign-up), password reset via email (the app's first email-sending capability — Better Auth resetPassword flow), custom domain with `BETTER_AUTH_URL`/metadata updates. Required BEFORE charging money; deliberately its own milestone so M28 stays focused.
-
-### M28 — Billing with Stripe
-- Subscriptions, webhook handling, plan gating wired to the M26 quotas. First new major dependency — requires explicit founder approval at milestone start per standing rules. Do not begin without M25–M27 complete.
-
-### M29 — Public share links or better reports
-- Read-only public share pages for idea/project reports (builds on the M18 Markdown builders in `lib/reports.ts`), and/or richer export formats (PDF/CSV of comparisons). First deliberately public surface for user content — needs its own privacy review.
+- **Status:** ⏸ SKIPPED FOR NOW (founder decision, July 2026) — the founder chose to finish M25–M29 first. Revisit once real testers have used the app for ~a week; scope is their feedback (Beta insights funnel + feedback inbox), which cannot be written in advance.
 
 ### M30 — Complaint Finder v2 (PARTIALLY BUILT EARLY, founder decision, July 2026)
 - **Shipped early (before beta launch):** whole-web source via Tavily search API (`fetchWebComplaints` in `lib/complaint-finder.ts`; `TAVILY_API_KEY`; Gemini extracts verbatim complaint passages via the isolated `lib/web-complaint-extract.ts` — clustering prompt/scoring untouched; fail-soft like every other source) + one-click niche suggestion chips in the finder (`lib/niche-suggestions.ts`, curated list, no AI) so beginners never face a blank input.
@@ -354,7 +357,8 @@ Do **not** start any of these without an explicit user prompt for that specific 
 
 ## Standing rules per milestone
 
-- Do not change auth config or add billing, teams, notifications, or automatic scraping as MVP requirements.
+- Billing (M28) and the password-reset auth config change (M27) are SHIPPED, founder-authorized one-offs. Do not extend billing or auth config further without an explicit founder prompt. Never write `User.plan` anywhere except the Stripe webhook (`app/api/stripe/webhook/route.ts`).
+- Do not add teams, notifications, or automatic scraping as MVP requirements.
 - Do not change AI prompts unless the milestone explicitly asks for it.
 - Do not change scoring logic unless the milestone explicitly asks for it.
 - Keep the MVP focused on proving the core workflow (upload → cluster → score → browse → save → detail → deploy).

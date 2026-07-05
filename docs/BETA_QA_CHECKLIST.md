@@ -136,3 +136,40 @@ need a second account are marked **[2nd account]**.
 - [ ] `BETTER_AUTH_URL` matches the production domain (no trailing slash).
 - [ ] Sign-in works on the deployed domain (trusted origins OK).
 - [ ] A full happy path on production: sign in → create project → demo data → find ideas → open idea → decide → export.
+
+## Pricing + quotas (M25/M26)
+
+- [ ] `/pricing` renders signed-out (both cards, "Create a free account" CTA).
+- [ ] Signed in on the free plan: usage line "N of 10 free idea runs used this month" shows on the Ideas page; hidden for admin accounts.
+- [ ] With a NON-admin free account: create projects until the 4th is blocked with a friendly message (not a crash).
+- [ ] Import complaints until a batch would cross 1,000 in one project — friendly message names the remaining room.
+- [ ] Re-importing the SAME complaints does not consume quota (dedupe runs first).
+- [ ] Complaint Finder: the 21st search this month is blocked BEFORE any sources are fetched.
+- [ ] Admin account (RIFT_ADMIN_EMAILS) never hits any cap.
+
+## Legal + password reset (M27)
+
+- [ ] `/privacy` and `/terms` load signed-out; footer links work; sign-up shows the agree line.
+- [ ] WITHOUT `RESEND_API_KEY`: no "Forgot password?" link on sign-in.
+- [ ] WITH the key: link shows → request a reset for a real account → email arrives → link opens `/reset-password` → new password works, old one doesn't.
+- [ ] Requesting a reset for a NONEXISTENT email shows the same neutral success message.
+- [ ] A used or expired reset link shows the "invalid or expired" state, not a crash.
+
+## Billing in Stripe TEST mode (M28)
+
+- [ ] Without Stripe keys: Pro card says "Payments coming soon", no dead buttons.
+- [ ] With test keys: Upgrade → Stripe checkout → `4242 4242 4242 4242` → back to dashboard → Pricing shows "You're on Pro".
+- [ ] Pro caps active (e.g. 4th project now allowed).
+- [ ] Manage subscription → cancel → account returns to Free (webhook may take ~1 min).
+- [ ] Webhook signature check: `stripe.exe` CLI or dashboard "Send test event" with a WRONG secret gets 400 (check Vercel logs).
+- [ ] `User.plan` never changes from just visiting success/cancel URLs without paying.
+
+## Share links + print (M29)
+
+- [ ] Dashboard → Share link → URL copied → opens in an incognito window with NO login.
+- [ ] Same for an idea detail page.
+- [ ] Clicking Share again returns the SAME URL (no link spam).
+- [ ] Revoke → the public URL now shows 404.
+- [ ] Share a project → delete that project (archive → permanent delete) → the public URL 404s.
+- [ ] "Save as PDF" prints clean: white background, no buttons in the printout.
+- [ ] The share page HTML contains `noindex` (view source) and `/share` is disallowed in `/robots.txt`.

@@ -168,7 +168,7 @@ public/
 
 Rift now has auth and project-scoped market tests:
 
-- `User` — Better Auth user plus relations to sessions/accounts/projects and owned app data.
+- `User` — Better Auth user plus relations to sessions/accounts/projects and owned app data. M28 added billing fields: `plan` (String, default `"free"`, `"pro"` when subscribed — written ONLY by the Stripe webhook), `stripeCustomerId` (nullable, unique), `stripeSubscriptionId` (nullable), `planUpdatedAt` (nullable).
 - `Session`, `Account`, `Verification` — Better Auth tables. Do not change auth config for M16A work.
 - `Project` — M16A project / market test. Required `userId`, `User` relation with `onDelete: Cascade`, optional `description`, `createdAt`, `updatedAt`, and `@@index([userId])`. M16B2 added nullable `archivedAt` (`null` = active, set = archived/hidden; all related data is preserved).
 - `Complaint` — complaint row with nullable `userId` and nullable `projectId` during the M16A migration. `projectId` has an optional `Project` relation with `onDelete: SetNull` and `@@index([projectId])`.
@@ -180,6 +180,7 @@ Rift now has auth and project-scoped market tests:
 - `BetaFeedback` — M20 in-app feedback: `type` (bug/confusing/idea/praise/other), optional 1–5 `rating`, `message` (only what the user typed, ≤2000 chars), optional `pagePath`/`projectId` (project attached only when owned by the submitter). Shown in the admin-only feedback inbox on Beta insights.
 - `ProductEvent` — M19 first-party usage analytics: `type` string, optional `projectId`/`opportunityId` (`SetNull`), small sanitized Json `metadata`. Stores metadata and counts ONLY — never complaint text, report contents, or AI prompts/output. Written via `lib/product-events.ts` `trackProductEvent()` which fails silently. Read only by the admin-only `/dashboard/beta-insights` page (access via `RIFT_ADMIN_EMAILS`, see `lib/admin.ts`).
 - `ValidationWorkspace` — M16C database-backed Validation Workspace state: one row per user per opportunity (`@@unique([userId, opportunityId])`) holding `decisionStatus` ("undecided" | "pursue" | "park" | "reject"), `validationChecklist` (Json `boolean[]` mirroring `VALIDATION_CHECKLIST_ITEMS`), and a reserved nullable `validationEvidence` Json column (the evidence-log UI was removed in an earlier UX patch). All three relations (`user`, `project`, `opportunity`) use `onDelete: Cascade`, so M16B3 permanent project delete removes validation state automatically.
+- `ShareLink` — M29 public report links: unique 32-hex `token` (crypto-random), `kind` "project" | "idea", required `userId` plus optional `projectId`/`opportunityId` — ALL relations `onDelete: Cascade` so a public URL can never outlive its data — and nullable `revokedAt` (`null` = live; revoked/unknown tokens 404 on `/share/[token]`). One live link per target (create reuses it); M16B3's manual delete transaction also removes them explicitly.
 
 All application reads/writes for complaints, opportunities, and saved opportunities must filter by both `userId` and the selected `projectId`. Legacy rows with `userId = null` are left alone by the M16A backfill. Import and AI-run history (M16D) is queried the same way — always by `userId` + `projectId`. History survives archive/restore; M16B3 permanent delete removes it with the project; Start Fresh keeps it as a record of past work.
 
@@ -272,8 +273,13 @@ Dashboard routes use query-param project routing in M16A: `?projectId=...`. If t
 | `/dashboard/opportunities/[id]` | dynamic | Detail page |
 | `/dashboard/opportunities/decision-board` | static | Decision Board (M11) |
 | `/dashboard/saved` | static | Saved opportunities grid |
-| `/robots.txt` | static | Robots |
-| `/sitemap.xml` | static | Sitemap (only `/`) |
+| `/pricing` | dynamic | M25 public pricing page (Free vs Pro $9/mo; CTA adapts to session + billing keys) |
+| `/privacy`, `/terms` | static | M27 plain-English legal pages |
+| `/forgot-password`, `/reset-password` | static | M27 password reset flow (only reachable via the key-gated "Forgot password?" link / emailed link) |
+| `/share/[token]` | dynamic | M29 public report page (no auth; revoked/unknown token → 404; noindex) |
+| `/api/stripe/webhook` | dynamic | M28 Stripe webhook — the only writer of `User.plan` |
+| `/robots.txt` | static | Robots (disallow `/dashboard`, `/beta-access`, `/share`) |
+| `/sitemap.xml` | static | Sitemap (`/`, `/pricing`, `/privacy`, `/terms`) |
 | `/_not-found` | static | Global 404 (only renders when nothing more specific matches) |
 
 ---
@@ -302,9 +308,13 @@ Dashboard routes use query-param project routing in M16A: `?projectId=...`. If t
 | `actions/projects.ts` | `createProject(prev, formData)` (M16A), `renameProject(prev, formData)` (M16B1), `archiveProject(prev, formData)` and `unarchiveProject(prev, formData)` (M16B2). All verify ownership server-side. Create/rename trim the name, enforce required/max-60-char names, and reject duplicate project names per user (case-insensitive, app-level — no DB unique constraint). Archive sets `archivedAt`, refuses to archive the last active project ("You need at least one active project."), and redirects to the oldest remaining active project; unarchive clears `archivedAt` and redirects into the restored project. `deleteArchivedProject(prev, formData)` (M16B3) permanently deletes an ARCHIVED project only: it requires the user to type the project name exactly (`confirmName`), rejects active projects ("Archive this project before deleting it."), and deletes saved ideas → complaints → ideas → the project row in one transaction, every statement filtered by the current user's id and the project id. There is no undo. |
 | `actions/saved.ts` | `saveOpportunity(prev, formData)`, `unsaveOpportunity(prev, formData)`, `saveAction(formData)`, `unsaveAction(formData)`. All require a user and owned project. |
 | `actions/beta.ts` | M20: `addBetaTester`/`revokeBetaTester`/`reactivateBetaTester` (admin-only — session email checked against `RIFT_ADMIN_EMAILS` server-side) and `submitBetaFeedback(prev, formData)` (signed-in + beta access required, message trimmed/required/≤2000 chars, projectId attached only if owned). The dashboard layout calls `requireBetaAccess(user)` from `lib/beta-access.ts` after `requireUser()` — a no-op unless `RIFT_BETA_MODE=invite_only`. Sign-in and Better Auth config are untouched. |
-| `actions/reports.ts` | M18: `getProjectReport(projectId)` and `getIdeaReport(opportunityId)` generate private Markdown reports server-side. Both verify ownership first; reports include only the current user's current project/idea data. Nothing is stored; download/copy happens client-side via `components/reports/export-buttons.tsx`. No public share links, no PDF. |
+| `actions/reports.ts` | M18: `getProjectReport(projectId)` and `getIdeaReport(opportunityId)` generate private Markdown reports server-side. Both verify ownership first; reports include only the current user's current project/idea data. Nothing is stored; download/copy happens client-side via `components/reports/export-buttons.tsx`. M29: the data assembly lives in `lib/report-data.ts` (shared with the public share page); the Markdown output is unchanged. |
+| `actions/share.ts` | M29: `createShareLink(kind, targetId)` (ownership verified; reuses the live link per target or mints a fresh `crypto.randomBytes(16)` hex token; returns the absolute `/share/<token>` URL) and `revokeShareLink(linkId)` (sets `revokedAt`; the public page 404s afterwards). Product events `share_link_created`/`share_link_revoked`. |
+| `actions/billing.ts` | M28: `createCheckoutSession()` (Stripe subscription checkout for Rift Pro; creates/reuses `stripeCustomerId`; redirects to Stripe) and `createPortalSession()` (billing portal; manage/cancel). Both return a friendly error when billing keys are missing. NEITHER writes `User.plan` — only the webhook does. |
 | `actions/validation.ts` | M16C: `setDecisionStatus(opportunityId, status)`, `saveValidationChecklist(opportunityId, checked)`, `migrateValidationState(entries)`. All verify the opportunity belongs to the session user server-side before upserting the `ValidationWorkspace` row; `projectId` is copied from the owned opportunity, never from the client. Migration only inserts rows that don't already exist. |
 | `actions/workspace.ts` | `clearWorkspace(projectId)` clears only saved opportunities, opportunities, and complaints for the current user's current project. |
+
+M26 — plan quotas: `lib/plans.ts` defines the free/pro limits (free: 3 active projects, 10 idea runs/mo, 20 finder searches/mo, 1,000 complaints/project; pro: 100/500/1,000/20,000; admins from `RIFT_ADMIN_EMAILS` always resolve to pro). `lib/quotas.ts` derives usage from existing rows (no counter tables; UTC calendar months) and is enforced inside `createProject`, `runPipeline` (before any progress/history rows), all five complaint import actions (post-dedupe batch size), and `findComplaintsAction` (search quota before external fetches + complaint cap before insert). Quota failures return each action's normal error shape with a friendly message pointing at `/pricing`.
 
 All actions are `"use server"` files. They import `prisma` from `lib/db.ts` and `revalidatePath` from `next/cache`.
 
@@ -325,6 +335,11 @@ All actions are `"use server"` files. They import `prisma` from `lib/db.ts` and 
 | `REDDIT_CLIENT_ID` | M22. Optional. Reddit "script" app client ID for the complaint finder's OAuth search (create at https://www.reddit.com/prefs/apps). Unset = public-endpoint fallback, which Reddit often blocks with HTTP 403 from server IPs. | `your_reddit_client_id_here` |
 | `REDDIT_CLIENT_SECRET` | M22. Optional. Secret paired with `REDDIT_CLIENT_ID`. Never logged. | `your_reddit_client_secret_here` |
 | `REDDIT_USER_AGENT` | M22. Optional. Descriptive User-Agent Reddit asks for, `platform:app-id:version (by /u/username)` format. Defaults to a generic rift-app UA. | `web:rift-app:v0.1 (by /u/name)` |
+| `RESEND_API_KEY` | M27. Optional. Enables transactional email (password reset) via the Resend HTTP API. Unset = the "Forgot password?" link is hidden and reset stays disabled. | `re_your_key` |
+| `EMAIL_FROM` | M27. Optional sender; defaults to `Rift <onboarding@resend.dev>` (works before a domain is verified in Resend). | `Rift <hello@yourdomain.com>` |
+| `STRIPE_SECRET_KEY` | M28. Optional. Stripe server key (`sk_test_...` in test mode). Billing is enabled only when this AND the price id are set. | `sk_test_...` |
+| `STRIPE_PRICE_PRO_MONTHLY` | M28. Optional. Price id of the "Rift Pro" $9/month recurring product. | `price_...` |
+| `STRIPE_WEBHOOK_SECRET` | M28. Optional. Signing secret of the `/api/stripe/webhook` endpoint; without it the webhook returns 503. | `whsec_...` |
 
 All of these are server-only. No client component imports them. The three `REDDIT_*` vars degrade gracefully: when unset, the complaint finder falls back to Reddit's public endpoint and surfaces an actionable error if that is blocked; the App Store source is unaffected either way. See `.env.example` for placeholder examples; never commit `.env`. On Vercel, set `RIFT_ADMIN_EMAILS` (and `RIFT_BETA_MODE` when running the invite-only beta) in the project's environment variables. `BETTER_AUTH_URL` doubles as `metadataBase` in `app/layout.tsx`, so OG-image and sitemap URLs absolutize to the deployed domain; the social card itself is generated by `app/opengraph-image.tsx` (next/og). Beta launch steps live in `docs/LAUNCH_RUNBOOK.md`.
 

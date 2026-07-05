@@ -94,7 +94,85 @@ After a week, the feedback inbox + funnel decide what to build next.
 
 ## Before a PUBLIC launch (not needed for beta)
 
-- Privacy policy + Terms pages and footer links to them.
-- A custom domain and updated `BETTER_AUTH_URL`.
-- Decide pricing/limits (there is no billing in the app today).
+- ~~Privacy policy + Terms pages and footer links to them~~ — ✅ shipped in M27 (`/privacy`, `/terms`).
+- A custom domain and updated `BETTER_AUTH_URL` (see "Going paid" Step 3 below).
+- ~~Decide pricing/limits~~ — ✅ shipped in M25/M26 (Pro $9/mo; free limits enforced app-side).
 - Revisit the known issues listed under M21 in `docs/ROADMAP.md`.
+
+---
+
+# Going paid (M25–M29 activation)
+
+Everything below is ALREADY BUILT and key-gated: the app runs exactly as
+before until you paste keys into Vercel. Do the steps in order.
+
+## Step 0 — REQUIRED: apply the database schema
+
+The M25–M29 code adds columns to `User` and a new `ShareLink` table. Vercel's
+build does NOT change the database, so until you run this, the deployed code
+will error on sign-in and dashboard pages.
+
+From the project folder on your computer (your `.env` points at Neon):
+
+```
+pnpm exec prisma db push
+pnpm exec prisma generate
+```
+
+This is **additive only** — no data is deleted or changed. Run it once,
+before (or immediately after) merging the M25–M29 pull request.
+
+## Step 1 — Resend (password reset emails), ~5 minutes
+
+1. Sign up at https://resend.com (free tier: 100 emails/day — plenty).
+2. Dashboard → **API Keys** → Create API Key (Full access) → copy it.
+3. Vercel → your project → Settings → Environment Variables → add
+   `RESEND_API_KEY` = the key → **Redeploy**.
+4. That's it: the "Forgot password?" link appears on sign-in and reset emails
+   send from Resend's shared `onboarding@resend.dev` sender. (Branded sender
+   comes in Step 3.)
+
+## Step 2 — Stripe in TEST mode, ~15 minutes
+
+1. Create an account at https://dashboard.stripe.com. Stay in **Test mode**
+   (toggle in the top-right).
+2. **Product catalog → Add product**: name "Rift Pro", price **$9.00 USD,
+   Recurring, Monthly** → Save. Click the price and copy the id
+   (`price_...`).
+3. **Developers → API keys** → copy the **Secret key** (`sk_test_...`).
+4. Vercel → Environment Variables → add:
+   - `STRIPE_SECRET_KEY` = the secret key
+   - `STRIPE_PRICE_PRO_MONTHLY` = the price id
+   → **Redeploy**. The pricing page now shows a real Upgrade button.
+5. **Developers → Webhooks → Add endpoint**:
+   - URL: `https://YOUR-DOMAIN/api/stripe/webhook` (your live Vercel URL)
+   - Events: `checkout.session.completed`,
+     `customer.subscription.updated`, `customer.subscription.deleted`
+   - Copy the **Signing secret** (`whsec_...`) → Vercel env var
+     `STRIPE_WEBHOOK_SECRET` → **Redeploy**.
+6. **Test the loop** (still test mode — no real money): sign in with a
+   non-admin account → Pricing → Upgrade to Pro → pay with card
+   `4242 4242 4242 4242`, any future date, any CVC → you land back on the
+   dashboard → Pricing shows "You're on Pro" and the caps are lifted.
+   Then **Manage subscription → Cancel** → within a minute the account is
+   back on Free.
+7. When you're ready to charge real money: flip Stripe to **Live mode**,
+   repeat steps 2–5 with the live product/keys/webhook, and replace the four
+   values in Vercel.
+
+## Step 3 — Custom domain + branded email (whenever you buy one)
+
+1. Vercel → project → Settings → **Domains** → add your domain, follow the
+   DNS instructions.
+2. Vercel env var `BETTER_AUTH_URL` = `https://yourdomain.com` → Redeploy.
+   (Metadata, share links, and checkout return URLs all derive from it.)
+3. Resend → **Domains** → Add domain → add the DNS records it shows → once
+   verified, set Vercel env var `EMAIL_FROM` = `Rift <hello@yourdomain.com>`
+   → Redeploy.
+4. Stripe → Developers → Webhooks → update the endpoint URL to the new
+   domain (or add a second endpoint and delete the old one).
+
+## Step 4 — QA the paid features
+
+Run the four new sections at the bottom of `docs/BETA_QA_CHECKLIST.md`
+(pricing + quotas, legal + reset, billing test mode, share links + print).
