@@ -257,7 +257,8 @@ export async function unarchiveProject(
  *
  * Delete order (children before parent, all in one transaction):
  *   1. SavedOpportunity rows  2. Complaint rows  3. Opportunity rows
- *   4. the Project row itself.
+ *   4. AIRun rows  5. ComplaintImport rows (M16D history)
+ *   6. the Project row itself.
  * On success, redirects to /dashboard (resolves to the oldest active project).
  */
 export async function deleteArchivedProject(
@@ -289,6 +290,9 @@ export async function deleteArchivedProject(
     prisma.savedOpportunity.deleteMany({ where: scoped }),
     prisma.complaint.deleteMany({ where: scoped }),
     prisma.opportunity.deleteMany({ where: scoped }),
+    // M16D — remove this project's history so no orphan rows are left.
+    prisma.aIRun.deleteMany({ where: scoped }),
+    prisma.complaintImport.deleteMany({ where: scoped }),
     prisma.project.deleteMany({ where: { id: owned.id, userId: user.id } }),
   ]);
 

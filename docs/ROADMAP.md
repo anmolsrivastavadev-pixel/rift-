@@ -239,17 +239,20 @@ The Start Fresh Test patch addresses workspace-mixing confusion:
 - **Important behavior:** UI is unchanged apart from "Saved only in this browser." captions becoming "Saved to your account." / "Decisions are saved to your account." Old localStorage keys are left in place but never read outside the migrator. The evidence-log UI was removed in an earlier UX patch, so there is no evidence state to persist — the column exists for the future only.
 - **Not included:** No UI redesign, no notifications/collaboration/billing/uploads/scraping, no new AI calls, no new dependencies, no Gemini prompt/scoring/parsing/cleaning changes, no auth or archive/delete behavior changes.
 
+### M16D — Upload history + AI run history
+- **Status:** ✅ Done
+- **Purpose:** Make each project feel like a saved market test: users can see what complaint data they added (and from where), when they added it, and when Rift generated ideas from it.
+- **What was built:** New `ComplaintImport` model (one row per successful import — CSV upload, pasted text, demo data, starter packs, custom starter complaints, complaint finder — with sourceType, readable label, complaint count; empty imports are never recorded) and new `AIRun` model (one row per "Find ideas" run: created as "running" before the AI work, marked "completed" with the output idea count, or "failed" with a short safe error message — no stack traces). Nullable lineage links: `Complaint.complaintImportId` and `Opportunity.aiRunId` (both `onDelete: SetNull`, existing rows stay valid with null). Compact "Recent data" / "Recent idea runs" panel on the dashboard home (last 5 each, project-scoped, hidden when empty). M16B3's permanent-delete transaction now also deletes the project's `AIRun` and `ComplaintImport` rows so no orphan history remains.
+- **Important behavior:** Rerunning ideas is the existing "Find ideas" button — each click records a new `AIRun`, and the pipeline's existing replace-on-rerun behavior (delete this project's old opportunities, regenerate) is unchanged. Archive/restore preserves history (rows are untouched by `archivedAt`). Start Fresh still clears only complaints/opportunities/saved ideas — history rows remain as a record of past work. All history queries filter by both `userId` and `projectId`.
+- **Not included:** No file storage or original-file downloads, no run comparison/diffing, no restoring old runs, no version control, no analytics dashboards, no notifications, no new dependencies, no Gemini prompt/scoring/cleaning/parsing changes, no auth or archive/delete behavior changes beyond the delete transaction covering history.
+
 ---
 
 ## Future / post-MVP milestones (not started)
 
 Do **not** start any of these without an explicit user prompt. They appear here only for visibility.
 
-> Note: M7–M16C are complete — see "Completed milestones" above. The items below are future work and must not be started without an explicit user prompt.
-
-### M16D — Upload history & re-runs
-- Persist each upload as a row in the DB; let users reopen past analyses and compare AI re-runs.
-- Requires a new `Upload` model (file name, date, complaint count, opportunities generated, processing status).
+> Note: M7–M16D are complete — see "Completed milestones" above. The items below are future work and must not be started without an explicit user prompt.
 
 ### M17 — Comparison & multi-opportunity tools
 - Side-by-side comparison view for 2–3 opportunities; export to PDF/CSV.

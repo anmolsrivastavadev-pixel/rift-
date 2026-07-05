@@ -41,7 +41,8 @@ function pickField(row: Record<string, unknown>, keys: string[]): string {
 function insertValidRows(
   valid: { title: string; body: string; sourceDate: Date | null }[],
   userId: string,
-  projectId: string
+  projectId: string,
+  complaintImportId?: string
 ): Promise<unknown> {
   const CHUNK = 500;
   const inserts = [];
@@ -50,10 +51,30 @@ function insertValidRows(
       ...row,
       userId,
       projectId,
+      complaintImportId: complaintImportId ?? null,
     }));
     inserts.push(prisma.complaint.createMany({ data: batch }));
   }
   return Promise.all(inserts);
+}
+
+/* M16D — record one ComplaintImport history row per successful import. Called
+ * only when at least one complaint was actually inserted (empty imports are
+ * never recorded). Returns the import id so inserted complaints can link back
+ * to it. Parsing/cleaning/dedupe behavior is unchanged — this only logs.
+ */
+async function recordImport(
+  userId: string,
+  projectId: string,
+  sourceType: string,
+  label: string,
+  complaintCount: number
+): Promise<string> {
+  const row = await prisma.complaintImport.create({
+    data: { userId, projectId, sourceType, label, complaintCount },
+    select: { id: true },
+  });
+  return row.id;
 }
 
 /* Server action: receives a form with a hidden "data" field containing the
@@ -136,7 +157,10 @@ export async function uploadComplaints(
   }
 
   // Insert in chunks to keep query size reasonable.
-  await insertValidRows(valid, user.id, project.id);
+  if (valid.length > 0) {
+    const importId = await recordImport(user.id, project.id, "csv", "CSV upload", valid.length);
+    await insertValidRows(valid, user.id, project.id, importId);
+  }
 
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/complaints");
@@ -208,7 +232,8 @@ export async function loadDemoComplaints(
   const toInsert = valid.filter((r) => !existingBodies.has(r.body));
 
   if (toInsert.length > 0) {
-    await insertValidRows(toInsert, user.id, project.id);
+    const importId = await recordImport(user.id, project.id, "demo", "Demo complaints", toInsert.length);
+    await insertValidRows(toInsert, user.id, project.id, importId);
   }
 
   revalidatePath("/dashboard");
@@ -300,7 +325,14 @@ export async function loadStarterComplaints(
   const toInsert = valid.filter((r) => !existingBodies.has(r.body));
 
   if (toInsert.length > 0) {
-    await insertValidRows(toInsert, user.id, project.id);
+    const importId = await recordImport(
+      user.id,
+      project.id,
+      "starter_market",
+      `${pack.label} starter pack`,
+      toInsert.length
+    );
+    await insertValidRows(toInsert, user.id, project.id, importId);
   }
 
   revalidatePath("/dashboard");
@@ -401,7 +433,8 @@ export async function importTextComplaints(
   const skipped = capped.length - toInsert.length;
 
   if (toInsert.length > 0) {
-    await insertValidRows(toInsert, user.id, project.id);
+    const importId = await recordImport(user.id, project.id, "paste", "Pasted text", toInsert.length);
+    await insertValidRows(toInsert, user.id, project.id, importId);
   }
 
   revalidatePath("/dashboard");
@@ -473,7 +506,14 @@ export async function createCustomStarterComplaints(
   const skipped = capped.length - toInsert.length;
 
   if (toInsert.length > 0) {
-    await insertValidRows(toInsert, user.id, project.id);
+    const importId = await recordImport(
+      user.id,
+      project.id,
+      "starter_market",
+      `“${market}” starter complaints`,
+      toInsert.length
+    );
+    await insertValidRows(toInsert, user.id, project.id, importId);
   }
 
   revalidatePath("/dashboard");

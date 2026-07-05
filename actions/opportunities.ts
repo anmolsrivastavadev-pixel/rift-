@@ -75,6 +75,26 @@ export async function runPipeline(
   }
   setProgress(jobId, { stage: "cleaning", message: "Cleaning complaints…", total: 0, done: 0 });
 
+  // M16D — AI run history row for this pipeline run. Created as "running"
+  // before the AI work starts, then marked completed/failed. Metadata only —
+  // the pipeline stages themselves are unchanged.
+  let runId: string | null = null;
+  const failRun = async (message: string) => {
+    if (!runId) return;
+    await prisma.aIRun
+      .update({
+        where: { id: runId },
+        data: {
+          status: "failed",
+          errorMessage: message.slice(0, 300),
+          completedAt: new Date(),
+        },
+      })
+      .catch(() => {
+        // History bookkeeping must never mask the real pipeline error.
+      });
+  };
+
   try {
     /* --- Stage 1: Cleaning --- */
     logger.info("pipeline.started", { jobId, projectId: project.id });
@@ -90,12 +110,24 @@ export async function runPipeline(
       return { created: 0, error: "No complaints to analyse. Upload a CSV first." };
     }
 
+    const run = await prisma.aIRun.create({
+      data: {
+        userId: user.id,
+        projectId: project.id,
+        inputComplaintCount: all.length,
+        status: "running",
+      },
+      select: { id: true },
+    });
+    runId = run.id;
+
     const cleaned = cleanComplaints(all);
     setProgress(jobId, { stage: "cleaning", total: all.length, done: cleaned.length, message: `Cleaned ${cleaned.length} of ${all.length} complaints.` });
     logger.info("pipeline.cleaned", { raw: all.length, cleaned: cleaned.length });
 
     if (cleaned.length === 0) {
       setProgress(jobId, { stage: "error", error: "All complaints were empty or duplicates.", message: "No clean complaints." });
+      await failRun("All complaints were empty or duplicates.");
       return { created: 0, error: "All complaints were empty or duplicates. Nothing to analyse." };
     }
 
@@ -116,6 +148,7 @@ export async function runPipeline(
 
     if (clusters.length === 0) {
       setProgress(jobId, { stage: "error", error: "Gemini returned no clusters.", message: "No clusters returned." });
+      await failRun("The AI returned no idea clusters.");
       return { created: 0, error: "Gemini returned no clusters from the complaints." };
     }
 
@@ -186,6 +219,7 @@ export async function runPipeline(
           trend: trend as unknown as object,
           userId: user.id,
           projectId: project.id,
+          aiRunId: runId,
         },
       });
 
@@ -201,6 +235,21 @@ export async function runPipeline(
 
     setProgress(jobId, { stage: "saving", done: created.length, total: created.length, message: "Saving results…" });
 
+    if (runId) {
+      await prisma.aIRun
+        .update({
+          where: { id: runId },
+          data: {
+            status: "completed",
+            outputOpportunityCount: created.length,
+            completedAt: new Date(),
+          },
+        })
+        .catch(() => {
+          // History bookkeeping must never fail a successful run.
+        });
+    }
+
     revalidatePath("/dashboard");
     revalidatePath("/dashboard/opportunities");
     revalidatePath("/dashboard/complaints");
@@ -212,6 +261,7 @@ export async function runPipeline(
     const message = err instanceof Error ? err.message : String(err);
     logger.error("pipeline.failed", { jobId, error: message });
     setProgress(jobId, { stage: "error", error: message, message: "Pipeline failed." });
+    await failRun(message);
     return { created: 0, error: message };
   }
 }

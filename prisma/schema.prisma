@@ -26,6 +26,8 @@ model User {
   opportunities      Opportunity[]
   savedOpportunities SavedOpportunity[]
   validationWorkspaces ValidationWorkspace[]
+  complaintImports   ComplaintImport[]
+  aiRuns             AIRun[]
 }
 
 // M16A — Multi-Project Market Tests. Lets a user split market tests into
@@ -44,6 +46,8 @@ model Project {
   opportunities      Opportunity[]
   savedOpportunities SavedOpportunity[]
   validationWorkspaces ValidationWorkspace[]
+  complaintImports   ComplaintImport[]
+  aiRuns             AIRun[]
   createdAt           DateTime           @default(now())
   updatedAt           DateTime           @updatedAt
 
@@ -101,12 +105,16 @@ model Complaint {
   user          User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
   projectId     String?
   project       Project?  @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  // M16D — optional link back to the import that created this complaint.
+  complaintImportId String?
+  complaintImport   ComplaintImport? @relation(fields: [complaintImportId], references: [id], onDelete: SetNull)
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
 
   @@index([opportunityId])
   @@index([userId])
   @@index([projectId])
+  @@index([complaintImportId])
 }
 
 model Opportunity {
@@ -141,6 +149,9 @@ model Opportunity {
   user               User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
   projectId          String?
   project            Project?  @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  // M16D — optional link back to the AI run that generated this idea.
+  aiRunId            String?
+  aiRun              AIRun?    @relation(fields: [aiRunId], references: [id], onDelete: SetNull)
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
@@ -149,6 +160,51 @@ model Opportunity {
   validationWorkspaces ValidationWorkspace[]
 
   @@index([userId])
+  @@index([projectId])
+  @@index([aiRunId])
+}
+
+// M16D — Import/upload history. One row per successful complaint import
+// (CSV, pasted text, demo data, starter pack, complaint finder). Records what
+// data was added, from where, and when. Cascade-deleted with the user or the
+// project (M16B3 permanent delete also removes these explicitly).
+model ComplaintImport {
+  id             String      @id @default(cuid())
+  userId         String
+  user           User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projectId      String
+  project        Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  sourceType     String      // "csv" | "paste" | "demo" | "starter_market" | "finder"
+  label          String
+  complaintCount Int
+  createdAt      DateTime    @default(now())
+  complaints     Complaint[]
+  aiRuns         AIRun[]
+
+  @@index([userId, projectId])
+  @@index([projectId])
+}
+
+// M16D — AI run history. One row per "Find ideas" pipeline run, recording the
+// input complaint count, how many ideas came out, and whether it failed.
+// status: "running" | "completed" | "failed".
+model AIRun {
+  id                     String    @id @default(cuid())
+  userId                 String
+  user                   User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projectId              String
+  project                Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  complaintImportId      String?
+  complaintImport        ComplaintImport? @relation(fields: [complaintImportId], references: [id], onDelete: SetNull)
+  inputComplaintCount    Int
+  outputOpportunityCount Int       @default(0)
+  status                 String
+  errorMessage           String?
+  createdAt              DateTime  @default(now())
+  completedAt            DateTime?
+  opportunities          Opportunity[]
+
+  @@index([userId, projectId])
   @@index([projectId])
 }
 

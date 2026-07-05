@@ -12,6 +12,7 @@ import {
   type DecisionCounts,
 } from "@/components/dashboard/founder-command-client";
 import { isValidDecisionStatus } from "@/lib/decision-board";
+import { ProjectHistory } from "@/components/dashboard/project-history";
 import { Button } from "@/components/ui/button";
 import type { DashboardStats } from "@/lib/dashboard-plan";
 import { requireUser } from "@/lib/auth/current-user";
@@ -103,13 +104,41 @@ export default async function DashboardPage({
 
   // M16C — decision counts come from the database (per user, per project), so
   // the Founder Command Center shows the same summary on every device.
+  // M16D — recent import + AI run history for this project.
   const ids = opportunityIds.map((o) => o.id);
-  const workspaces = ids.length
-    ? await prisma.validationWorkspace.findMany({
-        where: { userId: user.id, opportunityId: { in: ids } },
-        select: { decisionStatus: true },
-      })
-    : [];
+  const [workspaces, recentImports, recentRuns] = await Promise.all([
+    ids.length
+      ? prisma.validationWorkspace.findMany({
+          where: { userId: user.id, opportunityId: { in: ids } },
+          select: { decisionStatus: true },
+        })
+      : Promise.resolve([]),
+    prisma.complaintImport.findMany({
+      where: { userId: user.id, projectId: project.id },
+      orderBy: { createdAt: "desc" },
+      take: 5,
+      select: {
+        id: true,
+        sourceType: true,
+        label: true,
+        complaintCount: true,
+        createdAt: true,
+      },
+    }),
+    prisma.aIRun.findMany({
+      where: { userId: user.id, projectId: project.id },
+      orderBy: { createdAt: "desc" },
+      take: 5,
+      select: {
+        id: true,
+        status: true,
+        inputComplaintCount: true,
+        outputOpportunityCount: true,
+        errorMessage: true,
+        createdAt: true,
+      },
+    }),
+  ]);
   const decisionCounts: DecisionCounts = { pursue: 0, park: 0, reject: 0, undecided: 0 };
   for (const w of workspaces) {
     if (isValidDecisionStatus(w.decisionStatus) && w.decisionStatus !== "undecided") {
@@ -203,6 +232,9 @@ export default async function DashboardPage({
         decisionCounts={decisionCounts}
         projectId={projectId}
       />
+
+      {/* M16D — what data was added + when ideas were generated */}
+      <ProjectHistory imports={recentImports} runs={recentRuns} />
 
       {/* High-signal opportunities (only when they exist) */}
       {topOpportunities.length > 0 && (

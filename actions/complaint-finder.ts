@@ -109,6 +109,18 @@ export async function findComplaintsAction(
   );
 
   if (toInsert.length > 0) {
+    // M16D — record this find as one import history row and link the
+    // complaints back to it.
+    const complaintImport = await prisma.complaintImport.create({
+      data: {
+        userId: user.id,
+        projectId: project.id,
+        sourceType: "finder",
+        label: `Found complaints for “${keyword}”`,
+        complaintCount: toInsert.length,
+      },
+      select: { id: true },
+    });
     const CHUNK = 500;
     for (let i = 0; i < toInsert.length; i += CHUNK) {
       await prisma.complaint.createMany({
@@ -116,6 +128,7 @@ export async function findComplaintsAction(
           ...row,
           userId: user.id,
           projectId: project.id,
+          complaintImportId: complaintImport.id,
         })),
       });
     }
