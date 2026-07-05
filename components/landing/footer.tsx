@@ -48,6 +48,18 @@ export function Footer() {
           >
             Pricing
           </Link>
+          <Link
+            href="/privacy"
+            className="text-[var(--color-muted-foreground)] transition-colors hover:text-[var(--color-foreground)]"
+          >
+            Privacy
+          </Link>
+          <Link
+            href="/terms"
+            className="text-[var(--color-muted-foreground)] transition-colors hover:text-[var(--color-foreground)]"
+          >
+            Terms
+          </Link>
         </nav>
         <div className="mt-8 flex items-center justify-center gap-4">
           <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--color-primary)] text-[11px] font-bold text-white">
