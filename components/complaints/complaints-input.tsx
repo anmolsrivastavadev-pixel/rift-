@@ -70,11 +70,10 @@ export function ComplaintsInput({ projectId }: { projectId: string }) {
         {tab === "file" && <TextInput mode="file" projectId={projectId} />}
       </div>
 
-      {/* Onboarding helpers — shared across all tabs */}
       <div className="flex flex-wrap items-center gap-3 border-t border-[var(--color-border)] pt-4">
         <Button asChild variant="secondary" size="md">
           <Link href="/sample_complaints.csv" download>
-            <Download className="h-4 w-4" /> Download sample spreadsheet
+            <Download className="h-4 w-4" /> Sample file
           </Link>
         </Button>
 
@@ -87,7 +86,7 @@ export function ComplaintsInput({ projectId }: { projectId: string }) {
               </>
             ) : (
               <>
-                <Sparkles className="h-4 w-4" /> Use demo data
+                <Sparkles className="h-4 w-4" /> Use examples
               </>
             )}
           </Button>

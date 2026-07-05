@@ -42,7 +42,7 @@ export function ComplaintsTable({
         <p className="text-sm text-[var(--color-muted-foreground)]">
           {hasQuery
             ? "No complaints match your search. Try a different term."
-            : "No complaints in this MVP workspace yet. Use demo data, download a sample CSV, or upload your own above."}
+            : "No complaints yet. Add data above to get started."}
         </p>
       </div>
     );

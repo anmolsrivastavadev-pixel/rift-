@@ -165,10 +165,6 @@ export function OpportunityCard({
           </div>
         </div>
 
-        <p className="mt-3 text-[10px] leading-snug text-[var(--color-muted-foreground)]">
-          The score is a rough sorting signal, not proof an idea will work.
-        </p>
-
         <span
           className="mt-3 inline-flex items-center justify-center gap-1.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-xs font-medium text-[var(--color-foreground)] transition-all duration-150 ease-out group-hover:border-[var(--color-primary)]/30 group-hover:bg-[var(--color-primary-soft)] group-hover:text-[var(--color-primary)]"
           aria-hidden="true"

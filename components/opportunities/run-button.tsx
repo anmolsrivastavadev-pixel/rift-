@@ -19,8 +19,8 @@ import { Button } from "@/components/ui/button";
 const STAGE_META: Record<Stage, { label: string; icon: React.ComponentType<{ className?: string }> }> = {
   idle: { label: "Idle", icon: ToggleRight },
   cleaning: { label: "Cleaning complaints", icon: Sparkles },
-  clustering: { label: "Clustering with AI", icon: ListChecks },
-  generating: { label: "Generating opportunities", icon: Sparkles },
+  clustering: { label: "Finding patterns", icon: ListChecks },
+  generating: { label: "Creating ideas", icon: Sparkles },
   saving: { label: "Saving results", icon: Database },
   complete: { label: "Complete", icon: CheckCircle2 },
   error: { label: "Error", icon: AlertTriangle },
@@ -79,7 +79,7 @@ export function RunOpportunitiesButton({ projectId }: { projectId: string }) {
               </>
             ) : (
               <>
-                <Sparkles className="h-4 w-4" /> Generate business ideas
+                <Sparkles className="h-4 w-4" /> Find ideas
               </>
             )}
           </Button>

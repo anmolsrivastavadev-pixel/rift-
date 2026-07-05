@@ -12,14 +12,14 @@ import { projectHref } from "@/lib/project-href";
 export function ImportNextStepLink({ projectId }: { projectId: string }) {
   return (
     <span className="block text-xs text-[var(--color-muted-foreground)]">
-      Next: head to{" "}
+      Next: go to{" "}
       <Link
         href={projectHref("/dashboard/opportunities", projectId)}
         className="font-medium text-[var(--color-primary)] hover:underline"
       >
-        Opportunities → Generate business ideas
+        Ideas → Find ideas
       </Link>{" "}
-      to turn the complaints into scored startup opportunities.
+      to turn complaints into ideas.
     </span>
   );
 }
@@ -41,7 +41,7 @@ export function DemoSummary({
         <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
         <div className="space-y-1">
           <p className="font-medium">
-            Demo complaints are already loaded. You can generate business ideas now.
+            Example complaints are already loaded. You can find ideas now.
           </p>
           <p className="text-xs text-[var(--color-muted-foreground)]">
             Demo data is fake and safe to test with.{" "}
@@ -49,9 +49,9 @@ export function DemoSummary({
               href={projectHref("/dashboard/opportunities", projectId)}
               className="font-medium text-[var(--color-primary)] hover:underline"
             >
-              Opportunities → Generate business ideas
+              Ideas → Find ideas
             </Link>{" "}
-            to generate scored opportunities.
+            to generate scored ideas.
           </p>
         </div>
       </div>
@@ -63,11 +63,10 @@ export function DemoSummary({
       <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
       <div className="space-y-1">
         <p className="font-medium">
-          Demo complaints added ({result.inserted}). Now generate business ideas to
-          create opportunities.
+          Example complaints added ({result.inserted}). Now find ideas.
         </p>
         <p className="text-xs text-[var(--color-muted-foreground)]">
-          This is fake demo data, safe to test with. <ImportNextStepLink projectId={projectId} />
+          These examples are safe to test with. <ImportNextStepLink projectId={projectId} />
         </p>
       </div>
     </div>
@@ -93,7 +92,7 @@ export function TextImportSummary({
         <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
         <div className="space-y-1">
           <p className="font-medium">
-            These complaints are already loaded. You can generate business ideas now.
+            These complaints are already loaded. You can find ideas now.
           </p>
           <ImportNextStepLink projectId={projectId} />
         </div>
@@ -124,7 +123,7 @@ export function TextImportSummary({
         <p className="font-medium">
           Imported {result.inserted} complaint
           {result.inserted === 1 ? "" : "s"}
-          {fromLabel}. Now generate business ideas to create opportunities.
+          {fromLabel}. Now find ideas.
         </p>
         {result.skipped > 0 && (
           <p className="text-xs">

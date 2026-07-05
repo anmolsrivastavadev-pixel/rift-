@@ -34,12 +34,12 @@ export function ValidationWorkspace({ input }: { input: ValidationPlanInput }) {
   const risks = buildRisksToTest(input);
 
   return (
-    <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-sm space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--color-border)] pb-4">
+    <details className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-sm">
+      <summary className="cursor-pointer text-base font-semibold">Testing guide</summary>
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-b border-[var(--color-border)] pb-4">
         <div>
-          <h2 className="text-base font-semibold">Validation Workspace</h2>
           <p className="mt-0.5 text-xs text-[var(--color-muted-foreground)]">
-            A simple checklist for testing the idea with real people.
+            A short guide for testing the idea with real people.
           </p>
         </div>
         <CopyValidationBrief input={input} />
@@ -118,7 +118,7 @@ export function ValidationWorkspace({ input }: { input: ValidationPlanInput }) {
           <ValidationChecklist opportunityId={input.id} />
         </div>
       </div>
-    </section>
+    </details>
   );
 }
 

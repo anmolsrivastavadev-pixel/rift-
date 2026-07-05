@@ -112,8 +112,7 @@ export function TextInput({
         </label>
       </div>
       <p className="text-xs text-[var(--color-muted-foreground)]">
-        The source label is for your reference only — it is not stored on the
-        complaint. This MVP workspace keeps only the complaint text.
+        The source label is only for this import.
       </p>
 
       {mode === "paste" ? (
@@ -136,8 +135,7 @@ export function TextInput({
             }}
           />
           <span className="mt-1 text-[11px] text-[var(--color-muted-foreground)]">
-            Bullets (-, *, •, 1.) are stripped automatically. Entries under 10
-            characters are ignored. Exact duplicates are skipped.
+            Short entries and exact duplicates are skipped.
           </span>
         </label>
       ) : (
@@ -154,8 +152,7 @@ export function TextInput({
               Drag a .txt or .md file here, or click to browse
             </p>
             <p className="text-xs text-[var(--color-muted-foreground)]">
-              Rift reads the file in your browser and parses it the same way as
-              pasted text.
+              Rift reads it like pasted text.
             </p>
           </button>
           <input

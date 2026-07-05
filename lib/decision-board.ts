@@ -83,4 +83,4 @@ export function computeTestingPriority(input: TestingPriorityInput): TestingPrio
 }
 
 export const TESTING_PRIORITY_HELPER =
-  "Testing Priority is a lightweight UI helper based on score, complaint count, confidence, and risk flags. It is not a new AI score.";
+  "Testing Priority helps you choose what to inspect first. It is not a new score.";

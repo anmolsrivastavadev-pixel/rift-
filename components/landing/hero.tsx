@@ -58,9 +58,8 @@ export function Hero() {
           transition={{ duration: 0.45, ease: "easeOut", delay: 0.1 }}
           className="mx-auto mt-6 max-w-2xl text-balance text-base text-[var(--color-muted-foreground)] sm:text-lg leading-relaxed"
         >
-          Type a market or paste real complaints. Rift finds repeated problems,
-          generates business idea hypotheses, and helps you compare which one to
-          test first.
+          Type a market or paste real complaints. Rift finds repeated problems
+          and turns them into ideas you can compare.
         </motion.p>
 
         {/* CTA buttons */}
@@ -75,11 +74,6 @@ export function Hero() {
               Start with a market <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>
-          <Button asChild size="lg" variant="outline">
-            <Link href="/dashboard/complaints">
-              Paste complaints
-            </Link>
-          </Button>
         </motion.div>
 
         {/* Trust copy */}
@@ -89,8 +83,7 @@ export function Hero() {
           transition={{ duration: 0.4, delay: 0.25 }}
           className="mt-5 text-xs text-[var(--color-muted-foreground)]/70"
         >
-          Free to try. No card required. Starter examples are for brainstorming
-          — real complaints give stronger results.
+          Free to try. No card required.
         </motion.p>
 
         {/* Product visual — mini workflow */}

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Target, SearchX, BookmarkX, Sparkles, Upload } from "lucide-react";
+import { Target, SearchX, BookmarkX, Upload } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { projectHref } from "@/lib/project-href";
@@ -20,18 +20,11 @@ export function NoOpportunitiesEmpty({ projectId }: { projectId: string }) {
       <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
         Add customer pain data, then generate ideas from repeated problems.
       </p>
-      <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
-        <Button asChild>
-          <Link href={projectHref("/dashboard/complaints", projectId)}>
-            <Sparkles className="h-4 w-4" /> Use Demo Data
-          </Link>
-        </Button>
-        <Button asChild variant="outline">
-          <Link href={projectHref("/dashboard/complaints", projectId)}>
-            <Upload className="h-4 w-4" /> Add complaints
-          </Link>
-        </Button>
-      </div>
+      <Button asChild className="mt-5">
+        <Link href={projectHref("/dashboard/complaints", projectId)}>
+          <Upload className="h-4 w-4" /> Add data
+        </Link>
+      </Button>
     </div>
   );
 }

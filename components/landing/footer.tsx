@@ -11,18 +11,12 @@ export function Footer() {
           Ready to find your first idea?
         </h2>
         <p className="mx-auto mt-4 max-w-md text-sm text-[var(--color-muted-foreground)]">
-          Start with a market you know, or paste complaints you have collected.
-          Rift does the pattern-finding for you.
+          Start with a market you know. Rift finds the repeated complaints.
         </p>
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
           <Button asChild size="lg">
             <Link href="/dashboard/complaints">
               Start with a market <ArrowRight className="h-4 w-4" />
-            </Link>
-          </Button>
-          <Button asChild size="lg" variant="outline">
-            <Link href="/dashboard/complaints">
-              Paste complaints
             </Link>
           </Button>
         </div>

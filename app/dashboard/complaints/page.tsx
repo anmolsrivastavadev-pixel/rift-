@@ -26,9 +26,7 @@ export default async function ComplaintsPage({
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Complaints</h1>
         <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
-          Add market pain by uploading a spreadsheet, pasting raw comments, or uploading
-          a text file. Rift will turn each complaint or review into a row before
-          AI clustering. Uploaded data stays in this MVP project database.
+          Add complaints, reviews, or support notes. Rift uses them to find ideas.
         </p>
         <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
           Project: <span className="font-medium text-[var(--color-foreground)]">{project.name}</span>
@@ -36,90 +34,39 @@ export default async function ComplaintsPage({
       </div>
 
       <section>
-        <h2 className="text-base font-semibold">Why complaints?</h2>
-        <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
-          Complaints reveal repeated pain. Repeated pain is often where useful business ideas begin.
-        </p>
-        <p className="mt-2 text-sm text-[var(--color-muted-foreground)]">
-          You can use product reviews, support tickets, Reddit/forum snippets you manually collect, sales call notes, or the built-in demo data.
-        </p>
-      </section>
-
-      <section>
-        <h2 className="text-base font-semibold">What counts as a complaint?</h2>
-        <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
-          A complaint is any real customer frustration. You can paste reviews, app-store feedback, support tickets, Reddit/forum snippets you manually collected, interview notes, or use demo data.
-        </p>
-        <p className="mt-2 text-sm text-[var(--color-muted-foreground)]">
-          You are looking for problems people repeat, not random opinions.
-        </p>
-        <p className="mt-2 text-xs text-[var(--color-muted-foreground)]">
-          Do not include private personal information. Keep the text focused on the problem people are describing.
-        </p>
-      </section>
-
-      <StarterMarkets projectId={project.id} />
-
-      <section>
-        <h2 className="text-base font-semibold">Don't have complaints yet?</h2>
-        <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
-          That is normal. Here are easy ways to collect your first few:
-        </p>
-        <ul className="mt-3 space-y-2 text-sm text-[var(--color-muted-foreground)]">
-          <li className="flex items-start gap-2">
-            <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-primary)]" />
-            Read app store reviews (1–3 star) and copy any sentence that names a problem
-          </li>
-          <li className="flex items-start gap-2">
-            <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-primary)]" />
-            Screenshot Reddit, Twitter/X, or forum posts where people complain
-          </li>
-          <li className="flex items-start gap-2">
-            <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-primary)]" />
-            Note things your friends, coworkers, or customers say annoy them
-          </li>
-          <li className="flex items-start gap-2">
-            <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-primary)]" />
-            Paste a few complaint sentences — even 5–10 is enough to start
-          </li>
-        </ul>
-        <p className="mt-3 text-xs text-[var(--color-muted-foreground)]">
-          No scraping or automation needed. Collect manually — copy and paste works.
-          Or try the demo data first to see how Rift works.
-        </p>
-      </section>
-
-      <section>
-        <h2 className="text-base font-semibold">Add complaints</h2>
+        <h2 className="text-base font-semibold">Add data</h2>
         <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
-          Choose an input method below. For spreadsheet upload, a CSV is a simple spreadsheet file you can export from Excel, Google Sheets, Airtable, or many review/support tools. The expected columns are{" "}
-          <code className="font-mono">body</code> (required); optional{" "}
-          <code className="font-mono">title</code>,{" "}
-          <code className="font-mono">sourceDate</code> (ISO date). For pasted
-          text or <code className="font-mono">.txt</code>/<code>.md</code> files,
-          one complaint per line or one per blank-line-separated paragraph.
-          You can also download a sample spreadsheet or use demo data below.
+          Paste text, use examples, or upload a file.
         </p>
         <div className="mt-3">
           <ComplaintsInput projectId={project.id} />
         </div>
       </section>
 
-      <section className="rounded-[12px] border border-dashed border-[var(--color-border)] bg-[var(--color-card)]/60 p-5">
-        <h2 className="text-sm font-semibold">Testing a new niche?</h2>
-        <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
-          Rift analyzes all complaints currently in this project. To get clean
-          results, start fresh before adding a new set of complaints.
-        </p>
-        <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
-          Use this when you want to test a new market, like student productivity
-          apps, fitness apps, or restaurant booking tools, without mixing old
-          complaints into the results.
+      <details className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)]/60 p-5">
+        <summary className="cursor-pointer text-sm font-semibold">Need examples?</summary>
+        <div className="mt-4">
+          <StarterMarkets projectId={project.id} />
+        </div>
+      </details>
+
+      <details className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)]/60 p-5">
+        <summary className="cursor-pointer text-sm font-semibold">What should I paste?</summary>
+        <div className="mt-3 space-y-3 text-sm text-[var(--color-muted-foreground)]">
+          <p>Paste real frustrations: reviews, support tickets, forum posts, sales notes, or interview notes.</p>
+          <p>Look for repeated problems, not random opinions. Do not include private personal information.</p>
+        </div>
+      </details>
+
+      <details className="rounded-[12px] border border-dashed border-[var(--color-border)] bg-[var(--color-card)]/60 p-5">
+        <summary className="cursor-pointer text-sm font-semibold">Start fresh</summary>
+        <p className="mt-3 text-sm text-[var(--color-muted-foreground)]">
+          Clear this project before testing a different market.
         </p>
         <div className="mt-3">
           <StartFreshButton projectId={project.id} />
         </div>
-      </section>
+      </details>
 
       <section>
         <h2 className="text-base font-semibold">All complaints</h2>

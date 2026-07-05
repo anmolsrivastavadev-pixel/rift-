@@ -59,19 +59,10 @@ export default async function OpportunitiesPage({
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Business Ideas</h1>
           <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
-            These ideas are generated from patterns in the complaints you added. Scores help sort ideas. A higher score means Rift saw stronger signals in the complaints, but it does not mean the idea is proven.
+            Review ideas found from this project’s complaints.
           </p>
           <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
             Project: <span className="font-medium text-[var(--color-foreground)]">{project.name}</span>
-          </p>
-          <p className="mt-2 text-xs text-[var(--color-muted-foreground)]">
-            Ideas are generated from the complaints currently in this project.
-            If you used a preset starter pack or typed a custom market name,
-            treat the results as inspiration — not proof of demand.
-            If you pasted real complaints, treat them as stronger evidence.
-          </p>
-          <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
-            Start by opening one idea with a high score, then check whether the evidence actually makes sense.
           </p>
         </div>
         <Button asChild variant="outline">
@@ -81,20 +72,10 @@ export default async function OpportunitiesPage({
         </Button>
       </div>
 
-      <p className="text-xs text-[var(--color-muted-foreground)]">
-        Not sure which idea to choose? Select 2–3 ideas below and compare them
-        side by side.
-      </p>
-
       <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)]">
-        <h2 className="text-base font-semibold">Generate business ideas</h2>
+        <h2 className="text-base font-semibold">Find ideas</h2>
         <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
-          Group this project's complaints into business idea hypotheses based on repeated pain, severity, and confidence.
-        </p>
-        <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
-          Rift generates ideas from all complaints currently in this project.
-          For a clean test, start fresh on the Complaints page before adding a
-          new niche.
+          Turn this project’s complaints into scored ideas.
         </p>
         <div className="mt-4">
           <RunOpportunitiesButton projectId={project.id} />

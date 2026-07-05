@@ -99,16 +99,15 @@ export function ValidationEvidenceLog({
   const hasNoEvidence = state.interviewsCompleted === 0 && !hydrated;
 
   return (
-    <section
+    <details
       id="validation-evidence-log"
       className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-6 space-y-6 scroll-mt-6"
     >
-      {/* Header */}
-      <div className="flex flex-wrap items-start justify-between gap-3 border-b border-[var(--color-border)] pb-4">
+      <summary className="cursor-pointer text-base font-semibold">Your testing notes</summary>
+      <div className="mt-4 flex flex-wrap items-start justify-between gap-3 border-b border-[var(--color-border)] pb-4">
         <div>
-          <h2 className="text-base font-semibold">Validation Evidence Log</h2>
           <p className="mt-0.5 text-xs text-[var(--color-muted-foreground)]">
-            A place to record what you learn after talking to people.
+            Save short notes after talking to people.
           </p>
         </div>
         <Button
@@ -190,7 +189,7 @@ export function ValidationEvidenceLog({
           {/* Evidence Signal label */}
           <div className="rounded-[8px] border border-[var(--color-border)] bg-[var(--color-background)] p-3">
             <p className="text-[11px] uppercase tracking-wide text-[var(--color-muted-foreground)]">
-              Evidence signal
+            Testing signal
             </p>
             <p className="mt-0.5 text-sm font-semibold">
               {hydrated ? EVIDENCE_SIGNAL_LABELS[signal] : "—"}
@@ -251,7 +250,7 @@ export function ValidationEvidenceLog({
       <p className="flex items-center gap-1 text-[11px] text-[var(--color-muted-foreground)]">
         <Info className="h-3 w-3" /> Saved only in this browser.
       </p>
-    </section>
+    </details>
   );
 }
 

@@ -44,7 +44,7 @@ export function MarketGapHypothesis({ data }: { data: MarketGapData }) {
     return (
       <section className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-6">
         <h2 className="flex items-center gap-2 text-base font-semibold">
-          <Compass className="h-4 w-4 text-[var(--color-primary)]" /> Market Gap Hypothesis
+          <Compass className="h-4 w-4 text-[var(--color-primary)]" /> Why this might matter
         </h2>
         {data.reason ? (
           <p className="mt-2 text-sm leading-relaxed text-[var(--color-foreground)]/90">
@@ -52,21 +52,21 @@ export function MarketGapHypothesis({ data }: { data: MarketGapData }) {
           </p>
         ) : null}
         <p className="mt-3 text-xs text-[var(--color-muted-foreground)]">
-          Generate business ideas again to generate market gap hypotheses for this
-          opportunity. Market gap, target customer, workarounds, product angle,
-          and differentiation are part of the updated AI output.
+          Find ideas again to add more context for this idea.
         </p>
       </section>
     );
   }
 
   return (
-    <section className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-6">
-      <h2 className="flex items-center gap-2 text-base font-semibold">
-        <Compass className="h-4 w-4 text-[var(--color-primary)]" /> Market Gap Hypothesis
-      </h2>
-      <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
-        A guess about why this problem might be worth exploring. This is not proof.
+    <details className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-6">
+      <summary className="cursor-pointer text-base font-semibold">
+        <span className="inline-flex items-center gap-2">
+          <Compass className="h-4 w-4 text-[var(--color-primary)]" /> Why this might matter
+        </span>
+      </summary>
+      <p className="mt-2 text-xs text-[var(--color-muted-foreground)]">
+        Supporting context for the idea.
       </p>
 
       <div className="mt-4 space-y-4">
@@ -103,7 +103,7 @@ export function MarketGapHypothesis({ data }: { data: MarketGapData }) {
           </p>
         </div>
       )}
-    </section>
+    </details>
   );
 }
 

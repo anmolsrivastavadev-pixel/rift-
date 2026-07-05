@@ -115,9 +115,6 @@ export function DashboardShell({
               <LogOut className="h-4 w-4" />
               Sign out
             </button>
-            <div className="text-[11px] text-[var(--color-muted-foreground)]/60 text-center">
-              MVP build
-            </div>
           </div>
         </Container>
       </aside>

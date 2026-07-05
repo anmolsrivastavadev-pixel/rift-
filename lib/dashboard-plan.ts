@@ -38,16 +38,16 @@ export function computeWorkflowSteps(
   return [
     {
       id: "import",
-      title: "Import complaints",
-      description: "Add customer pain signals via CSV, paste, text file, or demo data.",
+      title: "Add data",
+      description: "Paste complaints, upload a file, or use examples.",
       status: complaintCount > 0 ? "done" : "not-started",
       href: "/dashboard/complaints",
-      cta: "Go to Complaints",
+      cta: "Add data",
     },
     {
       id: "generate",
-      title: "Generate opportunities",
-      description: "Generate business ideas to turn complaints into scored opportunity hypotheses.",
+      title: "Find ideas",
+      description: "Turn complaints into scored ideas.",
       status:
         opportunityCount > 0
           ? "done"
@@ -55,20 +55,20 @@ export function computeWorkflowSteps(
             ? "ready"
             : "not-started",
       href: "/dashboard/opportunities",
-      cta: "Go to Opportunities",
+      cta: "Find ideas",
     },
     {
       id: "review",
-      title: "Review details",
-      description: "Open opportunity detail pages to inspect evidence and hypotheses.",
+      title: "Review ideas",
+      description: "Open an idea and check the evidence.",
       status: opportunityCount > 0 ? "in-progress" : "not-started",
       href: "/dashboard/opportunities",
-      cta: "Browse opportunities",
+      cta: "Review ideas",
     },
     {
       id: "validate",
-      title: "Validate evidence",
-      description: "Record what you learn from real customer conversations.",
+      title: "Test an idea",
+      description: "Talk to people and save short notes.",
       status:
         local.hasEvidence
           ? "in-progress"
@@ -76,12 +76,12 @@ export function computeWorkflowSteps(
             ? "ready"
             : "not-started",
       href: "/dashboard/opportunities",
-      cta: "Review Opportunities",
+      cta: "Review ideas",
     },
     {
       id: "decide",
       title: "Decide next step",
-      description: "Mark opportunities as Pursue, Park, or Reject on the Decision Board.",
+      description: "Compare ideas and pick one to test.",
       status:
         local.hasNonUndecidedDecision
           ? "in-progress"
@@ -89,7 +89,7 @@ export function computeWorkflowSteps(
             ? "ready"
             : "not-started",
       href: "/dashboard/opportunities/decision-board",
-      cta: "Open Decision Board",
+      cta: "Compare ideas",
     },
   ];
 }
@@ -109,55 +109,55 @@ export function computeNextAction(
 
   if (complaintCount === 0) {
     return {
-      title: "Add complaints",
-      description: "Import customer pain signals to start discovering opportunities.",
-      cta: "Go to Complaints",
+      title: "Add data",
+      description: "Paste complaints, upload a file, or start with examples.",
+      cta: "Add data",
       href: "/dashboard/complaints",
     };
   }
 
   if (opportunityCount === 0) {
     return {
-      title: "Generate opportunities",
-      description: "Generate business ideas to turn complaints into opportunity hypotheses.",
-      cta: "Go to Opportunities",
+      title: "Find ideas",
+      description: "Turn this project’s complaints into scored ideas.",
+      cta: "Find ideas",
       href: "/dashboard/opportunities",
     };
   }
 
   if (!local.hasEvidence) {
     return {
-      title: "Start validation",
-      description: "Open a promising opportunity and record early validation evidence.",
-      cta: "Review Opportunities",
+      title: "Pick one to test",
+      description: "Open a promising idea and check the evidence.",
+      cta: "Review ideas",
       href: "/dashboard/opportunities",
     };
   }
 
   if (!local.hasNonUndecidedDecision) {
     return {
-      title: "Decide what to pursue",
+      title: "Compare ideas",
       description:
-        "Use evidence and testing priority to mark opportunities as Pursue, Park, or Reject.",
-      cta: "Open Decision Board",
+        "Pick one idea to test next, or park the rest for later.",
+      cta: "Compare ideas",
       href: "/dashboard/opportunities/decision-board",
     };
   }
 
   if (local.hasPursue) {
     return {
-      title: "Review pursued opportunities",
+      title: "Review picked ideas",
       description:
-        "Review the opportunities you marked Pursue and continue validation before building.",
-      cta: "Open Decision Board",
+        "Keep testing the ideas you chose before building.",
+      cta: "Compare ideas",
       href: "/dashboard/opportunities/decision-board",
     };
   }
 
   return {
-    title: "Review your opportunities",
-    description: "Continue comparing opportunities and collecting evidence.",
-    cta: "Open Decision Board",
+    title: "Review your ideas",
+    description: "Compare ideas and save short testing notes.",
+    cta: "Compare ideas",
     href: "/dashboard/opportunities/decision-board",
   };
 }

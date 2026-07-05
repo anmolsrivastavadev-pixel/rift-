@@ -1,13 +1,5 @@
 import Link from "next/link";
-import {
-  ArrowRight,
-  FileText,
-  Target,
-  Users,
-  Bookmark,
-  Trophy,
-  Briefcase,
-} from "lucide-react";
+import { ArrowRight, FileText, Target, Users, Bookmark, Trophy, Briefcase } from "lucide-react";
 
 import { prisma } from "@/lib/db";
 import { StatCard } from "@/components/dashboard/stat-card";
@@ -111,117 +103,31 @@ export default async function DashboardPage({
 
   return (
     <div className="mx-auto max-w-6xl space-y-8">
-      {/* Header */}
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">
-          Founder Command Center
+          Home
         </h1>
         <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
           Project: <span className="font-medium text-[var(--color-foreground)]">{project.name}</span>
         </p>
-        <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
-          Track your opportunity discovery workflow from raw complaints to
-          validated next steps. Data shown here is scoped to this project only.
-        </p>
-        <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
-          Rift helps you move from customer pain signals to opportunities,
-          validation evidence, and decisions.
-        </p>
       </div>
 
-      {/* First-time user guidance */}
-      <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)] transition-all duration-150 ease-out hover:shadow-[0_4px_12px_0_rgb(0_0_0_/_0.06),0_2px_4px_-2px_rgb(0_0_0_/_0.04)]">
-        <div className="flex items-start gap-4">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--color-primary-soft)] text-[var(--color-primary)] ring-1 ring-[var(--color-primary)]/10">
-            <Target className="h-5 w-5" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <h2 className="text-base font-semibold">Start here</h2>
-            <p className="mt-1.5 text-sm text-[var(--color-muted-foreground)] leading-relaxed">
-              New to Rift? Use demo data to see how customer complaints become business ideas. Then replace the demo data with complaints, reviews, or support tickets from your own market.
-            </p>
-          </div>
-        </div>
-        <p className="mt-3 text-xs text-[var(--color-muted-foreground)]">
-          Don't have complaints yet? No problem — use the demo data to see how Rift works, then come back with your own. You can read app store reviews (1–3 star), screenshot Reddit or forum posts, note things people complain about in real life, or paste support tickets. Even 5–10 sentences is enough to start.
-        </p>
-        <div className="mt-4 flex flex-wrap items-center gap-3">
-          <Button asChild>
-            <Link href={projectHref("/dashboard/complaints", project.id)}>Use demo data</Link>
-          </Button>
-          <Button asChild variant="outline">
-            <Link href={projectHref("/dashboard/complaints", project.id)}>Add complaints</Link>
-          </Button>
-          <Button asChild variant="outline">
-            <Link href={projectHref("/dashboard/opportunities", project.id)}>View business ideas</Link>
-          </Button>
-        </div>
-        <p className="mt-4 text-xs text-[var(--color-muted-foreground)]">
-          Current MVP: works from complaints, reviews, support tickets, or demo data you provide. Future direction: scan public sources like Reddit, reviews, and forums to surface market pain automatically.
-        </p>
-      </div>
-
-      {/* Beginner guide */}
-      <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)] transition-all duration-150 ease-out hover:shadow-[0_4px_12px_0_rgb(0_0_0_/_0.06),0_2px_4px_-2px_rgb(0_0_0_/_0.04)]">
-        <div className="flex items-start gap-4">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--color-warning-soft)] text-[var(--color-warning)] ring-1 ring-[var(--color-warning)]/10">
-            <Target className="h-5 w-5" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <h2 className="text-base font-semibold">What should I do first?</h2>
-            <p className="mt-1.5 text-sm text-[var(--color-muted-foreground)] leading-relaxed">
-              If you do not have your own complaints yet, start with demo data. Once you understand the workflow, replace it with real complaints or reviews from a market you care about.
-            </p>
-          </div>
-        </div>
-        <ol className="mt-4 space-y-2 text-sm text-[var(--color-muted-foreground)]">
-          <li className="flex gap-2">
-            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary-soft)] text-[10px] font-semibold text-[var(--color-primary)]">1</span>
-            Use demo data
-          </li>
-          <li className="flex gap-2">
-            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary-soft)] text-[10px] font-semibold text-[var(--color-primary)]">2</span>
-            Generate business ideas
-          </li>
-          <li className="flex gap-2">
-            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary-soft)] text-[10px] font-semibold text-[var(--color-primary)]">3</span>
-            Open one idea
-          </li>
-          <li className="flex gap-2">
-            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary-soft)] text-[10px] font-semibold text-[var(--color-primary)]">4</span>
-            Read the evidence and score
-          </li>
-          <li className="flex gap-2">
-            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary-soft)] text-[10px] font-semibold text-[var(--color-primary)]">5</span>
-            Talk to real people
-          </li>
-          <li className="flex gap-2">
-            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary-soft)] text-[10px] font-semibold text-[var(--color-primary)]">6</span>
-            Mark the idea as Pursue, Park, or Reject
-          </li>
-        </ol>
-        <p className="mt-4 text-xs text-[var(--color-muted-foreground)]">
-          Plain English: Rift helps you spot repeated problems people complain about, turn them into possible business ideas, then decide which one is worth testing.
-        </p>
-      </div>
-
-      {/* Project stat cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           icon={Users}
           label="Complaints loaded"
           value={complaintCount.toLocaleString()}
-          hint={complaintCount > 0 ? "Ready for clustering" : "None yet"}
+          hint={complaintCount > 0 ? "Ready to use" : "None yet"}
         />
         <StatCard
           icon={Target}
-          label="Opportunities generated"
+          label="Ideas found"
           value={opportunityCount.toLocaleString()}
-          hint={opportunityCount > 0 ? "Discovered by AI" : "Run clustering →"}
+          hint={opportunityCount > 0 ? "Ready to review" : "Find ideas →"}
         />
         <StatCard
           icon={Bookmark}
-          label="Saved opportunities"
+          label="Saved ideas"
           value={savedCount.toLocaleString()}
           hint={savedCount > 0 ? "Bookmarked" : "None saved"}
         />
@@ -243,11 +149,11 @@ export default async function DashboardPage({
             No complaints yet
           </h2>
           <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
-            Start with demo data or add complaints, reviews, support tickets, or manually collected forum snippets.
+            Add data to find your first ideas.
           </p>
           <Button asChild className="mt-4">
             <Link href={projectHref("/dashboard/complaints", projectId)}>
-              Go to Complaints <ArrowRight className="h-4 w-4" />
+              Add data <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>
         </div>
@@ -261,11 +167,11 @@ export default async function DashboardPage({
             Ready to generate business ideas
           </h2>
           <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
-            Generate business ideas to turn complaints into scored business idea hypotheses.
+            Find ideas from the complaints in this project.
           </p>
           <Button asChild className="mt-4">
             <Link href={projectHref("/dashboard/opportunities", projectId)}>
-              Go to Ideas <ArrowRight className="h-4 w-4" />
+              Find ideas <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>
         </div>

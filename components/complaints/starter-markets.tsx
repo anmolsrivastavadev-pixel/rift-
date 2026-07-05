@@ -28,12 +28,9 @@ export function StarterMarkets({ projectId }: { projectId: string }) {
           <Zap className="h-4 w-4" />
         </div>
         <div>
-          <h2 className="text-base font-semibold">Want business ideas fast?</h2>
+          <h2 className="text-base font-semibold">Start from a market</h2>
           <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
-            Pick a market and Rift will load starter complaint examples so you
-            can generate business ideas quickly. This is useful for exploring
-            ideas, but real complaints from your own research will give stronger
-            results.
+            Pick a market to load example complaints.
           </p>
         </div>
       </div>
@@ -61,8 +58,7 @@ export function StarterMarkets({ projectId }: { projectId: string }) {
       {/* Custom market input */}
       <div className="mt-4 border-t border-[var(--color-border)] pt-4">
         <p className="text-sm text-[var(--color-muted-foreground)] mb-2">
-          Don&apos;t see your market? Type any market or niche below to generate
-          brainstorming examples:
+          Type any market or niche:
         </p>
         <form action={customAction} className="flex gap-2">
           <input type="hidden" name="projectId" value={projectId} />
@@ -84,23 +80,7 @@ export function StarterMarkets({ projectId }: { projectId: string }) {
           </Button>
         </form>
         <p className="mt-1 text-[11px] text-[var(--color-muted-foreground)]">
-          AI-generated examples — not real data. You can also paste real
-          complaints from your own customers.
-        </p>
-      </div>
-
-      <div className="mt-4 rounded-xl bg-[var(--color-surface)] p-3 text-xs text-[var(--color-muted-foreground)]">
-        <p>
-          <strong className="font-medium text-[var(--color-foreground)]">
-            Quick ideas
-          </strong>{" "}
-          = fast inspiration from starter examples.
-        </p>
-        <p className="mt-0.5">
-          <strong className="font-medium text-[var(--color-foreground)]">
-            Real data
-          </strong>{" "}
-          = stronger ideas grounded in complaints you provide.
+          Examples are for exploring. Real complaints are stronger.
         </p>
       </div>
 
@@ -119,9 +99,7 @@ export function StarterMarkets({ projectId }: { projectId: string }) {
       {customState && <StarterSummary result={customState} projectId={projectId} />}
 
       <p className="mt-3 text-[11px] text-[var(--color-muted-foreground)]">
-        Starter examples are for exploring the workflow. They are not proof of
-        demand. For stronger results, paste real complaints or reviews from your
-        market.
+        Examples are not proof of demand.
       </p>
     </section>
   );
@@ -148,9 +126,9 @@ function StarterSummary({
               href={projectHref("/dashboard/opportunities", projectId)}
               className="font-medium text-[var(--color-primary)] hover:underline"
             >
-              Ideas → Generate business ideas
+              Ideas → Find ideas
             </Link>{" "}
-            to see what Rift finds in the patterns.
+            to see what Rift finds.
           </p>
         </div>
       </div>
@@ -182,15 +160,14 @@ function StarterSummary({
           {result.skipped > 0 && ` ${result.skipped} already existed.`}
         </p>
         <p className="text-xs text-[var(--color-muted-foreground)]">
-          These are synthetic starter examples for exploring the workflow. Now
-          go to{" "}
+          Now go to{" "}
           <Link
             href={projectHref("/dashboard/opportunities", projectId)}
             className="font-medium text-[var(--color-primary)] hover:underline"
           >
-            Ideas → Generate business ideas
+            Ideas → Find ideas
           </Link>{" "}
-          to see what Rift finds.
+          to find ideas.
         </p>
       </div>
     </div>

@@ -1,13 +1,7 @@
 "use client";
 
 import * as React from "react";
-import {
-  CheckCircle2,
-  Circle,
-  Clock,
-  ArrowRight,
-  Info,
-} from "lucide-react";
+import { ArrowRight, Info } from "lucide-react";
 import Link from "next/link";
 
 import {
@@ -22,11 +16,9 @@ import {
   type EvidenceState,
 } from "@/lib/validation-evidence";
 import {
-  computeWorkflowSteps,
   computeNextAction,
   type DashboardStats,
   type LocalSummary,
-  type WorkflowStepStatus,
 } from "@/lib/dashboard-plan";
 import { Button } from "@/components/ui/button";
 import { projectHref } from "@/lib/project-href";
@@ -130,17 +122,15 @@ export function FounderCommandClient({
     return () => window.removeEventListener("focus", onFocus);
   }, [hydrated, readAll]);
 
-  const steps = computeWorkflowSteps(stats, local);
   const nextAction = computeNextAction(stats, local);
 
   return (
     <div className="space-y-8">
-      {/* Recommended Next Action */}
       <section className="rounded-xl border border-[var(--color-primary)]/30 bg-[var(--color-primary)]/5 p-6 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)]">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-[11px] uppercase tracking-wide text-[var(--color-primary)]">
-              Recommended next action
+              Next step
             </p>
             <h2 className="mt-1 text-base font-semibold">{nextAction.title}</h2>
             <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
@@ -155,25 +145,13 @@ export function FounderCommandClient({
         </div>
       </section>
 
-      {/* Workflow Step Cards */}
-      <div>
-        <h2 className="text-base font-semibold">Opportunity workflow</h2>
-        <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-          {steps.map((step) => (
-            <WorkflowStepCard key={step.id} step={step} projectId={projectId} />
-          ))}
-        </div>
-      </div>
-
-      {/* Decision + Evidence Snapshot */}
       {stats.opportunityCount > 0 && (
         <div className="grid gap-4 lg:grid-cols-2">
-          {/* Decision summary */}
           <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-5 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)]">
             <h3 className="text-sm font-semibold">Decision status</h3>
             <p className="mt-0.5 text-xs text-[var(--color-muted-foreground)]">
               {hydrated
-                ? "From your local decision choices in this browser."
+                ? "Your local choices for this project."
                 : "Loading…"}
             </p>
             <div className="mt-3 grid grid-cols-4 gap-2 text-center">
@@ -186,16 +164,15 @@ export function FounderCommandClient({
               href={projectHref("/dashboard/opportunities/decision-board", projectId)}
               className="mt-3 inline-block text-xs text-[var(--color-primary)] hover:underline"
             >
-              Open Decision Board →
+              Open Compare Ideas →
             </Link>
           </div>
 
-          {/* Evidence summary */}
           <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-5 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)]">
-            <h3 className="text-sm font-semibold">Evidence so far</h3>
+            <h3 className="text-sm font-semibold">Testing notes</h3>
             <p className="mt-0.5 text-xs text-[var(--color-muted-foreground)]">
               {hydrated
-                ? "From validation evidence saved in this browser."
+                ? "Notes you saved in this browser."
                 : "Loading…"}
             </p>
             <div className="mt-3 grid grid-cols-2 gap-2 text-center">
@@ -208,57 +185,15 @@ export function FounderCommandClient({
               href={projectHref("/dashboard/opportunities", projectId)}
               className="mt-3 inline-block text-xs text-[var(--color-primary)] hover:underline"
             >
-              Review Opportunities →
+              Review ideas →
             </Link>
           </div>
         </div>
       )}
 
       <p className="flex items-center gap-1 text-[11px] text-[var(--color-muted-foreground)]">
-        <Info className="h-3 w-3" /> Decision and evidence summaries are read
-        from this browser only. They are not stored in the database.
+        <Info className="h-3 w-3" /> Decisions and testing notes are saved only in this browser.
       </p>
-    </div>
-  );
-}
-
-function WorkflowStepCard({
-  step,
-  projectId,
-}: {
-  step: import("@/lib/dashboard-plan").WorkflowStep;
-  projectId: string;
-}) {
-  const statusMeta: Record<
-    WorkflowStepStatus,
-    { label: string; icon: React.ComponentType<{ className?: string }>; color: string }
-  > = {
-    "not-started": { label: "Not started", icon: Circle, color: "text-[var(--color-muted-foreground)]" },
-    ready: { label: "Ready", icon: Circle, color: "text-[var(--color-primary)]" },
-    "in-progress": { label: "In progress", icon: Clock, color: "text-[var(--color-warning)]" },
-    done: { label: "Done", icon: CheckCircle2, color: "text-[var(--color-success)]" },
-  };
-  const meta = statusMeta[step.status];
-  const Icon = meta.icon;
-
-  return (
-    <div className="flex flex-col rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-4 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)] transition-all duration-150 ease-out hover:-translate-y-0.5 hover:shadow-[0_4px_12px_0_rgb(0_0_0_/_0.06),0_2px_4px_-2px_rgb(0_0_0_/_0.04)]">
-      <div className="flex items-center gap-1.5">
-        <Icon className={`h-3.5 w-3.5 ${meta.color}`} />
-        <span className={`text-[10px] uppercase tracking-wide ${meta.color}`}>
-          {meta.label}
-        </span>
-      </div>
-      <h3 className="mt-1.5 text-sm font-semibold">{step.title}</h3>
-      <p className="mt-0.5 flex-1 text-[11px] text-[var(--color-muted-foreground)]">
-        {step.description}
-      </p>
-      <Link
-        href={projectHref(step.href, projectId)}
-        className="mt-2 inline-block text-[11px] text-[var(--color-primary)] hover:underline"
-      >
-        {step.cta} →
-      </Link>
     </div>
   );
 }

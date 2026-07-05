@@ -8,8 +8,8 @@ const steps = [
   },
   {
     n: "2",
-    title: "Generate business idea hypotheses",
-    text: "Rift groups repeated pain into possible business ideas.",
+    title: "Find ideas",
+    text: "Rift groups repeated complaints into possible ideas.",
   },
   {
     n: "3",

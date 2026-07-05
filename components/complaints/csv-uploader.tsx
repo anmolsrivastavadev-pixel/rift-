@@ -91,10 +91,7 @@ export function CsvUploader({ projectId }: { projectId: string }) {
               Drag &amp; drop a spreadsheet here, or click to browse
             </p>
             <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
-              A CSV is a simple spreadsheet file. You can export one from Excel, Google Sheets, Airtable, or many review/support tools.
-            </p>
-            <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
-              Required column: <code className="font-mono">body</code>. Optional:{" "}
+              Required: <code className="font-mono">body</code>. Optional:{" "}
               <code className="font-mono">title</code>,{" "}
               <code className="font-mono">sourceDate</code>
             </p>
@@ -172,7 +169,7 @@ function UploadSummary({
       <div className="space-y-1">
         <p className="font-medium">
           Imported {result.inserted} complaint{result.inserted === 1 ? "" : "s"}
-          {" "}from spreadsheet. Now run AI clustering to generate business ideas.
+          {" "}from spreadsheet. Now find ideas.
         </p>
         {result.skipped > 0 && (
           <p className="text-xs">Skipped {result.skipped} invalid row(s).</p>

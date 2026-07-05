@@ -203,7 +203,7 @@ export function DecisionBoardClient({
           <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
             {isCompareMode
               ? "The ideas you selected could not be found. Try selecting ideas again from the Ideas page."
-              : "Add complaints, then run AI clustering to generate business ideas before using the Compare Ideas board."}
+              : "Add data, then find ideas before using Compare Ideas."}
           </p>
           <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
             <Button asChild>
@@ -228,8 +228,7 @@ export function DecisionBoardClient({
         <DecisionBoardHeader isCompareMode={isCompareMode} projectId={projectId} />
 
         <p className="text-xs text-[var(--color-muted-foreground)]">
-          Compare these ideas side by side. Pick the one with the clearest
-          person, repeated problem, simple solution, and evidence you understand.
+          Compare these ideas side by side and pick one to test.
         </p>
 
         {/* Side-by-side comparison table */}
@@ -362,8 +361,7 @@ export function DecisionBoardClient({
         </div>
 
         <p className="flex items-center gap-1 text-[11px] text-[var(--color-muted-foreground)]">
-          <Info className="h-3 w-3" /> This helps you choose what to inspect
-          first. It does not prove which idea will work.
+          <Info className="h-3 w-3" /> Use this to choose what to test first.
         </p>
         <p className="flex items-center gap-1 text-[11px] text-[var(--color-muted-foreground)]">
           <Info className="h-3 w-3" /> Saved only in this browser.
@@ -407,14 +405,8 @@ export function DecisionBoardClient({
         </span>
       </div>
 
-      {/* Testing Priority helper */}
       <p className="flex items-center gap-1 text-[11px] text-[var(--color-muted-foreground)]">
         <Info className="h-3 w-3" /> {TESTING_PRIORITY_HELPER}
-      </p>
-      <p className="text-[11px] text-[var(--color-muted-foreground)]">
-        Testing Priority is based on opportunity score, complaint count,
-        confidence, and risk flags. Evidence Signal is based only on validation
-        evidence saved in this browser.
       </p>
 
       {/* Opportunity comparison cards */}
@@ -557,20 +549,19 @@ function DecisionBoardHeader({
       </h1>
       {isCompareMode ? (
         <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
-          Compare these ideas side by side. Pick the one with the clearest
-          person, repeated problem, simple solution, and evidence you understand.
+          Compare these ideas side by side and pick one to test.
         </p>
       ) : (
         <>
           <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
-            Choose whether to pursue, park, reject, or keep reviewing each idea based on the evidence so far.
+            Compare ideas and pick one to test.
           </p>
-          <p className="mt-2 text-xs text-[var(--color-muted-foreground)]">
-            Pursue = test this idea next. Park = save it for later. Reject = stop spending time on it for now. Undecided = not enough evidence yet.
-          </p>
-          <p className="mt-2 text-xs text-[var(--color-muted-foreground)]">
-            These decisions are for your own thinking. They do not prove whether an idea is good or bad.
-          </p>
+          <details className="mt-2 text-xs text-[var(--color-muted-foreground)]">
+            <summary className="cursor-pointer">What do the choices mean?</summary>
+            <p className="mt-2">
+              Pursue means test next. Park means save for later. Reject means stop spending time on it for now.
+            </p>
+          </details>
         </>
       )}
     </div>
@@ -661,7 +652,7 @@ function EvidenceSnapshot({
   return (
     <div className="mt-3 rounded-[8px] border border-[var(--color-border)] bg-[var(--color-background)] p-3">
       <p className="text-[10px] uppercase tracking-wide text-[var(--color-muted-foreground)]">
-        Evidence so far
+        Testing notes
       </p>
       {hydrated && hasEvidence && evidence ? (
         <>
@@ -680,7 +671,7 @@ function EvidenceSnapshot({
         </>
       ) : (
         <p className="mt-0.5 text-[11px] text-[var(--color-muted-foreground)]">
-          {hydrated ? "No evidence yet" : "—"}
+          {hydrated ? "No testing notes yet" : "—"}
         </p>
       )}
       <Link
@@ -690,7 +681,7 @@ function EvidenceSnapshot({
         )}
         className="mt-1.5 inline-block text-[11px] text-[var(--color-primary)] hover:underline"
       >
-        Open evidence log
+        Open testing notes
       </Link>
     </div>
   );
