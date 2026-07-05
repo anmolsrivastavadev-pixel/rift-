@@ -14,10 +14,12 @@ import { projectHref } from "@/lib/project-href";
  * - rename an owned project (M16B1)
  * - archive / unarchive an owned project (M16B2) — archiving only sets
  *   Project.archivedAt; every complaint/idea/saved row is preserved.
+ * - permanently delete an ARCHIVED project (M16B3) — removes the project and
+ *   its complaints/ideas/saved ideas in one transaction. Active projects can
+ *   never be deleted directly; they must be archived first.
  *
  * Duplicate project names per user are blocked at the app level (M16B1) —
  * no DB unique constraint, so existing duplicate rows keep working.
- * Permanent project deletion is still future work.
  */
 
 const MAX_PROJECTS_PER_USER = 100;
@@ -242,4 +244,56 @@ export async function unarchiveProject(
   revalidatePath("/dashboard", "layout");
 
   redirect(projectHref("/dashboard", owned.id));
+}
+
+/**
+ * M16B3 — Permanently delete an ARCHIVED project and its app data.
+ *
+ * Deliberately harder than archive: the project must already be archived, and
+ * the user must type the project name exactly (`confirmName`) to confirm.
+ * Ownership is verified server-side; every delete in the transaction filters
+ * by BOTH the current user's id and this project's id, so rows from other
+ * projects, other users, or legacy rows with userId = null are never touched.
+ *
+ * Delete order (children before parent, all in one transaction):
+ *   1. SavedOpportunity rows  2. Complaint rows  3. Opportunity rows
+ *   4. the Project row itself.
+ * On success, redirects to /dashboard (resolves to the oldest active project).
+ */
+export async function deleteArchivedProject(
+  _prev: ArchiveActionResult | null,
+  formData: FormData
+): Promise<ArchiveActionResult> {
+  const user = await requireUser();
+  const projectId = String(formData.get("projectId") ?? "").trim();
+  const confirmName = String(formData.get("confirmName") ?? "").trim();
+
+  const owned = projectId
+    ? await prisma.project.findFirst({
+        where: { id: projectId, userId: user.id },
+        select: { id: true, name: true, archivedAt: true },
+      })
+    : null;
+  if (!owned) {
+    return { ok: false, error: "Project not found." };
+  }
+  if (!owned.archivedAt) {
+    return { ok: false, error: "Archive this project before deleting it." };
+  }
+  if (confirmName !== owned.name) {
+    return { ok: false, error: "Type the project name exactly to confirm." };
+  }
+
+  const scoped = { userId: user.id, projectId: owned.id };
+  await prisma.$transaction([
+    prisma.savedOpportunity.deleteMany({ where: scoped }),
+    prisma.complaint.deleteMany({ where: scoped }),
+    prisma.opportunity.deleteMany({ where: scoped }),
+    prisma.project.deleteMany({ where: { id: owned.id, userId: user.id } }),
+  ]);
+
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard", "layout");
+
+  redirect("/dashboard");
 }

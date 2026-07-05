@@ -143,7 +143,7 @@ actions/
 ├─ complaints.ts        project-scoped uploadComplaints, loadDemoComplaints, importTextComplaints
 ├─ opportunities.ts    runPipeline, getProcessingStatus, resetOpportunities,
 │                       resetOpportunitiesAction (project-scoped)
-├─ projects.ts          createProject (M16A) + renameProject (M16B1) + archive/unarchive (M16B2), duplicate-name validation
+├─ projects.ts          createProject (M16A) + renameProject (M16B1) + archive/unarchive (M16B2) + deleteArchivedProject (M16B3), duplicate-name validation
 ├─ saved.ts             project-scoped saveOpportunity, unsaveOpportunity, saveAction, unsaveAction
 └─ workspace.ts         clearWorkspace (start fresh test — clears current project data)
 
@@ -288,7 +288,7 @@ Dashboard routes use query-param project routing in M16A: `?projectId=...`. If t
 |---|---|
 | `actions/complaints.ts` | `uploadComplaints(prev, formData)`, `loadDemoComplaints(prev, formData)`, starter/demo actions, `importTextComplaints(prev, formData)`. All require a user and owned project. |
 | `actions/opportunities.ts` | `runPipeline(formData)`, `getProcessingStatus(jobId, projectId)`, `resetOpportunities(formData)`, `resetOpportunitiesAction(formData)`. All require a user and owned project. |
-| `actions/projects.ts` | `createProject(prev, formData)` (M16A), `renameProject(prev, formData)` (M16B1), `archiveProject(prev, formData)` and `unarchiveProject(prev, formData)` (M16B2). All verify ownership server-side. Create/rename trim the name, enforce required/max-60-char names, and reject duplicate project names per user (case-insensitive, app-level — no DB unique constraint). Archive sets `archivedAt`, refuses to archive the last active project ("You need at least one active project."), and redirects to the oldest remaining active project; unarchive clears `archivedAt` and redirects into the restored project. Permanent project delete is still future work. |
+| `actions/projects.ts` | `createProject(prev, formData)` (M16A), `renameProject(prev, formData)` (M16B1), `archiveProject(prev, formData)` and `unarchiveProject(prev, formData)` (M16B2). All verify ownership server-side. Create/rename trim the name, enforce required/max-60-char names, and reject duplicate project names per user (case-insensitive, app-level — no DB unique constraint). Archive sets `archivedAt`, refuses to archive the last active project ("You need at least one active project."), and redirects to the oldest remaining active project; unarchive clears `archivedAt` and redirects into the restored project. `deleteArchivedProject(prev, formData)` (M16B3) permanently deletes an ARCHIVED project only: it requires the user to type the project name exactly (`confirmName`), rejects active projects ("Archive this project before deleting it."), and deletes saved ideas → complaints → ideas → the project row in one transaction, every statement filtered by the current user's id and the project id. There is no undo. |
 | `actions/saved.ts` | `saveOpportunity(prev, formData)`, `unsaveOpportunity(prev, formData)`, `saveAction(formData)`, `unsaveAction(formData)`. All require a user and owned project. |
 | `actions/workspace.ts` | `clearWorkspace(projectId)` clears only saved opportunities, opportunities, and complaints for the current user's current project. |
 

@@ -225,16 +225,20 @@ The Start Fresh Test patch addresses workspace-mixing confusion:
 - **Important behavior:** Archiving only sets `archivedAt` — no rows are deleted and no Complaint/Opportunity/SavedOpportunity relations changed, so restoring a project brings back all its data untouched.
 - **Not included:** No permanent delete or bulk delete (still future work), no project sharing/teams/billing, no upload history, no scraping, no new AI calls, no new dependencies, no nested project routes, no auth/route-protection changes, no Gemini prompt/scoring/parsing/cleaning changes.
 
+### M16B3 — Permanent delete for archived projects
+- **Status:** ✅ Done
+- **Purpose:** Let users permanently clean up old ARCHIVED projects — including that project's complaints, generated ideas, and saved ideas — while keeping active projects impossible to delete directly.
+- **What was built:** `deleteArchivedProject(prev, formData)` server action in `actions/projects.ts` (requires signed-in user, verifies ownership server-side, requires the project to be archived first — "Archive this project before deleting it." — and requires the user to type the project name exactly to confirm — "Type the project name exactly to confirm."); deletion runs in one Prisma transaction, children before parent: SavedOpportunity → Complaint → Opportunity → Project, every statement filtered by BOTH the current user's id and the project id so other projects, other users, and legacy rows with `userId = null` are never touched; on success it redirects to `/dashboard`; the sidebar "Archived projects" area gained a per-project two-step "Delete permanently" flow (button → inline confirmation panel with name input, "This removes the project, complaints, ideas, and saved ideas. This cannot be undone."). Restore remains available right next to it.
+- **Important behavior:** Delete is intentionally harder than archive (archived-only + typed name confirmation). There is NO undo after delete. Active projects cannot be deleted — archive/restore behavior from M16B2 is unchanged. No schema changes were needed; M16B3 reuses `Project.archivedAt` from M16B2.
+- **Not included:** No deleting active projects, no bulk delete, no undo/restore after delete, no project sharing/teams/billing, no upload history, no scraping, no new AI calls, no new dependencies, no nested project routes, no auth/route-protection changes, no Gemini prompt/scoring/parsing/cleaning changes.
+
 ---
 
 ## Future / post-MVP milestones (not started)
 
 Do **not** start any of these without an explicit user prompt. They appear here only for visibility.
 
-> Note: M7–M16B2 are complete — see "Completed milestones" above. The items below are future work and must not be started without an explicit user prompt.
-
-### M16B — Project management polish (remaining)
-- Permanent project delete. (Rename and duplicate-name handling shipped in M16B1; archive/restore shipped in M16B2.)
+> Note: M7–M16B3 are complete (M16B — rename, duplicate names, archive/restore, permanent delete — is fully done). The items below are future work and must not be started without an explicit user prompt.
 
 ### M16C — Persist validation workspace state
 - Move validation checklist, validation evidence, and decision status from localStorage to authenticated, project-scoped database tables.

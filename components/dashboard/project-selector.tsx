@@ -8,6 +8,7 @@ import {
   Pencil,
   Archive,
   ArchiveRestore,
+  Trash2,
   Loader2,
   AlertCircle,
   Check,
@@ -21,6 +22,7 @@ import {
   renameProject,
   archiveProject,
   unarchiveProject,
+  deleteArchivedProject,
   type CreateProjectResult,
   type RenameProjectResult,
   type ArchiveActionResult,
@@ -188,7 +190,7 @@ export function ProjectSelector({
                 Archived projects are hidden, not deleted.
               </p>
               {archivedProjects.map((p) => (
-                <RestoreProjectRow key={p.id} projectId={p.id} projectName={p.name} />
+                <ArchivedProjectRow key={p.id} projectId={p.id} projectName={p.name} />
               ))}
             </div>
           )}
@@ -373,44 +375,114 @@ function ArchiveProjectForm({
   );
 }
 
-function RestoreProjectRow({
+function ArchivedProjectRow({
   projectId,
   projectName,
 }: {
   projectId: string;
   projectName: string;
 }) {
-  // On success the server action redirects into the restored project.
-  const [state, formAction, pending] = useActionState<
+  const [confirmingDelete, setConfirmingDelete] = React.useState(false);
+
+  // On success the restore action redirects into the restored project.
+  const [restoreState, restoreAction, restorePending] = useActionState<
     ArchiveActionResult | null,
     FormData
   >(unarchiveProject, null);
 
+  // On success the delete action redirects to /dashboard, so this form only
+  // ever renders errors (wrong confirmation text, project already gone, …).
+  const [deleteState, deleteAction, deletePending] = useActionState<
+    ArchiveActionResult | null,
+    FormData
+  >(deleteArchivedProject, null);
+
   return (
-    <form action={formAction} className="space-y-1 px-2">
-      <input type="hidden" name="projectId" value={projectId} />
+    <div className="space-y-1 px-2">
       <div className="flex items-center justify-between gap-2">
         <span className="min-w-0 truncate text-xs text-[var(--color-muted-foreground)]">
           {projectName}
         </span>
-        <button
-          type="submit"
-          disabled={pending}
-          className="inline-flex shrink-0 items-center gap-1 rounded-lg px-2 py-1 text-[11px] text-[var(--color-primary)] transition-colors hover:bg-[var(--color-card)]/60 disabled:opacity-50"
-        >
-          {pending ? (
-            <Loader2 className="h-3 w-3 animate-spin" />
-          ) : (
-            <ArchiveRestore className="h-3 w-3" />
-          )}
-          Restore
-        </button>
+        <div className="flex shrink-0 items-center gap-1">
+          <form action={restoreAction}>
+            <input type="hidden" name="projectId" value={projectId} />
+            <button
+              type="submit"
+              disabled={restorePending}
+              className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] text-[var(--color-primary)] transition-colors hover:bg-[var(--color-card)]/60 disabled:opacity-50"
+            >
+              {restorePending ? (
+                <Loader2 className="h-3 w-3 animate-spin" />
+              ) : (
+                <ArchiveRestore className="h-3 w-3" />
+              )}
+              Restore
+            </button>
+          </form>
+          <button
+            type="button"
+            onClick={() => setConfirmingDelete((v) => !v)}
+            className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] text-[var(--color-danger)] transition-colors hover:bg-[var(--color-danger-soft)] disabled:opacity-50"
+          >
+            <Trash2 className="h-3 w-3" />
+            Delete permanently
+          </button>
+        </div>
       </div>
-      {state && !state.ok && (
+      {restoreState && !restoreState.ok && (
         <p className="flex items-start gap-1 text-[11px] text-[var(--color-danger)]">
-          <AlertCircle className="mt-0.5 h-3 w-3 shrink-0" /> {state.error}
+          <AlertCircle className="mt-0.5 h-3 w-3 shrink-0" /> {restoreState.error}
         </p>
       )}
-    </form>
+      {confirmingDelete && (
+        <form
+          action={deleteAction}
+          className="space-y-2 rounded-lg border border-[var(--color-danger)]/40 bg-[var(--color-card)] p-2"
+        >
+          <input type="hidden" name="projectId" value={projectId} />
+          <p className="text-[10px] leading-snug text-[var(--color-muted-foreground)]">
+            This removes the project, complaints, ideas, and saved ideas. This
+            cannot be undone.
+          </p>
+          <label className="block text-[10px] text-[var(--color-muted-foreground)]">
+            Type the project name to confirm.
+            <input
+              name="confirmName"
+              type="text"
+              required
+              autoComplete="off"
+              placeholder={projectName}
+              className="mt-1 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-background)] px-2 py-1.5 text-xs text-[var(--color-foreground)] placeholder:text-[var(--color-muted-foreground)]/60 outline-none focus:border-[var(--color-danger)]"
+            />
+          </label>
+          <div className="flex items-center gap-2">
+            <button
+              type="submit"
+              disabled={deletePending}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--color-danger)] px-2.5 py-1.5 text-xs font-medium text-white transition-colors disabled:opacity-50"
+            >
+              {deletePending ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Trash2 className="h-3.5 w-3.5" />
+              )}
+              Delete permanently
+            </button>
+            <button
+              type="button"
+              onClick={() => setConfirmingDelete(false)}
+              className="rounded-lg px-2 py-1.5 text-xs text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)]"
+            >
+              Cancel
+            </button>
+          </div>
+          {deleteState && !deleteState.ok && (
+            <p className="flex items-start gap-1 text-[11px] text-[var(--color-danger)]">
+              <AlertCircle className="mt-0.5 h-3 w-3 shrink-0" /> {deleteState.error}
+            </p>
+          )}
+        </form>
+      )}
+    </div>
   );
 }
