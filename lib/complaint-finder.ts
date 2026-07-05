@@ -4,9 +4,11 @@
  * network/parse errors return an empty list plus an error message so one dead
  * source never breaks the whole search.
  *
- * Reddit: uses the official OAuth API (client_credentials) when
- * REDDIT_CLIENT_ID/REDDIT_CLIENT_SECRET are set; otherwise falls back to the
- * public endpoint, which Reddit often blocks (403) from server IPs.
+ * Reddit: uses the official OAuth API (client_credentials) ONLY. When
+ * REDDIT_CLIENT_ID/REDDIT_CLIENT_SECRET are unset the source is disabled with
+ * a friendly note — the unauthenticated public-endpoint fallback was removed
+ * (July 2026, founder decision) so every source is an official API or a
+ * licensed provider.
  * Hacker News: Algolia search API — free, no key or approval needed.
  * Web (M30): Tavily search API (TAVILY_API_KEY) finds complaint-shaped pages
  * across the whole indexed web; Gemini then EXTRACTS verbatim complaint
@@ -37,7 +39,6 @@ const USER_AGENT = "rift-app/0.1 (complaint research; contact via app)";
 
 const REDDIT_TOKEN_URL = "https://www.reddit.com/api/v1/access_token";
 const REDDIT_OAUTH_SEARCH_URL = "https://oauth.reddit.com/search";
-const REDDIT_PUBLIC_SEARCH_URL = "https://www.reddit.com/search.json";
 const TOKEN_EXPIRY_MARGIN_MS = 60_000;
 
 /** Words that make a Reddit search surface frustration posts. */
@@ -216,22 +217,24 @@ export async function fetchRedditComplaints(
   limit = 25
 ): Promise<SourceResult> {
   const creds = getRedditCredentials();
+  // Official API only. Without approved credentials the source sits out
+  // (fail-soft, like an unconfigured Tavily) instead of hitting Reddit's
+  // public endpoint unauthenticated.
+  if (!creds) {
+    logger.info("reddit.disabled_no_credentials", {});
+    return {
+      complaints: [],
+      error:
+        "Reddit is temporarily unavailable (waiting for Reddit API approval). Results below come from the other sources.",
+    };
+  }
   const q = encodeURIComponent(`${keyword} ${COMPLAINT_TERMS}`);
   const params = `q=${q}&sort=relevance&t=year&limit=${limit}&raw_json=1`;
   try {
-    if (!creds) {
-      logger.warn("reddit.no_credentials_using_public", {});
-      const json = await fetchJson(`${REDDIT_PUBLIC_SEARCH_URL}?${params}`);
-      return { complaints: parseRedditListing(json) };
-    }
     const json = await searchRedditOAuth(params, creds);
     return { complaints: parseRedditListing(json) };
   } catch (err) {
     let msg = err instanceof Error ? err.message : "unknown error";
-    if (!creds && msg === "HTTP 403") {
-      msg +=
-        " — set REDDIT_CLIENT_ID and REDDIT_CLIENT_SECRET (see .env.example) to use Reddit's official API";
-    }
     if (msg === "HTTP 429") {
       msg += " — Reddit rate limit, try again in a minute";
     }
