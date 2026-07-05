@@ -14,6 +14,7 @@ import {
 import { isValidDecisionStatus } from "@/lib/decision-board";
 import { ProjectHistory } from "@/components/dashboard/project-history";
 import { OnboardingCard } from "@/components/dashboard/onboarding-card";
+import { ExportButtons } from "@/components/reports/export-buttons";
 import type { DashboardStats } from "@/lib/dashboard-plan";
 import { requireUser } from "@/lib/auth/current-user";
 import { getProjectOrDefault, projectHref } from "@/lib/projects";
@@ -160,13 +161,22 @@ export default async function DashboardPage({
 
   return (
     <div className="mx-auto max-w-6xl space-y-8">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">
-          Home
-        </h1>
-        <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
-          Project: <span className="font-medium text-[var(--color-foreground)]">{project.name}</span>
-        </p>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            Home
+          </h1>
+          <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
+            Project: <span className="font-medium text-[var(--color-foreground)]">{project.name}</span>
+          </p>
+        </div>
+        {/* M18 — private Markdown export for this project */}
+        <ExportButtons
+          kind="project"
+          targetId={projectId}
+          exportLabel="Export report"
+          copyLabel="Copy report"
+        />
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

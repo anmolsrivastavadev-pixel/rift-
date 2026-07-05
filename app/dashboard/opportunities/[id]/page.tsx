@@ -28,6 +28,7 @@ import { NoRelatedEmpty } from "@/components/opportunities/no-related-empty";
 import { PrevNextNav } from "@/components/opportunities/prev-next-nav";
 import { MarketGapHypothesis } from "@/components/opportunities/market-gap-hypothesis";
 import { ValidationWorkspace } from "@/components/opportunities/validation-workspace";
+import { ExportButtons } from "@/components/reports/export-buttons";
 import { requireUser } from "@/lib/auth/current-user";
 import { projectHref } from "@/lib/project-href";
 import { requireOwnedProject } from "@/lib/projects";
@@ -344,6 +345,14 @@ export default async function OpportunityDetailPage({
               )}
             </div>
           </section>
+
+          {/* M18 — private Markdown export for this idea */}
+          <ExportButtons
+            kind="idea"
+            targetId={op.id}
+            exportLabel="Export idea"
+            copyLabel="Copy idea report"
+          />
 
           {/* M17 — compact next-step hint */}
           <div className="rounded-2xl border border-[var(--color-primary)]/30 bg-[var(--color-primary)]/5 p-4">

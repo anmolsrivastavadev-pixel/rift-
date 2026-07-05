@@ -252,13 +252,19 @@ The Start Fresh Test patch addresses workspace-mixing confusion:
 - **What was built:** `components/dashboard/onboarding-card.tsx` — a compact "Start your market test" card on the dashboard home with three steps (Add complaints / Find ideas / Pick one to test), each with a done/active state and one clear action button; it REPLACES the two old dashed empty-state blocks and hides itself once the project has complaints, ideas, and any testing progress. Progress is inferred entirely from existing data (complaint count, opportunity count, saved ideas, decisions, checklist ticks from `ValidationWorkspace`) — no new model, nothing stored, no localStorage. Ideas page now shows one state-appropriate action: "Add complaints first" when the project is empty, a prominent "Find ideas — Rift will use N complaints from this project." when there are complaints but no ideas, and a collapsed "Run again" (with honest replace warning) once ideas exist. Complaints page subtitle clarified ("Add real complaints, reviews, or support messages. Rift will look for repeated problems."). Idea detail page gained a compact sidebar "Next step" hint linking to Compare Ideas. All links preserve `projectId` via `projectHref`.
 - **Not included:** No new Prisma model, no localStorage product data, no billing/teams/scraping/notifications/sharing/analytics dashboards, no new dependencies, no Gemini prompt/scoring/cleaning/parsing changes, no auth or history behavior changes.
 
+### M18 — Exportable project + idea reports (private Markdown)
+- **Status:** ✅ Done
+- **Purpose:** Let users take their research out of Rift — save it, paste it into docs, or share it manually — without public links.
+- **What was built:** Pure Markdown builders in `lib/reports.ts` (project report: summary counts, top 5 ideas by score, saved ideas, decisions, recent imports/runs, next-step; idea report: summary, score + subscores, why-this-exists, up to 5 evidence quotes from the idea's own linked complaints, decision + checklist status, next step). Server actions `getProjectReport(projectId)` / `getIdeaReport(opportunityId)` in `actions/reports.ts` verify ownership before reading anything and only include the current user's current project/idea data — no invented evidence. `components/reports/export-buttons.tsx` renders small secondary "Export report"/"Copy report" buttons (dashboard home) and "Export idea"/"Copy idea report" (idea detail sidebar): download is a client-side Blob with a safe slugified filename (`rift-project-fitness.md`, `rift-idea-ai-fitness-coach.md`), copy uses the clipboard API with inline success/failure notices.
+- **Not included:** No public share pages/URLs, no PDF, no email sending, no Notion/Google Docs integrations, no file storage, reports are NOT saved to the database, no new dependencies, no schema changes, no Gemini/scoring/parsing/auth changes.
+
 ---
 
 ## Future / post-MVP milestones (not started)
 
 Do **not** start any of these without an explicit user prompt. They appear here only for visibility.
 
-> Note: M7–M17 are complete — see "Completed milestones" above. The items below are future work and must not be started without an explicit user prompt.
+> Note: M7–M18 are complete — see "Completed milestones" above. The items below are future work and must not be started without an explicit user prompt.
 
 ### Future — PDF/CSV export of comparisons
 - Side-by-side comparison export to PDF/CSV. (Markdown export shipped in M18.)
