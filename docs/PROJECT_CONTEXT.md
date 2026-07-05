@@ -143,7 +143,7 @@ actions/
 ├─ complaints.ts        project-scoped uploadComplaints, loadDemoComplaints, importTextComplaints
 ├─ opportunities.ts    runPipeline, getProcessingStatus, resetOpportunities,
 │                       resetOpportunitiesAction (project-scoped)
-├─ projects.ts          createProject (M16A name-only project creation)
+├─ projects.ts          createProject (M16A) + renameProject (M16B1), duplicate-name validation
 ├─ saved.ts             project-scoped saveOpportunity, unsaveOpportunity, saveAction, unsaveAction
 └─ workspace.ts         clearWorkspace (start fresh test — clears current project data)
 
@@ -288,7 +288,7 @@ Dashboard routes use query-param project routing in M16A: `?projectId=...`. If t
 |---|---|
 | `actions/complaints.ts` | `uploadComplaints(prev, formData)`, `loadDemoComplaints(prev, formData)`, starter/demo actions, `importTextComplaints(prev, formData)`. All require a user and owned project. |
 | `actions/opportunities.ts` | `runPipeline(formData)`, `getProcessingStatus(jobId, projectId)`, `resetOpportunities(formData)`, `resetOpportunitiesAction(formData)`. All require a user and owned project. |
-| `actions/projects.ts` | `createProject(prev, formData)` for M16A name-only project creation. |
+| `actions/projects.ts` | `createProject(prev, formData)` (M16A) and `renameProject(prev, formData)` (M16B1). Both verify ownership server-side, trim the name, enforce required/max-60-char names, and reject duplicate project names per user (case-insensitive, app-level — no DB unique constraint). Project delete/archive is still future work. |
 | `actions/saved.ts` | `saveOpportunity(prev, formData)`, `unsaveOpportunity(prev, formData)`, `saveAction(formData)`, `unsaveAction(formData)`. All require a user and owned project. |
 | `actions/workspace.ts` | `clearWorkspace(projectId)` clears only saved opportunities, opportunities, and complaints for the current user's current project. |
 

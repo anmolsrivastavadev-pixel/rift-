@@ -5,17 +5,19 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/auth/current-user";
 
-/* M16A — Minimal project management server actions.
+/* M16A/M16B1 — Minimal project management server actions.
  *
- * Only what M16A needs:
- *   - list the current user's projects (for the sidebar selector)
- *   - create a new project for the current user
+ * - list the current user's projects (for the sidebar selector)
+ * - create a new project for the current user (M16A)
+ * - rename an owned project (M16B1)
  *
- * Renaming, deleting, and archiving a project are M16B (not built here).
+ * Duplicate project names per user are blocked at the app level (M16B1) —
+ * no DB unique constraint, so existing duplicate rows keep working.
+ * Deleting and archiving a project are still future work (M16B).
  */
 
 const MAX_PROJECTS_PER_USER = 100;
-const MAX_NAME = 80;
+const MAX_NAME = 60;
 
 export type ProjectSummary = {
   id: string;
@@ -25,6 +27,10 @@ export type ProjectSummary = {
 };
 
 export type CreateProjectResult =
+  | { ok: true; project: ProjectSummary }
+  | { ok: false; error: string };
+
+export type RenameProjectResult =
   | { ok: true; project: ProjectSummary }
   | { ok: false; error: string };
 
@@ -40,6 +46,23 @@ export async function getProjectsForCurrentUser(): Promise<ProjectSummary[]> {
       createdAt: true,
     },
   });
+}
+
+/** Case-insensitive "does this user already use this name" check. */
+async function nameTakenByUser(
+  userId: string,
+  name: string,
+  excludeProjectId?: string
+): Promise<boolean> {
+  const existing = await prisma.project.findFirst({
+    where: {
+      userId,
+      name: { equals: name, mode: "insensitive" },
+      ...(excludeProjectId ? { id: { not: excludeProjectId } } : {}),
+    },
+    select: { id: true },
+  });
+  return existing !== null;
 }
 
 /**
@@ -64,9 +87,62 @@ export async function createProject(
   if (count >= MAX_PROJECTS_PER_USER) {
     return { ok: false, error: `You already have ${MAX_PROJECTS_PER_USER} projects. This is the M16A soft cap.` };
   }
+  if (await nameTakenByUser(user.id, name)) {
+    return { ok: false, error: "You already have a project with this name." };
+  }
 
   const project = await prisma.project.create({
     data: { name, userId: user.id },
+    select: { id: true, name: true, description: true, createdAt: true },
+  });
+
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard", "layout");
+
+  return { ok: true, project };
+}
+
+/**
+ * M16B1 — Rename an owned project. Form-action compatible: reads `projectId`
+ * and `name` from the FormData. Ownership is verified server-side, so a forged
+ * projectId from another user's project just returns an error. The project id
+ * never changes, so existing `?projectId=...` URLs and scoped data stay valid.
+ */
+export async function renameProject(
+  _prev: RenameProjectResult | null,
+  formData: FormData
+): Promise<RenameProjectResult> {
+  const user = await requireUser();
+  const projectId = String(formData.get("projectId") ?? "").trim();
+  const name = String(formData.get("name") ?? "").trim();
+
+  if (!projectId) {
+    return { ok: false, error: "Project not found." };
+  }
+  if (name.length < 1) {
+    return { ok: false, error: "Project name is required." };
+  }
+  if (name.length > MAX_NAME) {
+    return { ok: false, error: `Project name must be ${MAX_NAME} characters or fewer.` };
+  }
+
+  const owned = await prisma.project.findFirst({
+    where: { id: projectId, userId: user.id },
+    select: { id: true, name: true },
+  });
+  if (!owned) {
+    return { ok: false, error: "Project not found." };
+  }
+
+  // Excluding the project itself lets a user change only the casing,
+  // e.g. "fitness" -> "Fitness".
+  if (await nameTakenByUser(user.id, name, owned.id)) {
+    return { ok: false, error: "You already have a project with this name." };
+  }
+
+  const project = await prisma.project.update({
+    where: { id: owned.id },
+    data: { name },
     select: { id: true, name: true, description: true, createdAt: true },
   });
 

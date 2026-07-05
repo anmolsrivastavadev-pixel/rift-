@@ -211,16 +211,23 @@ The Start Fresh Test patch addresses workspace-mixing confusion:
 - **Important behavior:** Missing `projectId` uses the user's oldest project or creates `Default project`; unowned project IDs do not expose data; direct opportunity detail links without `projectId` resolve the project from the owned opportunity; related ideas and prev/next stay within the same project; demo dedupe is project-scoped; Start Fresh clears only the current project.
 - **Not included:** No project rename/delete/archive, no upload history, no nested project routes, no moving validation checklist/evidence/decision localStorage to the DB, no billing/teams/public sharing/scraping/market-size estimates/fake metrics/fake guarantees, no auth config changes, no middleware/proxy changes, no Gemini prompt/schema changes, no scoring changes, no cleaning/parsing changes, no deployment env var changes.
 
+### M16B1 — Project rename + duplicate-name handling
+- **Status:** ✅ Done
+- **Purpose:** Let users rename the current project and prevent confusing duplicate project names, so beginners don't mix up workspaces like "Fitness", "Fitness test", "New project".
+- **What was built:** `renameProject(prev, formData)` server action in `actions/projects.ts` (requires signed-in user, verifies project ownership server-side, trims the name, requires 1–60 characters, rejects duplicate names per user case-insensitively, revalidates dashboard routes); `createProject` now enforces the same 60-char limit and rejects duplicate names with the beginner-friendly error "You already have a project with this name."; sidebar project selector gained a compact inline Rename form (native form, no modal, no new dependency) plus lightly improved copy ("Create project", "Rename project", "Use separate projects for different niches.").
+- **Important behavior:** Duplicate names are blocked at the app level only — no DB unique constraint was added, so any pre-existing duplicate rows keep working. Renaming never changes the project id, so `?projectId=...` URLs and all project-scoped complaints/ideas/saved items stay attached. Changing only the casing of a project's own name is allowed.
+- **Not included:** No project delete/archive (still M16B future work), no project sharing/teams/billing, no upload history, no schema changes, no AI/scoring/parsing/cleaning changes, no auth or route-protection changes, no new dependencies, no nested project routes.
+
 ---
 
 ## Future / post-MVP milestones (not started)
 
 Do **not** start any of these without an explicit user prompt. They appear here only for visibility.
 
-> Note: M7–M16A are complete — see "Completed milestones" above. The items below are future work and must not be started without an explicit user prompt.
+> Note: M7–M16B1 are complete — see "Completed milestones" above. The items below are future work and must not be started without an explicit user prompt.
 
-### M16B — Project management polish
-- Project rename/delete/archive and duplicate-name handling.
+### M16B — Project management polish (remaining)
+- Project delete/archive. (Rename and duplicate-name handling shipped in M16B1.)
 
 ### M16C — Persist validation workspace state
 - Move validation checklist, validation evidence, and decision status from localStorage to authenticated, project-scoped database tables.
