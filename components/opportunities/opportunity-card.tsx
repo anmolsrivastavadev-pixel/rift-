@@ -93,6 +93,7 @@ export function OpportunityCard({
           projectId={projectId}
           saved={op.saved}
           size="sm"
+          showLabel
         />
       </div>
 
@@ -101,7 +102,7 @@ export function OpportunityCard({
         className="flex flex-1 flex-col"
         aria-label={`Open opportunity: ${op.title}, score ${op.opportunityScore}`}
       >
-        <div className="flex items-start gap-2 pr-28">
+        <div className="flex items-start gap-2 pr-40">
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-[var(--color-muted-foreground)]">
               <Briefcase className="h-3 w-3" />

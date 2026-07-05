@@ -335,6 +335,7 @@ Do **not** start any of these without an explicit user prompt for that specific 
 
 ### M24 — Feedback fixes from first testers
 - **Status:** ⏸ SKIPPED FOR NOW (founder decision, July 2026) — the founder chose to finish M25–M29 first. Revisit once real testers have used the app for ~a week; scope is their feedback (Beta insights funnel + feedback inbox), which cannot be written in advance.
+- **Ad-hoc fixes shipped as feedback arrives:** visible "Save"/"Saved" label on the idea-card bookmark button (July 2026 — a tester flagged the icon-only button as unclear; `SaveButton` gained a `showLabel` prop, behavior unchanged).
 
 ### M30 — Complaint Finder v2 (PARTIALLY BUILT EARLY, founder decision, July 2026)
 - **Shipped early (before beta launch):** whole-web source via Tavily search API (`fetchWebComplaints` in `lib/complaint-finder.ts`; `TAVILY_API_KEY`; Gemini extracts verbatim complaint passages via the isolated `lib/web-complaint-extract.ts` — clustering prompt/scoring untouched; fail-soft like every other source) + one-click niche suggestion chips in the finder (`lib/niche-suggestions.ts`, curated list, no AI) so beginners never face a blank input.

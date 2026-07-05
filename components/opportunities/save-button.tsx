@@ -13,11 +13,15 @@ export function SaveButton({
   projectId,
   saved,
   size = "md",
+  showLabel = false,
 }: {
   opportunityId: string;
   projectId: string;
   saved: boolean;
   size?: "sm" | "md";
+  /** Render a visible "Save"/"Saved" label (M24 feedback: the bare bookmark
+   * icon was cryptic next to the fully-labeled compare button). */
+  showLabel?: boolean;
 }) {
   const initial: State = { saved };
   const [state, formAction, pending] = useActionState<State, FormData>(
@@ -35,8 +39,13 @@ export function SaveButton({
 
   const isSaved = state?.saved ?? saved;
   const Icon = isSaved ? BookmarkCheck : Bookmark;
-  const dim = size === "sm" ? "h-7 w-7" : "h-8 w-8";
-  const iconCls = size === "sm" ? "h-3.5 w-3.5" : "h-4 w-4";
+  // Labeled variant matches the compare chip; icon-only keeps the square.
+  const dim = showLabel
+    ? "gap-1 rounded-lg px-2.5 py-1 text-[11px] font-medium"
+    : size === "sm"
+      ? "h-7 w-7 rounded-[10px]"
+      : "h-8 w-8 rounded-[10px]";
+  const iconCls = showLabel ? "h-3 w-3" : size === "sm" ? "h-3.5 w-3.5" : "h-4 w-4";
 
   return (
     <form action={formAction}>
@@ -48,7 +57,7 @@ export function SaveButton({
         aria-pressed={isSaved}
         aria-label={isSaved ? "Remove from saved" : "Save opportunity"}
         title={isSaved ? "Remove from saved" : "Save opportunity"}
-        className={`group/inline-flex ${dim} items-center justify-center rounded-[10px] border transition-colors disabled:opacity-50 ${
+        className={`group/inline-flex ${dim} items-center justify-center border transition-colors disabled:opacity-50 ${
           isSaved
             ? "border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)]"
             : "border-[var(--color-border)] bg-[var(--color-background)] text-[var(--color-muted-foreground)] hover:border-[var(--color-primary)]/60 hover:text-[var(--color-primary)]"
@@ -59,6 +68,7 @@ export function SaveButton({
         ) : (
           <Icon className={iconCls} />
         )}
+        {showLabel && (isSaved ? "Saved" : "Save")}
       </button>
     </form>
   );
