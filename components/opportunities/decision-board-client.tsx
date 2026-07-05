@@ -24,14 +24,6 @@ import {
   DecisionStatusSelect,
   useDecisionStatuses,
 } from "@/components/opportunities/decision-status-select";
-import {
-  evidenceStorageKey,
-  parseEvidenceState,
-  computeEvidenceSignal,
-  computeSuggestedNextStep,
-  EVIDENCE_SIGNAL_LABELS,
-  type EvidenceState,
-} from "@/lib/validation-evidence";
 import { projectHref } from "@/lib/project-href";
 
 export type DecisionBoardOpportunity = {
@@ -82,23 +74,6 @@ function priorityColor(priority: string): string {
   }
 }
 
-function evidenceSignalColor(signal: string): string {
-  switch (signal) {
-    case "promising-signal":
-      return "text-[var(--color-success)]";
-    case "early-signal":
-      return "text-[var(--color-primary)]";
-    case "weak-signal":
-      return "text-[var(--color-danger)]";
-    case "mixed-signal":
-      return "text-[var(--color-warning)]";
-    case "needs-more-evidence":
-      return "text-[var(--color-warning)]";
-    default:
-      return "text-[var(--color-muted-foreground)]";
-  }
-}
-
 function evidenceStrength(
   mentions: number,
   confidence: number | null
@@ -124,41 +99,6 @@ function difficultyToTest(
   return "Harder to test";
 }
 
-function useEvidenceSnapshots(opportunityIds: string[]): {
-  snapshots: Record<string, EvidenceState>;
-  hydrated: boolean;
-} {
-  const [snapshots, setSnapshots] = React.useState<Record<string, EvidenceState>>({});
-  const [hydrated, setHydrated] = React.useState(false);
-
-  const readAll = React.useCallback(() => {
-    const map: Record<string, EvidenceState> = {};
-    try {
-      for (const id of opportunityIds) {
-        const raw = window.localStorage.getItem(evidenceStorageKey(id));
-        map[id] = parseEvidenceState(raw);
-      }
-    } catch {
-      // localStorage unavailable
-    }
-    return map;
-  }, [opportunityIds]);
-
-  React.useEffect(() => {
-    setSnapshots(readAll()); // eslint-disable-line react-hooks/set-state-in-effect
-    setHydrated(true);
-  }, [readAll]);
-
-  React.useEffect(() => {
-    if (!hydrated) return;
-    const onFocus = () => setSnapshots(readAll());
-    window.addEventListener("focus", onFocus);
-    return () => window.removeEventListener("focus", onFocus);
-  }, [hydrated, readAll]);
-
-  return { snapshots, hydrated };
-}
-
 export function DecisionBoardClient({
   opportunities,
   isCompareMode = false,
@@ -170,8 +110,6 @@ export function DecisionBoardClient({
 }) {
   const ids = React.useMemo(() => opportunities.map((o) => o.id), [opportunities]);
   const { statuses, hydrated, setStatus } = useDecisionStatuses(ids);
-  const { snapshots: evidenceSnapshots, hydrated: evidenceHydrated } =
-    useEvidenceSnapshots(ids);
   const [filter, setFilter] = React.useState<FilterValue>("all");
 
   const resolveStatus = (id: string): DecisionStatus =>
@@ -256,14 +194,6 @@ export function DecisionBoardClient({
             </thead>
             <tbody>
               <CompareRow
-                label="Idea"
-                values={filtered.map((op) => (
-                  <span className={`font-semibold ${scoreColor(op.opportunityScore)}`}>
-                    {op.opportunityScore}
-                  </span>
-                ))}
-              />
-              <CompareRow
                 label="Who it is for"
                 values={filtered.map((op) => (
                   <span className="text-[var(--color-muted-foreground)]">{op.targetCustomer || "—"}</span>
@@ -326,19 +256,6 @@ export function DecisionBoardClient({
                 )}
               />
               <CompareRow
-                label="Suggested next step"
-                values={filtered.map((op) => {
-                  const ev = evidenceHydrated ? evidenceSnapshots[op.id] : undefined;
-                  return (
-                    <span className="text-[var(--color-muted-foreground)]">
-                      {ev && ev.interviewsCompleted > 0
-                        ? computeSuggestedNextStep(ev)
-                        : "Start interviews to learn more"}
-                    </span>
-                  );
-                })}
-              />
-              <CompareRow
                 label="Decision"
                 values={filtered.map((op) => {
                   const status = resolveStatus(op.id);
@@ -361,10 +278,7 @@ export function DecisionBoardClient({
         </div>
 
         <p className="flex items-center gap-1 text-[11px] text-[var(--color-muted-foreground)]">
-          <Info className="h-3 w-3" /> Use this to choose what to test first.
-        </p>
-        <p className="flex items-center gap-1 text-[11px] text-[var(--color-muted-foreground)]">
-          <Info className="h-3 w-3" /> Saved only in this browser.
+          <Info className="h-3 w-3" /> Decisions are saved only in this browser.
         </p>
       </div>
     );
@@ -493,14 +407,6 @@ export function DecisionBoardClient({
                 />
               </div>
 
-              {/* Evidence snapshot */}
-              <EvidenceSnapshot
-                opportunityId={op.id}
-                evidence={evidenceHydrated ? evidenceSnapshots[op.id] : undefined}
-                hydrated={evidenceHydrated}
-                projectId={projectId}
-              />
-
               {/* Decision status selector */}
               <div className="mt-4 flex items-center justify-between border-t border-[var(--color-border)] pt-3">
                 <span className="text-[11px] text-[var(--color-muted-foreground)]">
@@ -524,7 +430,7 @@ export function DecisionBoardClient({
       )}
 
       <p className="flex items-center gap-1 text-[11px] text-[var(--color-muted-foreground)]">
-        <Info className="h-3 w-3" /> Saved only in this browser.
+        <Info className="h-3 w-3" /> Decisions are saved only in this browser.
       </p>
     </div>
   );
@@ -552,17 +458,9 @@ function DecisionBoardHeader({
           Compare these ideas side by side and pick one to test.
         </p>
       ) : (
-        <>
-          <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
-            Compare ideas and pick one to test.
-          </p>
-          <details className="mt-2 text-xs text-[var(--color-muted-foreground)]">
-            <summary className="cursor-pointer">What do the choices mean?</summary>
-            <p className="mt-2">
-              Pursue means test next. Park means save for later. Reject means stop spending time on it for now.
-            </p>
-          </details>
-        </>
+        <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
+          Compare ideas and pick one to test.
+        </p>
       )}
     </div>
   );
@@ -636,53 +534,3 @@ function CompareRow({
   );
 }
 
-function EvidenceSnapshot({
-  opportunityId,
-  evidence,
-  hydrated,
-  projectId,
-}: {
-  opportunityId: string;
-  evidence?: EvidenceState;
-  hydrated: boolean;
-  projectId: string;
-}) {
-  const hasEvidence = hydrated && evidence && evidence.interviewsCompleted > 0;
-
-  return (
-    <div className="mt-3 rounded-[8px] border border-[var(--color-border)] bg-[var(--color-background)] p-3">
-      <p className="text-[10px] uppercase tracking-wide text-[var(--color-muted-foreground)]">
-        Testing notes
-      </p>
-      {hydrated && hasEvidence && evidence ? (
-        <>
-          <p className={`mt-0.5 text-xs font-medium ${evidenceSignalColor(computeEvidenceSignal(evidence))}`}>
-            {EVIDENCE_SIGNAL_LABELS[computeEvidenceSignal(evidence)]}
-          </p>
-          <p className="mt-0.5 text-[11px] text-[var(--color-muted-foreground)]">
-            {evidence.interviewsCompleted} interviews ·{" "}
-            {evidence.peopleReportingSamePain} same pain ·{" "}
-            {evidence.peopleWillingToTry} willing to try ·{" "}
-            {evidence.peopleWillingToPay} willing to pay
-          </p>
-          <p className="mt-0.5 text-[11px] text-[var(--color-muted-foreground)]">
-            {computeSuggestedNextStep(evidence)}
-          </p>
-        </>
-      ) : (
-        <p className="mt-0.5 text-[11px] text-[var(--color-muted-foreground)]">
-          {hydrated ? "No testing notes yet" : "—"}
-        </p>
-      )}
-      <Link
-        href={projectHref(
-          `/dashboard/opportunities/${opportunityId}#validation-evidence-log`,
-          projectId
-        )}
-        className="mt-1.5 inline-block text-[11px] text-[var(--color-primary)] hover:underline"
-      >
-        Open testing notes
-      </Link>
-    </div>
-  );
-}

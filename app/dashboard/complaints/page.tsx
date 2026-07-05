@@ -36,7 +36,7 @@ export default async function ComplaintsPage({
       <section>
         <h2 className="text-base font-semibold">Add data</h2>
         <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
-          Paste text, use examples, or upload a file.
+          Type a niche to find complaints online, or paste your own.
         </p>
         <div className="mt-3">
           <ComplaintsInput projectId={project.id} />

@@ -69,7 +69,7 @@ export function ValidationChecklist({ opportunityId }: { opportunityId: string }
       <div className="mb-3 flex items-center justify-between">
         <h3 className="flex items-center gap-2 text-sm font-semibold">
           <ListChecks className="h-4 w-4 text-[var(--color-primary)]" />
-          Validation Checklist
+          Testing checklist
         </h3>
         <span className="text-xs text-[var(--color-muted-foreground)]" aria-live="polite">
           {doneCount}/{items.length} done

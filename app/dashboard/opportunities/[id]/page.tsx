@@ -28,7 +28,6 @@ import { NoRelatedEmpty } from "@/components/opportunities/no-related-empty";
 import { PrevNextNav } from "@/components/opportunities/prev-next-nav";
 import { MarketGapHypothesis } from "@/components/opportunities/market-gap-hypothesis";
 import { ValidationWorkspace } from "@/components/opportunities/validation-workspace";
-import { ValidationEvidenceLog } from "@/components/opportunities/validation-evidence-log";
 import { requireUser } from "@/lib/auth/current-user";
 import { projectHref } from "@/lib/project-href";
 import { requireOwnedProject } from "@/lib/projects";
@@ -274,12 +273,12 @@ export default async function OpportunityDetailPage({
             />
           </div>
 
-          {/* Score Breakdown + plain-English explanation */}
+          {/* Score Breakdown */}
           {bd?.subscores && (
-            <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)]">
-              <h2 className="text-sm font-semibold">Score breakdown</h2>
+            <details className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)]">
+              <summary className="cursor-pointer text-sm font-semibold">Score breakdown</summary>
               <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
-                The score is a rough sorting signal. It combines how often the problem appears, how painful it seems, and how confident Rift is in the pattern.
+                Scores help sort ideas. They do not prove demand.
               </p>
               <div className="mt-3 space-y-3">
                 <BarRow
@@ -307,13 +306,7 @@ export default async function OpportunityDetailPage({
                   <span className="font-semibold text-[var(--color-primary)]">{bd.final}</span>
                 </div>
               )}
-              <p className="mt-4 text-xs leading-relaxed text-[var(--color-muted-foreground)]">
-                Frequency measures how often the pain appears. Severity
-                estimates how urgent the pain sounds. Confidence shows how
-                clearly the AI identified the pattern. The final score
-                combines these signals to help prioritize opportunities.
-              </p>
-            </section>
+            </details>
           )}
 
           {/* Related Opportunities */}
@@ -369,10 +362,6 @@ export default async function OpportunityDetailPage({
           riskFlags: op.riskFlags,
         }}
       />
-
-      {/* Full-width Validation Evidence Log — below the Validation Workspace.
-          Local-only (localStorage), no DB. Tracks aggregate validation signals. */}
-      <ValidationEvidenceLog opportunityId={op.id} />
     </div>
   );
 }

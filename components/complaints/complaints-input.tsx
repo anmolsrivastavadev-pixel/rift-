@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Upload, ClipboardPaste, FileText, Download, Sparkles, Loader2 } from "lucide-react";
+import { Upload, ClipboardPaste, FileText, Download, Sparkles, Loader2, Globe } from "lucide-react";
 import { useActionState } from "react";
 
 import { loadDemoComplaints } from "@/actions/complaints";
@@ -10,18 +10,20 @@ import type { UploadResult } from "@/lib/schemas";
 import { Button } from "@/components/ui/button";
 import { CsvUploader } from "@/components/complaints/csv-uploader";
 import { TextInput } from "@/components/complaints/text-input";
+import { ComplaintFinder } from "@/components/complaints/complaint-finder";
 import { DemoSummary } from "@/components/complaints/import-summary";
 
-type Tab = "csv" | "paste" | "file";
+type Tab = "find" | "csv" | "paste" | "file";
 
 const TABS: { id: Tab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
+  { id: "find", label: "Find online", icon: Globe },
   { id: "paste", label: "Paste text", icon: ClipboardPaste },
   { id: "csv", label: "Upload spreadsheet", icon: Upload },
   { id: "file", label: "Upload text file", icon: FileText },
 ];
 
 export function ComplaintsInput({ projectId }: { projectId: string }) {
-  const [tab, setTab] = React.useState<Tab>("paste");
+  const [tab, setTab] = React.useState<Tab>("find");
   const [demoState, demoAction, demoPending] = useActionState<
     UploadResult | null,
     FormData
@@ -65,6 +67,7 @@ export function ComplaintsInput({ projectId }: { projectId: string }) {
         id={`rift-input-panel-${tab}`}
         aria-labelledby={`rift-input-tab-${tab}`}
       >
+        {tab === "find" && <ComplaintFinder projectId={projectId} />}
         {tab === "csv" && <CsvUploader projectId={projectId} />}
         {tab === "paste" && <TextInput mode="paste" projectId={projectId} />}
         {tab === "file" && <TextInput mode="file" projectId={projectId} />}
