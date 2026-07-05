@@ -12,10 +12,15 @@ const title = "Rift — Turn complaints into business ideas";
 const description =
   "Type a market or paste real complaints. Rift finds repeated problems and turns them into ideas you can compare.";
 
+// Public site origin for OG images / sitemap URLs. Prefer Vercel's automatic
+// production-domain variable — BETTER_AUTH_URL has pointed at deployment-
+// specific URLs before, which are auth-walled and break social card fetches.
+const siteUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
+  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+  : (process.env.BETTER_AUTH_URL ?? "http://localhost:3000");
+
 export const metadata: Metadata = {
-  // Reuses the canonical app origin so OG images and sitemap URLs absolutize
-  // to the deployed domain on Vercel without a separate env var.
-  metadataBase: new URL(process.env.BETTER_AUTH_URL ?? "http://localhost:3000"),
+  metadataBase: new URL(siteUrl),
   title: {
     default: title,
     template: "%s · Rift",
