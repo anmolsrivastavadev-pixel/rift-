@@ -70,7 +70,7 @@ export function Hero() {
           className="mt-10 flex flex-wrap items-center justify-center gap-3"
         >
           <Button asChild size="lg">
-            <Link href="/dashboard/complaints">
+            <Link href="/dashboard">
               Start with a market <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>
