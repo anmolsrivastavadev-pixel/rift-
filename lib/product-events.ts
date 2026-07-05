@@ -31,7 +31,11 @@ export type ProductEventType =
   | "idea_exported"
   | "beta_access_granted"
   | "beta_access_revoked"
-  | "beta_feedback_submitted";
+  | "beta_feedback_submitted"
+  | "subscription_started"
+  | "subscription_canceled"
+  | "share_link_created"
+  | "share_link_revoked";
 
 const MAX_STRING = 120;
 const MAX_KEYS = 10;

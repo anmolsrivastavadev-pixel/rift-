@@ -103,6 +103,18 @@ export default function SignUpPage() {
           </Button>
         </form>
 
+        <p className="mt-4 text-center text-xs text-[var(--color-muted-foreground)]">
+          By creating an account you agree to the{" "}
+          <Link href="/terms" className="underline hover:text-[var(--color-foreground)]">
+            Terms
+          </Link>{" "}
+          and{" "}
+          <Link href="/privacy" className="underline hover:text-[var(--color-foreground)]">
+            Privacy Policy
+          </Link>
+          .
+        </p>
+
         <p className="mt-4 text-center text-sm text-[var(--color-muted-foreground)]">
           Already have an account?{" "}
           <Link href="/sign-in" className="text-[var(--color-primary)] font-medium hover:underline transition-colors">

@@ -15,6 +15,8 @@ import { isValidDecisionStatus } from "@/lib/decision-board";
 import { ProjectHistory } from "@/components/dashboard/project-history";
 import { OnboardingCard } from "@/components/dashboard/onboarding-card";
 import { ExportButtons } from "@/components/reports/export-buttons";
+import { ShareButton } from "@/components/reports/share-button";
+import { shareUrlForToken } from "@/lib/share";
 import type { DashboardStats } from "@/lib/dashboard-plan";
 import { requireUser } from "@/lib/auth/current-user";
 import { getProjectOrDefault, projectHref } from "@/lib/projects";
@@ -56,6 +58,7 @@ export default async function DashboardPage({
     topOpportunity,
     topOpportunities,
     opportunityIds,
+    activeShareLink,
   ] = await Promise.all([
     prisma.complaint.count({ where: { userId: user.id, projectId: project.id } }),
     prisma.complaint.findMany({
@@ -92,6 +95,17 @@ export default async function DashboardPage({
       orderBy: { opportunityScore: "desc" },
       take: 100,
       select: { id: true },
+    }),
+    // M29 — live share link for this project, if any, so the Share button
+    // shows the copy/revoke state after a refresh.
+    prisma.shareLink.findFirst({
+      where: {
+        userId: user.id,
+        projectId: project.id,
+        kind: "project",
+        revokedAt: null,
+      },
+      select: { id: true, token: true },
     }),
   ]);
 
@@ -172,13 +186,27 @@ export default async function DashboardPage({
             Project: <span className="font-medium text-[var(--color-foreground)]">{project.name}</span>
           </p>
         </div>
-        {/* M18 — private Markdown export for this project */}
-        <ExportButtons
-          kind="project"
-          targetId={projectId}
-          exportLabel="Export report"
-          copyLabel="Copy report"
-        />
+        {/* M18 — private Markdown export; M29 — public share link */}
+        <div className="flex flex-col items-end gap-2">
+          <ExportButtons
+            kind="project"
+            targetId={projectId}
+            exportLabel="Export report"
+            copyLabel="Copy report"
+          />
+          <ShareButton
+            kind="project"
+            targetId={projectId}
+            initialLink={
+              activeShareLink
+                ? {
+                    linkId: activeShareLink.id,
+                    url: shareUrlForToken(activeShareLink.token),
+                  }
+                : null
+            }
+          />
+        </div>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

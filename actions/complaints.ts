@@ -8,6 +8,7 @@ import { parseComplaintsFromText, normaliseBodyForKey } from "@/lib/text-import"
 import { requireUser } from "@/lib/auth/current-user";
 import { requireOwnedProject } from "@/lib/projects";
 import { trackProductEvent } from "@/lib/product-events";
+import { checkComplaintQuota } from "@/lib/quotas";
 
 const MAX_ROWS = 5000;
 
@@ -166,6 +167,11 @@ export async function uploadComplaints(
 
   // Insert in chunks to keep query size reasonable.
   if (valid.length > 0) {
+    // M26 — per-project complaint cap, checked against the batch to insert.
+    const quota = await checkComplaintQuota(user, project.id, valid.length);
+    if (!quota.ok) {
+      return { inserted: 0, skipped, errors: [{ row: 0, reason: quota.message }] };
+    }
     const importId = await recordImport(user.id, project.id, "csv", "CSV upload", valid.length);
     await insertValidRows(valid, user.id, project.id, importId);
   }
@@ -240,6 +246,15 @@ export async function loadDemoComplaints(
   const toInsert = valid.filter((r) => !existingBodies.has(r.body));
 
   if (toInsert.length > 0) {
+    // M26 — per-project complaint cap (post-dedupe, so re-clicks stay free).
+    const quota = await checkComplaintQuota(user, project.id, toInsert.length);
+    if (!quota.ok) {
+      return {
+        inserted: 0,
+        skipped: valid.length - toInsert.length,
+        errors: [{ row: 0, reason: quota.message }],
+      };
+    }
     const importId = await recordImport(user.id, project.id, "demo", "Demo complaints", toInsert.length);
     await insertValidRows(toInsert, user.id, project.id, importId);
   }
@@ -330,6 +345,16 @@ export async function loadStarterComplaints(
   const toInsert = valid.filter((r) => !existingBodies.has(r.body));
 
   if (toInsert.length > 0) {
+    // M26 — per-project complaint cap (post-dedupe).
+    const quota = await checkComplaintQuota(user, project.id, toInsert.length);
+    if (!quota.ok) {
+      return {
+        inserted: 0,
+        skipped: valid.length - toInsert.length,
+        errors: [{ row: 0, reason: quota.message }],
+        market: pack.label,
+      };
+    }
     const importId = await recordImport(
       user.id,
       project.id,
@@ -438,6 +463,11 @@ export async function importTextComplaints(
   const skipped = capped.length - toInsert.length;
 
   if (toInsert.length > 0) {
+    // M26 — per-project complaint cap (post-dedupe).
+    const quota = await checkComplaintQuota(user, project.id, toInsert.length);
+    if (!quota.ok) {
+      return { inserted: 0, skipped, errors: [{ row: 0, reason: quota.message }] };
+    }
     const importId = await recordImport(user.id, project.id, "paste", "Pasted text", toInsert.length);
     await insertValidRows(toInsert, user.id, project.id, importId);
   }
@@ -512,6 +542,11 @@ export async function createCustomStarterComplaints(
   const skipped = capped.length - toInsert.length;
 
   if (toInsert.length > 0) {
+    // M26 — per-project complaint cap (post-dedupe).
+    const quota = await checkComplaintQuota(user, project.id, toInsert.length);
+    if (!quota.ok) {
+      return { inserted: 0, skipped, errors: [{ row: 0, reason: quota.message }], market };
+    }
     const importId = await recordImport(
       user.id,
       project.id,

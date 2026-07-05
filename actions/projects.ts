@@ -7,6 +7,7 @@ import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/auth/current-user";
 import { projectHref } from "@/lib/project-href";
 import { trackProductEvent } from "@/lib/product-events";
+import { checkProjectQuota } from "@/lib/quotas";
 
 /* M16A/M16B1/M16B2 — Minimal project management server actions.
  *
@@ -23,7 +24,6 @@ import { trackProductEvent } from "@/lib/product-events";
  * no DB unique constraint, so existing duplicate rows keep working.
  */
 
-const MAX_PROJECTS_PER_USER = 100;
 const MAX_NAME = 60;
 
 export type ProjectSummary = {
@@ -73,9 +73,8 @@ async function nameTakenByUser(
 }
 
 /**
- * Form-action compatible. Reads `name` from the FormData. Enforces a soft
- * per-user cap (MAX_PROJECTS_PER_USER) so a single user can't trivially bloat
- * the projects table.
+ * Form-action compatible. Reads `name` from the FormData. M26 — the active
+ * project cap is plan-aware (free: 3, pro: 100 — the old M16A soft cap).
  */
 export async function createProject(
   _prev: CreateProjectResult | null,
@@ -90,9 +89,9 @@ export async function createProject(
   if (name.length > MAX_NAME) {
     return { ok: false, error: `Project name must be ${MAX_NAME} characters or fewer.` };
   }
-  const count = await prisma.project.count({ where: { userId: user.id } });
-  if (count >= MAX_PROJECTS_PER_USER) {
-    return { ok: false, error: `You already have ${MAX_PROJECTS_PER_USER} projects. This is the M16A soft cap.` };
+  const quota = await checkProjectQuota(user);
+  if (!quota.ok) {
+    return { ok: false, error: quota.message };
   }
   if (await nameTakenByUser(user.id, name)) {
     return { ok: false, error: "You already have a project with this name." };
@@ -292,6 +291,13 @@ export async function deleteArchivedProject(
 
   const scoped = { userId: user.id, projectId: owned.id };
   await prisma.$transaction([
+    // M29 — kill share links for this project AND for its ideas, so no public
+    // URL survives the delete (idea links carry the opportunityId, not the
+    // projectId, hence the second filter).
+    prisma.shareLink.deleteMany({ where: scoped }),
+    prisma.shareLink.deleteMany({
+      where: { userId: user.id, opportunity: { projectId: owned.id } },
+    }),
     prisma.savedOpportunity.deleteMany({ where: scoped }),
     prisma.complaint.deleteMany({ where: scoped }),
     prisma.opportunity.deleteMany({ where: scoped }),

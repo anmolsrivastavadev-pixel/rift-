@@ -67,8 +67,8 @@ Do **not** do any of the following unless a future milestone explicitly asks:
 - **Do not move `DATABASE_URL` back into `prisma/schema.prisma`.** The URL lives in `prisma.config.ts`; the schema keeps only the `provider`.
 - **Do not change `package.json` `build` script** (`prisma generate && next build`). The Prisma client output is gitignored and must be regenerated on every build (local + Vercel).
 - **Do not run any destructive database command.** See Database safety below.
-- **Do not add new dependencies** unless the milestone lists them explicitly. No auth libraries, no billing SDKs, no UI kits, no notification services.
-- **Do not introduce authentication, billing, teams, notifications, or automatic scraping.** These are post-MVP ideas only — see `docs/ROADMAP.md`.
+- **Do not add new dependencies** unless the milestone lists them explicitly. No UI kits, no notification services. (Shipped founder-authorized exceptions: `better-auth` since M16A, `stripe` since M28.)
+- **Do not extend billing or auth config, and do not introduce teams, notifications, or automatic scraping.** Auth exists since M16A; billing (Stripe, key-gated) since M28; password-reset email since M27 — all founder-authorized one-offs. Never write `User.plan` anywhere except the Stripe webhook (`app/api/stripe/webhook/route.ts`), and do not touch `lib/auth/index.ts` or the billing files without an explicit founder prompt.
 - **Do not continue automatically past a milestone boundary.** Each milestone ends by reporting modified/new files and waiting for user confirmation.
 
 ---
@@ -129,8 +129,8 @@ Report, in this order:
 
 These are explicitly out of scope for the MVP. Do not start them without an explicit user-issued milestone prompt:
 
-- Authentication / user accounts
-- Billing / subscriptions / Stripe
+- ~~Authentication / user accounts~~ (shipped in M16A — do not extend the auth config)
+- ~~Billing / subscriptions / Stripe~~ (shipped in M28, key-gated — do not extend)
 - Multi-user teams / workspaces
 - Email or in-app notifications
 - Automatic scraping or data ingestion

@@ -17,6 +17,13 @@ model User {
   name               String?
   emailVerified      Boolean            @default(false)
   image              String?
+  // M25/M28 — billing plan. "free" | "pro". Only the Stripe webhook may write
+  // plan/stripeSubscriptionId/planUpdatedAt after checkout; admins from
+  // RIFT_ADMIN_EMAILS resolve to pro limits without a plan change.
+  plan                 String    @default("free")
+  stripeCustomerId     String?   @unique
+  stripeSubscriptionId String?
+  planUpdatedAt        DateTime?
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @updatedAt
   sessions           Session[]
@@ -30,6 +37,7 @@ model User {
   aiRuns             AIRun[]
   productEvents      ProductEvent[]
   betaFeedback       BetaFeedback[]
+  shareLinks         ShareLink[]
 }
 
 // M16A — Multi-Project Market Tests. Lets a user split market tests into
@@ -52,10 +60,34 @@ model Project {
   aiRuns             AIRun[]
   productEvents      ProductEvent[]
   betaFeedback       BetaFeedback[]
+  shareLinks         ShareLink[]
   createdAt           DateTime           @default(now())
   updatedAt           DateTime           @updatedAt
 
   @@index([userId])
+}
+
+// M29 — Public share links for project and idea reports. token is 32 hex
+// chars from crypto.randomBytes(16). kind: "project" | "idea". revokedAt null
+// = live; a revoked or cascade-deleted link must 404, never dangle publicly —
+// hence Cascade (not SetNull) on every relation. M16B3's manual delete
+// transaction also clears these explicitly.
+model ShareLink {
+  id            String       @id @default(cuid())
+  token         String       @unique
+  kind          String
+  userId        String
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projectId     String?
+  project       Project?     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  opportunityId String?
+  opportunity   Opportunity? @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  createdAt     DateTime     @default(now())
+  revokedAt     DateTime?
+
+  @@index([userId])
+  @@index([projectId])
+  @@index([opportunityId])
 }
 
 model Session {
@@ -163,6 +195,7 @@ model Opportunity {
   savedOpportunities SavedOpportunity[]
   validationWorkspaces ValidationWorkspace[]
   productEvents     ProductEvent[]
+  shareLinks        ShareLink[]
 
   @@index([userId])
   @@index([projectId])

@@ -29,6 +29,8 @@ import { PrevNextNav } from "@/components/opportunities/prev-next-nav";
 import { MarketGapHypothesis } from "@/components/opportunities/market-gap-hypothesis";
 import { ValidationWorkspace } from "@/components/opportunities/validation-workspace";
 import { ExportButtons } from "@/components/reports/export-buttons";
+import { ShareButton } from "@/components/reports/share-button";
+import { shareUrlForToken } from "@/lib/share";
 import { trackProductEvent } from "@/lib/product-events";
 import { requireUser } from "@/lib/auth/current-user";
 import { projectHref } from "@/lib/project-href";
@@ -61,7 +63,7 @@ export default async function OpportunityDetailPage({
 
   const project = await requireOwnedProject(projectId, user);
 
-  const [op, allOthers, allNeighbours] = await Promise.all([
+  const [op, allOthers, allNeighbours, activeShareLink] = await Promise.all([
     prisma.opportunity.findFirst({
       where: { id, userId: user.id, projectId: project.id },
       include: {
@@ -98,6 +100,11 @@ export default async function OpportunityDetailPage({
       where: { userId: user.id, projectId: project.id },
       orderBy: { createdAt: "desc" },
       select: { id: true, createdAt: true },
+    }),
+    // M29 — live share link for this idea, if any.
+    prisma.shareLink.findFirst({
+      where: { userId: user.id, opportunityId: id, kind: "idea", revokedAt: null },
+      select: { id: true, token: true },
     }),
   ]);
 
@@ -355,13 +362,27 @@ export default async function OpportunityDetailPage({
             </div>
           </section>
 
-          {/* M18 — private Markdown export for this idea */}
-          <ExportButtons
-            kind="idea"
-            targetId={op.id}
-            exportLabel="Export idea"
-            copyLabel="Copy idea report"
-          />
+          {/* M18 — private Markdown export; M29 — public share link */}
+          <div className="flex flex-col gap-2">
+            <ExportButtons
+              kind="idea"
+              targetId={op.id}
+              exportLabel="Export idea"
+              copyLabel="Copy idea report"
+            />
+            <ShareButton
+              kind="idea"
+              targetId={op.id}
+              initialLink={
+                activeShareLink
+                  ? {
+                      linkId: activeShareLink.id,
+                      url: shareUrlForToken(activeShareLink.token),
+                    }
+                  : null
+              }
+            />
+          </div>
 
           {/* M17 — compact next-step hint */}
           <div className="rounded-2xl border border-[var(--color-primary)]/30 bg-[var(--color-primary)]/5 p-4">

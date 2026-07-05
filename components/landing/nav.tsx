@@ -21,6 +21,9 @@ export function LandingNav() {
         </Link>
         <div className="flex items-center gap-2">
           <Button asChild variant="ghost" size="sm">
+            <Link href="/pricing">Pricing</Link>
+          </Button>
+          <Button asChild variant="ghost" size="sm">
             <Link href="/sign-in">Sign in</Link>
           </Button>
           <Button asChild size="sm">

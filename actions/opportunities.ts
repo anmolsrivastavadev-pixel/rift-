@@ -11,6 +11,7 @@ import { computeOpportunityScore } from "@/lib/scoring";
 import { requireUser } from "@/lib/auth/current-user";
 import { requireOwnedProject } from "@/lib/projects";
 import { trackProductEvent } from "@/lib/product-events";
+import { checkIdeaRunQuota } from "@/lib/quotas";
 
 /* -------------------------------------------------------------------------
  * Form-action wrapper for Reset (clientside <form action=...>).
@@ -74,6 +75,15 @@ export async function runPipeline(
   if (!jobId) {
     return { created: 0, error: "Missing processing job id." };
   }
+
+  // M26 — plan quota check BEFORE any progress/history rows, so a blocked run
+  // consumes nothing.
+  const quota = await checkIdeaRunQuota(user);
+  if (!quota.ok) {
+    setProgress(jobId, { stage: "error", error: quota.message, message: quota.message });
+    return { created: 0, error: quota.message };
+  }
+
   setProgress(jobId, { stage: "cleaning", message: "Cleaning complaints…", total: 0, done: 0 });
 
   // M16D — AI run history row for this pipeline run. Created as "running"

@@ -25,7 +25,7 @@ Key reminders (full rules live in `docs/AI_AGENT_INSTRUCTIONS.md`):
 - Do not change the CSV upload pipeline, the search/filter/sort logic, or the saved-opportunity logic unless the milestone explicitly authorises it.
 - Do not run destructive database commands (`prisma db push --force-reset`, `prisma migrate reset`, `DROP TABLE`, `TRUNCATE`, unguarded `DELETE`).
 - Do not expose secrets. `.env` is gitignored; use `.env.example` for placeholders only.
-- Do not add authentication, billing, teams, notifications, or scraping — they are post-MVP only.
+- Do not add teams, notifications, or scraping — they are post-MVP only. (Auth exists since M16A; billing since M28 — Stripe, key-gated — and password-reset email since M27, all founder-authorized. Do not extend billing or auth config further without an explicit founder prompt, and never write `User.plan` outside the Stripe webhook.)
 - Keep the Prisma driver-adapter setup (`lib/db.ts` + `prisma.config.ts`); do not move the URL back into `schema.prisma`.
 - Keep the `build` script as `prisma generate && next build` — the generated Prisma client is gitignored and must regenerate on every build.
 
