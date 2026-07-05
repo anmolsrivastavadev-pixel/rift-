@@ -27,21 +27,52 @@ export default function OpenGraphImage() {
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+          {/* Split-R brand mark (see components/logo.tsx) recreated with CSS
+              clip-path — satori doesn't support SVG clipPath elements. */}
           <div
             style={{
               display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: 72,
-              height: 72,
-              borderRadius: 18,
-              backgroundColor: "#3b82f6",
-              color: "#ffffff",
-              fontSize: 40,
-              fontWeight: 700,
+              position: "relative",
+              width: 76,
+              height: 76,
             }}
           >
-            R
+            <div
+              style={{
+                position: "absolute",
+                top: -1,
+                left: -1,
+                width: 76,
+                height: 76,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#2563EB",
+                fontSize: 72,
+                fontWeight: 800,
+                clipPath: "polygon(0% 0%, 66% 0%, 37% 100%, 0% 100%)",
+              }}
+            >
+              R
+            </div>
+            <div
+              style={{
+                position: "absolute",
+                top: 1,
+                left: 1,
+                width: 76,
+                height: 76,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#3B7CFF",
+                fontSize: 72,
+                fontWeight: 800,
+                clipPath: "polygon(66% 0%, 100% 0%, 100% 100%, 37% 100%)",
+              }}
+            >
+              R
+            </div>
           </div>
           <div style={{ fontSize: 44, fontWeight: 700 }}>Rift</div>
         </div>

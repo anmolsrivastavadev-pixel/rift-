@@ -1,4 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="14" fill="#2563EB"/>
-  <text x="32" y="45" font-family="Inter, Arial, sans-serif" font-size="38" font-weight="700" fill="#FFFFFF" text-anchor="middle">R</text>
+  <defs>
+    <clipPath id="riftL"><polygon points="0,0 42,0 24,64 0,64"/></clipPath>
+    <clipPath id="riftR"><polygon points="42,0 64,0 64,64 24,64"/></clipPath>
+  </defs>
+  <g clip-path="url(#riftL)"><g transform="translate(-1.1,-1)">
+    <text x="32" y="54" font-family="Inter, 'Segoe UI', Arial, sans-serif" font-size="58" font-weight="800" fill="#2563EB" text-anchor="middle">R</text>
+  </g></g>
+  <g clip-path="url(#riftR)"><g transform="translate(1.1,1)">
+    <text x="32" y="54" font-family="Inter, 'Segoe UI', Arial, sans-serif" font-size="58" font-weight="800" fill="#3B7CFF" text-anchor="middle">R</text>
+  </g></g>
 </svg>

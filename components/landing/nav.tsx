@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { Container } from "@/components/container";
 import { Button } from "@/components/ui/button";
+import { RiftMark } from "@/components/logo";
 
 /* Slim landing-page header: logo home link on the left, Sign in / Get started
  * on the right. Sticky so the entry points stay reachable while scrolling.
@@ -14,9 +15,7 @@ export function LandingNav() {
           href="/"
           className="flex items-center gap-2 text-base font-semibold tracking-tight"
         >
-          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--color-primary)] text-[11px] font-bold text-white">
-            R
-          </span>
+          <RiftMark size={30} id="nav-mark" />
           Rift
         </Link>
         <div className="flex items-center gap-2">

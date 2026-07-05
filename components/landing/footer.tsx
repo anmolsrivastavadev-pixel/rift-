@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Container } from "@/components/container";
 import { Button } from "@/components/ui/button";
+import { RiftMark } from "@/components/logo";
 
 export function Footer() {
   return (
@@ -62,9 +63,7 @@ export function Footer() {
           </Link>
         </nav>
         <div className="mt-8 flex items-center justify-center gap-4">
-          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--color-primary)] text-[11px] font-bold text-white">
-            R
-          </span>
+          <RiftMark size={28} id="footer-mark" />
           <span className="text-sm font-semibold tracking-tight text-[var(--color-foreground)]">Rift</span>
           <span className="text-xs text-[var(--color-muted-foreground)]">
             Business ideas from real customer pain.
