@@ -294,6 +294,12 @@ The Start Fresh Test patch addresses workspace-mixing confusion:
 - **What was built:** `lib/complaint-finder.ts` now authenticates via Reddit's OAuth2 client_credentials flow when `REDDIT_CLIENT_ID`/`REDDIT_CLIENT_SECRET` are set (create a "script" app at https://www.reddit.com/prefs/apps): app-only token from `www.reddit.com/api/v1/access_token` (Basic auth, form-encoded), cached in module memory with the response's `expires_in` minus a 60s margin, search via `oauth.reddit.com/search` with a Bearer token; on HTTP 401 the cached token is invalidated and the search retried once. Optional `REDDIT_USER_AGENT` sets the descriptive User-Agent Reddit asks for. Without credentials the finder still tries the public endpoint and, on 403, the error message now tells the founder to set the env vars. 429 gets a "rate limit, try again in a minute" hint. Error strings and logs contain env-var names and HTTP statuses only — never the secret or token. Documented in `.env.example`, the env table in `docs/PROJECT_CONTEXT.md`, and `docs/BETA_QA_CHECKLIST.md`.
 - **Not changed:** Gemini prompt, scoring, CSV/paste pipeline, App Store fetcher, `actions/complaint-finder.ts`, the finder UI component, Prisma schema, auth. No new dependencies (built-in `fetch` + `Buffer`). The fail-soft source contract (`{ complaints, error? }`) is preserved — a dead Reddit source still never breaks App Store results.
 
+### M23 — Complaint finder: Hacker News source (user-approved)
+- **Status:** ✅ Done
+- **Purpose:** Reddit disabled self-serve API app creation (Responsible Builder Policy, Nov 2025) — new credentials now require an application to Reddit and a multi-week wait. While the founder waits for approval, the finder needed a third source that works with no key or sign-up. The founder explicitly approved adding Hacker News.
+- **What was built:** `fetchHackerNewsComplaints()` in `lib/complaint-finder.ts` using the free HN Algolia search API (`hn.algolia.com/api/v1/search`, no auth). Algolia has no OR query syntax, so it runs three parallel searches (`<keyword> frustrating|annoying|problem`) over stories + comments from the last 2 years, merges and dedupes by `objectID`, strips HTML/entities from comment text, applies the same ≥30-char body bar as Reddit, caps at 25. One failed term-query is ignored; total failure fails soft with "Hacker News search failed (…)". `actions/complaint-finder.ts` runs it in the same `Promise.all` and returns `hackerNewsFound`; the finder UI line now reads "N from Reddit, M from App Store reviews, K from Hacker News".
+- **Not changed:** Gemini prompt, scoring, CSV/paste pipeline, Reddit/App Store fetchers, dedupe rules, Prisma schema, auth. No new dependencies, no env vars needed for HN.
+
 ### Post-M21 — Beta launch prep + landing polish (small pass, no milestone number)
 - **Status:** ✅ Done
 - **What was done:** New `docs/LAUNCH_RUNBOOK.md` (ordered founder playbook: Vercel env setup → production QA → flip invite-only → invite testers with a message template → week-one monitoring → rollback). Landing/SEO polish: `metadataBase` from `BETTER_AUTH_URL`; metadata retitled from "Opportunity Intelligence Platform" to "Rift — Turn complaints into business ideas" with description matching the hero; new `app/opengraph-image.tsx` (next/og, no dependency) so shared links render a real social card; new slim sticky `components/landing/nav.tsx` (logo + Sign in + Get started — previously there was NO way to reach sign-in from the landing page); footer gained Sign in / Create account / How it works links; hero trust line changed from "Free to try. No card required." to "Free during the private beta."; auth-page "Rift" headings link back home; `/beta-access` added to robots disallow.
@@ -301,25 +307,46 @@ The Start Fresh Test patch addresses workspace-mixing confusion:
 
 ---
 
-## Future / post-MVP milestones (not started)
+## Planned milestones (founder-approved sequence, July 2026)
 
-Do **not** start any of these without an explicit user prompt. They appear here only for visibility.
+Do **not** start any of these without an explicit user prompt for that specific milestone. The ORDER is deliberate — do not jump ahead (especially not to Stripe).
 
-> Note: M7–M22 are complete — see "Completed milestones" above. The items below are future work and must not be started without an explicit user prompt.
+> Note: M7–M23 are complete — see "Completed milestones" above. M22/M23 were the complaint-finder Reddit OAuth + Hacker News work, which is why this plan starts at M24.
 
-### Future — PDF/CSV export of comparisons
-- Side-by-side comparison export to PDF/CSV. (Markdown export shipped in M18.)
+> **Gate before M24:** the private beta must actually be launched first (see `docs/LAUNCH_RUNBOOK.md` Steps 1–5: env vars, production QA, invite-only mode, 3–5 real testers). M24's scope IS their feedback — it cannot be written in advance.
 
-### Future — Notification & in-app messaging
-- Server-side status when long jobs complete; optional email digest.
+### M24 — Feedback fixes from first testers
+- Scope decided by ~1 week of real usage: the Beta insights funnel (where users drop off) + the feedback inbox. Fix reported bugs and confusion points only — no speculative features.
 
-### Future — Multi-source ingestion / scraping (if explicitly approved)
-- Auto-pull complaints from review sites, app stores, forums. **Out of scope for MVP** — must not be added automatically.
+### M25 — Pricing page + plan design
+- Public pricing page and plan matrix: what's free, what's paid, which limits differ. Design/copy only — no enforcement, no payments, no billing dependency. Copy stays honest (no fake urgency or invented "most popular" pressure).
 
-### Future — Light mode + theming
+### M26 — Usage limits / quotas
+- Enforce the M25 plan design app-side: e.g. AI runs per month, complaints per project, projects per user. Generous free tier; friendly limit messages ("You've used your 10 free idea runs this month"). Derive counts from existing `AIRun`/`ComplaintImport` history where possible before adding any new model.
+
+### M27 — Pre-billing prerequisites
+- Privacy Policy + Terms pages (linked from footer and sign-up), password reset via email (the app's first email-sending capability — Better Auth resetPassword flow), custom domain with `BETTER_AUTH_URL`/metadata updates. Required BEFORE charging money; deliberately its own milestone so M28 stays focused.
+
+### M28 — Billing with Stripe
+- Subscriptions, webhook handling, plan gating wired to the M26 quotas. First new major dependency — requires explicit founder approval at milestone start per standing rules. Do not begin without M25–M27 complete.
+
+### M29 — Public share links or better reports
+- Read-only public share pages for idea/project reports (builds on the M18 Markdown builders in `lib/reports.ts`), and/or richer export formats (PDF/CSV of comparisons). First deliberately public surface for user content — needs its own privacy review.
+
+### M30 — Auto complaint discovery / Complaint Finder v2
+- Scheduled or broader automatic discovery on top of the existing Reddit + App Store + Hacker News sources in `lib/complaint-finder.ts`. Highest external risk on the list (source ToS, IP blocking, rate limits) — scope carefully and keep fail-soft per-source behavior.
+
+---
+
+## Unscheduled ideas (no slot, revisit after M30)
+
+### Light mode + theming
 - Toggle light/dark; persist preference locally. Pure UX; no schema changes.
 
-### Future — Prompt experimentation
+### Notification & in-app messaging
+- Server-side status when long jobs complete; optional email digest. (Email capability arrives in M27.)
+
+### Prompt experimentation
 - A/B different Gemini prompts and track quality. **Must not change the production prompt or scoring weights without explicit sign-off.**
 
 ---
