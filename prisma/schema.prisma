@@ -29,6 +29,7 @@ model User {
   complaintImports   ComplaintImport[]
   aiRuns             AIRun[]
   productEvents      ProductEvent[]
+  betaFeedback       BetaFeedback[]
 }
 
 // M16A — Multi-Project Market Tests. Lets a user split market tests into
@@ -50,6 +51,7 @@ model Project {
   complaintImports   ComplaintImport[]
   aiRuns             AIRun[]
   productEvents      ProductEvent[]
+  betaFeedback       BetaFeedback[]
   createdAt           DateTime           @default(now())
   updatedAt           DateTime           @updatedAt
 
@@ -165,6 +167,41 @@ model Opportunity {
   @@index([userId])
   @@index([projectId])
   @@index([aiRunId])
+}
+
+// M20 — Private beta access control. One row per normalized (lowercase)
+// email; admins from RIFT_ADMIN_EMAILS never need a row. Only consulted when
+// RIFT_BETA_MODE=invite_only. status: "invited" | "active" | "revoked".
+model BetaAccess {
+  id              String    @id @default(cuid())
+  email           String    @unique
+  status          String
+  invitedByUserId String?
+  createdAt       DateTime  @default(now())
+  acceptedAt      DateTime?
+  revokedAt       DateTime?
+
+  @@index([status])
+}
+
+// M20 — In-app beta feedback. Message text is only what the user typed into
+// the feedback box — complaint text is never attached automatically.
+// type: "bug" | "confusing" | "idea" | "praise" | "other".
+model BetaFeedback {
+  id            String       @id @default(cuid())
+  userId        String
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projectId     String?
+  project       Project?     @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  opportunityId String?
+  type          String
+  rating        Int?
+  message       String
+  pagePath      String?
+  createdAt     DateTime     @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
 }
 
 // M19 — First-party product events for private beta insights. Metadata and

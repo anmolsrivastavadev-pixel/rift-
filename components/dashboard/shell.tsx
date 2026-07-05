@@ -7,6 +7,7 @@ import { Container } from "@/components/container";
 import { authClient } from "@/lib/auth/client";
 import { projectHref } from "@/lib/project-href";
 import { ProjectSelector, type ProjectOption } from "@/components/dashboard/project-selector";
+import { FeedbackWidget } from "@/components/dashboard/feedback-widget";
 
 const nav = [
   { href: "/dashboard", label: "Home", icon: LayoutDashboard },
@@ -104,6 +105,8 @@ export function DashboardShell({
             })}
           </nav>
           <div className="mt-auto space-y-2.5 px-3 pt-4">
+            {/* M20 — compact beta feedback entry point */}
+            <FeedbackWidget projectId={projectId} />
             <div className="flex items-center gap-2.5 rounded-xl bg-[var(--color-card)] px-3 py-2.5">
               <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
                 <User className="h-3.5 w-3.5" />
@@ -167,12 +170,13 @@ export function DashboardShell({
           </button>
         </div>
         {/* Mobile project selector row */}
-        <div className="border-t border-[var(--color-border)] px-4 py-2">
+        <div className="space-y-2 border-t border-[var(--color-border)] px-4 py-2">
           <ProjectSelector
             projects={projects}
             archivedProjects={archivedProjects}
             currentProjectId={currentProjectId}
           />
+          <FeedbackWidget projectId={projectId} />
         </div>
       </div>
 

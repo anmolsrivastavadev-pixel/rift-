@@ -2,6 +2,7 @@ import { DashboardShell } from "@/components/dashboard/shell";
 import { ValidationStateMigrator } from "@/components/dashboard/validation-state-migrator";
 import { requireUser } from "@/lib/auth/current-user";
 import { isAdminEmail } from "@/lib/admin";
+import { requireBetaAccess } from "@/lib/beta-access";
 import {
   getProjectOrDefault,
   listProjectsForUser,
@@ -14,6 +15,9 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   const user = await requireUser();
+  // M20 — invite-only beta gate (no-op unless RIFT_BETA_MODE=invite_only;
+  // admins always pass). Redirects blocked users to /beta-access.
+  await requireBetaAccess(user);
   const project = await getProjectOrDefault(null, user);
   const projects = await listProjectsForUser(user);
   const archivedProjects = await listArchivedProjectsForUser(user);

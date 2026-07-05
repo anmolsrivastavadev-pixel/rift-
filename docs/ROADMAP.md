@@ -265,13 +265,19 @@ The Start Fresh Test patch addresses workspace-mixing confusion:
 - **Privacy:** events store metadata/counts only — never complaint text, exported report contents, AI prompts, or raw AI output. `.env.example` documents `RIFT_ADMIN_EMAILS`.
 - **Not included:** No Mixpanel/PostHog/GA or any third-party tool, no charts library, no cohorts/date filters, no notifications/billing/teams/scraping/sharing, no new dependencies, no auth overhaul, no Gemini/scoring/parsing changes.
 
+### M20 — Private beta access + feedback inbox
+- **Status:** ✅ Done
+- **Purpose:** Let the founder run a controlled private beta: invite specific testers, revoke access, and collect in-app feedback — without touching Better Auth config or blocking sign-in itself.
+- **What was built:** `RIFT_BETA_MODE` env flag ("off"/unset = app behaves exactly as before; "invite_only" = the dashboard layout calls `requireBetaAccess(user)` after `requireUser()`). New `BetaAccess` model (unique normalized lowercase email, status "invited"/"active"/"revoked"; admins from `RIFT_ADMIN_EMAILS` never need a row and can never be locked out) and `BetaFeedback` model (type bug/confusing/idea/praise/other, optional 1–5 rating, message ≤2000 chars, optional pagePath/projectId — project attached only if owned). `lib/beta-access.ts` helpers; invited users are auto-promoted to "active" with `acceptedAt` on first entry; blocked users land on `/beta-access` (shows their signed-in email, "Ask the founder to add this email to the beta." — no email sending, no fake "invite sent"). Admin "Beta access" section on Beta insights (add tester / revoke / restore via `actions/beta.ts`, admin verified server-side) plus a "Recent feedback" inbox (type, rating, message, user email, project, page, date). Compact Feedback widget in the dashboard shell (desktop sidebar + mobile row) via `submitBetaFeedback`. Product events: beta_access_granted, beta_access_revoked, beta_feedback_submitted (feedback text is never logged into events).
+- **Not included:** No email sending, no billing/subscriptions/teams, no public sharing, no screenshot upload, no support chat, no third-party tools, no new dependencies, no Better Auth config changes, no Gemini/scoring/parsing changes.
+
 ---
 
 ## Future / post-MVP milestones (not started)
 
 Do **not** start any of these without an explicit user prompt. They appear here only for visibility.
 
-> Note: M7–M19 are complete — see "Completed milestones" above. The items below are future work and must not be started without an explicit user prompt.
+> Note: M7–M20 are complete — see "Completed milestones" above. The items below are future work and must not be started without an explicit user prompt.
 
 ### Future — PDF/CSV export of comparisons
 - Side-by-side comparison export to PDF/CSV. (Markdown export shipped in M18.)

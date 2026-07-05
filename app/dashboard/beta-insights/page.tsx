@@ -1,9 +1,15 @@
 import { notFound } from "next/navigation";
-import { BarChart3, Activity } from "lucide-react";
+import { BarChart3, Activity, UserPlus, Inbox } from "lucide-react";
 
 import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/auth/current-user";
 import { isAdminEmail } from "@/lib/admin";
+import { isBetaModeEnabled } from "@/lib/beta-access";
+import {
+  addBetaTester,
+  revokeBetaTester,
+  reactivateBetaTester,
+} from "@/actions/beta";
 
 /* M19 — Private, admin-only beta insights.
  *
@@ -91,6 +97,29 @@ export default async function BetaInsightsPage() {
     }),
   ]);
 
+  // M20 — beta access rows + recent feedback (admin-only page, metadata and
+  // user-typed feedback messages only).
+  const [betaAccessRows, recentFeedback] = await Promise.all([
+    prisma.betaAccess.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 20,
+    }),
+    prisma.betaFeedback.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 20,
+      select: {
+        id: true,
+        type: true,
+        rating: true,
+        message: true,
+        pagePath: true,
+        createdAt: true,
+        user: { select: { email: true } },
+        project: { select: { name: true } },
+      },
+    }),
+  ]);
+
   const funnel: { label: string; count: number }[] = [
     { label: "Signed up", count: totalUsers },
     { label: "Created project", count: distinctUsers(projectOwners) },
@@ -151,6 +180,120 @@ export default async function BetaInsightsPage() {
             </li>
           ))}
         </ul>
+      </section>
+
+      {/* M20 — beta tester management */}
+      <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6">
+        <h2 className="flex items-center gap-2 text-base font-semibold">
+          <UserPlus className="h-4 w-4 text-[var(--color-primary)]" />
+          Beta access
+        </h2>
+        <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
+          Invite-only mode is currently{" "}
+          <span className="font-medium text-[var(--color-foreground)]">
+            {isBetaModeEnabled() ? "ON (RIFT_BETA_MODE=invite_only)" : "OFF"}
+          </span>
+          . Admins from RIFT_ADMIN_EMAILS always have access. No emails are sent —
+          tell testers to sign up with the address you add here.
+        </p>
+        <form action={addBetaTester} className="mt-4 flex flex-wrap items-center gap-2">
+          <input
+            name="email"
+            type="email"
+            required
+            placeholder="tester@example.com"
+            className="h-9 w-64 max-w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-background)] px-3 text-sm text-[var(--color-foreground)] placeholder:text-[var(--color-muted-foreground)] outline-none focus:border-[var(--color-primary)]"
+          />
+          <button
+            type="submit"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--color-primary)] px-3 py-2 text-xs font-medium text-white"
+          >
+            <UserPlus className="h-3.5 w-3.5" /> Add tester
+          </button>
+        </form>
+        {betaAccessRows.length > 0 && (
+          <ul className="mt-4 space-y-2">
+            {betaAccessRows.map((row) => (
+              <li
+                key={row.id}
+                className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--color-border)]/60 pb-2 text-xs last:border-b-0"
+              >
+                <span className="min-w-0 truncate font-medium text-[var(--color-foreground)]">
+                  {row.email}
+                </span>
+                <span
+                  className={
+                    row.status === "revoked"
+                      ? "text-[var(--color-danger)]"
+                      : "text-[var(--color-success)]"
+                  }
+                >
+                  {row.status === "revoked" ? "Access revoked" : "Access active"}
+                </span>
+                {row.status === "revoked" ? (
+                  <form action={reactivateBetaTester}>
+                    <input type="hidden" name="accessId" value={row.id} />
+                    <button
+                      type="submit"
+                      className="rounded-lg border border-[var(--color-border)] px-2 py-1 text-[11px] text-[var(--color-foreground)] hover:border-[var(--color-primary)]"
+                    >
+                      Restore access
+                    </button>
+                  </form>
+                ) : (
+                  <form action={revokeBetaTester}>
+                    <input type="hidden" name="accessId" value={row.id} />
+                    <button
+                      type="submit"
+                      className="rounded-lg border border-[var(--color-border)] px-2 py-1 text-[11px] text-[var(--color-danger)] hover:border-[var(--color-danger)]"
+                    >
+                      Revoke access
+                    </button>
+                  </form>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      {/* M20 — feedback inbox */}
+      <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6">
+        <h2 className="flex items-center gap-2 text-base font-semibold">
+          <Inbox className="h-4 w-4 text-[var(--color-primary)]" />
+          Recent feedback
+        </h2>
+        {recentFeedback.length === 0 ? (
+          <p className="mt-3 text-sm text-[var(--color-muted-foreground)]">
+            No feedback yet.
+          </p>
+        ) : (
+          <ul className="mt-4 space-y-3">
+            {recentFeedback.map((f) => (
+              <li
+                key={f.id}
+                className="rounded-[12px] border border-[var(--color-border)]/60 p-3 text-xs"
+              >
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  <span className="font-medium text-[var(--color-foreground)]">
+                    {f.type}
+                    {f.rating != null ? ` · ${f.rating}/5` : ""}
+                  </span>
+                  <span className="text-[var(--color-muted-foreground)]">
+                    {f.user.email}
+                    {f.project?.name ? ` · ${f.project.name}` : ""}
+                    {f.pagePath ? ` · ${f.pagePath}` : ""}
+                    {" · "}
+                    {f.createdAt.toLocaleString()}
+                  </span>
+                </div>
+                <p className="mt-1.5 whitespace-pre-wrap text-[var(--color-foreground)]/90">
+                  {f.message}
+                </p>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
 
       <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6">

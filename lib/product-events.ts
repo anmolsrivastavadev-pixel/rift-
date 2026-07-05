@@ -28,7 +28,10 @@ export type ProductEventType =
   | "decision_set"
   | "checklist_updated"
   | "project_exported"
-  | "idea_exported";
+  | "idea_exported"
+  | "beta_access_granted"
+  | "beta_access_revoked"
+  | "beta_feedback_submitted";
 
 const MAX_STRING = 120;
 const MAX_KEYS = 10;
