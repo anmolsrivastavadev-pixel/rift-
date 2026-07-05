@@ -218,16 +218,23 @@ The Start Fresh Test patch addresses workspace-mixing confusion:
 - **Important behavior:** Duplicate names are blocked at the app level only — no DB unique constraint was added, so any pre-existing duplicate rows keep working. Renaming never changes the project id, so `?projectId=...` URLs and all project-scoped complaints/ideas/saved items stay attached. Changing only the casing of a project's own name is allowed.
 - **Not included:** No project delete/archive (still M16B future work), no project sharing/teams/billing, no upload history, no schema changes, no AI/scoring/parsing/cleaning changes, no auth or route-protection changes, no new dependencies, no nested project routes.
 
+### M16B2 — Archive projects safely
+- **Status:** ✅ Done
+- **Purpose:** Let users hide old projects without deleting anything, so the selector stays uncluttered while all complaints, ideas, and saved data are preserved.
+- **What was built:** Additive `Project.archivedAt DateTime?` schema field (applied with `prisma db push`, no other schema changes); `lib/projects.ts` now resolves the oldest ACTIVE project by default, creates `Default project` when no active project exists, and redirects to `/dashboard` when a URL points at the user's own archived project (`requireOwnedProject` still checks ownership only, so unarchive and owned deep links keep working); `archiveProject`/`unarchiveProject` server actions in `actions/projects.ts` (ownership verified server-side, archive blocked for the last active project with "You need at least one active project.", success redirects to an active project); sidebar selector shows active projects only, gained an inline "Archive project" confirm panel ("Archiving hides this project. It does not delete your data.", hidden when only one active project remains) and a collapsible "Archived projects (n)" area with per-project Restore buttons ("Archived projects are hidden, not deleted.").
+- **Important behavior:** Archiving only sets `archivedAt` — no rows are deleted and no Complaint/Opportunity/SavedOpportunity relations changed, so restoring a project brings back all its data untouched.
+- **Not included:** No permanent delete or bulk delete (still future work), no project sharing/teams/billing, no upload history, no scraping, no new AI calls, no new dependencies, no nested project routes, no auth/route-protection changes, no Gemini prompt/scoring/parsing/cleaning changes.
+
 ---
 
 ## Future / post-MVP milestones (not started)
 
 Do **not** start any of these without an explicit user prompt. They appear here only for visibility.
 
-> Note: M7–M16B1 are complete — see "Completed milestones" above. The items below are future work and must not be started without an explicit user prompt.
+> Note: M7–M16B2 are complete — see "Completed milestones" above. The items below are future work and must not be started without an explicit user prompt.
 
 ### M16B — Project management polish (remaining)
-- Project delete/archive. (Rename and duplicate-name handling shipped in M16B1.)
+- Permanent project delete. (Rename and duplicate-name handling shipped in M16B1; archive/restore shipped in M16B2.)
 
 ### M16C — Persist validation workspace state
 - Move validation checklist, validation evidence, and decision status from localStorage to authenticated, project-scoped database tables.

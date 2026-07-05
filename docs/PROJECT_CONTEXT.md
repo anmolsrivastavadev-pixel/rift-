@@ -143,7 +143,7 @@ actions/
 ├─ complaints.ts        project-scoped uploadComplaints, loadDemoComplaints, importTextComplaints
 ├─ opportunities.ts    runPipeline, getProcessingStatus, resetOpportunities,
 │                       resetOpportunitiesAction (project-scoped)
-├─ projects.ts          createProject (M16A) + renameProject (M16B1), duplicate-name validation
+├─ projects.ts          createProject (M16A) + renameProject (M16B1) + archive/unarchive (M16B2), duplicate-name validation
 ├─ saved.ts             project-scoped saveOpportunity, unsaveOpportunity, saveAction, unsaveAction
 └─ workspace.ts         clearWorkspace (start fresh test — clears current project data)
 
@@ -169,7 +169,7 @@ Rift now has auth and project-scoped market tests:
 
 - `User` — Better Auth user plus relations to sessions/accounts/projects and owned app data.
 - `Session`, `Account`, `Verification` — Better Auth tables. Do not change auth config for M16A work.
-- `Project` — M16A project / market test. Required `userId`, `User` relation with `onDelete: Cascade`, optional `description`, `createdAt`, `updatedAt`, and `@@index([userId])`.
+- `Project` — M16A project / market test. Required `userId`, `User` relation with `onDelete: Cascade`, optional `description`, `createdAt`, `updatedAt`, and `@@index([userId])`. M16B2 added nullable `archivedAt` (`null` = active, set = archived/hidden; all related data is preserved).
 - `Complaint` — complaint row with nullable `userId` and nullable `projectId` during the M16A migration. `projectId` has an optional `Project` relation with `onDelete: SetNull` and `@@index([projectId])`.
 - `Opportunity` — generated idea row with nullable `userId` and nullable `projectId` during the M16A migration. `projectId` has an optional `Project` relation with `onDelete: SetNull` and `@@index([projectId])`.
 - `SavedOpportunity` — saved/bookmarked idea with nullable `userId` and nullable `projectId` during the M16A migration. It keeps `@@unique([userId, opportunityId])`, has `@@index([projectId])`, and its project relation uses `onDelete: SetNull`.
@@ -250,7 +250,7 @@ The pipeline **deletes existing opportunities in the current project before inse
 
 ## Current routes
 
-Dashboard routes use query-param project routing in M16A: `?projectId=...`. If the query param is omitted, the user's oldest project is used (or `Default project` is created for first use). Unowned project IDs must not expose data.
+Dashboard routes use query-param project routing in M16A: `?projectId=...`. If the query param is omitted, the user's oldest ACTIVE project is used (or `Default project` is created for first use / when every project is archived). Unowned project IDs must not expose data. Since M16B2, a URL pointing at the user's own ARCHIVED project redirects to `/dashboard`, which re-resolves to the oldest active project — archived projects never render as the current workspace.
 
 | Route | Type | Renders |
 |---|---|---|
@@ -288,7 +288,7 @@ Dashboard routes use query-param project routing in M16A: `?projectId=...`. If t
 |---|---|
 | `actions/complaints.ts` | `uploadComplaints(prev, formData)`, `loadDemoComplaints(prev, formData)`, starter/demo actions, `importTextComplaints(prev, formData)`. All require a user and owned project. |
 | `actions/opportunities.ts` | `runPipeline(formData)`, `getProcessingStatus(jobId, projectId)`, `resetOpportunities(formData)`, `resetOpportunitiesAction(formData)`. All require a user and owned project. |
-| `actions/projects.ts` | `createProject(prev, formData)` (M16A) and `renameProject(prev, formData)` (M16B1). Both verify ownership server-side, trim the name, enforce required/max-60-char names, and reject duplicate project names per user (case-insensitive, app-level — no DB unique constraint). Project delete/archive is still future work. |
+| `actions/projects.ts` | `createProject(prev, formData)` (M16A), `renameProject(prev, formData)` (M16B1), `archiveProject(prev, formData)` and `unarchiveProject(prev, formData)` (M16B2). All verify ownership server-side. Create/rename trim the name, enforce required/max-60-char names, and reject duplicate project names per user (case-insensitive, app-level — no DB unique constraint). Archive sets `archivedAt`, refuses to archive the last active project ("You need at least one active project."), and redirects to the oldest remaining active project; unarchive clears `archivedAt` and redirects into the restored project. Permanent project delete is still future work. |
 | `actions/saved.ts` | `saveOpportunity(prev, formData)`, `unsaveOpportunity(prev, formData)`, `saveAction(formData)`, `unsaveAction(formData)`. All require a user and owned project. |
 | `actions/workspace.ts` | `clearWorkspace(projectId)` clears only saved opportunities, opportunities, and complaints for the current user's current project. |
 

@@ -32,11 +32,13 @@ export function DashboardShell({
   children,
   user,
   projects,
+  archivedProjects,
   currentProjectId,
 }: {
   children: React.ReactNode;
   user: User;
   projects: ProjectOption[];
+  archivedProjects: ProjectOption[];
   currentProjectId: string;
 }) {
   const pathname = usePathname();
@@ -66,6 +68,7 @@ export function DashboardShell({
           <div className="mt-6 border-b border-[var(--color-border)] pb-4">
             <ProjectSelector
               projects={projects}
+              archivedProjects={archivedProjects}
               currentProjectId={currentProjectId}
             />
           </div>
@@ -161,6 +164,7 @@ export function DashboardShell({
         <div className="border-t border-[var(--color-border)] px-4 py-2">
           <ProjectSelector
             projects={projects}
+            archivedProjects={archivedProjects}
             currentProjectId={currentProjectId}
           />
         </div>

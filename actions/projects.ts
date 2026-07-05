@@ -1,19 +1,23 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/auth/current-user";
+import { projectHref } from "@/lib/project-href";
 
-/* M16A/M16B1 — Minimal project management server actions.
+/* M16A/M16B1/M16B2 — Minimal project management server actions.
  *
  * - list the current user's projects (for the sidebar selector)
  * - create a new project for the current user (M16A)
  * - rename an owned project (M16B1)
+ * - archive / unarchive an owned project (M16B2) — archiving only sets
+ *   Project.archivedAt; every complaint/idea/saved row is preserved.
  *
  * Duplicate project names per user are blocked at the app level (M16B1) —
  * no DB unique constraint, so existing duplicate rows keep working.
- * Deleting and archiving a project are still future work (M16B).
+ * Permanent project deletion is still future work.
  */
 
 const MAX_PROJECTS_PER_USER = 100;
@@ -150,4 +154,92 @@ export async function renameProject(
   revalidatePath("/dashboard", "layout");
 
   return { ok: true, project };
+}
+
+/* M16B2 — archive/unarchive. Both actions only ever return on error; on
+ * success they redirect to an active project, which also refreshes the
+ * sidebar. Ownership is verified server-side, so a forged projectId from
+ * another user's project just returns "Project not found." */
+
+export type ArchiveActionResult = { ok: false; error: string };
+
+/**
+ * Archive an owned project (hide it, keep all its data). Blocked when it is
+ * the user's last active project. On success, redirects to the user's oldest
+ * remaining active project.
+ */
+export async function archiveProject(
+  _prev: ArchiveActionResult | null,
+  formData: FormData
+): Promise<ArchiveActionResult> {
+  const user = await requireUser();
+  const projectId = String(formData.get("projectId") ?? "").trim();
+
+  const owned = projectId
+    ? await prisma.project.findFirst({
+        where: { id: projectId, userId: user.id },
+        select: { id: true, archivedAt: true },
+      })
+    : null;
+  if (!owned) {
+    return { ok: false, error: "Project not found." };
+  }
+
+  if (!owned.archivedAt) {
+    const activeCount = await prisma.project.count({
+      where: { userId: user.id, archivedAt: null },
+    });
+    if (activeCount <= 1) {
+      return { ok: false, error: "You need at least one active project." };
+    }
+
+    await prisma.project.update({
+      where: { id: owned.id },
+      data: { archivedAt: new Date() },
+    });
+  }
+
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard", "layout");
+
+  const nextActive = await prisma.project.findFirst({
+    where: { userId: user.id, archivedAt: null },
+    orderBy: { createdAt: "asc" },
+    select: { id: true },
+  });
+  redirect(projectHref("/dashboard", nextActive?.id ?? null));
+}
+
+/**
+ * Restore an owned archived project. On success, redirects to the restored
+ * project so the user lands right back in it.
+ */
+export async function unarchiveProject(
+  _prev: ArchiveActionResult | null,
+  formData: FormData
+): Promise<ArchiveActionResult> {
+  const user = await requireUser();
+  const projectId = String(formData.get("projectId") ?? "").trim();
+
+  const owned = projectId
+    ? await prisma.project.findFirst({
+        where: { id: projectId, userId: user.id },
+        select: { id: true, archivedAt: true },
+      })
+    : null;
+  if (!owned) {
+    return { ok: false, error: "Project not found." };
+  }
+
+  if (owned.archivedAt) {
+    await prisma.project.update({
+      where: { id: owned.id },
+      data: { archivedAt: null },
+    });
+  }
+
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard", "layout");
+
+  redirect(projectHref("/dashboard", owned.id));
 }

@@ -30,10 +30,13 @@ model User {
 // M16A — Multi-Project Market Tests. Lets a user split market tests into
 // separate projects so complaints, generated ideas, saved ideas, and Start
 // Fresh behaviour do not mix. Every project belongs to exactly one user.
+// M16B2 — archivedAt marks a project as archived (hidden from the normal
+// selector, all data preserved). Null = active.
 model Project {
   id                 String             @id @default(cuid())
   name               String
   description        String?
+  archivedAt         DateTime?
   userId              String
   user                User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   complaints         Complaint[]
