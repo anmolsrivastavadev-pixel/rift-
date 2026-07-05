@@ -345,6 +345,23 @@ export default async function OpportunityDetailPage({
             </div>
           </section>
 
+          {/* M17 — compact next-step hint */}
+          <div className="rounded-2xl border border-[var(--color-primary)]/30 bg-[var(--color-primary)]/5 p-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-primary)]">
+              Next step
+            </p>
+            <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
+              Ask 3 people if they have this problem. Then mark this idea in{" "}
+              <Link
+                href={projectHref("/dashboard/opportunities/decision-board", project.id)}
+                className="font-medium text-[var(--color-primary)] hover:underline"
+              >
+                Compare Ideas
+              </Link>
+              .
+            </p>
+          </div>
+
           <div className="flex items-center gap-2 text-xs text-[var(--color-muted-foreground)]">
             <CheckCircle2 className="h-3.5 w-3.5 text-[var(--color-success)]" />
             Created {op.createdAt.toLocaleDateString()}

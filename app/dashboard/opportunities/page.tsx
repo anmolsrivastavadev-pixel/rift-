@@ -22,7 +22,7 @@ export default async function OpportunitiesPage({
     firstParam((await searchParams).projectId),
     user
   );
-  const [ops, savedRows] = await Promise.all([
+  const [ops, savedRows, complaintCount] = await Promise.all([
     prisma.opportunity.findMany({
       where: { userId: user.id, projectId: project.id },
       orderBy: { opportunityScore: "desc" },
@@ -31,6 +31,9 @@ export default async function OpportunitiesPage({
     prisma.savedOpportunity.findMany({
       where: { userId: user.id, projectId: project.id },
       select: { opportunityId: true },
+    }),
+    prisma.complaint.count({
+      where: { userId: user.id, projectId: project.id },
     }),
   ]);
 
@@ -72,15 +75,43 @@ export default async function OpportunitiesPage({
         </Button>
       </div>
 
-      <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)]">
-        <h2 className="text-base font-semibold">Find ideas</h2>
-        <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
-          Turn this project’s complaints into scored ideas.
-        </p>
-        <div className="mt-4">
-          <RunOpportunitiesButton projectId={project.id} />
-        </div>
-      </section>
+      {/* M17 — one clear next step per state: no complaints → add them first;
+          no ideas yet → prominent Find ideas; ideas exist → quiet rerun. */}
+      {complaintCount === 0 ? (
+        <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)]">
+          <h2 className="text-base font-semibold">Add complaints first</h2>
+          <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
+            Add complaints to find business ideas.
+          </p>
+          <Button asChild className="mt-4">
+            <Link href={projectHref("/dashboard/complaints", project.id)}>
+              Add complaints
+            </Link>
+          </Button>
+        </section>
+      ) : ops.length === 0 ? (
+        <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)]">
+          <h2 className="text-base font-semibold">Find ideas</h2>
+          <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
+            Rift will use {complaintCount} complaint{complaintCount === 1 ? "" : "s"} from
+            this project.
+          </p>
+          <div className="mt-4">
+            <RunOpportunitiesButton projectId={project.id} />
+          </div>
+        </section>
+      ) : (
+        <details className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)]/60 p-5">
+          <summary className="cursor-pointer text-sm font-semibold">Run again</summary>
+          <p className="mt-2 text-xs text-[var(--color-muted-foreground)]">
+            Replaces the current ideas. Rift will use {complaintCount} complaint
+            {complaintCount === 1 ? "" : "s"} from this project.
+          </p>
+          <div className="mt-4">
+            <RunOpportunitiesButton projectId={project.id} />
+          </div>
+        </details>
+      )}
 
       <OpportunityBrowser opportunities={cards} projectId={project.id} />
     </div>

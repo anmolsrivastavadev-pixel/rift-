@@ -180,6 +180,8 @@ Rift now has auth and project-scoped market tests:
 
 All application reads/writes for complaints, opportunities, and saved opportunities must filter by both `userId` and the selected `projectId`. Legacy rows with `userId = null` are left alone by the M16A backfill. Import and AI-run history (M16D) is queried the same way — always by `userId` + `projectId`. History survives archive/restore; M16B3 permanent delete removes it with the project; Start Fresh keeps it as a record of past work.
 
+First-run onboarding (M17) is a compact "Start your market test" card on the dashboard home whose progress is inferred from existing data only (complaints → ideas → saved/decision/checklist progress); it stores nothing and disappears once the user has real progress. Empty states point to exactly one next action per page.
+
 Validation Workspace state (testing checklist + decision status) is database-backed since M16C: pages load it server-side and pass it into the client components, writes go through `actions/validation.ts` (checklist writes are debounced client-side). localStorage is used ONLY by the one-time migrator (`components/dashboard/validation-state-migrator.tsx`), which copies old `rift-opportunity-decision-*` / `rift-validation-checklist-*` keys into the DB on first dashboard load per user per browser — inserting only rows that don't exist yet, never overwriting database data.
 
 ---

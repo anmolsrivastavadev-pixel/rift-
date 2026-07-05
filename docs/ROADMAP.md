@@ -246,27 +246,33 @@ The Start Fresh Test patch addresses workspace-mixing confusion:
 - **Important behavior:** Rerunning ideas is the existing "Find ideas" button — each click records a new `AIRun`, and the pipeline's existing replace-on-rerun behavior (delete this project's old opportunities, regenerate) is unchanged. Archive/restore preserves history (rows are untouched by `archivedAt`). Start Fresh still clears only complaints/opportunities/saved ideas — history rows remain as a record of past work. All history queries filter by both `userId` and `projectId`.
 - **Not included:** No file storage or original-file downloads, no run comparison/diffing, no restoring old runs, no version control, no analytics dashboards, no notifications, no new dependencies, no Gemini prompt/scoring/cleaning/parsing changes, no auth or archive/delete behavior changes beyond the delete transaction covering history.
 
+### M17 — Beginner onboarding + first-run flow
+- **Status:** ✅ Done
+- **Purpose:** Give a first-time user one obvious path: add complaints → find ideas → pick one to test, without adding clutter or a new onboarding system.
+- **What was built:** `components/dashboard/onboarding-card.tsx` — a compact "Start your market test" card on the dashboard home with three steps (Add complaints / Find ideas / Pick one to test), each with a done/active state and one clear action button; it REPLACES the two old dashed empty-state blocks and hides itself once the project has complaints, ideas, and any testing progress. Progress is inferred entirely from existing data (complaint count, opportunity count, saved ideas, decisions, checklist ticks from `ValidationWorkspace`) — no new model, nothing stored, no localStorage. Ideas page now shows one state-appropriate action: "Add complaints first" when the project is empty, a prominent "Find ideas — Rift will use N complaints from this project." when there are complaints but no ideas, and a collapsed "Run again" (with honest replace warning) once ideas exist. Complaints page subtitle clarified ("Add real complaints, reviews, or support messages. Rift will look for repeated problems."). Idea detail page gained a compact sidebar "Next step" hint linking to Compare Ideas. All links preserve `projectId` via `projectHref`.
+- **Not included:** No new Prisma model, no localStorage product data, no billing/teams/scraping/notifications/sharing/analytics dashboards, no new dependencies, no Gemini prompt/scoring/cleaning/parsing changes, no auth or history behavior changes.
+
 ---
 
 ## Future / post-MVP milestones (not started)
 
 Do **not** start any of these without an explicit user prompt. They appear here only for visibility.
 
-> Note: M7–M16D are complete — see "Completed milestones" above. The items below are future work and must not be started without an explicit user prompt.
+> Note: M7–M17 are complete — see "Completed milestones" above. The items below are future work and must not be started without an explicit user prompt.
 
-### M17 — Comparison & multi-opportunity tools
-- Side-by-side comparison view for 2–3 opportunities; export to PDF/CSV.
+### Future — PDF/CSV export of comparisons
+- Side-by-side comparison export to PDF/CSV. (Markdown export shipped in M18.)
 
-### M18 — Notification & in-app messaging
+### Future — Notification & in-app messaging
 - Server-side status when long jobs complete; optional email digest.
 
-### M19 — Multi-source ingestion / scraping (if explicitly approved)
+### Future — Multi-source ingestion / scraping (if explicitly approved)
 - Auto-pull complaints from review sites, app stores, forums. **Out of scope for MVP** — must not be added automatically.
 
-### M20 — Light mode + theming
+### Future — Light mode + theming
 - Toggle light/dark; persist preference locally. Pure UX; no schema changes.
 
-### M21 — Prompt experimentation
+### Future — Prompt experimentation
 - A/B different Gemini prompts and track quality. **Must not change the production prompt or scoring weights without explicit sign-off.**
 
 ---

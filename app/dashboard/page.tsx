@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, FileText, Target, Users, Bookmark, Trophy, Briefcase } from "lucide-react";
+import { Target, Users, Bookmark, Trophy, Briefcase } from "lucide-react";
 
 import { prisma } from "@/lib/db";
 import { StatCard } from "@/components/dashboard/stat-card";
@@ -13,7 +13,7 @@ import {
 } from "@/components/dashboard/founder-command-client";
 import { isValidDecisionStatus } from "@/lib/decision-board";
 import { ProjectHistory } from "@/components/dashboard/project-history";
-import { Button } from "@/components/ui/button";
+import { OnboardingCard } from "@/components/dashboard/onboarding-card";
 import type { DashboardStats } from "@/lib/dashboard-plan";
 import { requireUser } from "@/lib/auth/current-user";
 import { getProjectOrDefault, projectHref } from "@/lib/projects";
@@ -110,7 +110,7 @@ export default async function DashboardPage({
     ids.length
       ? prisma.validationWorkspace.findMany({
           where: { userId: user.id, opportunityId: { in: ids } },
-          select: { decisionStatus: true },
+          select: { decisionStatus: true, validationChecklist: true },
         })
       : Promise.resolve([]),
     prisma.complaintImport.findMany({
@@ -147,6 +147,14 @@ export default async function DashboardPage({
   }
   decisionCounts.undecided =
     ids.length - decisionCounts.pursue - decisionCounts.park - decisionCounts.reject;
+
+  // M17 — onboarding progress inferred from existing data: any decision,
+  // saved idea, or ticked checklist item counts as testing progress.
+  const decided = decisionCounts.pursue + decisionCounts.park + decisionCounts.reject;
+  const hasChecklistProgress = workspaces.some(
+    (w) => Array.isArray(w.validationChecklist) && w.validationChecklist.some(Boolean)
+  );
+  const hasTestingProgress = decided > 0 || savedCount > 0 || hasChecklistProgress;
 
   const projectId = project.id;
 
@@ -188,43 +196,13 @@ export default async function DashboardPage({
         />
       </div>
 
-      {/* Empty state: no complaints */}
-      {complaintCount === 0 ? (
-        <div className="rounded-2xl border border-dashed border-[var(--color-border)] bg-[var(--color-card)] p-12 text-center shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)] transition-all duration-150 ease-out hover:shadow-[0_4px_12px_0_rgb(0_0_0_/_0.06),0_2px_4px_-2px_rgb(0_0_0_/_0.04)]">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--color-surface)] ring-1 ring-[var(--color-border)]">
-            <FileText className="h-6 w-6 text-[var(--color-muted-foreground)]" />
-          </div>
-          <h2 className="mt-4 text-base font-semibold">
-            No complaints yet
-          </h2>
-          <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
-            Add data to find your first ideas.
-          </p>
-          <Button asChild className="mt-4">
-            <Link href={projectHref("/dashboard/complaints", projectId)}>
-              Add data <ArrowRight className="h-4 w-4" />
-            </Link>
-          </Button>
-        </div>
-      ) : opportunityCount === 0 ? (
-        /* Empty state: complaints but no opportunities */
-        <div className="rounded-2xl border border-dashed border-[var(--color-border)] bg-[var(--color-card)] p-12 text-center shadow-[0_1px_3px_0_rgb(0_0_0/_0.04),0_1px_2px_-1px_rgb(0_0_0/_0.06)] transition-all duration-150 ease-out hover:shadow-[0_4px_12px_0_rgb(0_0_0/_0.06),0_2px_4px_-2px_rgb(0_0_0/_0.04)]">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--color-primary-soft)] ring-1 ring-[var(--color-primary)]/10">
-            <Target className="h-6 w-6 text-[var(--color-primary)]" />
-          </div>
-          <h2 className="mt-4 text-base font-semibold">
-            Ready to generate business ideas
-          </h2>
-          <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
-            Find ideas from the complaints in this project.
-          </p>
-          <Button asChild className="mt-4">
-            <Link href={projectHref("/dashboard/opportunities", projectId)}>
-              Find ideas <ArrowRight className="h-4 w-4" />
-            </Link>
-          </Button>
-        </div>
-      ) : null}
+      {/* M17 — first-run onboarding: one card, one clear next action.
+          Replaces the old pair of dashed empty-state blocks. Hidden once the
+          user has complaints, ideas, and any testing progress. */}
+      <OnboardingCard
+        state={{ complaintCount, opportunityCount, hasTestingProgress }}
+        projectId={projectId}
+      />
 
       {/* Workflow + next action + decision snapshot (DB-backed since M16C) */}
       <FounderCommandClient

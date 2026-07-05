@@ -26,7 +26,8 @@ export default async function ComplaintsPage({
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Complaints</h1>
         <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
-          Add complaints, reviews, or support notes. Rift uses them to find ideas.
+          Add real complaints, reviews, or support messages. Rift will look for
+          repeated problems.
         </p>
         <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
           Project: <span className="font-medium text-[var(--color-foreground)]">{project.name}</span>
