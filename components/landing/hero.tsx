@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Maximize2, Minimize2, Pause, Play } from "lucide-react";
+import { ArrowRight, Maximize2, Minimize2, Pause, Play, Volume2, VolumeX } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 import { Container } from "@/components/container";
 import { Button } from "@/components/ui/button";
@@ -32,6 +32,7 @@ export function Hero() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isFull, setIsFull] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const reduceMotion = useReducedMotion();
@@ -84,6 +85,15 @@ export function Hero() {
     } else {
       v.pause();
     }
+  }
+
+  // The demo autoplays muted (browsers require it); this lets the visitor
+  // opt into the soundtrack.
+  function toggleMute() {
+    const v = videoRef.current;
+    if (!v) return;
+    v.muted = !v.muted;
+    setIsMuted(v.muted);
   }
 
   return (
@@ -249,6 +259,18 @@ export function Hero() {
               <span className="shrink-0 text-[11px] tabular-nums text-white/85">
                 {formatTime(currentTime)} / {formatTime(duration)}
               </span>
+              <button
+                type="button"
+                onClick={toggleMute}
+                aria-label={isMuted ? "Unmute demo" : "Mute demo"}
+                className="shrink-0 rounded-lg p-1.5 text-[var(--color-foreground)] transition-colors duration-150 ease-out hover:bg-[var(--color-surface)] active:scale-[0.95]"
+              >
+                {isMuted ? (
+                  <VolumeX className="h-4 w-4" aria-hidden />
+                ) : (
+                  <Volume2 className="h-4 w-4" aria-hidden />
+                )}
+              </button>
               <button
                 type="button"
                 onClick={toggleFullscreen}
