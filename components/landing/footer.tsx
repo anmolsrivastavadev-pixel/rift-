@@ -52,7 +52,7 @@ export function Footer() {
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               <Button asChild size="sm" className="rounded-full px-4">
-                <Link href="/dashboard">Start free</Link>
+                <Link href="/sign-up">Start free</Link>
               </Button>
               <Button asChild variant="secondary" size="sm" className="rounded-full px-4">
                 <Link href="/pricing">View pricing</Link>

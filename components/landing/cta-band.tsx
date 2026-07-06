@@ -37,7 +37,7 @@ export function CtaBand() {
         </div>
         <Link
           href="/sign-up"
-          className="inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-full bg-[var(--color-primary)] px-7 text-base font-medium text-white shadow-md transition-all duration-150 ease-out hover:brightness-110 hover:shadow-lg active:scale-[0.97]"
+          className="inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-full bg-[var(--color-primary-fill)] px-7 text-base font-medium text-white shadow-md transition-all duration-150 ease-out hover:brightness-110 hover:shadow-lg active:scale-[0.97]"
         >
           Sign up now <ArrowRight className="h-4 w-4" aria-hidden />
         </Link>

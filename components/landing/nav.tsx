@@ -3,6 +3,7 @@ import { ArrowUpRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { RiftMark } from "@/components/logo";
+import { MobileMenu } from "@/components/landing/mobile-menu";
 
 const navLinks = [
   { href: "/#how-it-works", label: "How it works" },
@@ -18,7 +19,7 @@ const navLinks = [
 export function LandingNav() {
   return (
     <header className="sticky top-0 z-50 px-4 pt-3">
-      <div className="mx-auto flex h-14 w-full max-w-5xl items-center justify-between rounded-2xl border border-[var(--color-border)] bg-[#0a0a0a]/85 px-3 pl-4 shadow-[var(--shadow-elevated)] backdrop-blur-xl">
+      <div className="relative mx-auto flex h-14 w-full max-w-5xl items-center justify-between rounded-2xl border border-[var(--color-border)] bg-[#0a0a0a]/85 px-3 pl-4 shadow-[var(--shadow-elevated)] backdrop-blur-xl">
         <Link
           href="/"
           className="flex items-center gap-2 text-base font-semibold tracking-tight"
@@ -40,7 +41,7 @@ export function LandingNav() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <Button asChild variant="ghost" size="sm">
+          <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
             <Link href="/sign-in">Sign in</Link>
           </Button>
           <Button asChild size="sm" className="rounded-full px-4">
@@ -48,6 +49,7 @@ export function LandingNav() {
               Get started <ArrowUpRight className="h-3.5 w-3.5" />
             </Link>
           </Button>
+          <MobileMenu links={navLinks} />
         </div>
       </div>
     </header>

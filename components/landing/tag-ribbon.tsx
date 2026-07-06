@@ -16,14 +16,14 @@ const tags = [
   "customer quotes",
 ];
 
-/* Chips cycle through the brand accents (blue, green, amber, neutral) so the
- * ribbon reads as a living mix instead of a single-color strip.
+/* Mostly-neutral chips with an occasional blue one — green/amber stay
+ * reserved for semantic states (scores, warnings) elsewhere on the page.
  */
 const chipStyles = [
   "border-[var(--color-primary)]/30 bg-[var(--color-primary-soft)] text-[#a9c7fb]",
-  "border-[var(--color-success)]/30 bg-[var(--color-success-soft)] text-[#a7e8bc]",
   "border-[var(--color-border)] bg-[var(--color-card)] text-[var(--color-muted-foreground)]",
-  "border-[var(--color-warning)]/30 bg-[var(--color-warning-soft)] text-[#f4cf92]",
+  "border-[var(--color-border)] bg-[var(--color-card)] text-[var(--color-muted-foreground)]",
+  "border-[var(--color-border)] bg-[var(--color-card)] text-[var(--color-muted-foreground)]",
 ];
 
 function Row({ reverse }: { reverse?: boolean }) {

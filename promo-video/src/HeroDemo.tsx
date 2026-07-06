@@ -3,11 +3,11 @@ import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } fr
 import { FONT } from "./theme";
 
 /* HeroDemo — a looping in-page demo for the landing hero's product window.
- * Recreates the static "research cockpit" mock from components/landing/hero.tsx
- * and animates it: complaints stream in, a pattern is detected, confidence
- * counts up, signal bars grow, the top opportunity appears, Compare pulses.
- * 1040x1200 (same aspect ratio as the hero card), 30fps, ~19s, loop-safe
- * (content fades out at the end; the window chrome stays constant).
+ * Recreates the "research cockpit" mock from components/landing/hero.tsx and
+ * animates it like a real session: a scanning state, complaints streaming in,
+ * a detected pattern with counting confidence, growing signal bars, the top
+ * opportunity, and a cursor that moves in and clicks Compare.
+ * 1040x1200 (same aspect ratio as the hero card), 30fps, ~19s, loop-safe.
  */
 
 export const HERO_DEMO_DURATION = 570; // 19s @ 30fps
@@ -38,22 +38,27 @@ const inputs = ["Reviews", "Tickets", "Forums", "Calls"];
 
 // Timeline (frames)
 const T = {
-  quotes: [40, 85, 130], // each quote card
-  chips: 185,
-  pattern: 240,
-  signal: 330,
-  opportunity: 375,
-  footer: 440,
-  fadeOut: 545,
+  quotes: [48, 90, 132],
+  chips: 180,
+  pattern: 235,
+  signal: 320,
+  opportunity: 362,
+  footer: 425,
+  cursorIn: 448,
+  click: 500,
+  fadeOut: 548,
 };
 
-function useRise(delay: number) {
+// Compare button center, in composition coordinates
+const COMPARE = { x: 905, y: 1122 };
+
+function useRise(delay: number, distance = 36) {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const p = spring({ frame: frame - delay, fps, config: { damping: 200 } });
   return {
     opacity: frame < delay ? 0 : p,
-    transform: `translateY(${(1 - p) * 36}px)`,
+    transform: `translateY(${(1 - p) * distance}px)`,
   };
 }
 
@@ -64,6 +69,72 @@ function Label({ color, children }: { color: string; children: React.ReactNode }
     </div>
   );
 }
+
+/* "Scanning reviews" indicator shown before the first complaint arrives. */
+const Scanning: React.FC = () => {
+  const frame = useCurrentFrame();
+  const opacity = interpolate(frame, [4, 14, 36, 46], [0, 1, 1, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  return (
+    <div style={{ opacity, display: "flex", alignItems: "center", gap: 16, padding: "10px 6px" }}>
+      <div style={{ display: "flex", gap: 7 }}>
+        {[0, 1, 2].map((i) => (
+          <div
+            key={i}
+            style={{
+              width: 12,
+              height: 12,
+              borderRadius: "50%",
+              backgroundColor: C.primary,
+              opacity: 0.35 + 0.65 * Math.abs(Math.sin((frame - i * 5) / 8)),
+            }}
+          />
+        ))}
+      </div>
+      <div style={{ color: C.muted, fontSize: 23 }}>Scanning 24 reviews…</div>
+    </div>
+  );
+};
+
+/* White cursor that glides to the Compare button and presses it. */
+const Cursor: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const travel = spring({ frame: frame - T.cursorIn, fps, config: { damping: 60 } });
+  const x = interpolate(travel, [0, 1], [620, COMPARE.x - 6]);
+  const y = interpolate(travel, [0, 1], [820, COMPARE.y - 6]);
+  const opacity = interpolate(
+    frame,
+    [T.cursorIn, T.cursorIn + 12, T.fadeOut - 10, T.fadeOut],
+    [0, 1, 1, 0],
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+  );
+  const press = frame >= T.click && frame < T.click + 10 ? 0.82 : 1;
+  return (
+    <svg
+      width={44}
+      height={44}
+      viewBox="0 0 24 24"
+      style={{
+        position: "absolute",
+        left: x,
+        top: y,
+        opacity,
+        transform: `scale(${press})`,
+        filter: "drop-shadow(0 4px 14px rgba(0,0,0,0.7))",
+      }}
+    >
+      <path
+        d="M5.5 3.2l12.6 7.9-5.6 1.2-1.9 5.4L5.5 3.2z"
+        fill="#ffffff"
+        stroke="#0a0a0a"
+        strokeWidth={1.2}
+      />
+    </svg>
+  );
+};
 
 export const HeroDemo: React.FC = () => {
   const frame = useCurrentFrame();
@@ -80,23 +151,29 @@ export const HeroDemo: React.FC = () => {
       extrapolateRight: "clamp",
     })
   );
+  // Little pop when the confidence count lands on 92
+  const confidencePop =
+    1 + 0.12 * Math.max(0, spring({ frame: frame - (T.pattern + 55), fps, config: { damping: 12 } }) -
+      spring({ frame: frame - (T.pattern + 63), fps, config: { damping: 12 } }));
+
   const signalPct = Math.round(
     interpolate(frame, [T.signal + 5, T.signal + 50], [0, 38], {
       extrapolateLeft: "clamp",
       extrapolateRight: "clamp",
     })
   );
-  const pulse = 1 + 0.03 * Math.sin(Math.max(0, frame - T.footer - 20) / 9);
+
+  const clicked = frame >= T.click + 4;
+  const comparePress = frame >= T.click && frame < T.click + 8 ? 0.94 : 1;
 
   const patternStyle = useRise(T.pattern);
   const q0 = useRise(T.quotes[0]);
   const q1 = useRise(T.quotes[1]);
   const q2 = useRise(T.quotes[2]);
   const quoteStyles = [q0, q1, q2];
-  const chipsStyle = useRise(T.chips);
   const signalStyle = useRise(T.signal);
   const oppStyle = useRise(T.opportunity);
-  const footerStyle = useRise(T.footer);
+  const footerStyle = useRise(T.footer, 20);
 
   return (
     <AbsoluteFill style={{ backgroundColor: C.window, fontFamily: FONT }}>
@@ -146,6 +223,8 @@ export const HeroDemo: React.FC = () => {
 
         {/* Main panel */}
         <div style={{ flex: 1, padding: 30, display: "flex", flexDirection: "column", gap: 22, opacity: contentOpacity }}>
+          {frame < 50 && <Scanning />}
+
           {/* Pattern detected */}
           <div
             style={{
@@ -154,7 +233,7 @@ export const HeroDemo: React.FC = () => {
               backgroundColor: "rgba(59,130,246,0.05)",
               borderRadius: 22,
               padding: "26px 30px",
-              display: "flex",
+              display: frame < T.pattern ? "none" : "flex",
               justifyContent: "space-between",
               alignItems: "flex-start",
               gap: 20,
@@ -176,6 +255,7 @@ export const HeroDemo: React.FC = () => {
                 fontSize: 23,
                 fontWeight: 600,
                 whiteSpace: "nowrap",
+                transform: `scale(${confidencePop})`,
               }}
             >
               {confidence} confidence
@@ -201,22 +281,27 @@ export const HeroDemo: React.FC = () => {
             </div>
           ))}
 
-          {/* Tag chips */}
-          <div style={{ ...chipsStyle, display: "flex", gap: 12 }}>
-            {chips.map((chip) => (
-              <div
-                key={chip}
-                style={{
-                  border: `2px solid ${C.border}`,
-                  borderRadius: 999,
-                  padding: "9px 20px",
-                  color: C.muted,
-                  fontSize: 21,
-                }}
-              >
-                {chip}
-              </div>
-            ))}
+          {/* Tag chips, each popping in on its own spring */}
+          <div style={{ display: "flex", gap: 12 }}>
+            {chips.map((chip, i) => {
+              const pop = spring({ frame: frame - (T.chips + i * 9), fps, config: { damping: 14 } });
+              return (
+                <div
+                  key={chip}
+                  style={{
+                    opacity: frame < T.chips + i * 9 ? 0 : Math.min(1, pop * 1.4),
+                    transform: `scale(${0.6 + 0.4 * pop})`,
+                    border: `2px solid ${C.border}`,
+                    borderRadius: 999,
+                    padding: "9px 20px",
+                    color: C.muted,
+                    fontSize: 21,
+                  }}
+                >
+                  {chip}
+                </div>
+              );
+            })}
           </div>
 
           {/* Signal strength + top opportunity */}
@@ -240,14 +325,14 @@ export const HeroDemo: React.FC = () => {
                   const grow = spring({
                     frame: frame - (T.signal + 10 + i * 5),
                     fps,
-                    config: { damping: 200 },
+                    config: { damping: 16 },
                   });
                   return (
                     <div
                       key={i}
                       style={{
                         flex: 1,
-                        height: `${h * grow}%`,
+                        height: `${h * Math.min(1.06, grow)}%`,
                         borderRadius: "6px 6px 2px 2px",
                         background: "linear-gradient(to top, rgba(37,99,235,0.55), #3b82f6)",
                       }}
@@ -289,12 +374,12 @@ export const HeroDemo: React.FC = () => {
             <div style={{ color: C.muted, fontSize: 22 }}>3 idea candidates</div>
             <div
               style={{
-                transform: `scale(${pulse})`,
-                border: "2px solid rgba(59,130,246,0.4)",
-                backgroundColor: C.primarySoft,
+                transform: `scale(${comparePress})`,
+                border: `2px solid ${clicked ? C.primary : "rgba(59,130,246,0.4)"}`,
+                backgroundColor: clicked ? C.primary : C.primarySoft,
                 borderRadius: 16,
                 padding: "12px 34px",
-                color: C.primary,
+                color: clicked ? "#ffffff" : C.primary,
                 fontSize: 23,
                 fontWeight: 600,
               }}
@@ -303,6 +388,10 @@ export const HeroDemo: React.FC = () => {
             </div>
           </div>
         </div>
+      </div>
+
+      <div style={{ position: "absolute", inset: 0, opacity: contentOpacity }}>
+        <Cursor />
       </div>
     </AbsoluteFill>
   );

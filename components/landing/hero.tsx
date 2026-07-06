@@ -1,8 +1,9 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
-import { motion } from "framer-motion";
+import { ArrowRight, Maximize2, Minimize2, Pause, Play } from "lucide-react";
+import { motion, useReducedMotion } from "framer-motion";
 import { Container } from "@/components/container";
 import { Button } from "@/components/ui/button";
 
@@ -19,6 +20,52 @@ const metaChips = [
 ];
 
 export function Hero() {
+  const videoWrapRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [isFull, setIsFull] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const reduceMotion = useReducedMotion();
+
+  // Reduced-motion users get the poster frame, not an autoplaying loop;
+  // the play button stays available if they want the demo. State is synced
+  // via the video's onPlay/onPause events.
+  useEffect(() => {
+    if (reduceMotion) {
+      videoRef.current?.pause();
+    }
+  }, [reduceMotion]);
+
+  // Keep state in sync when the user exits with Esc instead of the button.
+  useEffect(() => {
+    const onChange = () => setIsFull(Boolean(document.fullscreenElement));
+    document.addEventListener("fullscreenchange", onChange);
+    return () => document.removeEventListener("fullscreenchange", onChange);
+  }, []);
+
+  async function toggleFullscreen() {
+    const el = videoWrapRef.current;
+    if (!el) return;
+    try {
+      if (document.fullscreenElement) {
+        await document.exitFullscreen();
+      } else {
+        await el.requestFullscreen();
+      }
+    } catch {
+      // Fullscreen unsupported or blocked: leave the inline video as is.
+    }
+  }
+
+  function togglePlay() {
+    const v = videoRef.current;
+    if (!v) return;
+    if (v.paused) {
+      void v.play();
+    } else {
+      v.pause();
+    }
+  }
+
   return (
     <section className="relative overflow-hidden">
       {/* Background tint: a deep navy wash over the whole hero plus a
@@ -51,25 +98,25 @@ export function Hero() {
         {/* Left — headline block */}
         <div className="text-left">
           <motion.p
-            initial={{ opacity: 0, y: 8 }}
+            initial={{ opacity: 0, y: reduceMotion ? 0 : 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35, ease: "easeOut" }}
-            className="text-[12px] font-bold uppercase tracking-[0.2em] text-[var(--color-primary)]"
+            className="text-[12px] font-bold uppercase tracking-[0.08em] text-[var(--color-muted-foreground)]"
           >
-            Rift · Idea research from customer pain
+            Idea research from customer pain
           </motion.p>
 
           <motion.h1
-            initial={{ opacity: 0, y: 12 }}
+            initial={{ opacity: 0, y: reduceMotion ? 0 : 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, ease: "easeOut", delay: 0.05 }}
-            className="mt-5 text-5xl font-extrabold leading-[0.95] tracking-tight text-[var(--color-foreground)] sm:text-6xl xl:text-[5rem]"
+            className="mt-5 text-5xl font-extrabold leading-none tracking-tight text-[var(--color-foreground)] sm:text-6xl xl:text-[5rem]"
           >
             Turn complaints into business ideas worth testing.
           </motion.h1>
 
           <motion.p
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: reduceMotion ? 0 : 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, ease: "easeOut", delay: 0.1 }}
             className="mt-6 max-w-md text-lg leading-relaxed text-[var(--color-muted-foreground)]"
@@ -79,13 +126,13 @@ export function Hero() {
           </motion.p>
 
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: reduceMotion ? 0 : 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, ease: "easeOut", delay: 0.15 }}
             className="mt-8 flex flex-wrap items-center gap-3"
           >
             <Button asChild size="lg" className="rounded-lg px-6">
-              <Link href="/dashboard">
+              <Link href="/sign-up">
                 Start with a market <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>
@@ -113,22 +160,59 @@ export function Hero() {
 
         {/* Right — research-cockpit demo video (Remotion) */}
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
+          initial={{ opacity: 0, y: reduceMotion ? 0 : 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: "easeOut", delay: 0.2 }}
         >
-          <div className="overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] shadow-[var(--shadow-elevated)]">
+          <div
+            ref={videoWrapRef}
+            className={`relative overflow-hidden border border-[var(--color-border)] shadow-[var(--shadow-elevated)] ${
+              isFull
+                ? "flex items-center justify-center rounded-none bg-black"
+                : "rounded-2xl bg-[var(--color-card)]"
+            }`}
+          >
             <video
+              ref={videoRef}
               autoPlay
               loop
               muted
               playsInline
+              onPlay={() => setIsPaused(false)}
+              onPause={() => setIsPaused(true)}
               poster="/hero-demo-poster.jpg"
               aria-label="Demo of Rift grouping complaints into a scored idea"
-              className="block h-auto w-full"
+              className={isFull ? "block h-full max-w-full" : "block h-auto w-full"}
             >
               <source src="/hero-demo.mp4" type="video/mp4" />
             </video>
+            {/* Minimal control strip, styled like native video controls */}
+            <div className="absolute bottom-3 right-3 flex items-center gap-0.5 rounded-xl border border-[var(--color-border)] bg-black/75 p-1 opacity-85 backdrop-blur-sm transition-opacity duration-150 ease-out hover:opacity-100">
+              <button
+                type="button"
+                onClick={togglePlay}
+                aria-label={isPaused ? "Play demo" : "Pause demo"}
+                className="rounded-lg p-2 text-[var(--color-foreground)] transition-colors duration-150 ease-out hover:bg-[var(--color-surface)] active:scale-[0.95]"
+              >
+                {isPaused ? (
+                  <Play className="h-4 w-4" aria-hidden />
+                ) : (
+                  <Pause className="h-4 w-4" aria-hidden />
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={toggleFullscreen}
+                aria-label={isFull ? "Exit full screen" : "View full screen"}
+                className="rounded-lg p-2 text-[var(--color-foreground)] transition-colors duration-150 ease-out hover:bg-[var(--color-surface)] active:scale-[0.95]"
+              >
+                {isFull ? (
+                  <Minimize2 className="h-4 w-4" aria-hidden />
+                ) : (
+                  <Maximize2 className="h-4 w-4" aria-hidden />
+                )}
+              </button>
+            </div>
           </div>
         </motion.div>
       </Container>

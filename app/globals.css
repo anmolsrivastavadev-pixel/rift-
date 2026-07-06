@@ -11,10 +11,13 @@
   --color-card: #0a0a0a;
   --color-border: #242424;
   --color-foreground: #ffffff;
-  --color-muted-foreground: #737373;
+  --color-muted-foreground: #8a8a8a;
 
   /* Accents */
   --color-primary: #3b82f6;
+  /* Button/badge fill — darker than --color-primary so white label text
+     clears WCAG AA 4.5:1 (5.2:1 here vs 3.7:1 on #3b82f6) */
+  --color-primary-fill: #2563eb;
   --color-primary-soft: rgba(59, 130, 246, 0.12);
   --color-primary-foreground: #ffffff;
   --color-success: #22c55e;

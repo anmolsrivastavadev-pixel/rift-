@@ -63,7 +63,7 @@ export function HowItWorks() {
                 <span
                   className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${
                     s.highlight
-                      ? "bg-[var(--color-primary)] text-white"
+                      ? "bg-[var(--color-primary-fill)] text-white"
                       : "bg-[var(--color-primary-soft)] text-[var(--color-primary)] ring-1 ring-[var(--color-primary)]/20"
                   }`}
                 >

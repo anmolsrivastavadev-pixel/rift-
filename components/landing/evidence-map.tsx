@@ -42,7 +42,7 @@ export function EvidenceMap() {
           </p>
           <div className="mt-7 flex flex-wrap gap-3">
             <Button asChild className="rounded-full px-5">
-              <Link href="/dashboard">Run your complaints</Link>
+              <Link href="/sign-up">Run your complaints</Link>
             </Button>
             <Button asChild variant="secondary" className="rounded-full px-5">
               <Link href="/#faq">Read the FAQ</Link>
