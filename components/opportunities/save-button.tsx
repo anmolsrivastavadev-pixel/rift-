@@ -57,7 +57,7 @@ export function SaveButton({
         aria-pressed={isSaved}
         aria-label={isSaved ? "Remove from saved" : "Save opportunity"}
         title={isSaved ? "Remove from saved" : "Save opportunity"}
-        className={`group/inline-flex ${dim} items-center justify-center border transition-colors disabled:opacity-50 ${
+        className={`inline-flex ${dim} items-center justify-center border transition-colors disabled:opacity-50 ${
           isSaved
             ? "border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)]"
             : "border-[var(--color-border)] bg-[var(--color-background)] text-[var(--color-muted-foreground)] hover:border-[var(--color-primary)]/60 hover:text-[var(--color-primary)]"

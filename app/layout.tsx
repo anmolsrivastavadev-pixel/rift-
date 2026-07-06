@@ -8,7 +8,7 @@ const inter = Inter({
   display: "swap",
 });
 
-const title = "Rift — Turn complaints into business ideas";
+const title = "Rift | Turn complaints into business ideas";
 const description =
   "Type a market or paste real complaints. Rift finds repeated problems and turns them into ideas you can compare.";
 
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
     default: title,
-    template: "%s · Rift",
+    template: "%s | Rift",
   },
   description,
   openGraph: {

@@ -5,7 +5,7 @@ import { LandingNav } from "@/components/landing/nav";
 import { Footer } from "@/components/landing/footer";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy — Rift",
+  title: "Privacy Policy",
   description: "How Rift handles your account data and the complaints you import.",
 };
 

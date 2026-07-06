@@ -24,7 +24,7 @@ import {
 } from "@/components/billing/billing-buttons";
 
 export const metadata: Metadata = {
-  title: "Pricing — Rift",
+  title: "Pricing",
   description:
     "Rift is free to start. Pro is $9/month for more projects, idea runs, and Complaint Finder searches.",
 };

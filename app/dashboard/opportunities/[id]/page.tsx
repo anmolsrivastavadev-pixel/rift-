@@ -284,20 +284,9 @@ export default async function OpportunityDetailPage({
             <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">out of 100</p>
           </div>
 
-          {/* MiniStats */}
-          <div className="grid grid-cols-3 gap-2">
-            <MiniStat icon={Users} label="Complaints" value={op.mentions} />
-            <MiniStat
-              icon={AlertTriangle}
-              label="Severity"
-              value={op.severity !== null ? op.severity.toFixed(1) : "—"}
-            />
-            <MiniStat
-              icon={Target}
-              label="Confidence"
-              value={op.confidence !== null ? `${op.confidence}%` : "—"}
-            />
-          </div>
+          {/* M24 — MiniStats tile row removed: it duplicated the header
+              stats exactly (Complaints/Severity/Confidence) and added to the
+              reviewer-reported information overload. */}
 
           {/* Score Breakdown */}
           {bd?.subscores && (
@@ -451,24 +440,6 @@ function HeaderStat({
       </span>
       <span className="text-[10px] uppercase tracking-wide">{label}</span>
     </span>
-  );
-}
-
-function MiniStat({
-  icon: Icon,
-  label,
-  value,
-}: {
-  icon: React.ComponentType<{ className?: string }>;
-  label: string;
-  value: React.ReactNode;
-}) {
-  return (
-    <div className="flex flex-col items-center rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-3 text-center shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)]">
-      <Icon className="h-3.5 w-3.5 text-[var(--color-muted-foreground)]" />
-      <span className="mt-1 text-sm font-medium">{value}</span>
-      <span className="text-[10px] text-[var(--color-muted-foreground)]">{label}</span>
-    </div>
   );
 }
 

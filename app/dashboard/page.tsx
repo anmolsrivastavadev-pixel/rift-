@@ -252,8 +252,16 @@ export default async function DashboardPage({
         />
       )}
 
-      {/* M16D — what data was added + when ideas were generated */}
-      <ProjectHistory imports={recentImports} runs={recentRuns} />
+      {/* M16D — what data was added + when ideas were generated.
+          M24 — collapsed by default: it's a log, not a decision surface. */}
+      {(recentImports.length > 0 || recentRuns.length > 0) && (
+        <details className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)]/60 p-5">
+          <summary className="cursor-pointer text-sm font-semibold">Recent activity</summary>
+          <div className="mt-4">
+            <ProjectHistory imports={recentImports} runs={recentRuns} />
+          </div>
+        </details>
+      )}
 
       {/* High-signal opportunities (only when they exist) */}
       {topOpportunities.length > 0 && (
@@ -311,38 +319,35 @@ export default async function DashboardPage({
         </section>
       )}
 
-      {/* Recent complaints (keep existing, only when complaints exist) */}
-      {complaintCount > 0 && (
-        <section>
-          <div className="flex items-center justify-between">
-            <h2 className="text-base font-semibold">Recent complaints</h2>
+      {/* Recent complaints — M24: collapsed by default (preview list; the
+          full list lives on the Complaints page). */}
+      {complaintCount > 0 && recent.length > 0 && (
+        <details className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)]/60 p-5">
+          <summary className="cursor-pointer text-sm font-semibold">
+            Recent complaints
+          </summary>
+          <ul className="mt-4 space-y-2">
+            {recent.map((c) => (
+              <li
+                key={c.id}
+                className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-4 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)] transition-all duration-150 ease-out hover:shadow-[0_4px_12px_0_rgb(0_0_0_/_0.06),0_2px_4px_-2px_rgb(0_0_0_/_0.04)]"
+              >
+                <p className="truncate text-sm font-medium">{c.title}</p>
+                <p className="mt-0.5 line-clamp-1 text-xs text-[var(--color-muted-foreground)]">
+                  {c.body}
+                </p>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-3">
             <Link
               href={projectHref("/dashboard/complaints", projectId)}
               className="text-sm text-[var(--color-primary)] transition-colors duration-150 ease-out hover:text-[var(--color-primary)]/70"
             >
               View all &rarr;
             </Link>
-          </div>
-          {recent.length === 0 ? (
-            <p className="mt-4 text-sm text-[var(--color-muted-foreground)]">
-              No complaints found.
-            </p>
-          ) : (
-            <ul className="mt-4 space-y-2">
-              {recent.map((c) => (
-                <li
-                  key={c.id}
-                  className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-4 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)] transition-all duration-150 ease-out hover:shadow-[0_4px_12px_0_rgb(0_0_0_/_0.06),0_2px_4px_-2px_rgb(0_0_0_/_0.04)]"
-                >
-                  <p className="truncate text-sm font-medium">{c.title}</p>
-                  <p className="mt-0.5 line-clamp-1 text-xs text-[var(--color-muted-foreground)]">
-                    {c.body}
-                  </p>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
+          </p>
+        </details>
       )}
     </div>
   );

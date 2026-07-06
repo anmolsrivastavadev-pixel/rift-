@@ -5,7 +5,7 @@ import { LandingNav } from "@/components/landing/nav";
 import { Footer } from "@/components/landing/footer";
 
 export const metadata: Metadata = {
-  title: "Terms of Service — Rift",
+  title: "Terms of Service",
   description: "The plain-English terms for using Rift.",
 };
 

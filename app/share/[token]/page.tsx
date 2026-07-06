@@ -15,7 +15,7 @@ import { PrintButton } from "@/components/reports/print-button";
  */
 
 export const metadata: Metadata = {
-  title: "Shared report — Rift",
+  title: "Shared report",
   robots: { index: false, follow: false },
 };
 
