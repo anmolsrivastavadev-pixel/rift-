@@ -7,9 +7,9 @@ import { Container } from "@/components/container";
 import { Button } from "@/components/ui/button";
 
 /* Hero — founder-approved "research cockpit" layout (July 2026 mockup):
- * huge left-aligned headline beside a browser-style product window built
- * entirely from styled divs. All window content is illustrative — no real
- * user data.
+ * huge left-aligned headline beside a looping Remotion demo video of the
+ * research cockpit (source composition: promo-video/src/HeroDemo.tsx,
+ * rendered to public/hero-demo.mp4 with a poster frame for slow loads).
  */
 
 const metaChips = [
@@ -17,18 +17,6 @@ const metaChips = [
   "No credit card required",
   "Works with 5–10 complaints",
 ];
-
-const inputs = ["Reviews", "Tickets", "Forums", "Calls"];
-
-const quotes = [
-  "“They never remind me about my appointment, so I just stopped going.”",
-  "“I can't tell what grooming will actually cost until I'm there.”",
-  "“Booked online and nobody ever confirmed it.”",
-];
-
-const chips = ["missed bookings", "unclear pricing", "no reminders"];
-
-const bars = [38, 55, 44, 70, 58, 86, 64];
 
 export function Hero() {
   return (
@@ -123,136 +111,24 @@ export function Hero() {
           </motion.div>
         </div>
 
-        {/* Right — research-cockpit window */}
+        {/* Right — research-cockpit demo video (Remotion) */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: "easeOut", delay: 0.2 }}
         >
-          <div className="overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] text-left shadow-[var(--shadow-elevated)]">
-            {/* Window chrome */}
-            <div className="flex h-11 items-center gap-3 border-b border-[var(--color-border)] px-4">
-              <div className="flex items-center gap-1.5" aria-hidden>
-                <span className="h-2.5 w-2.5 rounded-full bg-[var(--color-danger)]/60" />
-                <span className="h-2.5 w-2.5 rounded-full bg-[var(--color-warning)]/60" />
-                <span className="h-2.5 w-2.5 rounded-full bg-[var(--color-success)]/60" />
-              </div>
-              <p className="text-xs text-[var(--color-muted-foreground)]">
-                rift.app/ideas/new
-              </p>
-            </div>
-
-            <div className="flex">
-              {/* Inputs sidebar */}
-              <div className="hidden w-36 shrink-0 border-r border-[var(--color-border)] p-3 sm:block">
-                <p className="px-3 pb-2 pt-1 text-xs font-semibold text-[var(--color-foreground)]">
-                  Inputs
-                </p>
-                {inputs.map((item) => (
-                  <div
-                    key={item}
-                    className={`mb-1 rounded-lg px-3 py-2 text-xs ${
-                      item === "Reviews"
-                        ? "bg-[var(--color-surface)] font-medium text-[var(--color-foreground)]"
-                        : "text-[var(--color-muted-foreground)]"
-                    }`}
-                  >
-                    {item}
-                  </div>
-                ))}
-              </div>
-
-              {/* Main panel */}
-              <div className="flex-1 space-y-3 p-4">
-                {/* Pattern detected */}
-                <div className="rounded-xl border border-[var(--color-primary)]/30 bg-[var(--color-primary)]/5 p-4">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--color-primary)]">
-                        Pattern detected
-                      </p>
-                      <p className="mt-1.5 text-sm font-semibold leading-snug text-[var(--color-foreground)]">
-                        Repeated booking friction
-                      </p>
-                    </div>
-                    <span className="shrink-0 rounded-full border border-[var(--color-primary)]/40 bg-[var(--color-primary-soft)] px-3 py-1 text-xs font-semibold text-[var(--color-primary)]">
-                      92 confidence
-                    </span>
-                  </div>
-                </div>
-
-                {/* Complaint quotes */}
-                {quotes.map((quote) => (
-                  <div
-                    key={quote}
-                    className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3"
-                  >
-                    <p className="text-[13px] leading-snug text-[var(--color-foreground)]/85">
-                      {quote}
-                    </p>
-                  </div>
-                ))}
-
-                {/* Tag chips */}
-                <div className="flex flex-wrap gap-1.5">
-                  {chips.map((chip) => (
-                    <span
-                      key={chip}
-                      className="rounded-full border border-[var(--color-border)] px-2.5 py-1 text-[11px] text-[var(--color-muted-foreground)]"
-                    >
-                      {chip}
-                    </span>
-                  ))}
-                </div>
-
-                {/* Signal strength + top opportunity */}
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--color-muted-foreground)]">
-                      Signal strength
-                    </p>
-                    <p className="mt-1 text-lg font-bold text-[var(--color-foreground)]">
-                      +38%
-                    </p>
-                    <div className="mt-3 flex h-16 items-end gap-1.5" aria-hidden>
-                      {bars.map((h, i) => (
-                        <div
-                          key={i}
-                          className="flex-1 rounded-t-sm"
-                          style={{
-                            height: `${h}%`,
-                            background:
-                              "linear-gradient(to top, rgba(37,99,235,0.55), #3b82f6)",
-                          }}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                  <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--color-primary)]">
-                      Top opportunity
-                    </p>
-                    <p className="mt-1 text-sm font-semibold leading-snug text-[var(--color-foreground)]">
-                      Booking reminders for groomers
-                    </p>
-                    <p className="mt-1.5 text-xs leading-relaxed text-[var(--color-muted-foreground)]">
-                      People want confirmations before they trust a salon
-                      again.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Footer row */}
-                <div className="flex items-center justify-between pt-1">
-                  <p className="text-xs text-[var(--color-muted-foreground)]">
-                    3 idea candidates
-                  </p>
-                  <span className="rounded-lg border border-[var(--color-primary)]/40 bg-[var(--color-primary-soft)] px-4 py-1.5 text-xs font-semibold text-[var(--color-primary)]">
-                    Compare
-                  </span>
-                </div>
-              </div>
-            </div>
+          <div className="overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] shadow-[var(--shadow-elevated)]">
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              poster="/hero-demo-poster.jpg"
+              aria-label="Demo of Rift grouping complaints into a scored idea"
+              className="block h-auto w-full"
+            >
+              <source src="/hero-demo.mp4" type="video/mp4" />
+            </video>
           </div>
         </motion.div>
       </Container>
