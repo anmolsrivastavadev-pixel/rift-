@@ -51,7 +51,7 @@ export function ProjectHistory({
   return (
     <section className="grid gap-4 lg:grid-cols-2">
       {imports.length > 0 && (
-        <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-5 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)]">
+        <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-5 shadow-[var(--shadow-card)]">
           <h3 className="flex items-center gap-2 text-sm font-semibold">
             <FileText className="h-4 w-4 text-[var(--color-primary)]" />
             Recent data
@@ -79,7 +79,7 @@ export function ProjectHistory({
       )}
 
       {runs.length > 0 && (
-        <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-5 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)]">
+        <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-5 shadow-[var(--shadow-card)]">
           <h3 className="flex items-center gap-2 text-sm font-semibold">
             <Sparkles className="h-4 w-4 text-[var(--color-primary)]" />
             Recent idea runs
@@ -94,7 +94,7 @@ export function ProjectHistory({
                         Found {run.outputOpportunityCount} idea{run.outputOpportunityCount === 1 ? "" : "s"}
                       </span>
                     ) : run.status === "failed" ? (
-                      <span className="text-[var(--color-danger)]">Failed — try again</span>
+                      <span className="text-[var(--color-danger)]">Failed. Try again</span>
                     ) : (
                       <span className="text-[var(--color-muted-foreground)]">Running…</span>
                     )}

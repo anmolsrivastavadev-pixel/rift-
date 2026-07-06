@@ -165,7 +165,7 @@ export default async function OpportunityDetailPage({
       </div>
 
       {/* Header */}
-      <header className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)]">
+      <header className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[var(--shadow-card)]">
         <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-[var(--color-muted-foreground)]">
           <Briefcase className="h-3.5 w-3.5" />
           {op.industry}
@@ -244,7 +244,7 @@ export default async function OpportunityDetailPage({
               The wedge/narrow entry point lives in the Market Gap Hypothesis
               section as "Product Angle" (productAngle) so the two never show
               the same content. suggestedSoftware is always non-null. */}
-          <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)]">
+          <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[var(--shadow-card)]">
             <h2 className="flex items-center gap-2 text-sm font-semibold">
               <Lightbulb className="h-4 w-4 text-[var(--color-warning)]" />
               Product Opportunity
@@ -274,7 +274,7 @@ export default async function OpportunityDetailPage({
         {/* RIGHT column — sticky on large screens */}
         <aside className="space-y-6 lg:sticky lg:top-6 lg:self-start">
           {/* Opportunity Score hero */}
-          <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)] text-center">
+          <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[var(--shadow-card)] text-center">
             <p className="text-xs uppercase tracking-wide text-[var(--color-muted-foreground)]">
               Opportunity score
             </p>
@@ -290,7 +290,7 @@ export default async function OpportunityDetailPage({
 
           {/* Score Breakdown */}
           {bd?.subscores && (
-            <details className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)]">
+            <details className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[var(--shadow-card)]">
               <summary className="cursor-pointer text-sm font-semibold">Score breakdown</summary>
               <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
                 Scores help sort ideas. They do not prove demand.
@@ -325,7 +325,7 @@ export default async function OpportunityDetailPage({
           )}
 
           {/* Related Opportunities */}
-          <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)]">
+          <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[var(--shadow-card)]">
             <h2 className="flex items-center gap-2 text-sm font-semibold">
               <Layers className="h-4 w-4 text-[var(--color-primary)]" />
               Related opportunities

@@ -53,8 +53,8 @@ export function OpportunityCard({
   return (
     <div
       className={
-        "group relative flex flex-col rounded-2xl border bg-[var(--color-card)] p-6 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)] " +
-        "transition-all duration-150 ease-out hover:-translate-y-0.5 hover:shadow-[0_4px_12px_0_rgb(0_0_0_/_0.06),0_2px_4px_-2px_rgb(0_0_0_/_0.04)] " +
+        "group relative flex flex-col rounded-2xl border bg-[var(--color-card)] p-6 shadow-[var(--shadow-card)] " +
+        "transition-all duration-150 ease-out hover:-translate-y-0.5 hover:shadow-[var(--shadow-card-hover)] " +
         (selected
           ? "border-[var(--color-primary)] ring-1 ring-[var(--color-primary)]/30"
           : "border-[var(--color-border)] hover:border-[var(--color-primary)]/40")

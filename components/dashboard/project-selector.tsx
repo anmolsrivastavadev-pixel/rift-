@@ -139,14 +139,14 @@ export function ProjectSelector({
           <button
             type="button"
             onClick={() => openForm("create")}
-            className="flex w-full items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs text-[var(--color-muted-foreground)] transition-colors hover:bg-[var(--color-card)]/60 hover:text-[var(--color-foreground)]"
+            className="flex w-full items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs text-[var(--color-muted-foreground)] transition-colors hover:bg-[var(--color-surface)] hover:text-[var(--color-foreground)]"
           >
             <Plus className="h-3.5 w-3.5" /> Create project
           </button>
           <button
             type="button"
             onClick={() => openForm("rename")}
-            className="flex w-full items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs text-[var(--color-muted-foreground)] transition-colors hover:bg-[var(--color-card)]/60 hover:text-[var(--color-foreground)]"
+            className="flex w-full items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs text-[var(--color-muted-foreground)] transition-colors hover:bg-[var(--color-surface)] hover:text-[var(--color-foreground)]"
           >
             <Pencil className="h-3.5 w-3.5" /> Rename project
           </button>
@@ -154,7 +154,7 @@ export function ProjectSelector({
             <button
               type="button"
               onClick={() => openForm("archive")}
-              className="flex w-full items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs text-[var(--color-muted-foreground)] transition-colors hover:bg-[var(--color-card)]/60 hover:text-[var(--color-foreground)]"
+              className="flex w-full items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs text-[var(--color-muted-foreground)] transition-colors hover:bg-[var(--color-surface)] hover:text-[var(--color-foreground)]"
             >
               <Archive className="h-3.5 w-3.5" /> Archive project
             </button>
@@ -175,7 +175,7 @@ export function ProjectSelector({
           <button
             type="button"
             onClick={() => setShowArchived((v) => !v)}
-            className="flex w-full items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs text-[var(--color-muted-foreground)] transition-colors hover:bg-[var(--color-card)]/60 hover:text-[var(--color-foreground)]"
+            className="flex w-full items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs text-[var(--color-muted-foreground)] transition-colors hover:bg-[var(--color-surface)] hover:text-[var(--color-foreground)]"
           >
             {showArchived ? (
               <ChevronDown className="h-3.5 w-3.5" />
@@ -409,7 +409,7 @@ function ArchivedProjectRow({
             <button
               type="submit"
               disabled={restorePending}
-              className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] text-[var(--color-primary)] transition-colors hover:bg-[var(--color-card)]/60 disabled:opacity-50"
+              className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] text-[var(--color-primary)] transition-colors hover:bg-[var(--color-surface)] disabled:opacity-50"
             >
               {restorePending ? (
                 <Loader2 className="h-3 w-3 animate-spin" />

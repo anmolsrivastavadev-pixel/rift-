@@ -51,7 +51,7 @@ export default function ForgotPasswordPage() {
           <div className="space-y-4 text-center">
             <p className="text-sm">
               If that email has an account, a reset link is on its way. Check
-              your inbox (and spam folder) — the link expires in 1 hour.
+              your inbox (and spam folder). The link expires in 1 hour.
             </p>
             <Button asChild variant="outline" className="w-full">
               <Link href="/sign-in">Back to sign in</Link>

@@ -85,7 +85,7 @@ function ProCta({ signedIn, plan }: { signedIn: boolean; plan: "free" | "pro" })
         Upgrade to Pro
       </Button>
       <p className="text-xs text-[var(--color-muted-foreground)]">
-        Payments coming soon — Rift is free during the private beta.
+        Payments coming soon. Rift is free during the private beta.
       </p>
     </div>
   );
@@ -115,9 +115,7 @@ export default async function PricingPage() {
           </div>
 
           <div className="mx-auto mt-12 grid max-w-3xl gap-6 sm:grid-cols-2">
-            {/* Card's default bg-white is a landing-era leftover — force the
-                dark theme card color so text stays readable. */}
-            <Card className="bg-[var(--color-card)]">
+            <Card>
               <CardHeader>
                 <CardTitle>Free</CardTitle>
                 <CardDescription>
@@ -154,7 +152,7 @@ export default async function PricingPage() {
               </CardContent>
             </Card>
 
-            <Card className="bg-[var(--color-card)] border-[var(--color-primary)] ring-1 ring-[var(--color-primary)]">
+            <Card className="border-[var(--color-primary)] ring-1 ring-[var(--color-primary)]">
               <CardHeader className="rounded-t-2xl bg-[var(--color-primary-soft)]">
                 <div className="flex items-center justify-between">
                   <CardTitle>Pro</CardTitle>
@@ -179,7 +177,7 @@ export default async function PricingPage() {
                     `${pro.finderSearchesPerMonth.toLocaleString("en-US")} Complaint Finder searches per month`,
                     `${pro.complaintsPerProject.toLocaleString("en-US")} complaints per project`,
                     "Everything in Free",
-                    "Cancel anytime — no lock-in",
+                    "Cancel anytime, no lock-in",
                   ]}
                 />
                 <ProCta signedIn={!!user} plan={effective?.plan ?? "free"} />

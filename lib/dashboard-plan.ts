@@ -67,7 +67,7 @@ export function computeNextAction(
 
   return {
     title: "Revisit your ideas",
-    description: "Nothing marked Pursue yet — compare again and pick one.",
+    description: "Nothing marked Pursue yet. Compare again and pick one.",
     cta: "Compare ideas",
     href: "/dashboard/opportunities/decision-board",
   };

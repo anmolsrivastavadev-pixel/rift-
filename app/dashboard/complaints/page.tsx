@@ -45,7 +45,7 @@ export default async function ComplaintsPage({
         </div>
       </section>
 
-      <details className="group rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)]/60 p-5">
+      <details className="group rounded-[12px] border border-[var(--color-border)] bg-[var(--color-surface)] p-5">
         <summary className="flex cursor-pointer select-none list-none items-center justify-between text-sm font-semibold text-[var(--color-foreground)] transition-colors duration-150 ease-out hover:text-[var(--color-primary)] [&::-webkit-details-marker]:hidden">
           Need examples?
           <ChevronDown className="h-4 w-4 shrink-0 text-[var(--color-muted-foreground)] transition-transform duration-150 ease-out group-open:rotate-180" />
@@ -55,7 +55,7 @@ export default async function ComplaintsPage({
         </div>
       </details>
 
-      <details className="group rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)]/60 p-5">
+      <details className="group rounded-[12px] border border-[var(--color-border)] bg-[var(--color-surface)] p-5">
         <summary className="flex cursor-pointer select-none list-none items-center justify-between text-sm font-semibold text-[var(--color-foreground)] transition-colors duration-150 ease-out hover:text-[var(--color-primary)] [&::-webkit-details-marker]:hidden">
           What should I paste?
           <ChevronDown className="h-4 w-4 shrink-0 text-[var(--color-muted-foreground)] transition-transform duration-150 ease-out group-open:rotate-180" />
@@ -66,7 +66,7 @@ export default async function ComplaintsPage({
         </div>
       </details>
 
-      <details className="group rounded-[12px] border border-dashed border-[var(--color-border)] bg-[var(--color-card)]/60 p-5">
+      <details className="group rounded-[12px] border border-dashed border-[var(--color-border)] bg-[var(--color-surface)] p-5">
         <summary className="flex cursor-pointer select-none list-none items-center justify-between text-sm font-semibold text-[var(--color-foreground)] transition-colors duration-150 ease-out hover:text-[var(--color-primary)] [&::-webkit-details-marker]:hidden">
           Start fresh
           <ChevronDown className="h-4 w-4 shrink-0 text-[var(--color-muted-foreground)] transition-transform duration-150 ease-out group-open:rotate-180" />

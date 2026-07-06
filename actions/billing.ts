@@ -20,7 +20,7 @@ import { getAppBaseUrl, getProPriceId, getStripe, isBillingEnabled } from "@/lib
 export type BillingActionResult = { ok: false; error: string };
 
 const BILLING_DISABLED_MESSAGE =
-  "Payments aren't live yet — Rift is free during the private beta.";
+  "Payments aren't live yet. Rift is free during the private beta.";
 
 async function getOrCreateStripeCustomerId(user: {
   id: string;

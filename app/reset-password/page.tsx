@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { authClient } from "@/lib/auth/client";
 import { Button } from "@/components/ui/button";
+import { PasswordInput } from "@/components/auth/password-input";
 
 /* M27 — set a new password. Better Auth's emailed link goes through
  * /api/auth/reset-password/:token and redirects here with ?token=... on
@@ -90,10 +91,10 @@ function ResetPasswordForm() {
         <label htmlFor="password" className="block text-sm font-medium">
           New password
         </label>
-        <input
+        <PasswordInput
           id="password"
-          type="password"
           required
+          autoComplete="new-password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           className="mt-1 block w-full rounded-[10px] border border-[var(--color-border)] bg-[var(--color-background)] px-3 py-2 text-sm text-[var(--color-foreground)] placeholder:text-[var(--color-muted-foreground)] outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]"
@@ -104,10 +105,10 @@ function ResetPasswordForm() {
         <label htmlFor="confirm" className="block text-sm font-medium">
           Confirm new password
         </label>
-        <input
+        <PasswordInput
           id="confirm"
-          type="password"
           required
+          autoComplete="new-password"
           value={confirm}
           onChange={(e) => setConfirm(e.target.value)}
           className="mt-1 block w-full rounded-[10px] border border-[var(--color-border)] bg-[var(--color-background)] px-3 py-2 text-sm text-[var(--color-foreground)] placeholder:text-[var(--color-muted-foreground)] outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]"

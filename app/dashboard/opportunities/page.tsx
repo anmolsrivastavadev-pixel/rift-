@@ -92,7 +92,7 @@ export default async function OpportunitiesPage({
       {/* M17 — one clear next step per state: no complaints → add them first;
           no ideas yet → prominent Find ideas; ideas exist → quiet rerun. */}
       {complaintCount === 0 ? (
-        <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)]">
+        <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[var(--shadow-card)]">
           <h2 className="text-base font-semibold">Add complaints first</h2>
           <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
             Add complaints to find business ideas.
@@ -104,7 +104,7 @@ export default async function OpportunitiesPage({
           </Button>
         </section>
       ) : ops.length === 0 ? (
-        <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)]">
+        <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[var(--shadow-card)]">
           <h2 className="text-base font-semibold">Find ideas</h2>
           <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
             Rift will use {complaintCount} complaint{complaintCount === 1 ? "" : "s"} from
@@ -116,7 +116,7 @@ export default async function OpportunitiesPage({
           </div>
         </section>
       ) : (
-        <details className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)]/60 p-5">
+        <details className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5">
           <summary className="cursor-pointer text-sm font-semibold">Run again</summary>
           <p className="mt-2 text-xs text-[var(--color-muted-foreground)]">
             Replaces the current ideas. Rift will use {complaintCount} complaint

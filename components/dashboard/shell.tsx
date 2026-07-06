@@ -111,8 +111,8 @@ export function DashboardShell({
             collapsed && !onNavigate ? "justify-center px-2" : ""
           } ${
             isActive
-              ? "bg-[var(--color-card)] text-[var(--color-foreground)] shadow-sm font-medium"
-              : "text-[var(--color-muted-foreground)] hover:bg-[var(--color-card)]/60 hover:text-[var(--color-foreground)]"
+              ? "bg-[var(--color-primary-soft)] text-[var(--color-foreground)] font-medium"
+              : "text-[var(--color-muted-foreground)] hover:bg-[var(--color-surface)] hover:text-[var(--color-foreground)]"
           }`}
         >
           <Icon className={`h-4 w-4 shrink-0 transition-colors duration-150 ease-out ${

@@ -145,7 +145,7 @@ export default async function BetaInsightsPage() {
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Beta insights</h1>
         <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
-          Private usage overview. Counts and metadata only — no complaint text,
+          Private usage overview. Counts and metadata only: no complaint text,
           no report contents.
         </p>
       </div>
@@ -193,8 +193,8 @@ export default async function BetaInsightsPage() {
           <span className="font-medium text-[var(--color-foreground)]">
             {isBetaModeEnabled() ? "ON (RIFT_BETA_MODE=invite_only)" : "OFF"}
           </span>
-          . Admins from RIFT_ADMIN_EMAILS always have access. No emails are sent —
-          tell testers to sign up with the address you add here.
+          . Admins from RIFT_ADMIN_EMAILS always have access. No emails are sent,
+          so tell testers to sign up with the address you add here.
         </p>
         <form action={addBetaTester} className="mt-4 flex flex-wrap items-center gap-2">
           <input
@@ -233,7 +233,7 @@ export default async function BetaInsightsPage() {
                   {row.status === "revoked"
                     ? "Access revoked"
                     : row.status === "invited"
-                      ? "Invited — not signed in yet"
+                      ? "Invited, not signed in yet"
                       : "Access active"}
                 </span>
                 {row.status === "revoked" ? (

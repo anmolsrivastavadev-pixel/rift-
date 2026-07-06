@@ -255,7 +255,7 @@ export default async function DashboardPage({
       {/* M16D — what data was added + when ideas were generated.
           M24 — collapsed by default: it's a log, not a decision surface. */}
       {(recentImports.length > 0 || recentRuns.length > 0) && (
-        <details className="group rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)]/60 p-5">
+        <details className="group rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5">
           <summary className="flex cursor-pointer select-none items-center gap-2 text-sm font-semibold transition-colors duration-150 ease-out hover:text-[var(--color-primary)] marker:content-none [&::-webkit-details-marker]:hidden">
             <ChevronRight className="h-4 w-4 shrink-0 text-[var(--color-muted-foreground)] transition-transform duration-150 ease-out group-open:rotate-90" />
             Recent activity
@@ -311,7 +311,7 @@ export default async function DashboardPage({
 
       {/* Complaints over time chart (keep existing) */}
       {complaintCount > 0 && (
-        <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)]">
+        <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[var(--shadow-card)]">
           <h2 className="text-base font-semibold">Complaints over time</h2>
           <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
             Grouped by the day each complaint was added to this project.
@@ -325,7 +325,7 @@ export default async function DashboardPage({
       {/* Recent complaints — M24: collapsed by default (preview list; the
           full list lives on the Complaints page). */}
       {complaintCount > 0 && recent.length > 0 && (
-        <details className="group rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)]/60 p-5">
+        <details className="group rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5">
           <summary className="flex cursor-pointer select-none items-center gap-2 text-sm font-semibold transition-colors duration-150 ease-out hover:text-[var(--color-primary)] marker:content-none [&::-webkit-details-marker]:hidden">
             <ChevronRight className="h-4 w-4 shrink-0 text-[var(--color-muted-foreground)] transition-transform duration-150 ease-out group-open:rotate-90" />
             Recent complaints
@@ -334,7 +334,7 @@ export default async function DashboardPage({
             {recent.map((c) => (
               <li
                 key={c.id}
-                className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-4 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)] transition-all duration-150 ease-out hover:shadow-[0_4px_12px_0_rgb(0_0_0_/_0.06),0_2px_4px_-2px_rgb(0_0_0_/_0.04)]"
+                className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-4 shadow-[var(--shadow-card)] transition-all duration-150 ease-out hover:shadow-[var(--shadow-card-hover)]"
               >
                 <p className="truncate text-sm font-medium">{c.title}</p>
                 <p className="mt-0.5 line-clamp-1 text-xs text-[var(--color-muted-foreground)]">

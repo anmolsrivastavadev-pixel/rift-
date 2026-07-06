@@ -61,7 +61,7 @@ export function ShareButton({
     setNotice(
       copied
         ? { ok: true, text: "Public link copied to clipboard." }
-        : { ok: false, text: "Could not copy — select the URL manually." }
+        : { ok: false, text: "Could not copy. Select the URL manually." }
     );
   }
 
@@ -76,7 +76,7 @@ export function ShareButton({
         return;
       }
       setLink(null);
-      setNotice({ ok: true, text: "Link revoked — the public page is gone." });
+      setNotice({ ok: true, text: "Link revoked. The public page is gone." });
     } catch {
       setNotice({ ok: false, text: "Could not revoke. Try again." });
     } finally {

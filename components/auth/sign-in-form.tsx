@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { authClient } from "@/lib/auth/client";
 import { Button } from "@/components/ui/button";
+import { PasswordInput } from "@/components/auth/password-input";
 
 /* M27 — the sign-in form moved verbatim out of app/sign-in/page.tsx so the
  * page can be a server component that key-gates the "Forgot password?" link
@@ -73,10 +74,10 @@ export function SignInForm({ resetEnabled }: { resetEnabled: boolean }) {
             <label htmlFor="password" className="block text-sm font-medium">
               Password
             </label>
-            <input
+            <PasswordInput
               id="password"
-              type="password"
               required
+              autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="mt-1 block w-full rounded-[10px] border border-[var(--color-border)] bg-[var(--color-background)] px-3 py-2 text-sm text-[var(--color-foreground)] placeholder:text-[var(--color-muted-foreground)] outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]"

@@ -43,14 +43,14 @@ export function FeedbackWidget({ projectId }: { projectId: string }) {
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-[var(--color-muted-foreground)] transition-all duration-150 ease-out hover:bg-[var(--color-card)]/60 hover:text-[var(--color-foreground)]"
+          className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-[var(--color-muted-foreground)] transition-all duration-150 ease-out hover:bg-[var(--color-surface)] hover:text-[var(--color-foreground)]"
         >
           <MessageSquare className="h-4 w-4" />
           Feedback
         </button>
         {state && state.ok && (
           <p className="flex items-center gap-1 px-3 text-[11px] text-[var(--color-success)]">
-            <Check className="h-3 w-3" /> Thanks — feedback saved.
+            <Check className="h-3 w-3" /> Thanks, feedback saved.
           </p>
         )}
       </div>

@@ -137,7 +137,7 @@ async function getRedditAccessToken(
   // Error strings name env vars and statuses only — never the secret/token.
   if (!res.ok) {
     throw new Error(
-      `auth HTTP ${res.status} — check REDDIT_CLIENT_ID/REDDIT_CLIENT_SECRET`
+      `auth HTTP ${res.status} (check REDDIT_CLIENT_ID/REDDIT_CLIENT_SECRET)`
     );
   }
   const json = (await res.json()) as {
@@ -148,7 +148,7 @@ async function getRedditAccessToken(
   // Reddit's token endpoint can answer 200 with { error } and no token.
   if (!json.access_token) {
     throw new Error(
-      `auth rejected (${json.error ?? "no token in response"}) — check REDDIT_CLIENT_ID/REDDIT_CLIENT_SECRET`
+      `auth rejected (${json.error ?? "no token in response"}), check REDDIT_CLIENT_ID/REDDIT_CLIENT_SECRET`
     );
   }
   const ttlSec =
@@ -236,7 +236,7 @@ export async function fetchRedditComplaints(
   } catch (err) {
     let msg = err instanceof Error ? err.message : "unknown error";
     if (msg === "HTTP 429") {
-      msg += " — Reddit rate limit, try again in a minute";
+      msg += ", Reddit rate limit, try again in a minute";
     }
     return {
       complaints: [],
@@ -337,7 +337,7 @@ export async function fetchWebComplaints(keyword: string): Promise<SourceResult>
     return {
       complaints: [],
       error:
-        "Web search is not configured (set TAVILY_API_KEY — see .env.example).",
+        "Web search is not configured (set TAVILY_API_KEY, see .env.example).",
     };
   }
 
@@ -363,7 +363,7 @@ export async function fetchWebComplaints(keyword: string): Promise<SourceResult>
   } catch (err) {
     let msg = err instanceof Error ? err.message : "unknown error";
     if (msg === "HTTP 401" || msg === "HTTP 403") {
-      msg += " — check TAVILY_API_KEY";
+      msg += " (check TAVILY_API_KEY)";
     }
     return { complaints: [], error: `Web search failed (${msg}).` };
   }
@@ -407,7 +407,7 @@ export async function fetchWebComplaints(keyword: string): Promise<SourceResult>
     });
     return {
       complaints: [],
-      error: "Web extraction failed — try again in a moment.",
+      error: "Web extraction failed. Try again in a moment.",
     };
   }
 }

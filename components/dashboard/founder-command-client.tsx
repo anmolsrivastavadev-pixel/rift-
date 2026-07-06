@@ -41,7 +41,7 @@ export function FounderCommandClient({
 
   return (
     <div className="space-y-8">
-      <section className="rounded-xl border border-[var(--color-primary)]/30 bg-[var(--color-primary)]/5 p-6 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)]">
+      <section className="rounded-xl border border-[var(--color-primary)]/30 bg-[var(--color-primary)]/5 p-6 shadow-[var(--shadow-card)]">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-[11px] uppercase tracking-wide text-[var(--color-primary)]">
@@ -61,7 +61,7 @@ export function FounderCommandClient({
       </section>
 
       {stats.opportunityCount > 0 && (
-        <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-5 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.04),0_1px_2px_-1px_rgb(0_0_0_/_0.06)]">
+        <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-5 shadow-[var(--shadow-card)]">
           <h3 className="text-sm font-semibold">Decision status</h3>
           <div className="mt-3 grid grid-cols-4 gap-2 text-center">
             <SnapshotCount label="Pursue" value={decisionCounts.pursue} accent="success" />

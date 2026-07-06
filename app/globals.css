@@ -5,13 +5,13 @@
    Dark, premium, founder-friendly palette.
  ---------------------------------------------------------------------------- */
 @theme {
-  /* Surfaces - dark minimal */
-  --color-background: #09090b;
-  --color-surface: rgba(255, 255, 255, 0.04);
-  --color-card: #111113;
-  --color-border: rgba(255, 255, 255, 0.10);
-  --color-foreground: #fafafa;
-  --color-muted-foreground: #a1a1aa;
+  /* Surfaces - dark minimal (brand kit: pure black canvas) */
+  --color-background: #000000;
+  --color-surface: rgba(255, 255, 255, 0.05);
+  --color-card: #0a0a0a;
+  --color-border: #242424;
+  --color-foreground: #ffffff;
+  --color-muted-foreground: #737373;
 
   /* Accents */
   --color-primary: #3b82f6;
@@ -128,6 +128,44 @@
     );
     background-size: 200% 100%;
     animation: shimmer 2s ease-in-out infinite;
+  }
+
+  /* Endless scroll for the landing-page capability ribbon. The track holds
+     two copies of the chip list, so -50% loops seamlessly. */
+  @keyframes ribbon-scroll {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  .animate-ribbon {
+    animation: ribbon-scroll 60s linear infinite;
+  }
+
+  .animate-ribbon-reverse {
+    animation: ribbon-scroll 60s linear infinite reverse;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-ribbon,
+    .animate-ribbon-reverse {
+      animation: none;
+    }
+  }
+
+  /* Faint blueprint grid for the landing page backdrop */
+  .bg-grid-faint {
+    background-image: linear-gradient(
+        to right,
+        rgba(255, 255, 255, 0.03) 1px,
+        transparent 1px
+      ),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 72px 72px;
+    background-position: center top;
   }
 
   /* Glass-morphism surface (dark) */

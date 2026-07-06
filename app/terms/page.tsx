@@ -29,7 +29,7 @@ export default function TermsPage() {
               <p>
                 Rift turns customer complaints into business idea suggestions.
                 You import complaints, Rift groups them with AI and scores the
-                opportunities it finds. It&apos;s a research tool — the ideas
+                opportunities it finds. It&apos;s a research tool. The ideas
                 are starting points to validate, not guarantees that a business
                 will work.
               </p>
@@ -40,7 +40,7 @@ export default function TermsPage() {
               <ul className="list-disc space-y-2 pl-5">
                 <li>You need an account to use the app, and you&apos;re responsible for what happens under it.</li>
                 <li>Keep your password to yourself. If you think someone else has it, reset it.</li>
-                <li>One person per account — don&apos;t share logins.</li>
+                <li>One person per account. Don&apos;t share logins.</li>
               </ul>
             </section>
 
@@ -58,7 +58,7 @@ export default function TermsPage() {
               <h2 className="text-lg font-semibold">Plans and payment</h2>
               <ul className="list-disc space-y-2 pl-5">
                 <li>The free plan is genuinely free, with the limits shown on the Pricing page.</li>
-                <li>Pro is a monthly subscription billed through Stripe. Cancel anytime — you keep Pro until the end of the period you paid for.</li>
+                <li>Pro is a monthly subscription billed through Stripe. Cancel anytime, and you keep Pro until the end of the period you paid for.</li>
                 <li>If a payment fails repeatedly, your account drops back to the free plan; your data stays.</li>
               </ul>
             </section>
@@ -75,7 +75,7 @@ export default function TermsPage() {
             <section className="space-y-3">
               <h2 className="text-lg font-semibold">No warranties</h2>
               <p>
-                Rift is provided as-is, and it&apos;s in beta — things may
+                Rift is provided as-is, and it&apos;s in beta, so things may
                 break or change. AI-generated ideas can be wrong, incomplete,
                 or already taken. Do your own validation before betting money
                 on one. To the extent the law allows, we&apos;re not liable for

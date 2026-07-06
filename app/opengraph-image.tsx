@@ -4,7 +4,7 @@ import { ImageResponse } from "next/og";
  * no static asset, no extra dependency. Dark theme to match the app.
  */
 
-export const alt = "Rift — Turn complaints into business ideas worth testing.";
+export const alt = "Rift: turn complaints into business ideas worth testing.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -19,7 +19,7 @@ export default function OpenGraphImage() {
           flexDirection: "column",
           justifyContent: "space-between",
           padding: 80,
-          backgroundColor: "#0a0a0f",
+          backgroundColor: "#000000",
           backgroundImage:
             "radial-gradient(circle at 20% 0%, rgba(59,130,246,0.25), transparent 55%)",
           color: "#f4f4f5",
@@ -95,7 +95,7 @@ export default function OpenGraphImage() {
           >
             Turn complaints into business ideas worth testing.
           </div>
-          <div style={{ fontSize: 32, color: "#a1a1aa", maxWidth: 900 }}>
+          <div style={{ fontSize: 32, color: "#737373", maxWidth: 900 }}>
             Paste real complaints. Rift finds repeated problems and turns them
             into ideas you can compare.
           </div>

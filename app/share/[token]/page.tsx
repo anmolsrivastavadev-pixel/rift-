@@ -84,7 +84,7 @@ export default async function SharePage({
                   <p className="font-medium">
                     {i + 1}. {idea.title}{" "}
                     <span className="text-xs font-normal text-[var(--color-muted-foreground)]">
-                      — score {idea.opportunityScore}/100 · {idea.mentions} complaint
+                      · score {idea.opportunityScore}/100 · {idea.mentions} complaint
                       {idea.mentions === 1 ? "" : "s"}
                     </span>
                   </p>
@@ -99,7 +99,7 @@ export default async function SharePage({
             <ul className="space-y-1.5">
               {data.decisions.map((d, i) => (
                 <li key={d.title + i}>
-                  {d.title} —{" "}
+                  {d.title}:{" "}
                   <span className="text-[var(--color-muted-foreground)]">
                     {DECISION_LABELS[d.status]}
                   </span>
@@ -140,7 +140,7 @@ export default async function SharePage({
           </Section>
         )}
         {data.evidence.length > 0 && (
-          <Section title="Evidence — what customers say">
+          <Section title="Evidence: what customers say">
             <ul className="space-y-2">
               {data.evidence.map((e, i) => {
                 const quote =
@@ -197,14 +197,14 @@ export default async function SharePage({
             Powered by{" "}
             <Link href="/" className="font-medium underline hover:text-[var(--color-foreground)]">
               Rift
-            </Link>{" "}
-            — business ideas from real customer pain.
+            </Link>
+            . Business ideas from real customer pain.
           </p>
           <Link
             href="/sign-up"
             className="print-hide mt-3 inline-flex items-center rounded-xl bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-[var(--color-primary-foreground)] transition-all duration-150 ease-out hover:opacity-90"
           >
-            Turn your customer complaints into ideas — try Rift free
+            Turn your customer complaints into ideas. Try Rift free
           </Link>
         </footer>
       </div>

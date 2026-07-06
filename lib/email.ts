@@ -65,7 +65,7 @@ export function buildResetPasswordEmail(url: string): {
     "",
     `Reset it here: ${url}`,
     "",
-    "The link expires in 1 hour. If you didn't ask for this, you can ignore this email — your password stays unchanged.",
+    "The link expires in 1 hour. If you didn't ask for this, you can ignore this email. Your password stays unchanged.",
   ].join("\n");
   const html = `
   <div style="font-family: -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 24px; color: #18181b;">
@@ -73,8 +73,8 @@ export function buildResetPasswordEmail(url: string): {
     <p style="margin: 24px 0;">
       <a href="${url}" style="display: inline-block; background: #4f46e5; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 10px; font-size: 14px; font-weight: 600;">Reset password</a>
     </p>
-    <p style="font-size: 13px; color: #52525b;">The link expires in 1 hour. If you didn't ask for this, you can ignore this email — your password stays unchanged.</p>
-    <p style="font-size: 12px; color: #a1a1aa; margin-top: 32px;">Rift — business ideas from real customer pain.</p>
+    <p style="font-size: 13px; color: #52525b;">The link expires in 1 hour. If you didn't ask for this, you can ignore this email. Your password stays unchanged.</p>
+    <p style="font-size: 12px; color: #a1a1aa; margin-top: 32px;">Rift: business ideas from real customer pain.</p>
   </div>`;
   return { subject, html, text };
 }
