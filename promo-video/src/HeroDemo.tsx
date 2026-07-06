@@ -56,35 +56,45 @@ const briefRows = [
 const checks = ["Talked to 5 real people", "Found 3 paying workarounds", "Collected 24 complaints"];
 
 // ---- Timeline (frames) -----------------------------------------------------
+/* Retimed 2026-07-06: the first cut had ~20s of dead air (static brief tail,
+ * 12s frozen end card). Now every beat lands within ~1.5s of the previous one
+ * and a Results scene fills the former gap. */
 const S1 = {
-  scan: 15,
-  quotes: [120, 180, 240],
-  chips: 310,
-  pattern: 370,
-  signal: 490,
-  opp: 540,
-  footer: 600,
-  cursor: 625,
-  click: 690,
-  out: 708,
+  scan: 12,
+  quotes: [100, 150, 200],
+  chips: 260,
+  pattern: 315,
+  signal: 420,
+  opp: 465,
+  footer: 520,
+  cursor: 535,
+  click: 590,
+  out: 610,
 };
 const S2 = {
-  in: 738,
-  cards: [765, 805, 845],
-  winner: 950,
-  cursor: 975,
-  click: 1040,
-  park: [1130, 1180],
-  out: 1368,
+  in: 640,
+  cards: [668, 698, 728],
+  winner: 800,
+  cursor: 815,
+  click: 865,
+  park: [915, 950],
+  out: 1150,
 };
 const S3 = {
-  in: 1398,
-  rows: [1445, 1525, 1605],
-  checks: [1705, 1765, 1825],
-  button: 1905,
-  out: 2088,
+  in: 1180,
+  rows: [1215, 1268, 1321],
+  checks: [1390, 1430, 1470],
+  button: 1520,
+  out: 1690,
 };
-const S4 = { in: 2118, tagline: 2165, pill: 2265 };
+const S5 = {
+  in: 1720,
+  counters: [1750, 1800, 1850],
+  meter: 1905,
+  line: 1985,
+  out: 2150,
+};
+const S4 = { in: 2180, tagline: 2235, pill: 2310 };
 const FADE = { start: 2615, end: 2690 };
 
 // ---- Small helpers ---------------------------------------------------------
@@ -145,7 +155,7 @@ const Cursor: React.FC = () => {
       extrapolateLeft: "clamp",
       extrapolateRight: "clamp",
     });
-  } else if (frame >= S2.cursor && frame < S2.park[0]) {
+  } else if (frame >= S2.cursor && frame < S2.click + 70) {
     const t = spring({ frame: frame - S2.cursor, fps, config: { damping: 60 } });
     x = interpolate(t, [0, 1], [660, 838]);
     y = interpolate(t, [0, 1], [700, 432]);
@@ -251,6 +261,10 @@ const CockpitScreen: React.FC = () => {
             fontSize: 23,
             fontWeight: 600,
             whiteSpace: "nowrap",
+            transform:
+              frame > S1.pattern + 62
+                ? `scale(${1 + 0.02 * Math.sin((frame - S1.pattern - 62) / 8)})`
+                : undefined,
           }}
         >
           {confidence} confidence
@@ -313,12 +327,13 @@ const CockpitScreen: React.FC = () => {
           <div style={{ display: "flex", alignItems: "flex-end", gap: 11, height: 120 }}>
             {bars.map((h, i) => {
               const grow = spring({ frame: frame - (S1.signal + 12 + i * 5), fps, config: { damping: 16 } });
+              const wobble = 1 + 0.03 * Math.sin(frame / 6 + i * 1.3);
               return (
                 <div
                   key={i}
                   style={{
                     flex: 1,
-                    height: `${h * Math.min(1.06, grow)}%`,
+                    height: `${h * Math.min(1.06, grow) * wobble}%`,
                     borderRadius: "6px 6px 2px 2px",
                     background: "linear-gradient(to top, rgba(37,99,235,0.55), #3b82f6)",
                   }}
@@ -571,6 +586,100 @@ const BriefScreen: React.FC = () => {
   );
 };
 
+// ---- Screen 5: results montage ------------------------------------------------
+const resultStats: Array<[number, string, string]> = [
+  [24, "complaints in", C.muted],
+  [3, "ideas scored", C.primary],
+  [1, "worth pursuing", C.success],
+];
+
+const ResultsScreen: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const meterPct = interpolate(frame, [S5.meter, S5.meter + 45], [0, 100], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  return (
+    <div style={{ flex: 1, padding: 30, display: "flex", flexDirection: "column", gap: 22 }}>
+      <div style={{ ...riseAt(frame, fps, S5.in + 6) }}>
+        <Label color={C.primary}>Market test</Label>
+        <div style={{ color: C.fg, fontSize: 34, fontWeight: 700, marginTop: 10, letterSpacing: "-0.02em" }}>
+          One session. One decision.
+        </div>
+      </div>
+
+      <div style={{ display: "flex", gap: 22 }}>
+        {resultStats.map(([target, label, tone], i) => {
+          const value = Math.round(
+            interpolate(frame, [S5.counters[i] + 5, S5.counters[i] + 40], [0, target], {
+              extrapolateLeft: "clamp",
+              extrapolateRight: "clamp",
+            })
+          );
+          return (
+            <div
+              key={label}
+              style={{
+                ...riseAt(frame, fps, S5.counters[i]),
+                flex: 1,
+                border: `2px solid ${C.border}`,
+                backgroundColor: C.panel,
+                borderRadius: 22,
+                padding: "30px 28px",
+                textAlign: "center",
+              }}
+            >
+              <div style={{ color: tone === C.muted ? C.fg : tone, fontSize: 62, fontWeight: 800, fontVariantNumeric: "tabular-nums" }}>
+                {value}
+              </div>
+              <div style={{ color: C.muted, fontSize: 21, marginTop: 8 }}>{label}</div>
+            </div>
+          );
+        })}
+      </div>
+
+      <div
+        style={{
+          ...riseAt(frame, fps, S5.meter - 12),
+          border: `2px solid ${C.border}`,
+          backgroundColor: C.panel,
+          borderRadius: 22,
+          padding: "26px 30px",
+        }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
+          <Label color={C.muted}>From noise to signal</Label>
+          <div style={{ color: C.fg, fontSize: 22, fontWeight: 700 }}>{Math.round(meterPct)}%</div>
+        </div>
+        <div style={{ height: 12, borderRadius: 999, backgroundColor: "rgba(255,255,255,0.07)" }}>
+          <div
+            style={{
+              height: "100%",
+              width: `${meterPct}%`,
+              borderRadius: 999,
+              background: "linear-gradient(90deg, #2563eb, #22c55e)",
+            }}
+          />
+        </div>
+      </div>
+
+      <div
+        style={{
+          ...riseAt(frame, fps, S5.line, 18),
+          marginTop: "auto",
+          textAlign: "center",
+          color: "rgba(255,255,255,0.9)",
+          fontSize: 26,
+          fontWeight: 600,
+        }}
+      >
+        No invented stats. Just your customers, organized.
+      </div>
+    </div>
+  );
+};
+
 // ---- Screen 4: outro ---------------------------------------------------------
 const OutroScreen: React.FC = () => {
   const frame = useCurrentFrame();
@@ -593,6 +702,7 @@ const OutroScreen: React.FC = () => {
           height: 620,
           borderRadius: "50%",
           background: "radial-gradient(circle, rgba(59,130,246,0.16), transparent 65%)",
+          transform: `scale(${1 + 0.06 * Math.sin((frame - S4.in) / 14)})`,
         }}
       />
       <div style={{ ...riseAt(frame, fps, S4.in + 8), color: C.primary, fontSize: 88, fontWeight: 800, letterSpacing: "-0.04em" }}>
@@ -642,16 +752,27 @@ export const HeroDemo: React.FC = () => {
   const s1 = screenFade(frame, 0, S1.out + 8);
   const s2 = screenFade(frame, S2.in, S2.out);
   const s3 = screenFade(frame, S3.in, S3.out);
+  const s5 = screenFade(frame, S5.in, S5.out);
   const s4 = screenFade(frame, S4.in, HERO_DEMO_DURATION);
 
   const url =
-    frame < S2.in ? "rift.app/ideas/new" : frame < S3.in ? "rift.app/ideas/compare" : frame < S4.in ? "rift.app/ideas/brief" : "rift.app";
+    frame < S2.in
+      ? "rift.app/ideas/new"
+      : frame < S3.in
+        ? "rift.app/ideas/compare"
+        : frame < S5.in
+          ? "rift.app/ideas/brief"
+          : frame < S4.in
+            ? "rift.app/ideas/report"
+            : "rift.app";
   const sidebar =
     frame < S2.in
       ? { items: ["Reviews", "Tickets", "Forums", "Calls"], active: "Reviews" }
       : frame < S3.in
         ? { items: ["Home", "Complaints", "Ideas", "Compare", "Saved"], active: "Compare" }
-        : { items: ["Home", "Complaints", "Ideas", "Compare", "Saved"], active: "Ideas" };
+        : frame < S5.in
+          ? { items: ["Home", "Complaints", "Ideas", "Compare", "Saved"], active: "Ideas" }
+          : { items: ["Home", "Complaints", "Ideas", "Compare", "Saved"], active: "Saved" };
 
   return (
     <AbsoluteFill style={{ backgroundColor: C.window, fontFamily: FONT }}>
@@ -692,9 +813,14 @@ export const HeroDemo: React.FC = () => {
                 <CompareScreen />
               </div>
             )}
-            {frame >= S3.in - 10 && frame < S4.in + 10 && (
+            {frame >= S3.in - 10 && frame < S5.in + 10 && (
               <div style={{ position: "absolute", inset: 0, display: "flex", opacity: s3 }}>
                 <BriefScreen />
+              </div>
+            )}
+            {frame >= S5.in - 10 && frame < S4.in + 10 && (
+              <div style={{ position: "absolute", inset: 0, display: "flex", opacity: s5 }}>
+                <ResultsScreen />
               </div>
             )}
           </div>
