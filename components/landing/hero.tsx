@@ -81,7 +81,7 @@ export function Hero() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.4, delay: 0.25 }}
-          className="mt-5 text-xs text-[var(--color-muted-foreground)]/70"
+          className="mt-5 text-xs text-[var(--color-muted-foreground)]"
         >
           Free during the private beta.
         </motion.p>
@@ -95,7 +95,7 @@ export function Hero() {
         >
           <div className="rounded-[16px] border border-[var(--color-border)] bg-[var(--color-card)]/60 p-6 backdrop-blur-sm">
             <p className="text-xs font-medium text-[var(--color-muted-foreground)] mb-4 uppercase tracking-wider">
-              How it works
+              See it in action
             </p>
             <div className="flex flex-col sm:flex-row items-stretch gap-3">
               {/* Step 1 */}

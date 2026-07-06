@@ -148,7 +148,9 @@ export function OpportunityBrowser({
   const compareParam = Array.from(selectedIds).join(",");
 
   return (
-    <div className="space-y-4">
+    // pb-24 while the fixed compare tray is up, so it never covers the last
+    // row of cards mid-selection.
+    <div className={`space-y-4 ${selectedIds.size > 0 ? "pb-24" : ""}`}>
       <OpportunityFilters
         state={filters}
         setState={setState}

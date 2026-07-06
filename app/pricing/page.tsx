@@ -154,8 +154,8 @@ export default async function PricingPage() {
               </CardContent>
             </Card>
 
-            <Card className="bg-[var(--color-card)] border-[var(--color-primary)]">
-              <CardHeader>
+            <Card className="bg-[var(--color-card)] border-[var(--color-primary)] ring-1 ring-[var(--color-primary)]">
+              <CardHeader className="rounded-t-2xl bg-[var(--color-primary-soft)]">
                 <div className="flex items-center justify-between">
                   <CardTitle>Pro</CardTitle>
                   <Badge variant="primary">For serious builders</Badge>

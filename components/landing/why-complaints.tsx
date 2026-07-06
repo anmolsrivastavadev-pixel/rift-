@@ -5,6 +5,9 @@ export function WhyComplaints() {
     <section id="why-trust" className="py-20 sm:py-28">
       <Container>
         <div className="mx-auto max-w-2xl text-center">
+          <p className="mb-3 text-xs font-medium uppercase tracking-wider text-[var(--color-muted-foreground)]">
+            Trust
+          </p>
           <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl text-[var(--color-foreground)]">
             Why trust it
           </h2>

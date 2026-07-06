@@ -77,10 +77,10 @@ export function CsvUploader({ projectId }: { projectId: string }) {
             const f = e.dataTransfer.files?.[0];
             if (f) handleFile(f);
           }}
-          className={`flex w-full flex-col items-center justify-center gap-3 rounded-2xl border border-dashed p-10 text-center shadow-sm transition-colors ${
+          className={`flex w-full flex-col items-center justify-center gap-3 rounded-2xl border border-dashed p-10 text-center shadow-sm transition-colors focus-visible:outline focus-visible:[outline-offset:2px] focus-visible:[outline-color:var(--color-primary)] ${
             dragOver
               ? "border-[var(--color-primary)] bg-[var(--color-primary-soft)]"
-              : "border-[var(--color-border)] bg-[var(--color-card)]"
+              : "border-[var(--color-border)] bg-[var(--color-card)] hover:border-[var(--color-primary)]/60"
           }`}
         >
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--color-primary-soft)] text-[var(--color-primary)]">

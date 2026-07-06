@@ -4,6 +4,13 @@ import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxi
 
 export type DayBucket = { date: string; count: number };
 
+/** "2026-07-05" -> "Jul 5" — raw ISO keys read like database fields. */
+const fmtDay = (d: string) =>
+  new Date(d + "T00:00:00").toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+  });
+
 export function ComplaintsChart({ data }: { data: DayBucket[] }) {
   if (data.length === 0) {
     return (
@@ -24,6 +31,9 @@ export function ComplaintsChart({ data }: { data: DayBucket[] }) {
             fontSize={12}
             tickLine={false}
             axisLine={false}
+            tickFormatter={fmtDay}
+            minTickGap={24}
+            interval="preserveStartEnd"
           />
           <YAxis
             stroke="var(--color-muted-foreground)"
@@ -31,6 +41,7 @@ export function ComplaintsChart({ data }: { data: DayBucket[] }) {
             tickLine={false}
             axisLine={false}
             allowDecimals={false}
+            width={36}
           />
           <Tooltip
             cursor={{ fill: "var(--color-border)", opacity: 0.3 }}
@@ -42,6 +53,7 @@ export function ComplaintsChart({ data }: { data: DayBucket[] }) {
               color: "var(--color-foreground)",
             }}
             labelStyle={{ color: "var(--color-muted-foreground)" }}
+            labelFormatter={(d) => fmtDay(String(d))}
           />
           <Bar dataKey="count" fill="var(--color-primary)" radius={[6, 6, 0, 0]} />
         </BarChart>

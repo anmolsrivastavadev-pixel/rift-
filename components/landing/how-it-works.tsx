@@ -28,12 +28,18 @@ export function HowItWorks() {
     <section id="how-it-works" className="py-20 sm:py-28">
       <Container>
         <div className="mx-auto max-w-2xl text-center">
+          <p className="mb-3 text-xs font-medium uppercase tracking-wider text-[var(--color-muted-foreground)]">
+            Process
+          </p>
           <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl text-[var(--color-foreground)]">
             How Rift works
           </h2>
+          <p className="mt-4 text-[var(--color-muted-foreground)] leading-relaxed">
+            Four steps from a market to an idea you can test.
+          </p>
         </div>
 
-        <div className="mx-auto mt-14 grid max-w-3xl gap-4 sm:grid-cols-2">
+        <div className="mx-auto mt-10 grid max-w-3xl gap-4 sm:grid-cols-2">
           {steps.map((s) => (
             <div
               key={s.n}

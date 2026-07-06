@@ -114,24 +114,16 @@ export function OpportunityCard({
           </div>
         </div>
 
-        <p className="mt-1 line-clamp-1 text-xs text-[var(--color-muted-foreground)]">
-          Product opportunity:{" "}
-          <span className="text-[var(--color-foreground)]/80">{op.suggestedSoftware}</span>
+        <p className="mt-1.5 line-clamp-1 text-sm font-medium text-[var(--color-foreground)]/80">
+          {op.suggestedSoftware}
         </p>
 
         {(op.targetCustomer || op.productAngle) && (
-          <div className="mt-2 space-y-0.5 text-[11px] text-[var(--color-muted-foreground)]">
-            {op.targetCustomer && (
-              <p className="line-clamp-1">
-                For: <span className="text-[var(--color-foreground)]/80">{op.targetCustomer}</span>
-              </p>
-            )}
-            {op.productAngle && (
-              <p className="line-clamp-2">
-                Angle: <span className="text-[var(--color-foreground)]/80">{op.productAngle}</span>
-              </p>
-            )}
-          </div>
+          <p className="mt-1.5 line-clamp-1 text-[11px] text-[var(--color-muted-foreground)]">
+            {[op.targetCustomer && `For ${op.targetCustomer}`, op.productAngle]
+              .filter(Boolean)
+              .join(" · ")}
+          </p>
         )}
 
         <div className="mt-4 flex flex-wrap gap-1.5">

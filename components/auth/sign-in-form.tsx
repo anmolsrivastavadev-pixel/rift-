@@ -42,7 +42,7 @@ export function SignInForm({ resetEnabled }: { resetEnabled: boolean }) {
 
   return (
     <div className="flex min-h-screen items-center justify-center px-4">
-      <div className="w-full max-w-sm space-y-6">
+      <div className="w-full max-w-sm space-y-6 rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-8 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.3),0_1px_2px_-1px_rgb(0_0_0_/_0.2)]">
         <div className="text-center">
           <h1 className="text-2xl font-semibold tracking-tight">
             <Link href="/" className="hover:text-[var(--color-primary)]">
@@ -65,7 +65,7 @@ export function SignInForm({ resetEnabled }: { resetEnabled: boolean }) {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 block w-full rounded-[10px] border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-2 text-sm text-[var(--color-foreground)] placeholder:text-[var(--color-muted-foreground)] outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]"
+              className="mt-1 block w-full rounded-[10px] border border-[var(--color-border)] bg-[var(--color-background)] px-3 py-2 text-sm text-[var(--color-foreground)] placeholder:text-[var(--color-muted-foreground)] outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]"
             />
           </div>
 
@@ -79,7 +79,7 @@ export function SignInForm({ resetEnabled }: { resetEnabled: boolean }) {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 block w-full rounded-[10px] border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-2 text-sm text-[var(--color-foreground)] placeholder:text-[var(--color-muted-foreground)] outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]"
+              className="mt-1 block w-full rounded-[10px] border border-[var(--color-border)] bg-[var(--color-background)] px-3 py-2 text-sm text-[var(--color-foreground)] placeholder:text-[var(--color-muted-foreground)] outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]"
             />
             {resetEnabled && (
               <p className="mt-1.5 text-right text-xs">
@@ -94,7 +94,12 @@ export function SignInForm({ resetEnabled }: { resetEnabled: boolean }) {
           </div>
 
           {error && (
-            <p className="text-sm text-[var(--color-danger)]">{error}</p>
+            <p
+              role="alert"
+              className="rounded-[10px] border border-[var(--color-danger)]/30 bg-[var(--color-danger-soft)] px-3 py-2 text-sm text-[var(--color-danger)]"
+            >
+              {error}
+            </p>
           )}
 
           <Button type="submit" disabled={loading} className="w-full">

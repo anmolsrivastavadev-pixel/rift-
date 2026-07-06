@@ -97,7 +97,7 @@ export function OpportunityFilters({
             max={100}
             step={5}
             onChange={(v) => setState({ minScore: v })}
-            suffix={`${state.minScore}`}
+            suffix={state.minScore === 0 ? "Any" : `${state.minScore}`}
             ariaLabel="Minimum opportunity score"
           />
         </Field>
@@ -109,7 +109,7 @@ export function OpportunityFilters({
             max={10}
             step={1}
             onChange={(v) => setState({ minSeverity: v })}
-            suffix={`${state.minSeverity}`}
+            suffix={state.minSeverity === 0 ? "Any" : `${state.minSeverity}`}
             ariaLabel="Minimum severity"
           />
         </Field>
@@ -121,7 +121,7 @@ export function OpportunityFilters({
             max={20}
             step={1}
             onChange={(v) => setState({ minComplaints: v })}
-            suffix={`${state.minComplaints}`}
+            suffix={state.minComplaints === 0 ? "Any" : `${state.minComplaints}`}
             ariaLabel="Minimum complaint count"
           />
         </Field>

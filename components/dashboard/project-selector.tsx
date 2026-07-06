@@ -237,7 +237,7 @@ function NewProjectForm({
         <button
           type="submit"
           disabled={pending}
-          className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--color-primary)] px-2.5 py-1.5 text-xs font-medium text-white transition-colors disabled:opacity-50"
+          className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--color-primary)] px-2.5 py-1.5 text-xs font-medium text-white transition-all duration-150 ease-out hover:brightness-110 active:scale-[0.97] focus-visible:outline-none focus-visible:shadow-[0_0_0_3px_rgba(59,130,246,0.2)] disabled:opacity-50"
         >
           {pending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
           Create
@@ -302,7 +302,7 @@ function RenameProjectForm({
         <button
           type="submit"
           disabled={pending}
-          className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--color-primary)] px-2.5 py-1.5 text-xs font-medium text-white transition-colors disabled:opacity-50"
+          className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--color-primary)] px-2.5 py-1.5 text-xs font-medium text-white transition-all duration-150 ease-out hover:brightness-110 active:scale-[0.97] focus-visible:outline-none focus-visible:shadow-[0_0_0_3px_rgba(59,130,246,0.2)] disabled:opacity-50"
         >
           {pending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Pencil className="h-3.5 w-3.5" />}
           Save name
@@ -353,7 +353,7 @@ function ArchiveProjectForm({
         <button
           type="submit"
           disabled={pending}
-          className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--color-primary)] px-2.5 py-1.5 text-xs font-medium text-white transition-colors disabled:opacity-50"
+          className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--color-primary)] px-2.5 py-1.5 text-xs font-medium text-white transition-all duration-150 ease-out hover:brightness-110 active:scale-[0.97] focus-visible:outline-none focus-visible:shadow-[0_0_0_3px_rgba(59,130,246,0.2)] disabled:opacity-50"
         >
           {pending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Archive className="h-3.5 w-3.5" />}
           Archive project
@@ -459,7 +459,7 @@ function ArchivedProjectRow({
             <button
               type="submit"
               disabled={deletePending}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--color-danger)] px-2.5 py-1.5 text-xs font-medium text-white transition-colors disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--color-danger)] px-2.5 py-1.5 text-xs font-medium text-white transition-all duration-150 ease-out hover:brightness-110 active:scale-[0.97] focus-visible:outline-none focus-visible:shadow-[0_0_0_3px_rgba(59,130,246,0.2)] disabled:opacity-50"
             >
               {deletePending ? (
                 <Loader2 className="h-3.5 w-3.5 animate-spin" />

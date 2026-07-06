@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Target, Users, Bookmark, Trophy, Briefcase } from "lucide-react";
+import { Target, Users, Bookmark, Trophy, Briefcase, ChevronRight } from "lucide-react";
 
 import { prisma } from "@/lib/db";
 import { StatCard } from "@/components/dashboard/stat-card";
@@ -255,8 +255,11 @@ export default async function DashboardPage({
       {/* M16D — what data was added + when ideas were generated.
           M24 — collapsed by default: it's a log, not a decision surface. */}
       {(recentImports.length > 0 || recentRuns.length > 0) && (
-        <details className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)]/60 p-5">
-          <summary className="cursor-pointer text-sm font-semibold">Recent activity</summary>
+        <details className="group rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)]/60 p-5">
+          <summary className="flex cursor-pointer select-none items-center gap-2 text-sm font-semibold transition-colors duration-150 ease-out hover:text-[var(--color-primary)] marker:content-none [&::-webkit-details-marker]:hidden">
+            <ChevronRight className="h-4 w-4 shrink-0 text-[var(--color-muted-foreground)] transition-transform duration-150 ease-out group-open:rotate-90" />
+            Recent activity
+          </summary>
           <div className="mt-4">
             <ProjectHistory imports={recentImports} runs={recentRuns} />
           </div>
@@ -322,8 +325,9 @@ export default async function DashboardPage({
       {/* Recent complaints — M24: collapsed by default (preview list; the
           full list lives on the Complaints page). */}
       {complaintCount > 0 && recent.length > 0 && (
-        <details className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)]/60 p-5">
-          <summary className="cursor-pointer text-sm font-semibold">
+        <details className="group rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)]/60 p-5">
+          <summary className="flex cursor-pointer select-none items-center gap-2 text-sm font-semibold transition-colors duration-150 ease-out hover:text-[var(--color-primary)] marker:content-none [&::-webkit-details-marker]:hidden">
+            <ChevronRight className="h-4 w-4 shrink-0 text-[var(--color-muted-foreground)] transition-transform duration-150 ease-out group-open:rotate-90" />
             Recent complaints
           </summary>
           <ul className="mt-4 space-y-2">

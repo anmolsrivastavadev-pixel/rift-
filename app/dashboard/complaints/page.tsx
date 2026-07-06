@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { ChevronDown } from "lucide-react";
 
 import { ComplaintsInput } from "@/components/complaints/complaints-input";
 import { ComplaintsList } from "@/components/complaints/complaints-list";
@@ -44,23 +45,32 @@ export default async function ComplaintsPage({
         </div>
       </section>
 
-      <details className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)]/60 p-5">
-        <summary className="cursor-pointer text-sm font-semibold">Need examples?</summary>
+      <details className="group rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)]/60 p-5">
+        <summary className="flex cursor-pointer select-none list-none items-center justify-between text-sm font-semibold text-[var(--color-foreground)] transition-colors duration-150 ease-out hover:text-[var(--color-primary)] [&::-webkit-details-marker]:hidden">
+          Need examples?
+          <ChevronDown className="h-4 w-4 shrink-0 text-[var(--color-muted-foreground)] transition-transform duration-150 ease-out group-open:rotate-180" />
+        </summary>
         <div className="mt-4">
           <StarterMarkets projectId={project.id} />
         </div>
       </details>
 
-      <details className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)]/60 p-5">
-        <summary className="cursor-pointer text-sm font-semibold">What should I paste?</summary>
+      <details className="group rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)]/60 p-5">
+        <summary className="flex cursor-pointer select-none list-none items-center justify-between text-sm font-semibold text-[var(--color-foreground)] transition-colors duration-150 ease-out hover:text-[var(--color-primary)] [&::-webkit-details-marker]:hidden">
+          What should I paste?
+          <ChevronDown className="h-4 w-4 shrink-0 text-[var(--color-muted-foreground)] transition-transform duration-150 ease-out group-open:rotate-180" />
+        </summary>
         <div className="mt-3 space-y-3 text-sm text-[var(--color-muted-foreground)]">
           <p>Paste real frustrations: reviews, support tickets, forum posts, sales notes, or interview notes.</p>
           <p>Look for repeated problems, not random opinions. Do not include private personal information.</p>
         </div>
       </details>
 
-      <details className="rounded-[12px] border border-dashed border-[var(--color-border)] bg-[var(--color-card)]/60 p-5">
-        <summary className="cursor-pointer text-sm font-semibold">Start fresh</summary>
+      <details className="group rounded-[12px] border border-dashed border-[var(--color-border)] bg-[var(--color-card)]/60 p-5">
+        <summary className="flex cursor-pointer select-none list-none items-center justify-between text-sm font-semibold text-[var(--color-foreground)] transition-colors duration-150 ease-out hover:text-[var(--color-primary)] [&::-webkit-details-marker]:hidden">
+          Start fresh
+          <ChevronDown className="h-4 w-4 shrink-0 text-[var(--color-muted-foreground)] transition-transform duration-150 ease-out group-open:rotate-180" />
+        </summary>
         <p className="mt-3 text-sm text-[var(--color-muted-foreground)]">
           Clear this project before testing a different market.
         </p>

@@ -47,12 +47,12 @@ export function FounderCommandClient({
             <p className="text-[11px] uppercase tracking-wide text-[var(--color-primary)]">
               Next step
             </p>
-            <h2 className="mt-1 text-base font-semibold">{nextAction.title}</h2>
+            <h2 className="mt-1 text-lg font-semibold tracking-tight">{nextAction.title}</h2>
             <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
               {nextAction.description}
             </p>
           </div>
-          <Button asChild size="sm">
+          <Button asChild>
             <Link href={projectHref(nextAction.href, projectId)}>
               {nextAction.cta} <ArrowRight className="h-3.5 w-3.5" />
             </Link>

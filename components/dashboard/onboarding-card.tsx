@@ -62,10 +62,10 @@ export function OnboardingCard({
   const active = steps.find((s) => !s.done) ?? steps[steps.length - 1];
 
   return (
-    <section className="rounded-2xl border border-[var(--color-primary)]/30 bg-[var(--color-primary)]/5 p-5">
+    <section className="rounded-2xl border border-[var(--color-primary)]/30 bg-[var(--color-primary)]/5 p-6 sm:p-7">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="min-w-0">
-          <h2 className="text-sm font-semibold">Start your market test</h2>
+          <h2 className="text-lg font-semibold tracking-tight">Start your market test</h2>
           <ol className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1">
             {steps.map((step, i) => (
               <li key={step.label} className="flex items-center gap-1.5 text-xs">
@@ -95,7 +95,7 @@ export function OnboardingCard({
             ))}
           </ol>
         </div>
-        <Button asChild size="sm">
+        <Button asChild>
           <Link href={active.href}>
             {active.cta} <ArrowRight className="h-3.5 w-3.5" />
           </Link>

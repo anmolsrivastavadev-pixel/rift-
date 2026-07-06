@@ -1,3 +1,5 @@
+import { Inbox } from "lucide-react";
+
 import { Badge } from "@/components/ui/badge";
 
 type Row = {
@@ -21,9 +23,10 @@ function fmtDate(d: Date | null): string {
 
 function sentimentLabel(s: number | null): {
   text: string;
-  variant: "success" | "warning" | "danger";
+  variant: "default" | "success" | "warning" | "danger";
 } {
-  if (s === null) return { text: "—", variant: "warning" };
+  // Unscored (fresh import) is a quiet neutral dash — amber read as "broken".
+  if (s === null) return { text: "—", variant: "default" };
   if (s <= -0.4) return { text: "Negative", variant: "danger" };
   if (s < 0.2) return { text: "Neutral", variant: "warning" };
   return { text: "Positive", variant: "success" };
@@ -39,10 +42,14 @@ export function ComplaintsTable({
   if (rows.length === 0) {
     return (
       <div className="rounded-[12px] border border-dashed border-[var(--color-border)] bg-[var(--color-card)] p-12 text-center">
-        <p className="text-sm text-[var(--color-muted-foreground)]">
-          {hasQuery
-            ? "No complaints match your search. Try a different term."
-            : "No complaints yet. Add data above to get started."}
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
+          <Inbox className="h-6 w-6" />
+        </div>
+        <p className="mt-3 text-sm font-medium text-[var(--color-foreground)]">
+          {hasQuery ? "No matching complaints" : "No complaints yet"}
+        </p>
+        <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
+          {hasQuery ? "Try a different search term." : "Add data above to get started."}
         </p>
       </div>
     );
@@ -79,7 +86,12 @@ export function ComplaintsTable({
                     {fmtDate(r.sourceDate)}
                   </td>
                   <td className="px-4 py-3">
-                    <Badge variant={s.variant}>{s.text}</Badge>
+                    <Badge
+                      variant={s.variant}
+                      className={s.variant === "default" ? "text-[var(--color-muted-foreground)]" : undefined}
+                    >
+                      {s.text}
+                    </Badge>
                   </td>
                   <td className="px-4 py-3 text-[var(--color-muted-foreground)]">
                     {r.severity !== null ? r.severity.toFixed(0) : "—"}

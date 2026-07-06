@@ -95,7 +95,12 @@ export default function SignUpPage() {
           </div>
 
           {error && (
-            <p className="text-sm text-[var(--color-danger)]">{error}</p>
+            <p
+              role="alert"
+              className="rounded-[10px] border border-[var(--color-danger)]/30 bg-[var(--color-danger-soft)] px-3 py-2 text-sm text-[var(--color-danger)]"
+            >
+              {error}
+            </p>
           )}
 
           <Button type="submit" disabled={loading} className="w-full">

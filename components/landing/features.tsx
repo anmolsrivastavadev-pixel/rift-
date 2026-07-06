@@ -30,9 +30,15 @@ export function Features() {
       <Container>
         {/* Quick ideas vs real research */}
         <div className="mx-auto max-w-2xl text-center">
+          <p className="mb-3 text-xs font-medium uppercase tracking-wider text-[var(--color-muted-foreground)]">
+            Modes
+          </p>
           <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl text-[var(--color-foreground)]">
             Quick ideas vs real research
           </h2>
+          <p className="mt-4 text-[var(--color-muted-foreground)] leading-relaxed">
+            Two ways to work, depending on how much evidence you have.
+          </p>
         </div>
 
         <div className="mx-auto mt-10 grid max-w-2xl gap-4 sm:grid-cols-2">
