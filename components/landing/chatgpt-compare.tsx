@@ -11,19 +11,19 @@ import { SectionHeader } from "@/components/landing/section-header";
 
 const rows = [
   {
-    chat: "Invents plausible-sounding ideas from thin air",
-    rift: "Builds ideas from real complaints — every quote links to the original post",
+    chat: "Skims a few pages once, pastes a few links, forgets it all tomorrow",
+    rift: "Collects hundreds of complaints into one evidence base — deduped, stored, every quote linked to its source",
   },
   {
-    chat: "Has no idea if the problem is growing or fading",
+    chat: "A different answer every time you ask",
+    rift: "A fixed 0–100 scoring formula — the same complaints always give the same score, with the breakdown in the open",
+  },
+  {
+    chat: "No dated history, so it can't tell if a problem is growing",
     rift: "Shows a pain trend from dated complaints — and says “Not enough data” instead of guessing",
   },
   {
-    chat: "One-off chat that's gone tomorrow",
-    rift: "Saved projects with scores, compare boards, and shareable reports",
-  },
-  {
-    chat: "Only answers when you ask",
+    chat: "Only answers while you're typing",
     rift: "Watches your niche weekly and emails you when new complaints appear",
   },
 ];
@@ -37,13 +37,13 @@ export function ChatgptCompare() {
           badge="Why not ChatGPT?"
           heading={
             <>
-              A chat AI guesses.{" "}
+              A chat forgets.{" "}
               <span className="text-[var(--color-primary)]">
-                Rift shows receipts.
+                Rift keeps receipts.
               </span>
             </>
           }
-          lead="ChatGPT is great for brainstorming. Rift is for evidence: real complaints, linked to their source, tracked over time."
+          lead="Even with web search, a chat skims a few pages and forgets them. Rift builds a stored evidence base: real complaints, linked to their source, tracked over time."
         />
 
         <div className="mt-12 grid gap-4 lg:grid-cols-2">

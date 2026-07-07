@@ -8,7 +8,7 @@ const faqs = [
   },
   {
     q: "Can't I just use ChatGPT for this?",
-    a: "ChatGPT invents plausible ideas, but it can't show you one real person with the problem. Rift starts from real complaints, links each quote back to its source, shows whether the pain is growing or fading, and keeps watching your niche weekly. Use ChatGPT to brainstorm; use Rift when you want evidence.",
+    a: "Even with web search, ChatGPT skims a few pages in one chat and forgets them. Rift collects hundreds of real complaints into a stored evidence base, links every quote to its source, scores ideas with the same fixed formula every time, shows whether the pain is growing or fading, and keeps watching your niche weekly. Use ChatGPT to brainstorm; use Rift to build proof.",
   },
   {
     q: "Do the scores prove an idea will work?",
