@@ -2,7 +2,7 @@ import { MessageSquareOff } from "lucide-react";
 
 import { ComplaintBody } from "@/components/opportunities/complaint-body";
 import { ExternalLink } from "@/components/ui/external-link";
-import { buildReceiptLabel } from "@/lib/complaint-sources";
+import { buildReceiptHref, buildReceiptLabel } from "@/lib/complaint-sources";
 
 export type LinkedComplaint = {
   id: string;
@@ -55,10 +55,11 @@ export function ExampleComplaints({ items }: { items: LinkedComplaint[] }) {
             </span>
             {(() => {
               const label = buildReceiptLabel(c.sourceKind, c.sourceUrl);
-              return label && c.sourceUrl ? (
+              const href = buildReceiptHref(c.sourceKind, c.sourceUrl);
+              return label && href ? (
                 <>
                   <span aria-hidden="true">·</span>
-                  <ExternalLink href={c.sourceUrl}>{label}</ExternalLink>
+                  <ExternalLink href={href}>{label}</ExternalLink>
                 </>
               ) : null;
             })()}

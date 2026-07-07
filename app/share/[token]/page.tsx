@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 
 import { prisma } from "@/lib/db";
 import { getIdeaReportData, getProjectReportData } from "@/lib/report-data";
-import { buildReceiptLabel } from "@/lib/complaint-sources";
+import { buildReceiptHref, buildReceiptLabel } from "@/lib/complaint-sources";
 import {
   buildEvidenceCaption,
   EVIDENCE_STRENGTH_LABELS,
@@ -170,15 +170,16 @@ export default async function SharePage({
                 const quote =
                   e.body.length > 240 ? `${e.body.slice(0, 240)}…` : e.body;
                 const receiptLabel = buildReceiptLabel(e.sourceKind, e.sourceUrl);
+                const receiptHref = buildReceiptHref(e.sourceKind, e.sourceUrl);
                 return (
                   <li
                     key={i}
                     className="border-l-2 border-[var(--color-border)] pl-3 text-[var(--color-muted-foreground)]"
                   >
                     “{quote.replace(/\s+/g, " ").trim()}”
-                    {receiptLabel && e.sourceUrl && (
+                    {receiptLabel && receiptHref && (
                       <span className="mt-1 block text-xs">
-                        <ExternalLink href={e.sourceUrl}>
+                        <ExternalLink href={receiptHref}>
                           {receiptLabel}
                         </ExternalLink>
                       </span>

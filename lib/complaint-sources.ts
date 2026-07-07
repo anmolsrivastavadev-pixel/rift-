@@ -11,7 +11,7 @@ export type ComplaintSourceKind = "reddit" | "appstore" | "hackernews" | "web";
 
 export const COMPLAINT_SOURCE_LABELS: Record<ComplaintSourceKind, string> = {
   reddit: "View on Reddit",
-  appstore: "View app on the App Store",
+  appstore: "View reviews on the App Store",
   hackernews: "View on Hacker News",
   web: "View source",
 };
@@ -54,4 +54,21 @@ export function buildReceiptLabel(
   if (!sanitiseReceiptUrl(url)) return null;
   if (isComplaintSourceKind(kind)) return COMPLAINT_SOURCE_LABELS[kind];
   return COMPLAINT_SOURCE_LABELS.web;
+}
+
+/** The href a receipt should actually open. App Store receipts land on the
+ * app's REVIEWS section (`?see-all=reviews`), not its marketing page —
+ * applied at render time so complaints stored before this fix benefit too. */
+export function buildReceiptHref(
+  kind: string | null | undefined,
+  url: string | null | undefined
+): string | null {
+  const clean = sanitiseReceiptUrl(url);
+  if (!clean) return null;
+  if (kind === "appstore" && !clean.includes("see-all=reviews")) {
+    return clean.includes("?")
+      ? `${clean}&see-all=reviews`
+      : `${clean}?see-all=reviews`;
+  }
+  return clean;
 }

@@ -130,9 +130,16 @@ export default async function OpportunityDetailPage({
       select: { sourceDate: true, sourceKind: true },
     }),
     // Receipt-bearing complaints = the real threads behind this idea, for
-    // the "Talk to the people behind the complaints" section.
+    // the "Talk to the people behind the complaints" section. App Store is
+    // excluded: nobody can reply to an App Store review, so it doesn't
+    // belong in a "talk to these people" list.
     prisma.complaint.findMany({
-      where: { opportunityId: id, userId: user.id, sourceUrl: { not: null } },
+      where: {
+        opportunityId: id,
+        userId: user.id,
+        sourceUrl: { not: null },
+        sourceKind: { in: ["reddit", "hackernews", "web"] },
+      },
       orderBy: { sourceDate: "desc" },
       take: 6,
       select: {

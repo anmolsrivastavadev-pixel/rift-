@@ -287,9 +287,12 @@ export async function fetchAppStoreComplaints(
           const raw = rss?.feed?.entry;
           const entries = Array.isArray(raw) ? raw : raw ? [raw] : [];
           // Per-review RSS links are unreliable (often dead-end at the app
-          // anyway), so the receipt is the app's own App Store page.
-          const appUrl =
+          // anyway), so the receipt is the app's REVIEWS section.
+          const appBase =
             app.trackViewUrl ?? `https://apps.apple.com/app/id${app.trackId}`;
+          const appUrl = appBase.includes("?")
+            ? `${appBase}&see-all=reviews`
+            : `${appBase}?see-all=reviews`;
           const out: FoundComplaint[] = [];
           for (const e of entries) {
             const rating = Number(e["im:rating"]?.label ?? "5");

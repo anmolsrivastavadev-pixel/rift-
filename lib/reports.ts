@@ -6,7 +6,7 @@
  * evidence, no new AI calls.
  */
 
-import { buildReceiptLabel } from "@/lib/complaint-sources";
+import { buildReceiptHref, buildReceiptLabel } from "@/lib/complaint-sources";
 import { DECISION_LABELS, type DecisionStatus } from "@/lib/decision-board";
 import {
   buildEvidenceCaption,
@@ -211,7 +211,8 @@ export function buildIdeaReport(input: IdeaReportInput): string {
     for (const e of input.evidence) {
       const quote = e.body.length > 240 ? `${e.body.slice(0, 240)}…` : e.body;
       const label = buildReceiptLabel(e.sourceKind, e.sourceUrl);
-      const receipt = label && e.sourceUrl ? ` — [${label}](${e.sourceUrl})` : "";
+      const href = buildReceiptHref(e.sourceKind, e.sourceUrl);
+      const receipt = label && href ? ` — [${label}](${href})` : "";
       lines.push(`- “${quote.replace(/\s+/g, " ").trim()}”${receipt}`);
     }
     lines.push("");
