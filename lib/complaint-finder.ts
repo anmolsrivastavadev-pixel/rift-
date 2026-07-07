@@ -26,7 +26,14 @@ export interface FoundComplaint {
   title: string;
   body: string;
   sourceDate: string | null; // ISO string when known
-  source: "reddit" | "appstore" | "hackernews" | "web";
+  source:
+    | "reddit"
+    | "appstore"
+    | "hackernews"
+    | "web"
+    | "youtube"
+    | "stackexchange"
+    | "github";
   // M31a — receipt: URL of the original public post/page, when the source
   // provides one. Sanitised again before persisting (lib/complaint-sources.ts).
   sourceUrl: string | null;
@@ -464,6 +471,110 @@ export async function fetchWebComplaints(keyword: string): Promise<SourceResult>
       complaints: [],
       error: "Web extraction failed. Try again in a moment.",
     };
+  }
+}
+
+/* ---------------------------------------------------------------- YouTube */
+
+const YT_SEARCH_URL = "https://www.googleapis.com/youtube/v3/search";
+const YT_COMMENTS_URL = "https://www.googleapis.com/youtube/v3/commentThreads";
+
+/** Deterministic complaint markers for YouTube comments (no AI call —
+ * comment volume is high and most comments are praise/noise). */
+const YT_COMPLAINT_MARKERS = [
+  "frustrating",
+  "annoying",
+  "problem",
+  "hate",
+  "broken",
+  "wish",
+  "stopped using",
+  "doesn't work",
+  "does not work",
+  "terrible",
+  "worst",
+  "issue",
+];
+
+interface YTCommentThread {
+  snippet?: {
+    topLevelComment?: {
+      id?: string;
+      snippet?: {
+        textDisplay?: string;
+        publishedAt?: string;
+      };
+    };
+  };
+}
+
+/**
+ * Comments under "review of X" videos — official YouTube Data API v3,
+ * key-gated on YOUTUBE_API_KEY (free key, see .env.example). Without the key
+ * the source silently sits out (no per-search nag). Receipt is a per-comment
+ * deep link (watch?v=…&lc=…) that lands on the exact comment.
+ * Quota: ~105 of the free 10,000 daily units per finder run.
+ */
+export async function fetchYouTubeComplaints(
+  keyword: string,
+  maxVideos = 5
+): Promise<SourceResult> {
+  const apiKey = process.env.YOUTUBE_API_KEY?.trim();
+  if (!apiKey) {
+    logger.info("youtube.disabled_no_key", {});
+    return { complaints: [] };
+  }
+
+  try {
+    const q = encodeURIComponent(`${keyword} review problems`);
+    const searchUrl = `${YT_SEARCH_URL}?part=snippet&type=video&maxResults=${maxVideos}&q=${q}&key=${apiKey}`;
+    const search = (await fetchJson(searchUrl)) as {
+      items?: { id?: { videoId?: string } }[];
+    };
+    const videoIds = (search.items ?? [])
+      .map((i) => i.id?.videoId)
+      .filter((v): v is string => Boolean(v));
+    if (videoIds.length === 0) {
+      return { complaints: [], error: "No matching YouTube videos found." };
+    }
+
+    const perVideo = await Promise.all(
+      videoIds.map(async (videoId) => {
+        try {
+          const url = `${YT_COMMENTS_URL}?part=snippet&videoId=${videoId}&maxResults=25&order=relevance&textFormat=plainText&key=${apiKey}`;
+          const json = (await fetchJson(url)) as { items?: YTCommentThread[] };
+          const out: FoundComplaint[] = [];
+          for (const item of json.items ?? []) {
+            const top = item.snippet?.topLevelComment;
+            const s = top?.snippet;
+            const text = cleanText(s?.textDisplay ?? "");
+            if (text.length < 30) continue;
+            const lower = text.toLowerCase();
+            if (!YT_COMPLAINT_MARKERS.some((m) => lower.includes(m))) continue;
+            if (!top?.id) continue;
+            out.push({
+              title: text.slice(0, 80),
+              body: text.slice(0, 5000),
+              sourceDate: s?.publishedAt ?? null,
+              source: "youtube",
+              sourceUrl: `https://www.youtube.com/watch?v=${videoId}&lc=${top.id}`,
+            });
+          }
+          return out;
+        } catch {
+          return [] as FoundComplaint[]; // comments disabled on a video is fine
+        }
+      })
+    );
+
+    return { complaints: perVideo.flat() };
+  } catch (err) {
+    // Error strings name statuses and env vars only — never the key.
+    let msg = err instanceof Error ? err.message : "unknown error";
+    if (msg === "HTTP 400" || msg === "HTTP 403") {
+      msg += " (check YOUTUBE_API_KEY)";
+    }
+    return { complaints: [], error: `YouTube search failed (${msg}).` };
   }
 }
 

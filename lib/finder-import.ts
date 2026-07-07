@@ -27,8 +27,13 @@ import {
   fetchAppStoreComplaints,
   fetchHackerNewsComplaints,
   fetchWebComplaints,
+  fetchYouTubeComplaints,
+  type SourceResult,
 } from "@/lib/complaint-finder";
-import { sanitiseReceiptUrl } from "@/lib/complaint-sources";
+import {
+  sanitiseReceiptUrl,
+  type ComplaintSourceKind,
+} from "@/lib/complaint-sources";
 import { trackProductEvent } from "@/lib/product-events";
 import { checkComplaintQuota } from "@/lib/quotas";
 
@@ -38,10 +43,8 @@ const DIGEST_TITLE_COUNT = 5;
 export type FinderImportResult = {
   inserted: number;
   skipped: number;
-  redditFound: number;
-  appStoreFound: number;
-  hackerNewsFound: number;
-  webFound: number;
+  /** How many complaints each source returned (0 for sources that sat out). */
+  foundBySource: Record<ComplaintSourceKind, number>;
   /** Source errors, or exactly [quota message] when the project is full. */
   errors: string[];
   /** True when the per-project complaint cap blocked the whole insert. */
@@ -49,6 +52,18 @@ export type FinderImportResult = {
   /** First few inserted complaint titles, for the watch digest email. */
   insertedTitles: string[];
 };
+
+export function emptyFoundBySource(): Record<ComplaintSourceKind, number> {
+  return {
+    reddit: 0,
+    appstore: 0,
+    hackernews: 0,
+    web: 0,
+    youtube: 0,
+    stackexchange: 0,
+    github: 0,
+  };
+}
 
 export async function runFinderImport(input: {
   user: { id: string; email: string };
@@ -62,43 +77,33 @@ export async function runFinderImport(input: {
   const base: FinderImportResult = {
     inserted: 0,
     skipped: 0,
-    redditFound: 0,
-    appStoreFound: 0,
-    hackerNewsFound: 0,
-    webFound: 0,
+    foundBySource: emptyFoundBySource(),
     errors: [],
     quotaFull: false,
     insertedTitles: [],
   };
 
-  const [reddit, appStore, hackerNews, web] = await Promise.all([
-    fetchRedditComplaints(keyword),
-    fetchAppStoreComplaints(keyword),
-    fetchHackerNewsComplaints(keyword),
-    fetchWebComplaints(keyword),
-  ]);
+  const sourceFetchers: [ComplaintSourceKind, Promise<SourceResult>][] = [
+    ["reddit", fetchRedditComplaints(keyword)],
+    ["appstore", fetchAppStoreComplaints(keyword)],
+    ["hackernews", fetchHackerNewsComplaints(keyword)],
+    ["web", fetchWebComplaints(keyword)],
+    ["youtube", fetchYouTubeComplaints(keyword)],
+  ];
+  const settled = await Promise.all(sourceFetchers.map(([, p]) => p));
 
   const errors: string[] = [];
-  if (reddit.error) errors.push(reddit.error);
-  if (appStore.error) errors.push(appStore.error);
-  if (hackerNews.error) errors.push(hackerNews.error);
-  if (web.error) errors.push(web.error);
+  const foundBySource = emptyFoundBySource();
+  const found: typeof settled[number]["complaints"] = [];
+  settled.forEach((result, i) => {
+    const [kind] = sourceFetchers[i];
+    if (result.error) errors.push(result.error);
+    foundBySource[kind] = result.complaints.length;
+    found.push(...result.complaints);
+  });
 
-  const counts = {
-    redditFound: reddit.complaints.length,
-    appStoreFound: appStore.complaints.length,
-    hackerNewsFound: hackerNews.complaints.length,
-    webFound: web.complaints.length,
-  };
-
-  const found = [
-    ...reddit.complaints,
-    ...appStore.complaints,
-    ...hackerNews.complaints,
-    ...web.complaints,
-  ];
   if (found.length === 0) {
-    return { ...base, ...counts, errors };
+    return { ...base, foundBySource, errors };
   }
 
   // Validate with the shared schema, then dedupe within the batch.
@@ -149,7 +154,7 @@ export async function runFinderImport(input: {
     if (!quota.ok) {
       return {
         ...base,
-        ...counts,
+        foundBySource,
         skipped: found.length,
         errors: [quota.message],
         quotaFull: true,
@@ -189,7 +194,7 @@ export async function runFinderImport(input: {
 
   return {
     ...base,
-    ...counts,
+    foundBySource,
     inserted: toInsert.length,
     skipped: found.length - toInsert.length,
     errors,

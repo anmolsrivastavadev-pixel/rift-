@@ -10,6 +10,10 @@ import {
 } from "@/actions/complaint-finder";
 import { Button } from "@/components/ui/button";
 import { ImportNextStepLink } from "@/components/complaints/import-summary";
+import {
+  COMPLAINT_SOURCE_NAMES,
+  COMPLAINT_SOURCE_ORDER,
+} from "@/lib/complaint-sources";
 import { pickNiches } from "@/lib/niche-suggestions";
 
 /* Keyword complaint finder — the "1-click" path for beginners who have no
@@ -95,8 +99,9 @@ export function ComplaintFinder({ projectId }: { projectId: string }) {
       </div>
 
       <p className="text-xs text-[var(--color-muted-foreground)]">
-        Rift searches Reddit, App Store reviews, Hacker News, and the wider web
-        for real frustrations about your niche. No spreadsheet needed.
+        Rift searches Reddit, App Store reviews, Hacker News, YouTube comments,
+        and the wider web for real frustrations about your niche. No
+        spreadsheet needed.
       </p>
 
       {result && !pending && <FinderSummary result={result} projectId={projectId} />}
@@ -111,11 +116,11 @@ function FinderSummary({
   result: FindComplaintsResult;
   projectId: string;
 }) {
-  const found =
-    result.redditFound +
-    result.appStoreFound +
-    result.hackerNewsFound +
-    result.webFound;
+  const found = Object.values(result.foundBySource).reduce((a, b) => a + b, 0);
+  // Only name sources that actually returned something.
+  const sourceParts = COMPLAINT_SOURCE_ORDER.filter(
+    (k) => result.foundBySource[k] > 0
+  ).map((k) => `${result.foundBySource[k]} from ${COMPLAINT_SOURCE_NAMES[k]}`);
 
   if (result.inserted === 0) {
     return (
@@ -147,9 +152,7 @@ function FinderSummary({
           “{result.keyword}”. Now find ideas.
         </p>
         <p className="text-xs text-[var(--color-muted-foreground)]">
-          {result.redditFound} from Reddit, {result.appStoreFound} from App Store
-          reviews, {result.hackerNewsFound} from Hacker News, {result.webFound} from
-          the web
+          {sourceParts.join(", ")}
           {result.skipped > 0 ? `, ${result.skipped} skipped (duplicates)` : ""}.
         </p>
         {result.errors.map((e, i) => (

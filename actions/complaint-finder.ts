@@ -2,7 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 
-import { runFinderImport } from "@/lib/finder-import";
+import { emptyFoundBySource, runFinderImport } from "@/lib/finder-import";
+import type { ComplaintSourceKind } from "@/lib/complaint-sources";
 import { requireUser } from "@/lib/auth/current-user";
 import { requireOwnedProject } from "@/lib/projects";
 import { checkFinderSearchQuota } from "@/lib/quotas";
@@ -10,19 +11,17 @@ import { checkFinderSearchQuota } from "@/lib/quotas";
 export interface FindComplaintsResult {
   inserted: number;
   skipped: number;
-  redditFound: number;
-  appStoreFound: number;
-  hackerNewsFound: number;
-  webFound: number;
+  /** How many complaints each source returned (0 for sources that sat out). */
+  foundBySource: Record<ComplaintSourceKind, number>;
   errors: string[];
   keyword: string;
 }
 
 /* Server action: type a niche keyword (e.g. "fitness apps") and Rift fetches
- * real complaints from Reddit search + App Store reviews + Hacker News + the
- * web, then imports them into the current project using the same validation +
- * dedupe rules as the paste-text path. The CSV pipeline and AI pipeline are
- * untouched.
+ * real complaints from Reddit search + App Store reviews + Hacker News +
+ * YouTube comments + the web, then imports them into the current project
+ * using the same validation + dedupe rules as the paste-text path. The CSV
+ * pipeline and AI pipeline are untouched.
  *
  * M31c — the fetch/validate/dedupe/insert core lives in lib/finder-import.ts,
  * shared with the weekly niche-watch cron. This action keeps what is
@@ -43,10 +42,7 @@ export async function findComplaintsAction(
   const base: FindComplaintsResult = {
     inserted: 0,
     skipped: 0,
-    redditFound: 0,
-    appStoreFound: 0,
-    hackerNewsFound: 0,
-    webFound: 0,
+    foundBySource: emptyFoundBySource(),
     errors: [],
     keyword,
   };
@@ -73,20 +69,14 @@ export async function findComplaintsAction(
     label: `Found complaints for “${keyword}”`,
   });
 
-  const foundTotal =
-    result.redditFound +
-    result.appStoreFound +
-    result.hackerNewsFound +
-    result.webFound;
+  const foundTotal = Object.values(result.foundBySource).reduce(
+    (a, b) => a + b,
+    0
+  );
   if (foundTotal === 0) {
     return {
       ...base,
-      ...{
-        redditFound: result.redditFound,
-        appStoreFound: result.appStoreFound,
-        hackerNewsFound: result.hackerNewsFound,
-        webFound: result.webFound,
-      },
+      foundBySource: result.foundBySource,
       errors:
         result.errors.length > 0
           ? result.errors
@@ -100,10 +90,7 @@ export async function findComplaintsAction(
   return {
     inserted: result.inserted,
     skipped: result.skipped,
-    redditFound: result.redditFound,
-    appStoreFound: result.appStoreFound,
-    hackerNewsFound: result.hackerNewsFound,
-    webFound: result.webFound,
+    foundBySource: result.foundBySource,
     errors: result.errors,
     keyword,
   };

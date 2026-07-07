@@ -15,6 +15,9 @@ export const THREAD_SOURCE_LABELS: Record<ComplaintSourceKind, string> = {
   hackernews: "Hacker News thread",
   appstore: "App Store reviews page",
   web: "Web page",
+  youtube: "YouTube comment",
+  stackexchange: "Stack Exchange question",
+  github: "GitHub issue",
 };
 
 export const OUTREACH_ETIQUETTE =

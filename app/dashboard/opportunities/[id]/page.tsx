@@ -138,7 +138,10 @@ export default async function OpportunityDetailPage({
         opportunityId: id,
         userId: user.id,
         sourceUrl: { not: null },
-        sourceKind: { in: ["reddit", "hackernews", "web"] },
+        // Reply-able places only (App Store reviews can't be replied to).
+        sourceKind: {
+          in: ["reddit", "hackernews", "web", "youtube", "stackexchange", "github"],
+        },
       },
       orderBy: { sourceDate: "desc" },
       take: 6,

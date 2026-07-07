@@ -7,20 +7,58 @@
  * no receipt (both fields null) and simply render no link.
  */
 
-export type ComplaintSourceKind = "reddit" | "appstore" | "hackernews" | "web";
+export type ComplaintSourceKind =
+  | "reddit"
+  | "appstore"
+  | "hackernews"
+  | "web"
+  | "youtube"
+  | "stackexchange"
+  | "github";
+
+/** Display order for source lists and the finder summary. */
+export const COMPLAINT_SOURCE_ORDER: ComplaintSourceKind[] = [
+  "reddit",
+  "appstore",
+  "hackernews",
+  "youtube",
+  "stackexchange",
+  "github",
+  "web",
+];
 
 export const COMPLAINT_SOURCE_LABELS: Record<ComplaintSourceKind, string> = {
   reddit: "View on Reddit",
   appstore: "View reviews on the App Store",
   hackernews: "View on Hacker News",
   web: "View source",
+  youtube: "View comment on YouTube",
+  stackexchange: "View on Stack Exchange",
+  github: "View issue on GitHub",
+};
+
+/** Plain source names for count summaries ("12 from Reddit, 8 from …"). */
+export const COMPLAINT_SOURCE_NAMES: Record<ComplaintSourceKind, string> = {
+  reddit: "Reddit",
+  appstore: "App Store reviews",
+  hackernews: "Hacker News",
+  web: "the web",
+  youtube: "YouTube comments",
+  stackexchange: "Stack Exchange",
+  github: "GitHub",
 };
 
 export function isComplaintSourceKind(
   v: string | null | undefined
 ): v is ComplaintSourceKind {
   return (
-    v === "reddit" || v === "appstore" || v === "hackernews" || v === "web"
+    v === "reddit" ||
+    v === "appstore" ||
+    v === "hackernews" ||
+    v === "web" ||
+    v === "youtube" ||
+    v === "stackexchange" ||
+    v === "github"
   );
 }
 
