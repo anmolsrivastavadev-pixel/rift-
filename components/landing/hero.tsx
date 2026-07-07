@@ -15,8 +15,8 @@ import { Button } from "@/components/ui/button";
 
 const metaChips = [
   "Every idea comes with receipts",
+  "Searches 7 sources at once",
   "Free during the private beta",
-  "No credit card required",
 ];
 
 /* 19 -> "0:19", 96 -> "1:36" */

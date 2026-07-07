@@ -12,7 +12,7 @@ import { SectionHeader } from "@/components/landing/section-header";
 const rows = [
   {
     chat: "Skims a few pages once, pastes a few links, forgets it all tomorrow",
-    rift: "Collects hundreds of complaints into one evidence base — deduped, stored, every quote linked to its source",
+    rift: "Collects hundreds of complaints from 7 sources into one evidence base — deduped, stored, every quote linked to its source",
   },
   {
     chat: "A different answer every time you ask",

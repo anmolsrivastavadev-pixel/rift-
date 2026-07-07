@@ -35,9 +35,18 @@ const C = {
 };
 
 const quotes = [
-  "“They never remind me about my appointment, so I just stopped going.”",
-  "“I can't tell what grooming will actually cost until I'm there.”",
-  "“Booked online and nobody ever confirmed it.”",
+  {
+    text: "“They never remind me about my appointment, so I just stopped going.”",
+    receipt: "Reddit · view post ↗",
+  },
+  {
+    text: "“I can't tell what grooming will actually cost until I'm there.”",
+    receipt: "YouTube · view comment ↗",
+  },
+  {
+    text: "“Booked online and nobody ever confirmed it.”",
+    receipt: "App Store · view review ↗",
+  },
 ];
 const chips = ["missed bookings", "unclear pricing", "no reminders"];
 const bars = [38, 55, 44, 70, 58, 86, 64];
@@ -53,7 +62,11 @@ const briefRows = [
   ["Audience", "Small grooming salons that take bookings online but run on pen and paper."],
   ["Test next", "Ask 5 salon owners how they handle no-shows today."],
 ];
-const checks = ["Talked to 5 real people", "Found 3 paying workarounds", "Collected 24 complaints"];
+const checks = [
+  "Talked to 5 real people",
+  "Replied to 3 real complainers",
+  "Found 3 paying workarounds",
+];
 
 // ---- Timeline (frames) -----------------------------------------------------
 /* Retimed 2026-07-06: the first cut had ~20s of dead air (static brief tail,
@@ -230,7 +243,9 @@ const CockpitScreen: React.FC = () => {
               />
             ))}
           </div>
-          <div style={{ color: C.muted, fontSize: 23 }}>Scanning 24 reviews…</div>
+          <div style={{ color: C.muted, fontSize: 23 }}>
+            Scanning Reddit, YouTube, App Store, the web…
+          </div>
         </div>
       )}
 
@@ -273,19 +288,21 @@ const CockpitScreen: React.FC = () => {
 
       {quotes.map((quote, i) => (
         <div
-          key={quote}
+          key={quote.text}
           style={{
             ...riseAt(frame, fps, S1.quotes[i]),
             border: `2px solid ${C.border}`,
             backgroundColor: C.panel,
             borderRadius: 22,
-            padding: "24px 30px",
-            color: "rgba(255,255,255,0.85)",
-            fontSize: 25,
-            lineHeight: 1.35,
+            padding: "22px 30px",
           }}
         >
-          {quote}
+          <div style={{ color: "rgba(255,255,255,0.85)", fontSize: 25, lineHeight: 1.35 }}>
+            {quote.text}
+          </div>
+          <div style={{ color: C.primary, fontSize: 18, fontWeight: 600, marginTop: 10 }}>
+            {quote.receipt}
+          </div>
         </div>
       ))}
 
@@ -322,8 +339,10 @@ const CockpitScreen: React.FC = () => {
             padding: 28,
           }}
         >
-          <Label color={C.muted}>Signal strength</Label>
-          <div style={{ color: C.fg, fontSize: 38, fontWeight: 700, margin: "8px 0 18px" }}>+{signalPct}%</div>
+          <Label color={C.muted}>Pain trend</Label>
+          <div style={{ color: C.success, fontSize: 38, fontWeight: 700, margin: "8px 0 18px" }}>
+            Growing +{signalPct}%
+          </div>
           <div style={{ display: "flex", alignItems: "flex-end", gap: 11, height: 120 }}>
             {bars.map((h, i) => {
               const grow = spring({ frame: frame - (S1.signal + 12 + i * 5), fps, config: { damping: 16 } });
@@ -588,7 +607,7 @@ const BriefScreen: React.FC = () => {
 
 // ---- Screen 5: results montage ------------------------------------------------
 const resultStats: Array<[number, string, string]> = [
-  [24, "complaints in", C.muted],
+  [7, "sources searched", C.muted],
   [3, "ideas scored", C.primary],
   [1, "worth pursuing", C.success],
 ];
@@ -767,7 +786,7 @@ export const HeroDemo: React.FC = () => {
             : "rift.app";
   const sidebar =
     frame < S2.in
-      ? { items: ["Reviews", "Tickets", "Forums", "Calls"], active: "Reviews" }
+      ? { items: ["Reddit", "YouTube", "App Store", "GitHub"], active: "Reddit" }
       : frame < S3.in
         ? { items: ["Home", "Complaints", "Ideas", "Compare", "Saved"], active: "Compare" }
         : frame < S5.in

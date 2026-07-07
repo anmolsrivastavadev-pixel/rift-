@@ -18,7 +18,7 @@ const COMPLAINTS = [
     text: "“I have to call three times just to confirm a booking. Why is this still a thing?”",
   },
   {
-    source: "Hacker News",
+    source: "YouTube comment",
     text: "“Your pricing makes no sense. I gave up and went with someone else.”",
   },
 ];

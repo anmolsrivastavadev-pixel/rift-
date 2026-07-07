@@ -4,7 +4,7 @@ import { Container } from "@/components/container";
 const faqs = [
   {
     q: "Where do I get complaints from?",
-    a: "Paste app reviews, Reddit posts, support tickets, or things people tell you in real life. Even 5 to 10 sentences is enough. You can also upload a CSV, use the built-in complaint finder, or start with demo data.",
+    a: "Type a niche and the built-in finder searches seven places at once: Reddit, YouTube comments, App Store reviews, Hacker News, Stack Exchange, GitHub, and the wider web. Or paste your own reviews, support tickets, and things people tell you — even 5 to 10 sentences is enough.",
   },
   {
     q: "Can't I just use ChatGPT for this?",
