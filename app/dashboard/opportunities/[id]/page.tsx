@@ -28,7 +28,10 @@ import { RelatedOpportunityCard } from "@/components/opportunities/related-oppor
 import { NoRelatedEmpty } from "@/components/opportunities/no-related-empty";
 import { PrevNextNav } from "@/components/opportunities/prev-next-nav";
 import { MarketGapHypothesis } from "@/components/opportunities/market-gap-hypothesis";
+import { TalkToComplainers } from "@/components/opportunities/talk-to-complainers";
 import { ValidationWorkspace } from "@/components/opportunities/validation-workspace";
+import { buildOutreachMessage } from "@/lib/complainer-outreach";
+import { buildInterviewQuestions } from "@/lib/validation-plan";
 import { ExportButtons } from "@/components/reports/export-buttons";
 import { ShareButton } from "@/components/reports/share-button";
 import { shareUrlForToken } from "@/lib/share";
@@ -75,7 +78,7 @@ export default async function OpportunityDetailPage({
 
   const project = await requireOwnedProject(projectId, user);
 
-  const [op, allOthers, allNeighbours, activeShareLink, trendDates] = await Promise.all([
+  const [op, allOthers, allNeighbours, activeShareLink, trendDates, receiptThreads] = await Promise.all([
     prisma.opportunity.findFirst({
       where: { id, userId: user.id, projectId: project.id },
       include: {
@@ -126,6 +129,20 @@ export default async function OpportunityDetailPage({
       where: { opportunityId: id, userId: user.id },
       select: { sourceDate: true, sourceKind: true },
     }),
+    // Receipt-bearing complaints = the real threads behind this idea, for
+    // the "Talk to the people behind the complaints" section.
+    prisma.complaint.findMany({
+      where: { opportunityId: id, userId: user.id, sourceUrl: { not: null } },
+      orderBy: { sourceDate: "desc" },
+      take: 6,
+      select: {
+        id: true,
+        title: true,
+        sourceUrl: true,
+        sourceKind: true,
+        sourceDate: true,
+      },
+    }),
   ]);
 
   if (!op) notFound();
@@ -134,6 +151,26 @@ export default async function OpportunityDetailPage({
   const painTrend = computePainTrend(trendDates.map((d) => d.sourceDate));
   // Display-only evidence strength ("Backed by 43 complaints from 3 sources…").
   const evidence = computeEvidenceStrength(trendDates);
+  // Outreach reply for the complainer threads, built from this idea's own
+  // interview questions.
+  const outreachMessage = buildOutreachMessage({
+    problemTitle: op.title,
+    questions: buildInterviewQuestions({
+      id: op.id,
+      title: op.title,
+      summary: op.summary,
+      suggestedSoftware: op.suggestedSoftware,
+      opportunityScore: op.opportunityScore,
+      marketGap: op.marketGap,
+      targetCustomer: op.targetCustomer,
+      productAngle: op.productAngle,
+      validationQuestions: op.validationQuestions,
+      riskFlags: op.riskFlags,
+    }),
+  });
+  const complainerThreads = receiptThreads
+    .filter((t) => t.sourceUrl !== null)
+    .map((t) => ({ ...t, sourceUrl: t.sourceUrl as string }));
 
   // M19 — usage event (metadata only, fails silently, never blocks the page).
   await trackProductEvent({
@@ -290,6 +327,13 @@ export default async function OpportunityDetailPage({
               )}
             </div>
           </section>
+
+          {/* Talk to the people behind the complaints — receipts turned into
+              a concrete validation task. Hidden when no receipts exist. */}
+          <TalkToComplainers
+            threads={complainerThreads}
+            outreachMessage={outreachMessage}
+          />
 
           {/* 3. Product Opportunity — the broad buildable product (suggestedSoftware).
               The wedge/narrow entry point lives in the Market Gap Hypothesis
