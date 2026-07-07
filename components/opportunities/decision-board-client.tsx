@@ -7,17 +7,18 @@ import {
   Briefcase,
   Users,
   AlertTriangle,
+  LayoutGrid,
+  ShieldAlert,
   Target,
-  Sparkles,
   Info,
 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 import { Button } from "@/components/ui/button";
 import {
   computeTestingPriority,
   TESTING_PRIORITY_LABELS,
   TESTING_PRIORITY_HELPER,
-  DECISION_LABELS,
   type DecisionStatus,
 } from "@/lib/decision-board";
 import {
@@ -136,13 +137,13 @@ export function DecisionBoardClient({
     return (
       <div className="mx-auto max-w-6xl space-y-8">
         <DecisionBoardHeader isCompareMode={isCompareMode} projectId={projectId} />
-        <div className="rounded-[12px] border border-dashed border-[var(--color-border)] bg-[var(--color-card)] p-12 text-center">
+        <div className="rounded-2xl border border-dashed border-[var(--color-border)] bg-[var(--color-card)] p-12 text-center">
           <Target className="mx-auto h-10 w-10 text-[var(--color-muted-foreground)]" />
           <h2 className="mt-4 text-base font-semibold">No ideas to compare yet</h2>
           <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
             {isCompareMode
               ? "The ideas you selected could not be found. Try selecting ideas again from the Ideas page."
-              : "Add data, then find ideas before using Compare Ideas."}
+              : "Add data, then find ideas before using Compare ideas."}
           </p>
           <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
             <Button asChild>
@@ -162,26 +163,32 @@ export function DecisionBoardClient({
   }
 
   if (isCompareMode) {
+    // Pure display comparison of already-rendered scores: mark the leading
+    // column so the eye lands on the current winner first.
+    const topScore = Math.max(...filtered.map((o) => o.opportunityScore));
+    const topScoreId =
+      filtered.length > 1
+        ? (filtered.find((o) => o.opportunityScore === topScore)?.id ?? null)
+        : null;
     return (
       <div className="mx-auto max-w-6xl space-y-8">
         <DecisionBoardHeader isCompareMode={isCompareMode} projectId={projectId} />
 
-        <p className="text-xs text-[var(--color-muted-foreground)]">
-          Compare these ideas side by side and pick one to test.
-        </p>
-
-        {/* Side-by-side comparison table */}
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs">
+        {/* Side-by-side comparison table: fixed layout keeps the columns
+            equal, and the sticky label column stays visible while scrolling
+            horizontally on smaller screens. */}
+        <div className="overflow-x-auto rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] shadow-[var(--shadow-card)]">
+          <table className="w-full min-w-[560px] table-fixed text-xs">
             <thead>
               <tr className="border-b border-[var(--color-border)]">
-                <th className="py-3 pr-4 text-left font-medium text-[var(--color-muted-foreground)]">
-                  Field
+                <th className="sticky left-0 z-10 w-32 bg-[var(--color-card)] py-3 pl-4 pr-4 text-left font-medium text-[var(--color-muted-foreground)]">
+                  <span className="sr-only">Comparison category</span>
                 </th>
                 {filtered.map((op) => (
                   <th
                     key={op.id}
-                    className="py-3 px-4 text-left font-medium text-[var(--color-foreground)]"
+                    scope="col"
+                    className="px-4 py-3 text-left font-medium text-[var(--color-foreground)]"
                   >
                     <Link
                       href={projectHref(`/dashboard/opportunities/${op.id}`, projectId)}
@@ -189,27 +196,22 @@ export function DecisionBoardClient({
                     >
                       {op.title}
                     </Link>
+                    {topScoreId === op.id && (
+                      <div className="mt-1.5">
+                        <Badge variant="success">Top score</Badge>
+                      </div>
+                    )}
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
               <CompareRow
-                label="Who it is for"
+                label="Score"
                 values={filtered.map((op) => (
-                  <span key={op.id} className="text-[var(--color-muted-foreground)]">{op.targetCustomer || "—"}</span>
-                ))}
-              />
-              <CompareRow
-                label="Problem"
-                values={filtered.map((op) => (
-                  <span key={op.id} className="text-[var(--color-muted-foreground)] line-clamp-3">{op.summary}</span>
-                ))}
-              />
-              <CompareRow
-                label="Possible solution"
-                values={filtered.map((op) => (
-                  <span key={op.id} className="text-[var(--color-muted-foreground)]">{op.productAngle || op.suggestedSoftware}</span>
+                  <span key={op.id} className={`text-lg font-bold ${scoreColor(op.opportunityScore)}`}>
+                    {op.opportunityScore}
+                  </span>
                 ))}
               />
               <CompareRow
@@ -227,17 +229,27 @@ export function DecisionBoardClient({
                 })}
               />
               <CompareRow
-                label="Score"
+                label="Who it is for"
                 values={filtered.map((op) => (
-                  <span key={op.id} className={`text-lg font-bold ${scoreColor(op.opportunityScore)}`}>
-                    {op.opportunityScore}
-                  </span>
+                  <span key={op.id} className="text-[var(--color-foreground)]/90">{op.targetCustomer || "—"}</span>
+                ))}
+              />
+              <CompareRow
+                label="Problem"
+                values={filtered.map((op) => (
+                  <span key={op.id} className="text-[var(--color-foreground)]/90 line-clamp-3">{op.summary}</span>
+                ))}
+              />
+              <CompareRow
+                label="Possible solution"
+                values={filtered.map((op) => (
+                  <span key={op.id} className="text-[var(--color-foreground)]/90">{op.productAngle || op.suggestedSoftware}</span>
                 ))}
               />
               <CompareRow
                 label="Difficulty to test"
                 values={filtered.map((op) => (
-                  <span key={op.id} className="text-[var(--color-muted-foreground)]">
+                  <span key={op.id} className="text-[var(--color-foreground)]/90">
                     {difficultyToTest(op.riskFlags, !!op.targetCustomer, !!op.productAngle)}
                   </span>
                 ))}
@@ -246,7 +258,7 @@ export function DecisionBoardClient({
                 label="Biggest risk"
                 values={filtered.map((op) =>
                   op.riskFlags.length > 0 ? (
-                    <ul key={op.id} className="list-disc pl-4 text-[var(--color-muted-foreground)]">
+                    <ul key={op.id} className="list-disc pl-4 text-[var(--color-foreground)]/90">
                       {op.riskFlags.slice(0, 2).map((r, i) => (
                         <li key={i}>{r}</li>
                       ))}
@@ -261,16 +273,12 @@ export function DecisionBoardClient({
                 values={filtered.map((op) => {
                   const status = resolveStatus(op.id);
                   return (
-                    <div key={op.id} className="flex items-center gap-2">
-                      <span className="text-[11px] text-[var(--color-muted-foreground)]">
-                        {hydrated ? DECISION_LABELS[status] : "—"}
-                      </span>
-                      <DecisionStatusSelect
-                        opportunityId={op.id}
-                        value={status}
-                        onChange={(s) => setStatus(op.id, s)}
-                      />
-                    </div>
+                    <DecisionStatusSelect
+                      key={op.id}
+                      opportunityId={op.id}
+                      value={status}
+                      onChange={(s) => setStatus(op.id, s)}
+                    />
                   );
                 })}
               />
@@ -289,40 +297,45 @@ export function DecisionBoardClient({
     <div className="mx-auto max-w-6xl space-y-8">
         <DecisionBoardHeader isCompareMode={false} projectId={projectId} />
 
-      {/* Summary cards */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
-        <SummaryCard label="Total" value={counts.total} />
-        <SummaryCard label="Pursue" value={counts.pursue} accent="success" />
-        <SummaryCard label="Park" value={counts.park} accent="warning" />
-        <SummaryCard label="Reject" value={counts.reject} accent="danger" />
-        <SummaryCard label="Undecided" value={counts.undecided} accent="muted" />
+      {/* Summary tiles double as the status filter — one section instead of
+          tiles + a duplicate chip row saying the same thing. */}
+      <div>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+          {FILTERS.map((f) => {
+            const value =
+              f.value === "all" ? counts.total : counts[f.value];
+            const active = filter === f.value;
+            return (
+              <SummaryCard
+                key={f.value}
+                label={f.value === "all" ? "Total" : f.label}
+                value={value}
+                accent={
+                  f.value === "pursue"
+                    ? "success"
+                    : f.value === "park"
+                      ? "warning"
+                      : f.value === "reject"
+                        ? "danger"
+                        : f.value === "undecided"
+                          ? "muted"
+                          : undefined
+                }
+                active={active}
+                onClick={() => setFilter(f.value)}
+              />
+            );
+          })}
+        </div>
+        <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-[11px] text-[var(--color-muted-foreground)]">
+          <span className="flex items-center gap-1">
+            <Info className="h-3 w-3" /> {TESTING_PRIORITY_HELPER}
+          </span>
+          <span aria-live="polite">
+            Showing {filtered.length} of {opportunities.length}
+          </span>
+        </div>
       </div>
-
-      {/* Filters */}
-      <div className="flex flex-wrap items-center gap-2">
-        {FILTERS.map((f) => (
-          <button
-            key={f.value}
-            type="button"
-            onClick={() => setFilter(f.value)}
-            aria-pressed={filter === f.value}
-            className={`rounded-[8px] px-3 py-1.5 text-xs transition-colors duration-150 ease-out focus-visible:outline focus-visible:[outline-offset:2px] focus-visible:[outline-color:var(--color-primary)] ${
-              filter === f.value
-                ? "bg-[var(--color-primary)] text-[var(--color-primary-foreground)]"
-                : "border border-[var(--color-border)] bg-[var(--color-card)] text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)]"
-            }`}
-          >
-            {f.label}
-          </button>
-        ))}
-        <span className="ml-auto text-xs text-[var(--color-muted-foreground)]">
-          {filtered.length} of {opportunities.length}
-        </span>
-      </div>
-
-      <p className="flex items-center gap-1 text-[11px] text-[var(--color-muted-foreground)]">
-        <Info className="h-3 w-3" /> {TESTING_PRIORITY_HELPER}
-      </p>
 
       {/* Opportunity comparison cards */}
       <div className="grid gap-4 lg:grid-cols-2">
@@ -337,7 +350,7 @@ export function DecisionBoardClient({
           return (
             <div
               key={op.id}
-              className="flex flex-col rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-5"
+              className="flex flex-col rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[var(--shadow-card)]"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
@@ -387,8 +400,8 @@ export function DecisionBoardClient({
                 </p>
               )}
 
-              {/* Mini stats */}
-              <div className="mt-3 flex flex-wrap gap-3 text-xs text-[var(--color-muted-foreground)]">
+              {/* Mini stats — grid so values line up across adjacent cards */}
+              <div className="mt-3 grid grid-cols-3 gap-2 text-xs text-[var(--color-muted-foreground)] sm:grid-cols-5">
                 <Stat icon={Users} label="Complaints" value={op.mentions} />
                 <Stat
                   icon={AlertTriangle}
@@ -400,7 +413,7 @@ export function DecisionBoardClient({
                   label="Confidence"
                   value={op.confidence !== null ? `${op.confidence}%` : "—"}
                 />
-                <Stat icon={Sparkles} label="Risks" value={op.riskFlags.length} />
+                <Stat icon={ShieldAlert} label="Risks" value={op.riskFlags.length} />
                 <Stat
                   icon={Info}
                   label="Questions"
@@ -409,10 +422,7 @@ export function DecisionBoardClient({
               </div>
 
               {/* Decision status selector */}
-              <div className="mt-4 flex items-center justify-between border-t border-[var(--color-border)] pt-3">
-                <span className="text-[11px] text-[var(--color-muted-foreground)]">
-                  {hydrated ? DECISION_LABELS[status] : "—"}
-                </span>
+              <div className="mt-4 flex items-center justify-end border-t border-[var(--color-border)] pt-3">
                 <DecisionStatusSelect
                   opportunityId={op.id}
                   value={status}
@@ -426,7 +436,7 @@ export function DecisionBoardClient({
 
       {filtered.length === 0 && (
         <p className="text-center text-sm text-[var(--color-muted-foreground)]">
-          No opportunities match this filter.
+          No ideas match this filter.
         </p>
       )}
 
@@ -451,18 +461,30 @@ function DecisionBoardHeader({
           <ArrowLeft className="h-4 w-4" /> Back to ideas
         </Link>
       </Button>
-      <h1 className="mt-4 text-2xl font-semibold tracking-tight">
-        {isCompareMode ? "Compare selected ideas" : "Compare Ideas"}
-      </h1>
-      {isCompareMode ? (
-        <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
-          Compare these ideas side by side and pick one to test.
-        </p>
-      ) : (
-        <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
-          Compare ideas and pick one to test.
-        </p>
-      )}
+      <div className="mt-4 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            {isCompareMode ? "Compare selected ideas" : "Compare ideas"}
+          </h1>
+          {isCompareMode ? (
+            <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
+              Compare these ideas side by side and pick one to test.
+            </p>
+          ) : (
+            <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
+              Pick 2–3 ideas on the Ideas page and press &ldquo;Compare
+              selected ideas&rdquo; — they appear here side by side.
+            </p>
+          )}
+        </div>
+        {!isCompareMode && (
+          <Button asChild variant="outline" size="sm">
+            <Link href={projectHref("/dashboard/opportunities", projectId)}>
+              <LayoutGrid className="h-4 w-4" /> Select ideas to compare
+            </Link>
+          </Button>
+        )}
+      </div>
     </div>
   );
 }
@@ -471,28 +493,42 @@ function SummaryCard({
   label,
   value,
   accent,
+  active = false,
+  onClick,
 }: {
   label: string;
   value: number;
   accent?: "success" | "warning" | "danger" | "muted";
+  active?: boolean;
+  onClick?: () => void;
 }) {
+  // Zero counts stay muted regardless of accent — a green "0" is false signal.
   const colorClass =
-    accent === "success"
-      ? "text-[var(--color-success)]"
-      : accent === "warning"
-        ? "text-[var(--color-warning)]"
-        : accent === "danger"
-          ? "text-[var(--color-danger)]"
-          : accent === "muted"
-            ? "text-[var(--color-muted-foreground)]"
+    value === 0 || accent === "muted"
+      ? "text-[var(--color-muted-foreground)]"
+      : accent === "success"
+        ? "text-[var(--color-success)]"
+        : accent === "warning"
+          ? "text-[var(--color-warning)]"
+          : accent === "danger"
+            ? "text-[var(--color-danger)]"
             : "text-[var(--color-foreground)]";
   return (
-    <div className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-4 text-center">
-      <p className={`text-2xl font-bold ${colorClass}`}>{value}</p>
-      <p className="mt-0.5 text-[10px] uppercase tracking-wide text-[var(--color-muted-foreground)]">
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className={`rounded-xl border p-4 text-center transition-all duration-150 ease-out ${
+        active
+          ? "border-[var(--color-primary)] bg-[var(--color-card)] ring-1 ring-[var(--color-primary)]/30"
+          : "border-[var(--color-border)] bg-[var(--color-card)] hover:border-[var(--color-primary)]/40"
+      }`}
+    >
+      <span className={`block text-2xl font-bold ${colorClass}`}>{value}</span>
+      <span className="mt-0.5 block text-[10px] uppercase tracking-wide text-[var(--color-muted-foreground)]">
         {label}
-      </p>
-    </div>
+      </span>
+    </button>
   );
 }
 
@@ -523,9 +559,12 @@ function CompareRow({
 }) {
   return (
     <tr className="border-b border-[var(--color-border)]">
-      <td className="py-3 pr-4 font-medium text-[var(--color-muted-foreground)] whitespace-nowrap">
+      <th
+        scope="row"
+        className="sticky left-0 z-10 bg-[var(--color-card)] py-3 pl-4 pr-4 text-left align-top font-medium text-[var(--color-muted-foreground)] whitespace-nowrap"
+      >
         {label}
-      </td>
+      </th>
       {values.map((value, i) => (
         <td key={i} className="py-3 px-4 align-top text-sm text-[var(--color-foreground)]">
           {value}

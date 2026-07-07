@@ -9,7 +9,10 @@ import {
 } from "@/lib/decision-board";
 import { setDecisionStatus as saveDecisionStatus } from "@/actions/validation";
 
-/* Compact native select for choosing a decision status per opportunity.
+/* Segmented Pursue / Park / Reject control for choosing a decision status.
+ * Clicking the active segment clears the decision back to "undecided", so
+ * every state is reachable without a dropdown. The chosen state carries its
+ * semantic color, which makes a board full of decisions glance-scannable.
  * M16C: statuses are database-backed — the server page loads them and passes
  * them into `useDecisionStatuses`; changes update local state instantly and
  * are persisted through a server action.
@@ -23,19 +26,43 @@ export function DecisionStatusSelect({
   value: DecisionStatus;
   onChange: (status: DecisionStatus) => void;
 }) {
+  const options = DECISION_STATUSES.filter((s) => s !== "undecided");
   return (
-    <select
-      value={value}
-      onChange={(e) => onChange(e.target.value as DecisionStatus)}
-      aria-label={`Decision status for opportunity ${opportunityId}`}
-      className="h-8 rounded-[8px] border border-[var(--color-border)] bg-[var(--color-background)] px-2 text-xs text-[var(--color-foreground)] outline-none focus:border-[var(--color-primary)] focus-visible:outline focus-visible:[outline-offset:2px] focus-visible:[outline-color:var(--color-primary)]"
+    <div
+      role="group"
+      aria-label={`Decision status for idea ${opportunityId}`}
+      className="inline-flex rounded-lg border border-[var(--color-border)]"
     >
-      {DECISION_STATUSES.map((s) => (
-        <option key={s} value={s}>
-          {DECISION_LABELS[s]}
-        </option>
-      ))}
-    </select>
+      {/* No overflow-hidden on the wrapper — it would clip the global
+          keyboard focus outline on the segments. Corners come from
+          first/last rounding instead. */}
+      {options.map((s, i) => {
+        const active = value === s;
+        const activeClass =
+          s === "pursue"
+            ? "bg-[var(--color-success-soft)] text-[var(--color-success)]"
+            : s === "park"
+              ? "bg-[var(--color-warning-soft)] text-[var(--color-warning)]"
+              : "bg-[var(--color-danger-soft)] text-[var(--color-danger)]";
+        return (
+          <button
+            key={s}
+            type="button"
+            aria-pressed={active}
+            onClick={() => onChange(active ? "undecided" : s)}
+            className={`h-8 px-3 text-xs font-medium transition-colors duration-150 ease-out first:rounded-l-lg last:rounded-r-lg focus-visible:relative focus-visible:z-10 ${
+              i > 0 ? "border-l border-[var(--color-border)]" : ""
+            } ${
+              active
+                ? activeClass
+                : "bg-[var(--color-background)] text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)]"
+            }`}
+          >
+            {DECISION_LABELS[s]}
+          </button>
+        );
+      })}
+    </div>
   );
 }
 

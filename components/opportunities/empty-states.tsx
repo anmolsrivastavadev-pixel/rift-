@@ -58,7 +58,7 @@ export function NoSavedEmpty({ projectId }: { projectId: string }) {
       </p>
       <Button asChild className="mt-4">
         <Link href={projectHref("/dashboard/opportunities", projectId)}>
-          Browse opportunities
+          Browse ideas
         </Link>
       </Button>
     </div>

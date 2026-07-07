@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
 import { Container } from "@/components/container";
+import { Button } from "@/components/ui/button";
 
 const assurances = [
   "Free during the private beta",
@@ -35,12 +36,11 @@ export function CtaBand() {
             ))}
           </ul>
         </div>
-        <Link
-          href="/sign-up"
-          className="inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-full bg-[var(--color-primary-fill)] px-7 text-base font-medium text-white shadow-md transition-all duration-150 ease-out hover:brightness-110 hover:shadow-lg active:scale-[0.97]"
-        >
-          Sign up now <ArrowRight className="h-4 w-4" aria-hidden />
-        </Link>
+        <Button asChild size="lg" className="shrink-0 rounded-full px-7">
+          <Link href="/sign-up">
+            Start free <ArrowRight className="h-4 w-4" aria-hidden />
+          </Link>
+        </Button>
       </Container>
     </section>
   );

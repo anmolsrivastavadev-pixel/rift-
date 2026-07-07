@@ -51,13 +51,13 @@ export function StartFreshButton({ projectId }: { projectId: string }) {
         project so you can test a new niche cleanly.
       </p>
       {result?.cleared && (
-        <p className="text-xs text-green-600 dark:text-green-400">
+        <p className="text-xs text-[var(--color-success)]">
           {result.projectName ?? "Project"} cleared. Add complaints for one niche,
           then generate business ideas.
         </p>
       )}
       {result?.error && (
-        <p className="text-xs text-red-600 dark:text-red-400">
+        <p className="text-xs text-[var(--color-danger)]">
           {result.error}
         </p>
       )}

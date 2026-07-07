@@ -22,6 +22,7 @@ export type OnboardingState = {
 
 type Step = {
   label: string;
+  description: string;
   done: boolean;
   href: string;
   cta: string;
@@ -42,18 +43,23 @@ export function OnboardingCard({
   const steps: Step[] = [
     {
       label: "Add complaints",
+      description:
+        "Paste reviews, upload a spreadsheet, or let the finder search seven sources for you.",
       done: hasComplaints,
       href: projectHref("/dashboard/complaints", projectId),
       cta: "Add complaints",
     },
     {
       label: "Find ideas",
+      description:
+        "Rift groups repeated problems and scores each idea 0–100.",
       done: hasIdeas,
       href: projectHref("/dashboard/opportunities", projectId),
       cta: "Find ideas",
     },
     {
       label: "Pick one to test",
+      description: "Compare your top ideas side by side and mark one Pursue.",
       done: state.hasTestingProgress,
       href: projectHref("/dashboard/opportunities", projectId),
       cta: "Pick an idea",
@@ -61,8 +67,52 @@ export function OnboardingCard({
   ];
   const active = steps.find((s) => !s.done) ?? steps[steps.length - 1];
 
+  // First run (no complaints yet): the page below is essentially empty, so
+  // the card acts as the page hero — full-size steps with descriptions and
+  // one large CTA instead of a compact one-liner.
+  if (!hasComplaints) {
+    return (
+      <section className="rounded-2xl border border-[var(--color-primary)]/30 bg-[var(--color-primary)]/5 p-6 sm:p-8">
+        <h2 className="text-xl font-semibold tracking-tight">
+          Start your market test
+        </h2>
+        <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
+          Three steps from raw complaints to one idea worth testing.
+        </p>
+        <ol className="mt-6 space-y-4">
+          {steps.map((step, i) => (
+            <li key={step.label} className="flex gap-3.5">
+              <span
+                className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${
+                  i === 0
+                    ? "bg-[var(--color-primary-fill)] text-[var(--color-primary-foreground)]"
+                    : "bg-[var(--color-primary-soft)] text-[var(--color-primary)] ring-1 ring-[var(--color-primary)]/20"
+                }`}
+              >
+                {i + 1}
+              </span>
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-[var(--color-foreground)]">
+                  {step.label}
+                </p>
+                <p className="mt-0.5 text-xs leading-relaxed text-[var(--color-muted-foreground)]">
+                  {step.description}
+                </p>
+              </div>
+            </li>
+          ))}
+        </ol>
+        <Button asChild size="lg" className="mt-7">
+          <Link href={steps[0].href}>
+            Add complaints <ArrowRight className="h-4 w-4" />
+          </Link>
+        </Button>
+      </section>
+    );
+  }
+
   return (
-    <section className="rounded-2xl border border-[var(--color-primary)]/30 bg-[var(--color-primary)]/5 p-6 sm:p-7">
+    <section className="rounded-2xl border border-[var(--color-primary)]/30 bg-[var(--color-primary)]/5 p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="min-w-0">
           <h2 className="text-lg font-semibold tracking-tight">Start your market test</h2>

@@ -41,10 +41,6 @@ export function WhyComplaints() {
               </div>
             ))}
           </div>
-          <p className="mt-6 border-t border-[var(--color-border)] pt-5 text-center text-sm text-[var(--color-muted-foreground)]">
-            Rift is for early brainstorming, not proof of demand. Talk to real
-            people before building.
-          </p>
         </div>
       </Container>
     </section>

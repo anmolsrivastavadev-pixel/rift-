@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Maximize2, Minimize2, Pause, Play, Volume2, VolumeX } from "lucide-react";
+import { ArrowRight, Check, Maximize2, Minimize2, Pause, Play, Volume2, VolumeX } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 import { Container } from "@/components/container";
 import { Button } from "@/components/ui/button";
@@ -124,7 +124,7 @@ export function Hero() {
         />
       </div>
 
-      <Container className="grid items-center gap-12 pt-16 pb-16 sm:pt-24 sm:pb-24 lg:grid-cols-2 lg:gap-10">
+      <Container className="grid items-center gap-12 pt-12 pb-12 sm:pt-24 sm:pb-24 lg:grid-cols-2 lg:gap-10">
         {/* Left — headline block */}
         <div className="text-left">
           <motion.p
@@ -140,7 +140,7 @@ export function Hero() {
             initial={{ opacity: 0, y: reduceMotion ? 0 : 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, ease: "easeOut", delay: 0.05 }}
-            className="mt-5 text-5xl font-extrabold leading-none tracking-tight text-[var(--color-foreground)] sm:text-6xl xl:text-[5rem]"
+            className="mt-5 text-4xl font-extrabold leading-[1.05] tracking-tight text-[var(--color-foreground)] sm:text-6xl sm:leading-none xl:text-[5rem]"
           >
             Turn complaints into business ideas worth testing.
           </motion.h1>
@@ -161,12 +161,12 @@ export function Hero() {
             transition={{ duration: 0.45, ease: "easeOut", delay: 0.15 }}
             className="mt-8 flex flex-wrap items-center gap-3"
           >
-            <Button asChild size="lg" className="rounded-lg px-6">
+            <Button asChild size="lg" className="rounded-full px-7">
               <Link href="/sign-up">
                 Start with a market <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>
-            <Button asChild variant="secondary" size="lg" className="rounded-lg px-6">
+            <Button asChild variant="secondary" size="lg" className="rounded-full px-7">
               <Link href="/#how-it-works">See how it works</Link>
             </Button>
           </motion.div>
@@ -175,13 +175,17 @@ export function Hero() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.4, delay: 0.25 }}
-            className="mt-8 flex flex-wrap gap-2"
+            className="mt-8 flex flex-wrap gap-x-5 gap-y-2"
           >
             {metaChips.map((chip) => (
               <span
                 key={chip}
-                className="rounded-full border border-[var(--color-border)] bg-[var(--color-card)] px-3.5 py-1.5 text-xs text-[var(--color-muted-foreground)]"
+                className="flex items-center gap-2 text-[13px] text-[var(--color-muted-foreground)]"
               >
+                <Check
+                  className="h-3.5 w-3.5 shrink-0 text-[var(--color-primary)]"
+                  aria-hidden
+                />
                 {chip}
               </span>
             ))}
@@ -199,7 +203,7 @@ export function Hero() {
             className={`group relative overflow-hidden border border-[var(--color-border)] shadow-[var(--shadow-elevated)] ${
               isFull
                 ? "flex items-center justify-center rounded-none bg-black"
-                : "rounded-2xl bg-[var(--color-card)]"
+                : "aspect-video rounded-2xl bg-[var(--color-card)]"
             }`}
           >
             <video
@@ -214,7 +218,7 @@ export function Hero() {
               onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
               poster="/hero-demo-poster.jpg"
               aria-label="Demo of Rift grouping complaints into a scored idea"
-              className={isFull ? "block h-full max-w-full" : "block h-auto w-full"}
+              className={isFull ? "block h-full max-w-full" : "block h-full w-full object-cover"}
             >
               <source src="/hero-demo.mp4" type="video/mp4" />
             </video>
@@ -222,8 +226,10 @@ export function Hero() {
                 fullscreen. Hidden until hover/focus (always shown while
                 paused) so it doesn't cover the demo's own footer. */}
             <div
-              className={`absolute inset-x-0 bottom-0 flex items-center gap-3 bg-gradient-to-t from-black/85 via-black/45 to-transparent px-3 pb-2.5 pt-8 transition-opacity duration-150 ease-out focus-within:opacity-100 group-hover:opacity-100 ${
-                isPaused ? "opacity-100" : "opacity-0"
+              className={`absolute inset-x-0 bottom-0 flex items-center gap-3 bg-gradient-to-t from-black/85 via-black/45 to-transparent px-3 pb-2.5 pt-8 transition-opacity duration-150 ease-out focus-within:pointer-events-auto focus-within:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100 [@media(pointer:coarse)]:pointer-events-auto [@media(pointer:coarse)]:opacity-100 ${
+                isPaused
+                  ? "pointer-events-auto opacity-100"
+                  : "pointer-events-none opacity-0"
               }`}
             >
               <button

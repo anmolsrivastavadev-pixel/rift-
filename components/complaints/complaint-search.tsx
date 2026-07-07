@@ -11,6 +11,7 @@ export function ComplaintSearch({ initial = "" }: { initial?: string }) {
     const next = new URLSearchParams(params.toString());
     if (value) next.set("q", value);
     else next.delete("q");
+    next.delete("page");
     router.replace(`/dashboard/complaints?${next.toString()}`);
   }
 

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import {
   ArrowLeft,
   Briefcase,
+  ChevronRight,
   Users,
   AlertTriangle,
   Target,
@@ -24,6 +25,7 @@ import {
   type NeighbourCandidate,
 } from "@/lib/opportunity-relations";
 import { ExampleComplaints } from "@/components/opportunities/example-complaints";
+import { SaveButton } from "@/components/opportunities/save-button";
 import { RelatedOpportunityCard } from "@/components/opportunities/related-opportunity-card";
 import { NoRelatedEmpty } from "@/components/opportunities/no-related-empty";
 import { PrevNextNav } from "@/components/opportunities/prev-next-nav";
@@ -183,7 +185,7 @@ export default async function OpportunityDetailPage({
     .map((t) => ({ ...t, sourceUrl: t.sourceUrl as string }));
 
   // M19 — usage event (metadata only, fails silently, never blocks the page).
-  await trackProductEvent({
+  void trackProductEvent({
     userId: user.id,
     projectId: project.id,
     opportunityId: op.id,
@@ -238,13 +240,24 @@ export default async function OpportunityDetailPage({
 
       {/* Header */}
       <header className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[var(--shadow-card)]">
-        <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-[var(--color-muted-foreground)]">
-          <Briefcase className="h-3.5 w-3.5" />
-          {op.industry}
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-[var(--color-muted-foreground)]">
+              <Briefcase className="h-3.5 w-3.5" />
+              {op.industry}
+            </div>
+            <h1 className="mt-2 text-3xl font-semibold tracking-tight text-balance">
+              {op.title}
+            </h1>
+          </div>
+          <SaveButton
+            opportunityId={op.id}
+            projectId={project.id}
+            saved={op.savedOpportunities.length > 0}
+            size="sm"
+            showLabel
+          />
         </div>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-balance">
-          {op.title}
-        </h1>
         <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-[var(--color-muted-foreground)]">
           <Badge
             variant={
@@ -291,8 +304,8 @@ export default async function OpportunityDetailPage({
         {/* LEFT column */}
         <div className="space-y-6">
           {/* 1. Problem Summary */}
-          <section>
-            <h2 className="text-base font-semibold">Problem Summary</h2>
+          <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[var(--shadow-card)]">
+            <h2 className="text-base font-semibold">Problem summary</h2>
             <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
               The repeated problem Rift found in the complaints.
             </p>
@@ -302,8 +315,8 @@ export default async function OpportunityDetailPage({
           </section>
 
           {/* 2. Evidence From Complaints — example complaints + keywords */}
-          <section>
-            <h2 className="text-base font-semibold">Evidence From Complaints</h2>
+          <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[var(--shadow-card)]">
+            <h2 className="text-base font-semibold">Evidence from complaints</h2>
             <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
               Examples from the complaints behind this idea. Complaints found by
               the finder link to the original post.
@@ -329,7 +342,7 @@ export default async function OpportunityDetailPage({
               ) : (
                 <div className="mt-3 flex flex-wrap gap-1.5">
                   {sortedKeywords.map((k) => (
-                    <Badge key={k} variant="primary">
+                    <Badge key={k} variant="default">
                       {k}
                     </Badge>
                   ))}
@@ -338,21 +351,14 @@ export default async function OpportunityDetailPage({
             </div>
           </section>
 
-          {/* Talk to the people behind the complaints — receipts turned into
-              a concrete validation task. Hidden when no receipts exist. */}
-          <TalkToComplainers
-            threads={complainerThreads}
-            outreachMessage={outreachMessage}
-          />
-
           {/* 3. Product Opportunity — the broad buildable product (suggestedSoftware).
               The wedge/narrow entry point lives in the Market Gap Hypothesis
               section as "Product Angle" (productAngle) so the two never show
               the same content. suggestedSoftware is always non-null. */}
           <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[var(--shadow-card)]">
-            <h2 className="flex items-center gap-2 text-sm font-semibold">
+            <h2 className="flex items-center gap-2 text-base font-semibold">
               <Lightbulb className="h-4 w-4 text-[var(--color-warning)]" />
-              Product Opportunity
+              Product opportunity
             </h2>
             <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
               A possible solution someone could build.
@@ -374,29 +380,30 @@ export default async function OpportunityDetailPage({
               reason: op.reason,
             }}
           />
+
+          {/* 5. Talk to the people behind the complaints — receipts turned
+              into a concrete validation task, placed AFTER the reader knows
+              what the idea is. Hidden when no receipts exist. */}
+          <TalkToComplainers
+            threads={complainerThreads}
+            outreachMessage={outreachMessage}
+          />
         </div>
 
         {/* RIGHT column — sticky on large screens */}
         <aside className="space-y-6 lg:sticky lg:top-6 lg:self-start">
-          {/* Opportunity Score hero */}
-          <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[var(--shadow-card)] text-center">
-            <p className="text-xs uppercase tracking-wide text-[var(--color-muted-foreground)]">
-              Opportunity score
-            </p>
-            <p className="mt-2 text-5xl font-bold leading-none">
-              {op.opportunityScore}
-            </p>
-            <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">out of 100</p>
-          </div>
-
-          {/* M24 — MiniStats tile row removed: it duplicated the header
-              stats exactly (Complaints/Severity/Confidence) and added to the
-              reviewer-reported information overload. */}
-
-          {/* Score Breakdown */}
+          {/* Score breakdown — open by default; this is the score's home in
+              the sidebar (the old separate score hero duplicated the header
+              stat with no interpretation). */}
           {bd?.subscores && (
-            <details className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[var(--shadow-card)]">
-              <summary className="cursor-pointer text-sm font-semibold">Score breakdown</summary>
+            <details
+              open
+              className="group rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[var(--shadow-card)]"
+            >
+              <summary className="flex cursor-pointer select-none items-center gap-2 text-sm font-semibold transition-colors duration-150 ease-out hover:text-[var(--color-primary)] marker:content-none [&::-webkit-details-marker]:hidden">
+                <ChevronRight className="h-4 w-4 shrink-0 text-[var(--color-muted-foreground)] transition-transform duration-150 ease-out group-open:rotate-90" />
+                Why this score is {op.opportunityScore}
+              </summary>
               <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
                 Scores help sort ideas. They do not prove demand.
               </p>
@@ -422,18 +429,18 @@ export default async function OpportunityDetailPage({
               </div>
               {bd.final != null && (
                 <div className="mt-4 flex items-center justify-between border-t border-[var(--color-border)] pt-3 text-sm">
-                  <span className="text-[var(--color-muted-foreground)]">Final Opportunity Score</span>
+                  <span className="text-[var(--color-muted-foreground)]">Final score</span>
                   <span className="font-semibold text-[var(--color-primary)]">{bd.final}</span>
                 </div>
               )}
             </details>
           )}
 
-          {/* Related Opportunities */}
+          {/* Related ideas */}
           <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[var(--shadow-card)]">
             <h2 className="flex items-center gap-2 text-sm font-semibold">
               <Layers className="h-4 w-4 text-[var(--color-primary)]" />
-              Related opportunities
+              Related ideas
             </h2>
             <div className="mt-3 space-y-2">
               {related.length === 0 ? (
@@ -489,18 +496,12 @@ export default async function OpportunityDetailPage({
                 href={projectHref("/dashboard/opportunities/decision-board", project.id)}
                 className="font-medium text-[var(--color-primary)] hover:underline"
               >
-                Compare Ideas
+                Compare ideas
               </Link>
               .
             </p>
           </div>
 
-          <div className="flex items-center gap-2 text-xs text-[var(--color-muted-foreground)]">
-            <CheckCircle2 className="h-3.5 w-3.5 text-[var(--color-success)]" />
-            Created {op.createdAt.toLocaleDateString()}
-          </div>
-
-          {op.savedOpportunities.length > 0 && <Badge variant="success">Saved</Badge>}
         </aside>
       </div>
 
@@ -522,6 +523,10 @@ export default async function OpportunityDetailPage({
           riskFlags: op.riskFlags,
         }}
       />
+
+      {/* Prev/next again at the end of the read, so finishing an idea never
+          means scrolling back to the top to reach the next one. */}
+      <PrevNextNav prevId={prevId} nextId={nextId} projectId={project.id} />
     </div>
   );
 }

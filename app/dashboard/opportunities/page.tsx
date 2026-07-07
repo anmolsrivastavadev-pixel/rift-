@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LayoutGrid } from "lucide-react";
+import { ChevronRight, LayoutGrid, Target } from "lucide-react";
 
 import { prisma } from "@/lib/db";
 import { RunOpportunitiesButton } from "@/components/opportunities/run-button";
@@ -9,6 +9,16 @@ import { requireUser } from "@/lib/auth/current-user";
 import { computePainTrend, PAIN_TREND_LABELS } from "@/lib/pain-trend";
 import { getProjectOrDefault, projectHref } from "@/lib/projects";
 import { getUsageSummary } from "@/lib/quotas";
+import { MAX_COMPLAINTS } from "@/lib/ai";
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+const PAIN_TREND_QUERY_DAYS = 365;
+
+// Long idea runs (clustering 1,500 complaints across ~15 Gemini batches) can
+// exceed Vercel's default Server Action time limit. The page-level
+// `maxDuration` propagates to every Server Action invoked from this segment,
+// so `runPipeline` is allowed to run for up to 300s here.
+export const maxDuration = 300;
 
 function firstParam(value: string | string[] | undefined): string | undefined {
   return Array.isArray(value) ? value[0] : value;
@@ -24,6 +34,7 @@ export default async function OpportunitiesPage({
     firstParam((await searchParams).projectId),
     user
   );
+  const painTrendStart = new Date(new Date().getTime() - PAIN_TREND_QUERY_DAYS * DAY_MS);
   const [ops, savedRows, complaintCount, usage, datedComplaints] = await Promise.all([
     prisma.opportunity.findMany({
       where: { userId: user.id, projectId: project.id },
@@ -45,7 +56,7 @@ export default async function OpportunitiesPage({
         userId: user.id,
         projectId: project.id,
         opportunityId: { not: null },
-        sourceDate: { not: null },
+        sourceDate: { not: null, gte: painTrendStart },
       },
       select: { opportunityId: true, sourceDate: true },
     }),
@@ -79,6 +90,17 @@ export default async function OpportunitiesPage({
       </p>
     ) : null;
 
+  // Visible cap notice — the clustering pipeline cuts at MAX_COMPLAINTS,
+  // quietly preferring the most recent complaints. Surfacing this prevents
+  // the surprise of seeing fewer complaints analyzed than the project holds.
+  const capNotice =
+    complaintCount > MAX_COMPLAINTS ? (
+      <p className="mt-2 text-xs text-[var(--color-muted-foreground)]">
+        Rift analyzes your {MAX_COMPLAINTS.toLocaleString()} most recent
+        complaints per run.
+      </p>
+    ) : null;
+
   const cards = ops.map((o) => ({
     id: o.id,
     title: o.title,
@@ -101,17 +123,19 @@ export default async function OpportunitiesPage({
     <div className="mx-auto max-w-6xl space-y-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Business Ideas</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">Business ideas</h1>
           <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
-            Review ideas found from this project’s complaints.
+            From {complaintCount.toLocaleString()} complaint
+            {complaintCount === 1 ? "" : "s"} in{" "}
+            <span className="font-medium text-[var(--color-foreground)]">
+              {project.name}
+            </span>
           </p>
-          <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
-            Project: <span className="font-medium text-[var(--color-foreground)]">{project.name}</span>
-          </p>
+          {ops.length > 0 && usageLine}
         </div>
         <Button asChild variant="outline">
           <Link href={projectHref("/dashboard/opportunities/decision-board", project.id)}>
-            <LayoutGrid className="h-4 w-4" /> Compare Ideas
+            <LayoutGrid className="h-4 w-4" /> Compare ideas
           </Link>
         </Button>
       </div>
@@ -131,32 +155,47 @@ export default async function OpportunitiesPage({
           </Button>
         </section>
       ) : ops.length === 0 ? (
-        <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[var(--shadow-card)]">
-          <h2 className="text-base font-semibold">Find ideas</h2>
-          <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
-            Rift will use {complaintCount} complaint{complaintCount === 1 ? "" : "s"} from
-            this project.
+        <section className="flex flex-col items-center rounded-2xl border border-dashed border-[var(--color-border)] bg-[var(--color-card)] px-6 py-12 text-center shadow-[var(--shadow-card)]">
+          <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--color-primary-soft)]">
+            <Target className="h-6 w-6 text-[var(--color-primary)]" aria-hidden />
+          </span>
+          <h2 className="mt-4 text-lg font-semibold tracking-tight">
+            Turn {complaintCount.toLocaleString()} complaint
+            {complaintCount === 1 ? "" : "s"} into ranked ideas
+          </h2>
+          <p className="mt-1 max-w-md text-sm text-[var(--color-muted-foreground)]">
+            Rift groups the repeated problems in this project and scores each
+            idea 0–100.
           </p>
-          <div className="mt-4">
+          {capNotice}
+          <div className="mt-5 flex flex-col items-center">
             <RunOpportunitiesButton projectId={project.id} />
             {usageLine}
           </div>
         </section>
       ) : (
-        <details className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5">
-          <summary className="cursor-pointer text-sm font-semibold">Run again</summary>
+        <details className="group rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5">
+          <summary className="flex cursor-pointer select-none items-center gap-2 text-sm font-semibold transition-colors duration-150 ease-out hover:text-[var(--color-primary)] marker:content-none [&::-webkit-details-marker]:hidden">
+            <ChevronRight className="h-4 w-4 shrink-0 text-[var(--color-muted-foreground)] transition-transform duration-150 ease-out group-open:rotate-90" />
+            Run analysis again
+            <span className="font-normal text-[var(--color-muted-foreground)]">
+              · replaces current ideas
+            </span>
+          </summary>
           <p className="mt-2 text-xs text-[var(--color-muted-foreground)]">
-            Replaces the current ideas. Rift will use {complaintCount} complaint
+            Rift will use {complaintCount} complaint
             {complaintCount === 1 ? "" : "s"} from this project.
           </p>
+          {capNotice}
           <div className="mt-4">
             <RunOpportunitiesButton projectId={project.id} />
-            {usageLine}
           </div>
         </details>
       )}
 
-      <OpportunityBrowser opportunities={cards} projectId={project.id} />
+      {ops.length > 0 && (
+        <OpportunityBrowser opportunities={cards} projectId={project.id} />
+      )}
     </div>
   );
 }

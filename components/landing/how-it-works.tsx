@@ -27,9 +27,9 @@ const steps = [
 ];
 
 const previewClusters = [
-  { label: "missed bookings", count: "9 complaints", width: "86%" },
-  { label: "unclear pricing", count: "7 complaints", width: "71%" },
-  { label: "long wait times", count: "5 complaints", width: "58%" },
+  { label: "invoices chased by hand", count: "11 complaints", width: "92%" },
+  { label: "no-show fees disputed", count: "8 complaints", width: "67%" },
+  { label: "exports break weekly", count: "5 complaints", width: "42%" },
 ];
 
 export function HowItWorks() {

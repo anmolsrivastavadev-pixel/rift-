@@ -17,9 +17,9 @@ export default function HomePage() {
       <LandingNav />
       <Hero />
       <TagRibbon />
+      <HowItWorks />
       <Features />
       <EvidenceMap />
-      <HowItWorks />
       <OutputWall />
       <ChatgptCompare />
       <WhyComplaints />

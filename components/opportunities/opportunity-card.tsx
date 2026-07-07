@@ -6,6 +6,7 @@ import {
   Target,
   Users,
   AlertTriangle,
+  ArrowRight,
   Briefcase,
   Plus,
   Check,
@@ -61,6 +62,7 @@ export function OpportunityCard({
         ? "bg-[var(--color-warning-soft)]"
         : "bg-[var(--color-danger-soft)]";
   const scoreLabel = `Score ${op.opportunityScore} out of 100`;
+  const href = projectHref(`/dashboard/opportunities/${op.id}`, projectId);
   return (
     <div
       className={
@@ -71,49 +73,14 @@ export function OpportunityCard({
           : "border-[var(--color-border)] hover:border-[var(--color-primary)]/40")
       }
     >
-      <div className="absolute right-4 top-4 flex items-center gap-1.5">
-        {onToggleCompare && (
-          <button
-            type="button"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              onToggleCompare(op.id);
-            }}
-            className={`inline-flex items-center gap-1 rounded-lg border px-2.5 py-1 text-[11px] font-medium transition-all duration-150 ease-out active:scale-[0.95] ${
-              selected
-                ? "border-[var(--color-primary)] bg-[var(--color-primary-soft)] text-[var(--color-primary)]"
-                : "border-[var(--color-border)] bg-[var(--color-card)] text-[var(--color-muted-foreground)] hover:border-[var(--color-primary)]/40 hover:text-[var(--color-primary)]"
-            }`}
-            aria-pressed={selected}
-            aria-label={selected ? "Remove from compare" : "Add to compare"}
-          >
-            {selected ? (
-              <>
-                <Check className="h-3 w-3" /> Added
-              </>
-            ) : (
-              <>
-                <Plus className="h-3 w-3" /> Add to compare
-              </>
-            )}
-          </button>
-        )}
-        <SaveButton
-          opportunityId={op.id}
-          projectId={projectId}
-          saved={op.saved}
-          size="sm"
-          showLabel
-        />
-      </div>
-
       <Link
-        href={projectHref(`/dashboard/opportunities/${op.id}`, projectId)}
+        href={href}
         className="flex flex-1 flex-col"
-        aria-label={`Open opportunity: ${op.title}, score ${op.opportunityScore}`}
+        aria-label={`Open idea: ${op.title}, score ${op.opportunityScore}`}
       >
-        <div className="flex items-start gap-2 pr-40">
+        {/* Header: title owns the left, score owns the top-right so a
+            vertical scan down the grid compares scores instantly. */}
+        <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-1.5 text-[11px] uppercase tracking-wider text-[var(--color-muted-foreground)]">
               <Briefcase className="h-3 w-3" />
@@ -137,9 +104,23 @@ export function OpportunityCard({
               {op.title}
             </h3>
           </div>
+          <div
+            className={`flex shrink-0 flex-col items-center rounded-xl ${bgScore} px-3 py-2`}
+            aria-label={scoreLabel}
+          >
+            <div className={`text-xl font-bold leading-none ${sc}`}>
+              {op.opportunityScore}
+            </div>
+            <div className="mt-0.5 text-[10px] uppercase tracking-wider text-[var(--color-muted-foreground)]">
+              Score
+            </div>
+          </div>
         </div>
 
-        <p className="mt-1.5 line-clamp-1 text-sm font-medium text-[var(--color-foreground)]/80">
+        <p className="mt-2 line-clamp-1 text-sm text-[var(--color-foreground)]/80">
+          <span className="text-[11px] font-medium uppercase tracking-wider text-[var(--color-muted-foreground)]">
+            Build
+          </span>{" "}
           {op.suggestedSoftware}
         </p>
 
@@ -153,43 +134,75 @@ export function OpportunityCard({
 
         <div className="mt-4 flex flex-wrap gap-1.5">
           {op.keywords.slice(0, 4).map((k) => (
-            <Badge key={k} variant="primary">
+            <Badge key={k} variant="default">
               {k}
             </Badge>
           ))}
         </div>
 
-        <div className="mt-4 flex items-end justify-between border-t border-[var(--color-border)] pt-3">
-          <div className="grid flex-1 grid-cols-3 gap-2 text-xs">
-            <Stat icon={Users} label="Complaints" value={op.mentions} />
-            <Stat
-              icon={AlertTriangle}
-              label="Severity"
-              value={op.severity !== null ? op.severity.toFixed(1) : "—"}
-            />
-            <Stat
-              icon={Target}
-              label="Confidence"
-              value={op.confidence !== null ? `${op.confidence}%` : "—"}
-            />
-          </div>
-          <div className={`ml-3 flex flex-col items-center shrink-0 rounded-xl ${bgScore} px-3 py-2`}>
-            <div className={`text-xl font-bold leading-none ${sc}`} aria-label={scoreLabel}>
-              {op.opportunityScore}
-            </div>
-            <div className="mt-0.5 text-[9px] uppercase tracking-wider text-[var(--color-muted-foreground)]">
-              Score
-            </div>
-          </div>
+        <div className="mt-4 grid grid-cols-3 gap-2 border-t border-[var(--color-border)] pt-3 text-xs">
+          <Stat icon={Users} label="Complaints" value={op.mentions} />
+          <Stat
+            icon={AlertTriangle}
+            label="Severity"
+            value={op.severity !== null ? op.severity.toFixed(1) : "—"}
+          />
+          <Stat
+            icon={Target}
+            label="Confidence"
+            value={op.confidence !== null ? `${op.confidence}%` : "—"}
+          />
         </div>
-
-        <span
-          className="mt-3 inline-flex items-center justify-center gap-1.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-xs font-medium text-[var(--color-foreground)] transition-all duration-150 ease-out group-hover:border-[var(--color-primary)]/30 group-hover:bg-[var(--color-primary-soft)] group-hover:text-[var(--color-primary)]"
-          aria-hidden="true"
-        >
-          Open idea
-        </span>
       </Link>
+
+      {/* Footer actions live OUTSIDE the main link so the whole card stays
+          clickable without nested-control surprises. */}
+      <div className="mt-3 flex items-center justify-between gap-1.5 border-t border-[var(--color-border)] pt-3">
+        <Link
+          href={href}
+          tabIndex={-1}
+          aria-hidden="true"
+          className="inline-flex items-center gap-1 text-xs font-medium text-[var(--color-muted-foreground)] transition-colors duration-150 ease-out group-hover:text-[var(--color-primary)]"
+        >
+          Open idea <ArrowRight className="h-3 w-3" />
+        </Link>
+        <div className="flex items-center gap-1.5">
+          {onToggleCompare && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onToggleCompare(op.id);
+              }}
+              className={`inline-flex items-center gap-1 rounded-lg border px-2.5 py-1 text-[11px] font-medium transition-all duration-150 ease-out active:scale-[0.95] ${
+                selected
+                  ? "border-[var(--color-primary)] bg-[var(--color-primary-soft)] text-[var(--color-primary)]"
+                  : "border-[var(--color-border)] bg-[var(--color-card)] text-[var(--color-muted-foreground)] hover:border-[var(--color-primary)]/40 hover:text-[var(--color-primary)]"
+              }`}
+              aria-pressed={selected}
+              aria-label={selected ? "Remove from compare" : "Add to compare"}
+            >
+              {selected ? (
+                <>
+                  <Check className="h-3 w-3" /> Added
+                </>
+              ) : (
+                <>
+                  <Plus className="h-3 w-3" /> Add to compare
+                </>
+              )}
+            </button>
+          )}
+          <SaveButton
+            opportunityId={op.id}
+            projectId={projectId}
+            saved={op.saved}
+            size="sm"
+            showLabel
+          />
+        </div>
+      </div>
     </div>
   );
 }

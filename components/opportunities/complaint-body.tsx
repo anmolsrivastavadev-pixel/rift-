@@ -13,14 +13,20 @@ export function ComplaintBody({ body }: { body: string }) {
   const long = body.length > MAX;
 
   if (!long) {
-    return <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">{body}</p>;
+    return (
+      <p className="mt-1 text-sm leading-relaxed text-[var(--color-foreground)]/90">
+        {body}
+      </p>
+    );
   }
 
   const shown = expanded ? body : body.slice(0, MAX) + "…";
 
   return (
     <div>
-      <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">{shown}</p>
+      <p className="mt-1 text-sm leading-relaxed text-[var(--color-foreground)]/90">
+        {shown}
+      </p>
       <button
         type="button"
         onClick={() => setExpanded((v) => !v)}

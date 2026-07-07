@@ -1,4 +1,5 @@
 import {
+  ChevronRight,
   Compass,
   Users,
   HelpCircle,
@@ -41,9 +42,19 @@ export function ValidationWorkspace({
   const questions = buildInterviewQuestions(input);
   const risks = buildRisksToTest(input);
 
+  const stepsDone = (initialChecklist ?? []).filter(Boolean).length;
+
   return (
-    <details className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-sm">
-      <summary className="cursor-pointer text-base font-semibold">Testing guide</summary>
+    <details className="group rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[var(--shadow-card)]">
+      <summary className="flex cursor-pointer select-none items-center gap-2 text-base font-semibold transition-colors duration-150 ease-out hover:text-[var(--color-primary)] marker:content-none [&::-webkit-details-marker]:hidden">
+        <ChevronRight className="h-4 w-4 shrink-0 text-[var(--color-muted-foreground)] transition-transform duration-150 ease-out group-open:rotate-90" />
+        Testing guide
+        <span className="font-normal text-[var(--color-muted-foreground)]">
+          {stepsDone > 0
+            ? `· ${stepsDone} step${stepsDone === 1 ? "" : "s"} done`
+            : "· interview questions + checklist"}
+        </span>
+      </summary>
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-b border-[var(--color-border)] pb-4">
         <div>
           <p className="mt-0.5 text-xs text-[var(--color-muted-foreground)]">

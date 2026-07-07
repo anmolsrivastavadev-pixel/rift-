@@ -1,6 +1,7 @@
 "use client";
 
-import { RotateCcw } from "lucide-react";
+import * as React from "react";
+import { RotateCcw, SlidersHorizontal } from "lucide-react";
 
 export type SortKey =
   | "score-desc"
@@ -28,10 +29,10 @@ export const DEFAULT_FILTERS: FilterState = {
 };
 
 const sortLabels: { key: SortKey; label: string }[] = [
-  { key: "score-desc", label: "Highest Opportunity Score" },
-  { key: "score-asc", label: "Lowest Opportunity Score" },
-  { key: "severity-desc", label: "Highest Severity" },
-  { key: "mentions-desc", label: "Most Complaints" },
+  { key: "score-desc", label: "Highest score" },
+  { key: "score-asc", label: "Lowest score" },
+  { key: "severity-desc", label: "Highest severity" },
+  { key: "mentions-desc", label: "Most complaints" },
   { key: "newest", label: "Newest" },
 ];
 
@@ -60,19 +61,37 @@ export function OpportunityFilters({
   industries: string[];
   onReset: () => void;
 }) {
+  // The three min-sliders are power-user controls; they stay behind a
+  // "More filters" toggle so the default bar is one calm row. Hidden-but-
+  // active filters surface as a count badge on the toggle.
+  const [showAdvanced, setShowAdvanced] = React.useState(false);
+  const advancedActive =
+    (state.minScore > 0 ? 1 : 0) +
+    (state.minSeverity > 0 ? 1 : 0) +
+    (state.minComplaints > 0 ? 1 : 0);
+  const isDefault =
+    state.query === DEFAULT_FILTERS.query &&
+    state.industry === DEFAULT_FILTERS.industry &&
+    state.minScore === DEFAULT_FILTERS.minScore &&
+    state.minSeverity === DEFAULT_FILTERS.minSeverity &&
+    state.minComplaints === DEFAULT_FILTERS.minComplaints &&
+    state.sort === DEFAULT_FILTERS.sort;
+
   return (
     <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-4 shadow-[var(--shadow-card)]">
-      <div className="grid gap-4 lg:grid-cols-[1fr_auto_auto_auto_auto] lg:items-end">
-        <Field label="Search">
-          <input
-            type="search"
-            value={state.query}
-            onChange={(e) => setState({ query: e.target.value })}
-            placeholder="Title, summary, keyword, software…"
-            aria-label="Search opportunities"
-            className={`${inputCls} lg:w-72 focus-visible:border-[var(--color-primary)] focus-visible:outline focus-visible:[outline-offset:2px] focus-visible:[outline-color:var(--color-primary)]`}
-          />
-        </Field>
+      <div className="flex flex-wrap items-end gap-3">
+        <div className="min-w-[12rem] flex-1">
+          <Field label="Search">
+            <input
+              type="search"
+              value={state.query}
+              onChange={(e) => setState({ query: e.target.value })}
+              placeholder="Title, summary, keyword, software…"
+              aria-label="Search ideas"
+              className={`${inputCls} focus-visible:border-[var(--color-primary)] focus-visible:outline focus-visible:[outline-offset:2px] focus-visible:[outline-color:var(--color-primary)]`}
+            />
+          </Field>
+        </div>
 
         <Field label="Industry">
           <select
@@ -90,49 +109,11 @@ export function OpportunityFilters({
           </select>
         </Field>
 
-        <Field label="Min score">
-          <Slider
-            value={state.minScore}
-            min={0}
-            max={100}
-            step={5}
-            onChange={(v) => setState({ minScore: v })}
-            suffix={state.minScore === 0 ? "Any" : `${state.minScore}`}
-            ariaLabel="Minimum opportunity score"
-          />
-        </Field>
-
-        <Field label="Min severity">
-          <Slider
-            value={state.minSeverity}
-            min={0}
-            max={10}
-            step={1}
-            onChange={(v) => setState({ minSeverity: v })}
-            suffix={state.minSeverity === 0 ? "Any" : `${state.minSeverity}`}
-            ariaLabel="Minimum severity"
-          />
-        </Field>
-
-        <Field label="Min complaints">
-          <Slider
-            value={state.minComplaints}
-            min={0}
-            max={20}
-            step={1}
-            onChange={(v) => setState({ minComplaints: v })}
-            suffix={state.minComplaints === 0 ? "Any" : `${state.minComplaints}`}
-            ariaLabel="Minimum complaint count"
-          />
-        </Field>
-      </div>
-
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-[var(--color-border)] pt-3">
         <Field label="Sort by">
           <select
             value={state.sort}
             onChange={(e) => setState({ sort: e.target.value as SortKey })}
-            aria-label="Sort opportunities"
+            aria-label="Sort ideas"
             className={`${inputCls} focus-visible:border-[var(--color-primary)] focus-visible:outline focus-visible:[outline-offset:2px] focus-visible:[outline-color:var(--color-primary)]`}
           >
             {sortLabels.map((s) => (
@@ -142,15 +123,73 @@ export function OpportunityFilters({
             ))}
           </select>
         </Field>
+
+        <button
+          type="button"
+          onClick={() => setShowAdvanced((v) => !v)}
+          aria-expanded={showAdvanced}
+          className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] px-3 text-xs text-[var(--color-muted-foreground)] transition-colors duration-150 ease-out hover:text-[var(--color-foreground)]"
+        >
+          <SlidersHorizontal className="h-3 w-3" aria-hidden />
+          More filters
+          {advancedActive > 0 && (
+            <span className="rounded-full bg-[var(--color-primary-soft)] px-1.5 py-0.5 text-[10px] font-semibold text-[var(--color-primary)]">
+              {advancedActive}
+              <span className="sr-only"> active</span>
+            </span>
+          )}
+        </button>
+
         <button
           type="button"
           onClick={onReset}
+          disabled={isDefault}
           aria-label="Reset all filters"
-          className="inline-flex items-center gap-1.5 rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-2 text-xs text-[var(--color-muted-foreground)] transition-colors duration-150 ease-out hover:text-[var(--color-foreground)] focus-visible:border-[var(--color-primary)] focus-visible:outline focus-visible:[outline-offset:2px] focus-visible:[outline-color:var(--color-primary)]"
+          className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] px-3 text-xs text-[var(--color-muted-foreground)] transition-colors duration-150 ease-out hover:text-[var(--color-foreground)] disabled:pointer-events-none disabled:opacity-50"
         >
-          <RotateCcw className="h-3 w-3" /> Reset filters
+          <RotateCcw className="h-3 w-3" /> Reset
         </button>
       </div>
+
+      {showAdvanced && (
+        <div className="mt-4 grid gap-4 border-t border-[var(--color-border)] pt-4 sm:grid-cols-3">
+          <Field label="Min score">
+            <Slider
+              value={state.minScore}
+              min={0}
+              max={100}
+              step={5}
+              onChange={(v) => setState({ minScore: v })}
+              suffix={state.minScore === 0 ? "Any" : `${state.minScore}`}
+              ariaLabel="Minimum idea score"
+            />
+          </Field>
+
+          <Field label="Min severity">
+            <Slider
+              value={state.minSeverity}
+              min={0}
+              max={10}
+              step={1}
+              onChange={(v) => setState({ minSeverity: v })}
+              suffix={state.minSeverity === 0 ? "Any" : `${state.minSeverity}`}
+              ariaLabel="Minimum severity"
+            />
+          </Field>
+
+          <Field label="Min complaints">
+            <Slider
+              value={state.minComplaints}
+              min={0}
+              max={20}
+              step={1}
+              onChange={(v) => setState({ minComplaints: v })}
+              suffix={state.minComplaints === 0 ? "Any" : `${state.minComplaints}`}
+              ariaLabel="Minimum complaint count"
+            />
+          </Field>
+        </div>
+      )}
     </div>
   );
 }

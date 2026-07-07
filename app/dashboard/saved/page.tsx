@@ -1,8 +1,12 @@
+import Link from "next/link";
+import { LayoutGrid } from "lucide-react";
+
 import { prisma } from "@/lib/db";
 import { OpportunityCard } from "@/components/opportunities/opportunity-card";
 import { NoSavedEmpty } from "@/components/opportunities/empty-states";
+import { Button } from "@/components/ui/button";
 import { requireUser } from "@/lib/auth/current-user";
-import { getProjectOrDefault } from "@/lib/projects";
+import { getProjectOrDefault, projectHref } from "@/lib/projects";
 
 function firstParam(value: string | string[] | undefined): string | undefined {
   return Array.isArray(value) ? value[0] : value;
@@ -56,14 +60,35 @@ export default async function SavedPage({
 
   return (
     <div className="mx-auto max-w-6xl space-y-8">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Saved Ideas</h1>
-        <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
-          Ideas you have bookmarked to revisit later.
-        </p>
-        <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
-          Project: <span className="font-medium text-[var(--color-foreground)]">{project.name}</span>
-        </p>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Saved ideas</h1>
+          <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
+            {cards.length > 0
+              ? `Your shortlist in ${project.name} — ${cards.length} saved. Compare these side by side when you're ready to pick one.`
+              : `Your shortlist in ${project.name}. Save ideas to compare them side by side later.`}
+          </p>
+        </div>
+        {cards.length >= 2 && cards.length <= 3 ? (
+          <Button asChild variant="outline" size="sm">
+            <Link
+              href={projectHref(
+                `/dashboard/opportunities/decision-board?compare=${cards
+                  .map((c) => c.id)
+                  .join(",")}`,
+                project.id
+              )}
+            >
+              <LayoutGrid className="h-4 w-4" /> Compare saved ideas
+            </Link>
+          </Button>
+        ) : cards.length > 3 ? (
+          <Button asChild variant="outline" size="sm">
+            <Link href={projectHref("/dashboard/opportunities", project.id)}>
+              <LayoutGrid className="h-4 w-4" /> Select 2–3 to compare
+            </Link>
+          </Button>
+        ) : null}
       </div>
 
       {cards.length === 0 ? (

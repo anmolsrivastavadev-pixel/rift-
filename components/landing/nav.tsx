@@ -46,7 +46,7 @@ export function LandingNav() {
           </Button>
           <Button asChild size="sm" className="rounded-full px-4">
             <Link href="/sign-up">
-              Get started <ArrowUpRight className="h-3.5 w-3.5" />
+              Start free <ArrowUpRight className="h-3.5 w-3.5" />
             </Link>
           </Button>
           <MobileMenu links={navLinks} />

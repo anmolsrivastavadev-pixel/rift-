@@ -51,7 +51,7 @@ function ProCta({ signedIn, plan }: { signedIn: boolean; plan: "free" | "pro" })
   if (!signedIn) {
     return (
       <Button asChild className="mt-6 w-full">
-        <Link href="/sign-up">Create a free account</Link>
+        <Link href="/sign-up">Start free</Link>
       </Button>
     );
   }
@@ -136,6 +136,7 @@ export default async function PricingPage() {
                     `${free.ideaRunsPerMonth} AI idea runs per month`,
                     `${free.finderSearchesPerMonth} Complaint Finder searches per month`,
                     `${free.complaintsPerProject.toLocaleString("en-US")} complaints per project`,
+                    `${free.maxActiveWatches} weekly niche watch`,
                     "CSV, paste, and starter-pack imports",
                     "Markdown report exports",
                   ]}
@@ -153,7 +154,7 @@ export default async function PricingPage() {
             </Card>
 
             <Card className="border-[var(--color-primary)] ring-1 ring-[var(--color-primary)]">
-              <CardHeader className="rounded-t-2xl bg-[var(--color-primary-soft)]">
+              <CardHeader className="rounded-t-2xl border-b border-[var(--color-primary)]/20 bg-[var(--color-primary-soft)]">
                 <div className="flex items-center justify-between">
                   <CardTitle>Pro</CardTitle>
                   <Badge variant="primary">For serious builders</Badge>
@@ -169,14 +170,15 @@ export default async function PricingPage() {
                   </span>
                 </p>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-6">
+                <p className="text-sm font-medium">Everything in Free, plus:</p>
                 <FeatureList
                   items={[
-                    `${pro.maxActiveProjects} active projects`,
-                    `${pro.ideaRunsPerMonth} AI idea runs per month`,
-                    `${pro.finderSearchesPerMonth.toLocaleString("en-US")} Complaint Finder searches per month`,
-                    `${pro.complaintsPerProject.toLocaleString("en-US")} complaints per project`,
-                    "Everything in Free",
+                    `${pro.maxActiveProjects} active projects (vs ${free.maxActiveProjects})`,
+                    `${pro.ideaRunsPerMonth} AI idea runs per month (vs ${free.ideaRunsPerMonth})`,
+                    `${pro.finderSearchesPerMonth.toLocaleString("en-US")} Complaint Finder searches per month (vs ${free.finderSearchesPerMonth})`,
+                    `${pro.complaintsPerProject.toLocaleString("en-US")} complaints per project (vs ${free.complaintsPerProject.toLocaleString("en-US")})`,
+                    `${pro.maxActiveWatches} weekly niche watches (vs ${free.maxActiveWatches})`,
                     "Cancel anytime, no lock-in",
                   ]}
                 />

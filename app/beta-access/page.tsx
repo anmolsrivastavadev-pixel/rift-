@@ -41,11 +41,23 @@ export default async function BetaAccessPage() {
           Ask the founder to add this email to the beta. Once it’s added, just
           reload this page.
         </p>
-        <div className="mt-6">
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+          <Button asChild>
+            <Link href="/dashboard">Check again</Link>
+          </Button>
           <Button asChild variant="outline">
             <Link href="/">Back to home</Link>
           </Button>
         </div>
+        <p className="mt-3 text-xs text-[var(--color-muted-foreground)]">
+          Signed up with the wrong email?{" "}
+          <Link
+            href="/sign-in"
+            className="font-medium text-[var(--color-primary)] hover:underline"
+          >
+            Use a different account
+          </Link>
+        </p>
       </Container>
     </main>
   );

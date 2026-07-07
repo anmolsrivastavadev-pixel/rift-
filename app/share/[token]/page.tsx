@@ -245,9 +245,9 @@ export default async function SharePage({
           </p>
           <Link
             href="/sign-up"
-            className="print-hide mt-3 inline-flex items-center rounded-xl bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-[var(--color-primary-foreground)] transition-all duration-150 ease-out hover:opacity-90"
+            className="print-hide mt-3 inline-flex items-center rounded-xl bg-[var(--color-primary-fill)] px-4 py-2 text-sm font-medium text-[var(--color-primary-foreground)] shadow-sm transition-all duration-150 ease-out hover:brightness-110 active:scale-[0.97]"
           >
-            Turn your customer complaints into ideas. Try Rift free
+            Turn your customer complaints into ideas. Start free
           </Link>
         </footer>
       </div>

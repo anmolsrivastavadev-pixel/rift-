@@ -21,22 +21,31 @@ import type { DashboardStats } from "@/lib/dashboard-plan";
 import { requireUser } from "@/lib/auth/current-user";
 import { getProjectOrDefault, projectHref } from "@/lib/projects";
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+const DASHBOARD_CHART_DAYS = 30;
+
 function firstParam(value: string | string[] | undefined): string | undefined {
   return Array.isArray(value) ? value[0] : value;
 }
 
 // Buckets by the day each complaint was ADDED to Rift (createdAt), not the
 // date parsed from the original source — imported reviews can carry years-old
-// source dates that make the chart look wrong.
+// source dates that make the chart look wrong. Every calendar day in the
+// window is emitted (zero-filled) so the time axis reads honestly instead of
+// collapsing two far-apart imports into adjacent bars.
 function bucketByDay(rows: { createdAt: Date }[]): DayBucket[] {
   const map = new Map<string, number>();
   for (const r of rows) {
     const key = r.createdAt.toISOString().slice(0, 10);
     map.set(key, (map.get(key) ?? 0) + 1);
   }
-  return Array.from(map.entries())
-    .map(([date, count]) => ({ date, count }))
-    .sort((a, b) => a.date.localeCompare(b.date));
+  const now = Date.now();
+  const out: DayBucket[] = [];
+  for (let i = DASHBOARD_CHART_DAYS - 1; i >= 0; i--) {
+    const key = new Date(now - i * DAY_MS).toISOString().slice(0, 10);
+    out.push({ date: key, count: map.get(key) ?? 0 });
+  }
+  return out;
 }
 
 export default async function DashboardPage({
@@ -48,6 +57,13 @@ export default async function DashboardPage({
   const project = await getProjectOrDefault(
     firstParam((await searchParams).projectId),
     user
+  );
+  // UTC midnight of the earliest zero-filled bucket, so the query window and
+  // the chart window are the same 30 calendar days.
+  const chartStart = new Date(
+    new Date(new Date().getTime() - (DASHBOARD_CHART_DAYS - 1) * DAY_MS)
+      .toISOString()
+      .slice(0, 10)
   );
   const [
     complaintCount,
@@ -68,7 +84,11 @@ export default async function DashboardPage({
       select: { id: true, title: true, body: true, createdAt: true },
     }),
     prisma.complaint.findMany({
-      where: { userId: user.id, projectId: project.id },
+      where: {
+        userId: user.id,
+        projectId: project.id,
+        createdAt: { gte: chartStart },
+      },
       select: { createdAt: true },
     }),
     prisma.opportunity.count({ where: { userId: user.id, projectId: project.id } }),
@@ -180,14 +200,15 @@ export default async function DashboardPage({
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">
-            Home
+            {project.name}
           </h1>
           <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
-            Project: <span className="font-medium text-[var(--color-foreground)]">{project.name}</span>
+            {complaintCount.toLocaleString()} complaints ·{" "}
+            {opportunityCount.toLocaleString()} ideas
           </p>
         </div>
         {/* M18 — private Markdown export; M29 — public share link */}
-        <div className="flex flex-col items-end gap-2">
+        <div className="flex flex-wrap items-center justify-end gap-2">
           <ExportButtons
             kind="project"
             targetId={projectId}
@@ -209,36 +230,11 @@ export default async function DashboardPage({
         </div>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          icon={Users}
-          label="Complaints loaded"
-          value={complaintCount.toLocaleString()}
-          hint={complaintCount > 0 ? "Ready to use" : "None yet"}
-        />
-        <StatCard
-          icon={Target}
-          label="Ideas found"
-          value={opportunityCount.toLocaleString()}
-          hint={opportunityCount > 0 ? "Ready to review" : "Find ideas →"}
-        />
-        <StatCard
-          icon={Bookmark}
-          label="Saved ideas"
-          value={savedCount.toLocaleString()}
-          hint={savedCount > 0 ? "Bookmarked" : "None saved"}
-        />
-        <StatCard
-          icon={Trophy}
-          label="Highest score"
-          value={highestScore !== null ? highestScore.toString() : "—"}
-          hint="Opportunity score (0–100)"
-        />
-      </div>
-
       {/* M17/M21 — exactly ONE guidance block, never two competing CTAs:
           the onboarding card while the first-run steps are incomplete, the
-          Founder Command next-action + decision snapshot afterwards. */}
+          Founder Command next-action + decision snapshot afterwards. M32 —
+          guidance renders FIRST so the next step is always the first thing
+          a founder reads; passive stats follow. */}
       {complaintCount > 0 && opportunityCount > 0 && hasTestingProgress ? (
         <FounderCommandClient
           stats={stats}
@@ -250,6 +246,37 @@ export default async function DashboardPage({
           state={{ complaintCount, opportunityCount, hasTestingProgress }}
           projectId={projectId}
         />
+      )}
+
+      {/* Stats stay hidden on a fresh project — a row of zeros reads as a
+          broken product, not a starting point. */}
+      {complaintCount > 0 && (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <StatCard
+            icon={Users}
+            label="Complaints loaded"
+            value={complaintCount.toLocaleString()}
+            href={projectHref("/dashboard/complaints", projectId)}
+          />
+          <StatCard
+            icon={Target}
+            label="Ideas found"
+            value={opportunityCount.toLocaleString()}
+            href={projectHref("/dashboard/opportunities", projectId)}
+          />
+          <StatCard
+            icon={Bookmark}
+            label="Saved ideas"
+            value={savedCount.toLocaleString()}
+            href={projectHref("/dashboard/saved", projectId)}
+          />
+          <StatCard
+            icon={Trophy}
+            label="Highest score"
+            value={highestScore !== null ? highestScore.toString() : "—"}
+            hint="Idea score (0–100)"
+          />
+        </div>
       )}
 
       {/* M16D — what data was added + when ideas were generated.
@@ -270,7 +297,7 @@ export default async function DashboardPage({
       {topOpportunities.length > 0 && (
         <div>
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-semibold">High-signal opportunities</h2>
+            <h2 className="text-base font-semibold">Top ideas</h2>
             <Link
               href={projectHref("/dashboard/opportunities", projectId)}
               className="text-sm text-[var(--color-primary)] transition-colors duration-150 ease-out hover:text-[var(--color-primary)]/70"
@@ -299,8 +326,13 @@ export default async function DashboardPage({
                   <span className="inline-flex items-center gap-1 text-xs text-[var(--color-muted-foreground)]">
                     <Users className="h-3 w-3" /> {o.mentions} complaints
                   </span>
-                  <span className="text-lg font-bold text-[var(--color-primary)]">
-                    {o.opportunityScore}
+                  <span className="flex items-baseline gap-1">
+                    <span className="text-lg font-bold text-[var(--color-primary)]">
+                      {o.opportunityScore}
+                    </span>
+                    <span className="text-[10px] uppercase tracking-wider text-[var(--color-muted-foreground)]">
+                      score
+                    </span>
                   </span>
                 </div>
               </Link>
@@ -312,9 +344,11 @@ export default async function DashboardPage({
       {/* Complaints over time chart (keep existing) */}
       {complaintCount > 0 && (
         <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[var(--shadow-card)]">
-          <h2 className="text-base font-semibold">Complaints over time</h2>
+          <h2 className="text-base font-semibold">
+            Complaints added — last 30 days
+          </h2>
           <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
-            Grouped by the day each complaint was added to this project.
+            Counted by the day each complaint was added to this project.
           </p>
           <div className="mt-4">
             <ComplaintsChart data={buckets} />
@@ -330,12 +364,9 @@ export default async function DashboardPage({
             <ChevronRight className="h-4 w-4 shrink-0 text-[var(--color-muted-foreground)] transition-transform duration-150 ease-out group-open:rotate-90" />
             Recent complaints
           </summary>
-          <ul className="mt-4 space-y-2">
+          <ul className="mt-2 divide-y divide-[var(--color-border)]">
             {recent.map((c) => (
-              <li
-                key={c.id}
-                className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-4 shadow-[var(--shadow-card)] transition-all duration-150 ease-out hover:shadow-[var(--shadow-card-hover)]"
-              >
+              <li key={c.id} className="py-2.5">
                 <p className="truncate text-sm font-medium">{c.title}</p>
                 <p className="mt-0.5 line-clamp-1 text-xs text-[var(--color-muted-foreground)]">
                   {c.body}

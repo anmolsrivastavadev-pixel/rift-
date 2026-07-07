@@ -5,9 +5,10 @@ import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import {
   LayoutDashboard,
-  Upload,
+  MessagesSquare,
   Target,
   Bookmark,
+  CreditCard,
   LayoutGrid,
   LogOut,
   User,
@@ -26,9 +27,9 @@ import { FeedbackWidget } from "@/components/dashboard/feedback-widget";
 
 const nav = [
   { href: "/dashboard", label: "Home", icon: LayoutDashboard },
-  { href: "/dashboard/complaints", label: "Complaints", icon: Upload },
+  { href: "/dashboard/complaints", label: "Complaints", icon: MessagesSquare },
   { href: "/dashboard/opportunities", label: "Ideas", icon: Target },
-  { href: "/dashboard/opportunities/decision-board", label: "Compare Ideas", icon: LayoutGrid },
+  { href: "/dashboard/opportunities/decision-board", label: "Compare ideas", icon: LayoutGrid },
   { href: "/dashboard/saved", label: "Saved", icon: Bookmark },
 ];
 
@@ -70,6 +71,21 @@ export function DashboardShell({
   const [collapsed, setCollapsed] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
+  // Mobile drawer: close on Escape and lock the page scroll while open.
+  useEffect(() => {
+    if (!drawerOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setDrawerOpen(false);
+    };
+    document.addEventListener("keydown", onKeyDown);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [drawerOpen]);
+
   useEffect(() => {
     // Post-mount setState is required here: the preference lives in
     // localStorage, which the server render can't see (hydration safety).
@@ -97,9 +113,15 @@ export function DashboardShell({
   const currentProjectName =
     projects.find((project) => project.id === projectId)?.name ?? "";
 
+  // Exactly ONE nav item lights up: the longest href that prefixes the
+  // current path wins, so "Ideas" no longer stays lit on Compare ideas.
+  const activeHref = navItems
+    .filter(({ href }) => pathname === href || pathname.startsWith(href + "/"))
+    .sort((a, b) => b.href.length - a.href.length)[0]?.href;
+
   const navLinks = (onNavigate?: () => void) =>
     navItems.map(({ href, label, icon: Icon }) => {
-      const isActive = pathname === href || (href !== "/dashboard" && pathname.startsWith(href));
+      const isActive = href === activeHref;
       return (
         <Link
           key={href}
@@ -191,6 +213,13 @@ export function DashboardShell({
             </div>
           ) : (
             <div className="mt-auto space-y-2.5 px-3 pt-4">
+              <Link
+                href="/pricing"
+                className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-[var(--color-muted-foreground)] transition-all duration-150 ease-out hover:bg-[var(--color-surface)] hover:text-[var(--color-foreground)]"
+              >
+                <CreditCard className="h-4 w-4" />
+                Plan &amp; pricing
+              </Link>
               {/* M20 — compact beta feedback entry point */}
               <FeedbackWidget projectId={projectId} />
               <div className="flex items-center gap-2.5 rounded-xl bg-[var(--color-card)] px-3 py-2.5">
@@ -230,11 +259,10 @@ export function DashboardShell({
             <RiftMark size={24} id="dash-mark-m" />
             Rift
           </Link>
-          {currentProjectName && (
-            <span className="min-w-0 flex-1 truncate text-xs text-[var(--color-muted-foreground)]">
-              {currentProjectName}
-            </span>
-          )}
+          <span className="min-w-0 flex-1 truncate text-xs text-[var(--color-muted-foreground)]">
+            {navItems.find((item) => item.href === activeHref)?.label ?? ""}
+            {currentProjectName ? ` · ${currentProjectName}` : ""}
+          </span>
           <button
             type="button"
             onClick={() => setDrawerOpen(true)}
@@ -288,6 +316,14 @@ export function DashboardShell({
             </nav>
 
             <div className="mt-auto space-y-2.5 pt-4">
+              <Link
+                href="/pricing"
+                onClick={() => setDrawerOpen(false)}
+                className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-[var(--color-muted-foreground)] transition-all duration-150 ease-out hover:bg-[var(--color-surface)] hover:text-[var(--color-foreground)]"
+              >
+                <CreditCard className="h-4 w-4" />
+                Plan &amp; pricing
+              </Link>
               <FeedbackWidget projectId={projectId} />
               <div className="flex items-center gap-2.5 rounded-xl bg-[var(--color-card)] px-3 py-2.5">
                 <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--color-primary-soft)] text-[var(--color-primary)]">

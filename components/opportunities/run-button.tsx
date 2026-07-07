@@ -35,9 +35,21 @@ const ORDER: (keyof typeof STAGE_META)[] = [
 ];
 
 export function RunOpportunitiesButton({ projectId }: { projectId: string }) {
-  const jobId = React.useId().replace(/[:]/g, "");
+  // useId is stable across mounts (and users), so it can only seed the
+  // hidden input for SSR; every actual run mints a fresh id — the DB-unique
+  // AIRun.jobId would otherwise collide on re-runs and strand the poll.
+  const reactId = React.useId().replace(/[:]/g, "");
+  const [jobId, setJobId] = React.useState(reactId);
   const [status, setStatus] = React.useState<ProcessingStatus | null>(null);
   const [running, setRunning] = React.useState(false);
+  // Two-step confirm for the destructive clear action: first click arms it
+  // for 3 seconds, second click submits.
+  const [confirmClear, setConfirmClear] = React.useState(false);
+  React.useEffect(() => {
+    if (!confirmClear) return;
+    const t = setTimeout(() => setConfirmClear(false), 3000);
+    return () => clearTimeout(t);
+  }, [confirmClear]);
 
   // Poll for progress once running.
   React.useEffect(() => {
@@ -58,12 +70,22 @@ export function RunOpportunitiesButton({ projectId }: { projectId: string }) {
     };
   }, [running, jobId, projectId]);
 
-  const [, action, pending] = useActionState<
+  const [result, action, pending] = useActionState<
     { created: number; error?: string } | null,
     FormData
   >(async (_prev, formData) => {
+    const fresh = `${reactId}-${Date.now().toString(36)}${Math.random()
+      .toString(36)
+      .slice(2, 8)}`;
+    setJobId(fresh);
+    formData.set("jobId", fresh);
     setRunning(true);
-    return await runPipeline(formData);
+    const res = await runPipeline(formData);
+    // Actions can fail before any progress is written (quota reached, beta
+    // access revoked). Without this, the poll never sees a terminal stage
+    // and the button spins forever.
+    if (res?.error) setRunning(false);
+    return res;
   }, null);
 
   return (
@@ -85,13 +107,37 @@ export function RunOpportunitiesButton({ projectId }: { projectId: string }) {
           </Button>
         </form>
 
-        <form action={resetOpportunitiesAction}>
+        <form
+          action={resetOpportunitiesAction}
+          onSubmit={(e) => {
+            if (!confirmClear) {
+              e.preventDefault();
+              setConfirmClear(true);
+            }
+          }}
+        >
           <input type="hidden" name="projectId" value={projectId} />
-          <Button type="submit" variant="outline" disabled={pending || running}>
-            Reset
+          <Button
+            type="submit"
+            variant={confirmClear ? "danger" : "ghost"}
+            disabled={pending || running}
+            className={
+              confirmClear
+                ? undefined
+                : "text-[var(--color-muted-foreground)] hover:text-[var(--color-danger)]"
+            }
+          >
+            {confirmClear ? "Delete all ideas?" : "Clear all ideas"}
           </Button>
         </form>
       </div>
+
+      {result?.error && !running && !status && (
+        <p className="flex items-start gap-2 rounded-xl border border-[var(--color-danger)]/40 bg-[var(--color-danger)]/10 p-3 text-sm text-[var(--color-danger)]">
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+          <span>{result.error}</span>
+        </p>
+      )}
 
       {(running || status) && (
         <ProgressPanel status={status} />
@@ -106,7 +152,7 @@ function ProgressPanel({ status }: { status: ProcessingStatus | null }) {
   const isError = current === "error";
 
   return (
-    <div className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-6">
+    <div className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-6">
       <ol className="space-y-3">
         {ORDER.map((stage) => {
           const meta = STAGE_META[stage];
@@ -158,10 +204,26 @@ function ProgressPanel({ status }: { status: ProcessingStatus | null }) {
         </p>
       )}
       {isError && status?.error && (
-        <p className="mt-4 flex items-start gap-2 rounded-[12px] border border-[var(--color-danger)]/40 bg-[var(--color-danger)]/10 p-3 text-sm text-[var(--color-danger)]">
+        <p className="mt-4 flex items-start gap-2 rounded-xl border border-[var(--color-danger)]/40 bg-[var(--color-danger)]/10 p-3 text-sm text-[var(--color-danger)]">
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
           <span>{status.error}</span>
         </p>
+      )}
+
+      {/* Idea-shaped skeletons while the AI works, so results have a place
+          to land instead of the page swapping abruptly at the end. */}
+      {!isComplete && !isError && (
+        <div
+          aria-hidden="true"
+          className="mt-6 grid w-full gap-4 sm:grid-cols-2 lg:grid-cols-3"
+        >
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div
+              key={i}
+              className="h-36 animate-shimmer rounded-2xl border border-[var(--color-border)]"
+            />
+          ))}
+        </div>
       )}
     </div>
   );

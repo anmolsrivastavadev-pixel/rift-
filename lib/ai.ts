@@ -16,7 +16,7 @@ import {
 
 const GEMINI_MODEL = process.env.GEMINI_MODEL ?? "gemini-2.5-flash";
 const BATCH_SIZE = 100; // complaints per Gemini call
-const MAX_COMPLAINTS = 1500; // hard cap to bound cost/latency
+export const MAX_COMPLAINTS = 1500; // hard cap to bound cost/latency
 
 /* ---------------------------------------------------------------------------
  * Public API

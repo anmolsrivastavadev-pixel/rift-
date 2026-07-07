@@ -10,11 +10,11 @@ import { RiftMark } from "@/components/logo";
 
 const nodes = [
   { label: "App reviews", className: "left-[8%] top-[12%]" },
-  { label: "Support tickets", className: "left-[4%] top-[45%]" },
+  { label: "GitHub issues", className: "left-[4%] top-[45%]" },
   { label: "YouTube comments", className: "left-[16%] bottom-[10%]" },
   { label: "Reddit posts", className: "right-[8%] top-[14%]" },
   { label: "Hacker News", className: "right-[4%] top-[46%]" },
-  { label: "Surveys", className: "right-[14%] bottom-[11%]" },
+  { label: "Stack Exchange", className: "right-[14%] bottom-[11%]" },
 ];
 
 const lines = ["rotate-0", "rotate-[30deg]", "-rotate-[30deg]"];
@@ -36,13 +36,13 @@ export function EvidenceMap() {
             </span>
           </h2>
           <p className="mt-4 leading-relaxed text-[var(--color-muted-foreground)]">
-            Paste it, upload a CSV, or let the built-in finder search Reddit,
-            Hacker News, and app reviews for you. Every source lands in one
-            project and feeds one set of scored ideas.
+            Paste it, upload a CSV, or let the built-in finder search all
+            seven sources for you. Every source lands in one project and
+            feeds one set of scored ideas.
           </p>
           <div className="mt-7 flex flex-wrap gap-3">
             <Button asChild className="rounded-full px-5">
-              <Link href="/sign-up">Run your complaints</Link>
+              <Link href="/sign-up">Start free</Link>
             </Button>
             <Button asChild variant="secondary" className="rounded-full px-5">
               <Link href="/#faq">Read the FAQ</Link>
@@ -50,8 +50,9 @@ export function EvidenceMap() {
           </div>
         </div>
 
-        {/* Node map */}
-        <div className="relative min-h-[380px] overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] bg-grid-faint shadow-[var(--shadow-elevated)] sm:min-h-[440px]">
+        {/* Node map (absolute layout on sm+; stacked core + chip list on phones,
+            where the percentage-positioned pills would overlap the core) */}
+        <div className="relative overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] bg-grid-faint shadow-[var(--shadow-elevated)] sm:min-h-[440px]">
           {/* Center glow */}
           <div
             aria-hidden
@@ -63,7 +64,7 @@ export function EvidenceMap() {
             <div
               key={rot}
               aria-hidden
-              className={`absolute left-1/2 top-1/2 h-px w-[78%] -translate-x-1/2 ${rot}`}
+              className={`absolute left-1/2 top-1/2 hidden h-px w-[78%] -translate-x-1/2 sm:block ${rot}`}
               style={{
                 background:
                   "linear-gradient(90deg, transparent, rgba(96,165,250,0.45), transparent)",
@@ -71,21 +72,32 @@ export function EvidenceMap() {
             />
           ))}
           {/* Core */}
-          <div className="absolute left-1/2 top-1/2 flex h-32 w-32 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center gap-1.5 rounded-3xl border border-[var(--color-border)] bg-[#0d1117] shadow-[var(--shadow-elevated)]">
+          <div className="relative mx-auto mt-8 flex h-32 w-32 flex-col items-center justify-center gap-1.5 rounded-3xl border border-[var(--color-border)] bg-[#0d1117] shadow-[var(--shadow-elevated)] sm:absolute sm:left-1/2 sm:top-1/2 sm:mt-0 sm:-translate-x-1/2 sm:-translate-y-1/2">
             <RiftMark size={44} id="evidence-mark" />
             <span className="text-sm font-bold text-[var(--color-foreground)]">
               Rift
             </span>
           </div>
-          {/* Source nodes */}
+          {/* Source nodes (sm+) */}
           {nodes.map((node) => (
             <div
               key={node.label}
-              className={`absolute ${node.className} rounded-xl border border-[var(--color-border)] bg-[#0d1117] px-4 py-2.5 text-xs font-semibold text-[var(--color-foreground)] shadow-[var(--shadow-card)]`}
+              className={`absolute hidden sm:block ${node.className} rounded-xl border border-[var(--color-border)] bg-[#0d1117] px-4 py-2.5 text-xs font-semibold text-[var(--color-foreground)] shadow-[var(--shadow-card)]`}
             >
               {node.label}
             </div>
           ))}
+          {/* Mobile fallback: same sources as wrapping chips */}
+          <div className="flex flex-wrap justify-center gap-2 p-6 sm:hidden">
+            {nodes.map((node) => (
+              <span
+                key={node.label}
+                className="rounded-xl border border-[var(--color-border)] bg-[#0d1117] px-4 py-2.5 text-xs font-semibold text-[var(--color-foreground)]"
+              >
+                {node.label}
+              </span>
+            ))}
+          </div>
         </div>
       </Container>
     </section>

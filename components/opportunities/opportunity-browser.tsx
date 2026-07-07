@@ -194,23 +194,33 @@ export function OpportunityBrowser({
                 {selectedIds.size} idea{selectedIds.size === 1 ? "" : "s"} selected
               </p>
               <p className="text-xs text-[var(--color-muted-foreground)]">
-                Compare them and pick one to test.
+                {selectedIds.size < 2
+                  ? "Select at least one more idea to compare."
+                  : "Compare them and pick one to test."}
               </p>
             </div>
             <div className="flex items-center gap-2">
               <Button variant="ghost" size="sm" onClick={clearSelection}>
                 Clear
               </Button>
-              <Button asChild disabled={selectedIds.size < 2}>
-                <Link
-                  href={projectHref(
-                    `/dashboard/opportunities/decision-board?compare=${compareParam}`,
-                    projectId
-                  )}
-                >
+              {/* An anchor can't be :disabled, so render a real disabled
+                  button until 2+ ideas are selected. */}
+              {selectedIds.size < 2 ? (
+                <Button disabled>
                   <LayoutGrid className="h-4 w-4" /> Compare selected ideas
-                </Link>
-              </Button>
+                </Button>
+              ) : (
+                <Button asChild>
+                  <Link
+                    href={projectHref(
+                      `/dashboard/opportunities/decision-board?compare=${compareParam}`,
+                      projectId
+                    )}
+                  >
+                    <LayoutGrid className="h-4 w-4" /> Compare selected ideas
+                  </Link>
+                </Button>
+              )}
             </div>
           </div>
         </div>

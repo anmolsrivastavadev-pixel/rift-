@@ -1,4 +1,5 @@
 import {
+  ChevronRight,
   Compass,
   UserRound,
   Wrench,
@@ -42,7 +43,7 @@ export function MarketGapHypothesis({ data }: { data: MarketGapData }) {
     // Legacy opportunity (pre-M9). Keep any existing AI reasoning visible as
     // a "Why This Matters" note, then prompt a re-run for the full hypothesis.
     return (
-      <section className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-6">
+      <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[var(--shadow-card)]">
         <h2 className="flex items-center gap-2 text-base font-semibold">
           <Compass className="h-4 w-4 text-[var(--color-primary)]" /> Why this might matter
         </h2>
@@ -59,14 +60,17 @@ export function MarketGapHypothesis({ data }: { data: MarketGapData }) {
   }
 
   return (
-    <details className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-6">
-      <summary className="cursor-pointer text-base font-semibold">
-        <span className="inline-flex items-center gap-2">
-          <Compass className="h-4 w-4 text-[var(--color-primary)]" /> Why this might matter
-        </span>
+    <details
+      open
+      className="group rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[var(--shadow-card)]"
+    >
+      <summary className="flex cursor-pointer select-none items-center gap-2 text-base font-semibold transition-colors duration-150 ease-out hover:text-[var(--color-primary)] marker:content-none [&::-webkit-details-marker]:hidden">
+        <ChevronRight className="h-4 w-4 shrink-0 text-[var(--color-muted-foreground)] transition-transform duration-150 ease-out group-open:rotate-90" />
+        <Compass className="h-4 w-4 text-[var(--color-primary)]" /> Why this
+        might matter
       </summary>
       <p className="mt-2 text-xs text-[var(--color-muted-foreground)]">
-        Supporting context for the idea.
+        Supporting context for the idea, inferred only from the complaints.
       </p>
 
       <div className="mt-4 space-y-4">
@@ -94,9 +98,9 @@ export function MarketGapHypothesis({ data }: { data: MarketGapData }) {
           part of the hypothesis (not a duplicate section) to avoid two
           same-purpose blocks. */}
       {data.reason && (
-        <div className="mt-5 rounded-[10px] border border-[var(--color-primary)]/30 bg-[var(--color-primary)]/5 p-4">
+        <div className="mt-5 rounded-xl border border-[var(--color-primary)]/30 bg-[var(--color-primary)]/5 p-4">
           <h3 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-[var(--color-primary)]">
-            <Sparkles className="h-3.5 w-3.5" /> Why this could matter
+            <Sparkles className="h-3.5 w-3.5" /> AI reasoning
           </h3>
           <p className="mt-1.5 text-sm leading-relaxed whitespace-normal break-words text-[var(--color-foreground)]/90">
             {data.reason}

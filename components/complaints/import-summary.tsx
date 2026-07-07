@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { CheckCircle2, AlertTriangle } from "lucide-react";
+import { ArrowRight, CheckCircle2, AlertTriangle } from "lucide-react";
 
 import type { UploadResult } from "@/lib/schemas";
+import { Button } from "@/components/ui/button";
 import { projectHref } from "@/lib/project-href";
 
 /* Shared import summaries used by the CSV demo path and the text import path.
@@ -10,16 +11,15 @@ import { projectHref } from "@/lib/project-href";
  */
 
 export function ImportNextStepLink({ projectId }: { projectId: string }) {
+  // The single most important next action in the funnel gets a real button,
+  // not a text link buried in helper copy.
   return (
-    <span className="block text-xs text-[var(--color-muted-foreground)]">
-      Next: go to{" "}
-      <Link
-        href={projectHref("/dashboard/opportunities", projectId)}
-        className="font-medium text-[var(--color-primary)] hover:underline"
-      >
-        Ideas → Find ideas
-      </Link>{" "}
-      to turn complaints into ideas.
+    <span className="mt-2 block">
+      <Button asChild size="sm">
+        <Link href={projectHref("/dashboard/opportunities", projectId)}>
+          Find ideas <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
+      </Button>
     </span>
   );
 }

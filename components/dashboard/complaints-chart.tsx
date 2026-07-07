@@ -55,7 +55,12 @@ export function ComplaintsChart({ data }: { data: DayBucket[] }) {
             labelStyle={{ color: "var(--color-muted-foreground)" }}
             labelFormatter={(d) => fmtDay(String(d))}
           />
-          <Bar dataKey="count" fill="var(--color-primary)" radius={[6, 6, 0, 0]} />
+          <Bar
+            dataKey="count"
+            fill="var(--color-primary)"
+            radius={[6, 6, 0, 0]}
+            maxBarSize={32}
+          />
         </BarChart>
       </ResponsiveContainer>
     </div>

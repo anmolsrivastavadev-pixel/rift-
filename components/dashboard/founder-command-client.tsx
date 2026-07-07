@@ -40,8 +40,8 @@ export function FounderCommandClient({
   });
 
   return (
-    <div className="space-y-8">
-      <section className="rounded-xl border border-[var(--color-primary)]/30 bg-[var(--color-primary)]/5 p-6 shadow-[var(--shadow-card)]">
+    <div className="space-y-4">
+      <section className="rounded-2xl border border-[var(--color-primary)]/30 bg-[var(--color-primary)]/5 p-6 shadow-[var(--shadow-card)]">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-[11px] uppercase tracking-wide text-[var(--color-primary)]">
@@ -61,7 +61,7 @@ export function FounderCommandClient({
       </section>
 
       {stats.opportunityCount > 0 && (
-        <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-5 shadow-[var(--shadow-card)]">
+        <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[var(--shadow-card)]">
           <h3 className="text-sm font-semibold">Decision status</h3>
           <div className="mt-3 grid grid-cols-4 gap-2 text-center">
             <SnapshotCount label="Pursue" value={decisionCounts.pursue} accent="success" />
@@ -69,18 +69,19 @@ export function FounderCommandClient({
             <SnapshotCount label="Reject" value={decisionCounts.reject} accent="danger" />
             <SnapshotCount label="Undecided" value={decisionCounts.undecided} accent="muted" />
           </div>
-          <Link
-            href={projectHref("/dashboard/opportunities/decision-board", projectId)}
-            className="mt-3 inline-block text-xs text-[var(--color-primary)] hover:underline"
-          >
-            Open Compare Ideas →
-          </Link>
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+            <Link
+              href={projectHref("/dashboard/opportunities/decision-board", projectId)}
+              className="text-xs text-[var(--color-primary)] hover:underline"
+            >
+              Open Compare ideas →
+            </Link>
+            <span className="flex items-center gap-1 text-[11px] text-[var(--color-muted-foreground)]">
+              <Info className="h-3 w-3" /> Decisions are saved to your account.
+            </span>
+          </div>
         </div>
       )}
-
-      <p className="flex items-center gap-1 text-[11px] text-[var(--color-muted-foreground)]">
-        <Info className="h-3 w-3" /> Decisions are saved to your account.
-      </p>
     </div>
   );
 }
@@ -94,20 +95,22 @@ function SnapshotCount({
   value: React.ReactNode;
   accent?: "success" | "warning" | "danger" | "muted";
 }) {
+  // Zero counts stay muted regardless of accent — a green "0" is false signal.
+  const isZero = value === 0;
   const colorClass =
-    accent === "success"
-      ? "text-[var(--color-success)]"
-      : accent === "warning"
-        ? "text-[var(--color-warning)]"
-        : accent === "danger"
-          ? "text-[var(--color-danger)]"
-          : accent === "muted"
-            ? "text-[var(--color-muted-foreground)]"
+    isZero || accent === "muted"
+      ? "text-[var(--color-muted-foreground)]"
+      : accent === "success"
+        ? "text-[var(--color-success)]"
+        : accent === "warning"
+          ? "text-[var(--color-warning)]"
+          : accent === "danger"
+            ? "text-[var(--color-danger)]"
             : "text-[var(--color-foreground)]";
   return (
-    <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] p-2">
+    <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-2">
       <p className={`text-lg font-bold ${colorClass}`}>{value}</p>
-      <p className="text-[10px] text-[var(--color-muted-foreground)]">{label}</p>
+      <p className="text-[11px] text-[var(--color-muted-foreground)]">{label}</p>
     </div>
   );
 }

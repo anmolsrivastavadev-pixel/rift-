@@ -1,4 +1,4 @@
-import { Inbox } from "lucide-react";
+import { ChevronRight, Inbox } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 
@@ -28,7 +28,8 @@ function sentimentLabel(s: number | null): {
   // Unscored (fresh import) is a quiet neutral dash — amber read as "broken".
   if (s === null) return { text: "—", variant: "default" };
   if (s <= -0.4) return { text: "Negative", variant: "danger" };
-  if (s < 0.2) return { text: "Neutral", variant: "warning" };
+  // Neutral is normal data, not a warning state.
+  if (s < 0.2) return { text: "Neutral", variant: "default" };
   return { text: "Positive", variant: "success" };
 }
 
@@ -77,10 +78,31 @@ export function ComplaintsTable({
                   className="border-b border-[var(--color-border)] last:border-0 hover:bg-[var(--color-card)]"
                 >
                   <td className="max-w-md px-4 py-3">
-                    <p className="truncate font-medium">{r.title}</p>
-                    <p className="mt-0.5 line-clamp-1 text-xs text-[var(--color-muted-foreground)]">
-                      {r.body}
-                    </p>
+                    {/* Zero-JS expand: click the row title to read the full
+                        complaint instead of a permanently clamped preview. */}
+                    <details className="group/row">
+                      {/* summary only allows phrasing content — spans, not p */}
+                      <summary
+                        className="flex cursor-pointer list-none items-start gap-1.5 marker:content-none [&::-webkit-details-marker]:hidden"
+                        title="Show full complaint"
+                      >
+                        <ChevronRight
+                          className="mt-1 h-3.5 w-3.5 shrink-0 text-[var(--color-muted-foreground)] transition-transform duration-150 ease-out group-open/row:rotate-90"
+                          aria-hidden
+                        />
+                        <span className="min-w-0">
+                          <span className="block truncate font-medium">
+                            {r.title}
+                          </span>
+                          <span className="mt-0.5 block truncate text-xs text-[var(--color-muted-foreground)] group-open/row:hidden">
+                            {r.body}
+                          </span>
+                        </span>
+                      </summary>
+                      <p className="mt-1 whitespace-pre-wrap pl-5 text-xs leading-relaxed text-[var(--color-foreground)]/90">
+                        {r.body}
+                      </p>
+                    </details>
                   </td>
                   <td className="whitespace-nowrap px-4 py-3 text-[var(--color-muted-foreground)]">
                     {fmtDate(r.sourceDate)}
