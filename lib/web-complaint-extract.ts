@@ -16,7 +16,7 @@ import { logger } from "@/lib/logger";
 
 const GEMINI_MODEL = process.env.GEMINI_MODEL ?? "gemini-2.5-flash";
 
-const MAX_COMPLAINTS = 20;
+const MAX_COMPLAINTS = 30;
 
 const extractedSchema = z.object({
   complaints: z

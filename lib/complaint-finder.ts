@@ -330,6 +330,18 @@ export async function fetchAppStoreComplaints(
 const TAVILY_SEARCH_URL = "https://api.tavily.com/search";
 const TAVILY_MAX_RESULTS = 8;
 const TAVILY_PAGE_TEXT_CAP = 4000;
+const TAVILY_MAX_PAGES = 12;
+
+/** Three search angles per niche — different phrasings surface different
+ * complaint-rich pages. NOTE: 3 Tavily calls per finder search (~330 searches
+ * per month on Tavily's free tier) — fine at beta scale. */
+function tavilyQueries(keyword: string): string[] {
+  return [
+    `"${keyword}" complaints problems frustrating`,
+    `"${keyword}" "so frustrating" OR "i hate" review`,
+    `why I stopped using "${keyword}" alternatives`,
+  ];
+}
 
 interface TavilyResult {
   title?: string;
@@ -355,14 +367,13 @@ export async function fetchWebComplaints(keyword: string): Promise<SourceResult>
     };
   }
 
-  let results: TavilyResult[];
-  try {
+  async function tavilySearch(query: string): Promise<TavilyResult[]> {
     const res = await fetch(TAVILY_SEARCH_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         api_key: apiKey,
-        query: `"${keyword}" complaints problems frustrating`,
+        query,
         search_depth: "basic",
         max_results: TAVILY_MAX_RESULTS,
         include_raw_content: true,
@@ -373,13 +384,37 @@ export async function fetchWebComplaints(keyword: string): Promise<SourceResult>
     // Error strings name statuses and env vars only — never the key.
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = (await res.json()) as { results?: TavilyResult[] };
-    results = json.results ?? [];
-  } catch (err) {
-    let msg = err instanceof Error ? err.message : "unknown error";
+    return json.results ?? [];
+  }
+
+  // Three angles in parallel; one failed query is ignored, all failing
+  // fails soft with the first error (same pattern as the HN per-term search).
+  const settled = await Promise.allSettled(
+    tavilyQueries(keyword).map((q) => tavilySearch(q))
+  );
+  const succeeded = settled.filter(
+    (s): s is PromiseFulfilledResult<TavilyResult[]> => s.status === "fulfilled"
+  );
+  if (succeeded.length === 0) {
+    const first = settled[0] as PromiseRejectedResult;
+    let msg =
+      first.reason instanceof Error ? first.reason.message : "unknown error";
     if (msg === "HTTP 401" || msg === "HTTP 403") {
       msg += " (check TAVILY_API_KEY)";
     }
     return { complaints: [], error: `Web search failed (${msg}).` };
+  }
+
+  // Merge across angles, dedupe by URL, keep first occurrence.
+  const seenUrls = new Set<string>();
+  const results: TavilyResult[] = [];
+  for (const s of succeeded) {
+    for (const r of s.value) {
+      const url = r.url ?? "";
+      if (url && seenUrls.has(url)) continue;
+      if (url) seenUrls.add(url);
+      results.push(r);
+    }
   }
 
   const pages: WebPageText[] = results
@@ -392,7 +427,8 @@ export async function fetchWebComplaints(keyword: string): Promise<SourceResult>
       ),
       publishedDate: r.published_date ?? null,
     }))
-    .filter((p) => p.text.length >= 100);
+    .filter((p) => p.text.length >= 100)
+    .slice(0, TAVILY_MAX_PAGES);
 
   if (pages.length === 0) {
     return { complaints: [], error: "Web search found no readable pages." };
