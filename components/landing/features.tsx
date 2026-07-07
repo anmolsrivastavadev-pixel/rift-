@@ -105,8 +105,8 @@ const features = [
   {
     n: "01",
     title: "Find real pain",
-    text: "Type any market for starter examples, or bring real reviews, complaints, and support tickets for stronger evidence.",
-    tags: ["Paste text", "CSV upload", "Complaint finder", "Demo data"],
+    text: "Type any market and Rift finds real complaints — each one linked back to the original post it came from. Or bring your own reviews and support tickets.",
+    tags: ["Complaint finder", "Linked sources", "Paste text", "CSV upload"],
     preview: <PreviewFindPain />,
   },
   {

@@ -125,7 +125,10 @@ export async function getIdeaReportData(
         where: { userId },
         orderBy: { createdAt: "asc" },
         take: 5,
-        select: { body: true },
+        // M31a — receipts are DELIBERATELY included in shared/exported
+        // reports: every sourceUrl points at an already-public post, and
+        // evidence with links is the point of sharing.
+        select: { body: true, sourceUrl: true, sourceKind: true },
       },
     },
   });

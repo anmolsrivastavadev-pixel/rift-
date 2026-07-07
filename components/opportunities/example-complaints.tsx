@@ -1,6 +1,8 @@
 import { MessageSquareOff } from "lucide-react";
 
 import { ComplaintBody } from "@/components/opportunities/complaint-body";
+import { ExternalLink } from "@/components/ui/external-link";
+import { buildReceiptLabel } from "@/lib/complaint-sources";
 
 export type LinkedComplaint = {
   id: string;
@@ -8,6 +10,9 @@ export type LinkedComplaint = {
   body: string;
   sourceDate: Date | null;
   createdAt: Date;
+  // M31a — receipt: original post/page URL for finder-sourced complaints.
+  sourceUrl: string | null;
+  sourceKind: string | null;
 };
 
 /* Example complaints list. Per spec:
@@ -42,10 +47,21 @@ export function ExampleComplaints({ items }: { items: LinkedComplaint[] }) {
             Complaint {i + 1}
           </p>
           <ComplaintBody body={c.body} />
-          <p className="mt-2 text-[10px] uppercase tracking-wide text-[var(--color-muted-foreground)]">
-            {c.sourceDate
-              ? c.sourceDate.toLocaleDateString()
-              : c.createdAt.toLocaleDateString()}
+          <p className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] uppercase tracking-wide text-[var(--color-muted-foreground)]">
+            <span>
+              {c.sourceDate
+                ? c.sourceDate.toLocaleDateString()
+                : c.createdAt.toLocaleDateString()}
+            </span>
+            {(() => {
+              const label = buildReceiptLabel(c.sourceKind, c.sourceUrl);
+              return label && c.sourceUrl ? (
+                <>
+                  <span aria-hidden="true">·</span>
+                  <ExternalLink href={c.sourceUrl}>{label}</ExternalLink>
+                </>
+              ) : null;
+            })()}
           </p>
         </li>
       ))}

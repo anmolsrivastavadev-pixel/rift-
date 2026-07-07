@@ -9,8 +9,8 @@ const points = [
   },
   {
     icon: FlaskConical,
-    title: "Real complaints",
-    text: "Real complaints and reviews give stronger evidence.",
+    title: "Ideas with receipts",
+    text: "Complaints found by Rift link back to the original Reddit, Hacker News, App Store, or web page.",
   },
   {
     icon: ShieldCheck,

@@ -27,6 +27,9 @@ export interface FoundComplaint {
   body: string;
   sourceDate: string | null; // ISO string when known
   source: "reddit" | "appstore" | "hackernews" | "web";
+  // M31a — receipt: URL of the original public post/page, when the source
+  // provides one. Sanitised again before persisting (lib/complaint-sources.ts).
+  sourceUrl: string | null;
 }
 
 export interface SourceResult {
@@ -89,6 +92,7 @@ interface RedditChild {
     created_utc?: number;
     over_18?: boolean;
     stickied?: boolean;
+    permalink?: string;
   };
 }
 
@@ -183,6 +187,7 @@ function parseRedditListing(json: unknown): FoundComplaint[] {
         ? new Date(d.created_utc * 1000).toISOString()
         : null,
       source: "reddit",
+      sourceUrl: d.permalink ? `https://www.reddit.com${d.permalink}` : null,
     });
   }
   return complaints;
@@ -250,6 +255,7 @@ export async function fetchRedditComplaints(
 interface ITunesApp {
   trackId?: number;
   trackName?: string;
+  trackViewUrl?: string;
 }
 
 interface AppStoreReviewEntry {
@@ -280,6 +286,10 @@ export async function fetchAppStoreComplaints(
           };
           const raw = rss?.feed?.entry;
           const entries = Array.isArray(raw) ? raw : raw ? [raw] : [];
+          // Per-review RSS links are unreliable (often dead-end at the app
+          // anyway), so the receipt is the app's own App Store page.
+          const appUrl =
+            app.trackViewUrl ?? `https://apps.apple.com/app/id${app.trackId}`;
           const out: FoundComplaint[] = [];
           for (const e of entries) {
             const rating = Number(e["im:rating"]?.label ?? "5");
@@ -293,6 +303,7 @@ export async function fetchAppStoreComplaints(
               body: `${content}${appName}`.slice(0, 5000),
               sourceDate: e.updated?.label ?? null,
               source: "appstore",
+              sourceUrl: appUrl,
             });
           }
           return out;
@@ -376,6 +387,7 @@ export async function fetchWebComplaints(keyword: string): Promise<SourceResult>
         0,
         TAVILY_PAGE_TEXT_CAP
       ),
+      publishedDate: r.published_date ?? null,
     }))
     .filter((p) => p.text.length >= 100);
 
@@ -385,15 +397,19 @@ export async function fetchWebComplaints(keyword: string): Promise<SourceResult>
 
   try {
     const extracted = await extractComplaintsFromPages(keyword, pages);
-    const publishedByIndex = results.find((r) => r.published_date)?.published_date;
-    const complaints: FoundComplaint[] = extracted.complaints.map((c) => ({
-      title: cleanText(c.title).slice(0, 200),
-      body: cleanText(c.body).slice(0, 5000),
-      // Page-level dates rarely map to individual passages; only use one when
-      // Tavily supplied it, otherwise leave null (import date is used).
-      sourceDate: publishedByIndex ?? null,
-      source: "web",
-    }));
+    // M31a — the extractor echoes a 1-based pageIndex per passage, so each
+    // complaint gets ITS page's URL (receipt) and published date. A missing or
+    // out-of-range index degrades to no receipt / no date, never a failure.
+    const complaints: FoundComplaint[] = extracted.complaints.map((c) => {
+      const page = c.pageIndex ? pages[c.pageIndex - 1] : undefined;
+      return {
+        title: cleanText(c.title).slice(0, 200),
+        body: cleanText(c.body).slice(0, 5000),
+        sourceDate: page?.publishedDate ?? null,
+        source: "web",
+        sourceUrl: page?.url || null,
+      };
+    });
     logger.info("web_finder.done", {
       keyword,
       pages: pages.length,
@@ -467,6 +483,7 @@ export async function fetchHackerNewsComplaints(
         body: body.slice(0, 5000),
         sourceDate: hit.created_at ?? null,
         source: "hackernews",
+        sourceUrl: `https://news.ycombinator.com/item?id=${hit.objectID}`,
       });
     }
     return { complaints };

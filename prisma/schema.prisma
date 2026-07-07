@@ -133,6 +133,11 @@ model Complaint {
   title         String
   body          String
   sourceDate    DateTime?
+  // M31a — receipt: original post/page URL, finder-sourced complaints only.
+  // sourceKind is the machine key ("reddit" | "appstore" | "hackernews" |
+  // "web"); display labels live in lib/complaint-sources.ts.
+  sourceUrl     String?
+  sourceKind    String?
   sentiment     Float? // -1.0 (negative) .. 1.0 (positive)
   severity      Float? // 0.0 .. 100.0 estimated severity
   opportunity   Opportunity? @relation(fields: [opportunityId], references: [id], onDelete: SetNull)

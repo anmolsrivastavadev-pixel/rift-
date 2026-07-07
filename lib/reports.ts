@@ -6,6 +6,7 @@
  * evidence, no new AI calls.
  */
 
+import { buildReceiptLabel } from "@/lib/complaint-sources";
 import { DECISION_LABELS, type DecisionStatus } from "@/lib/decision-board";
 
 /** "AI Fitness Coach!" -> "ai-fitness-coach" (safe, readable filenames). */
@@ -142,7 +143,7 @@ export type IdeaReportInput = {
   reason: string | null;
   marketGap: string | null;
   targetCustomer: string | null;
-  evidence: { body: string }[];
+  evidence: { body: string; sourceUrl: string | null; sourceKind: string | null }[];
   decisionStatus: DecisionStatus | null;
   checklistDone: number;
   checklistTotal: number;
@@ -187,7 +188,9 @@ export function buildIdeaReport(input: IdeaReportInput): string {
     lines.push(`## Evidence`);
     for (const e of input.evidence) {
       const quote = e.body.length > 240 ? `${e.body.slice(0, 240)}…` : e.body;
-      lines.push(`- “${quote.replace(/\s+/g, " ").trim()}”`);
+      const label = buildReceiptLabel(e.sourceKind, e.sourceUrl);
+      const receipt = label && e.sourceUrl ? ` — [${label}](${e.sourceUrl})` : "";
+      lines.push(`- “${quote.replace(/\s+/g, " ").trim()}”${receipt}`);
     }
     lines.push("");
   }

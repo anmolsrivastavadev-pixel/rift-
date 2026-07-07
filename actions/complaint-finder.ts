@@ -11,6 +11,7 @@ import {
   fetchHackerNewsComplaints,
   fetchWebComplaints,
 } from "@/lib/complaint-finder";
+import { sanitiseReceiptUrl } from "@/lib/complaint-sources";
 import { requireUser } from "@/lib/auth/current-user";
 import { requireOwnedProject } from "@/lib/projects";
 import { trackProductEvent } from "@/lib/product-events";
@@ -102,7 +103,13 @@ export async function findComplaintsAction(
 
   // Validate with the shared schema, then dedupe within the batch.
   const seen = new Set<string>();
-  const valid: { title: string; body: string; sourceDate: Date | null }[] = [];
+  const valid: {
+    title: string;
+    body: string;
+    sourceDate: Date | null;
+    sourceUrl: string | null;
+    sourceKind: string | null;
+  }[] = [];
   for (const f of found.slice(0, MAX_INSERT)) {
     const parsed = complaintRowSchema.safeParse({
       title: f.title,
@@ -117,6 +124,9 @@ export async function findComplaintsAction(
       title: parsed.data.title ?? parsed.data.body.slice(0, 80),
       body: parsed.data.body,
       sourceDate: parsed.data.sourceDate ? new Date(parsed.data.sourceDate) : null,
+      // M31a — receipt: sanitised original-post URL + which source it was.
+      sourceUrl: sanitiseReceiptUrl(f.sourceUrl),
+      sourceKind: f.source,
     });
   }
 

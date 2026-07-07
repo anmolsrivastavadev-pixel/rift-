@@ -24,6 +24,10 @@ const extractedSchema = z.object({
       z.object({
         title: z.string().min(1).max(200),
         body: z.string().min(30).max(2000),
+        // M31a — 1-based page number the passage came from, so the caller can
+        // attach the page's URL as a receipt. Optional: a missing or
+        // out-of-range value degrades to "no receipt", never a failure.
+        pageIndex: z.number().int().min(1).optional(),
       })
     )
     .max(MAX_COMPLAINTS),
@@ -35,6 +39,9 @@ export type WebPageText = {
   url: string;
   title: string;
   text: string;
+  // M31a — the page's published date (ISO string) when the search provider
+  // supplied one; used as the complaint's sourceDate for that page only.
+  publishedDate: string | null;
 };
 
 /**
@@ -71,12 +78,13 @@ STRICT RULES:
 - Skip anything containing personal information (real full names, emails, phone numbers, addresses, usernames).
 - Return at most ${MAX_COMPLAINTS} complaints. Fewer is fine. Zero is fine if the pages contain no real complaints.
 - "title": a short 3-10 word summary of the complaint. "body": the complaint passage itself (1-4 sentences, minimum 30 characters).
+- "pageIndex": the PAGE number the passage was found on (1 for PAGE 1, 2 for PAGE 2, ...). Always include it.
 
 PAGES:
 ${pageBlocks}
 
 Return ONLY a JSON object matching exactly:
-{ "complaints": [ { "title": "...", "body": "..." } ] }
+{ "complaints": [ { "title": "...", "body": "...", "pageIndex": 1 } ] }
 
 No other text, no markdown fences. Just the raw JSON.`;
 

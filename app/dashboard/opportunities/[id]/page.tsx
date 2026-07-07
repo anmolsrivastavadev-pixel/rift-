@@ -77,6 +77,8 @@ export default async function OpportunityDetailPage({
             body: true,
             sourceDate: true,
             createdAt: true,
+            sourceUrl: true,
+            sourceKind: true,
           },
         },
         savedOpportunities: {
@@ -214,7 +216,8 @@ export default async function OpportunityDetailPage({
           <section>
             <h2 className="text-base font-semibold">Evidence From Complaints</h2>
             <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
-              Examples from the text you added.
+              Examples from the complaints behind this idea. Complaints found by
+              the finder link to the original post.
             </p>
             <div className="mt-3">
               <ExampleComplaints items={op.complaints} />

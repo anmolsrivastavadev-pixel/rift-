@@ -4,8 +4,10 @@ import { notFound } from "next/navigation";
 
 import { prisma } from "@/lib/db";
 import { getIdeaReportData, getProjectReportData } from "@/lib/report-data";
+import { buildReceiptLabel } from "@/lib/complaint-sources";
 import { DECISION_LABELS } from "@/lib/decision-board";
 import { PrintButton } from "@/components/reports/print-button";
+import { ExternalLink } from "@/components/ui/external-link";
 
 /* M29 — Public report page. No auth: anyone with the token URL can view
  * until the owner revokes the link (revoked/unknown tokens 404). Data is
@@ -145,12 +147,20 @@ export default async function SharePage({
               {data.evidence.map((e, i) => {
                 const quote =
                   e.body.length > 240 ? `${e.body.slice(0, 240)}…` : e.body;
+                const receiptLabel = buildReceiptLabel(e.sourceKind, e.sourceUrl);
                 return (
                   <li
                     key={i}
                     className="border-l-2 border-[var(--color-border)] pl-3 text-[var(--color-muted-foreground)]"
                   >
                     “{quote.replace(/\s+/g, " ").trim()}”
+                    {receiptLabel && e.sourceUrl && (
+                      <span className="mt-1 block text-xs">
+                        <ExternalLink href={e.sourceUrl}>
+                          {receiptLabel}
+                        </ExternalLink>
+                      </span>
+                    )}
                   </li>
                 );
               })}
