@@ -9,6 +9,11 @@
 import { buildReceiptLabel } from "@/lib/complaint-sources";
 import { DECISION_LABELS, type DecisionStatus } from "@/lib/decision-board";
 import {
+  buildEvidenceCaption,
+  EVIDENCE_STRENGTH_LABELS,
+  type EvidenceStrengthResult,
+} from "@/lib/evidence-strength";
+import {
   buildPainTrendCaption,
   PAIN_TREND_LABELS,
   type PainTrendResult,
@@ -150,6 +155,7 @@ export type IdeaReportInput = {
   targetCustomer: string | null;
   evidence: { body: string; sourceUrl: string | null; sourceKind: string | null }[];
   painTrend: PainTrendResult | null;
+  evidenceStrength: EvidenceStrengthResult | null;
   decisionStatus: DecisionStatus | null;
   checklistDone: number;
   checklistTotal: number;
@@ -184,6 +190,11 @@ export function buildIdeaReport(input: IdeaReportInput): string {
   if (input.painTrend) {
     lines.push(
       `- Pain trend: ${PAIN_TREND_LABELS[input.painTrend.trend]}. ${buildPainTrendCaption(input.painTrend)}`
+    );
+  }
+  if (input.evidenceStrength) {
+    lines.push(
+      `- Evidence: ${EVIDENCE_STRENGTH_LABELS[input.evidenceStrength.strength]} — ${buildEvidenceCaption(input.evidenceStrength)}`
     );
   }
   lines.push("");

@@ -33,6 +33,11 @@ import { ExportButtons } from "@/components/reports/export-buttons";
 import { ShareButton } from "@/components/reports/share-button";
 import { shareUrlForToken } from "@/lib/share";
 import {
+  computeEvidenceStrength,
+  buildEvidenceCaption,
+  EVIDENCE_STRENGTH_LABELS,
+} from "@/lib/evidence-strength";
+import {
   computePainTrend,
   buildPainTrendCaption,
   PAIN_TREND_LABELS,
@@ -115,11 +120,11 @@ export default async function OpportunityDetailPage({
       where: { userId: user.id, opportunityId: id, kind: "idea", revokedAt: null },
       select: { id: true, token: true },
     }),
-    // M31b — ALL linked complaints' source dates (not just the 5 examples)
-    // for the display-only pain trend signal.
+    // M31b — ALL linked complaints (not just the 5 examples) for the
+    // display-only pain trend signal and the evidence strength line.
     prisma.complaint.findMany({
       where: { opportunityId: id, userId: user.id },
-      select: { sourceDate: true },
+      select: { sourceDate: true, sourceKind: true },
     }),
   ]);
 
@@ -127,6 +132,8 @@ export default async function OpportunityDetailPage({
 
   // M31b — display-only pain trend from original complaint dates.
   const painTrend = computePainTrend(trendDates.map((d) => d.sourceDate));
+  // Display-only evidence strength ("Backed by 43 complaints from 3 sources…").
+  const evidence = computeEvidenceStrength(trendDates);
 
   // M19 — usage event (metadata only, fails silently, never blocks the page).
   await trackProductEvent({
@@ -191,6 +198,20 @@ export default async function OpportunityDetailPage({
         <h1 className="mt-2 text-3xl font-semibold tracking-tight text-balance">
           {op.title}
         </h1>
+        <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-[var(--color-muted-foreground)]">
+          <Badge
+            variant={
+              evidence.strength === "strong"
+                ? "success"
+                : evidence.strength === "moderate"
+                  ? "default"
+                  : "warning"
+            }
+          >
+            {EVIDENCE_STRENGTH_LABELS[evidence.strength]}
+          </Badge>
+          <span>{buildEvidenceCaption(evidence)}</span>
+        </div>
         <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
           <HeaderStat icon={Target} label="Score" value={op.opportunityScore} highlight />
           <HeaderStat

@@ -5,6 +5,10 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { getIdeaReportData, getProjectReportData } from "@/lib/report-data";
 import { buildReceiptLabel } from "@/lib/complaint-sources";
+import {
+  buildEvidenceCaption,
+  EVIDENCE_STRENGTH_LABELS,
+} from "@/lib/evidence-strength";
 import { buildPainTrendCaption, PAIN_TREND_LABELS } from "@/lib/pain-trend";
 import { DECISION_LABELS } from "@/lib/decision-board";
 import { PrintButton } from "@/components/reports/print-button";
@@ -145,6 +149,12 @@ export default async function SharePage({
           {data.painTrend && (
             <p className="text-xs text-[var(--color-muted-foreground)]">
               {buildPainTrendCaption(data.painTrend)}
+            </p>
+          )}
+          {data.evidenceStrength && (
+            <p className="text-xs text-[var(--color-muted-foreground)]">
+              {EVIDENCE_STRENGTH_LABELS[data.evidenceStrength.strength]} —{" "}
+              {buildEvidenceCaption(data.evidenceStrength)}
             </p>
           )}
         </Section>

@@ -9,6 +9,7 @@
  */
 
 import { prisma } from "@/lib/db";
+import { computeEvidenceStrength } from "@/lib/evidence-strength";
 import { computePainTrend } from "@/lib/pain-trend";
 import { isValidDecisionStatus, type DecisionStatus } from "@/lib/decision-board";
 import { VALIDATION_CHECKLIST_ITEMS } from "@/lib/validation-plan";
@@ -140,10 +141,11 @@ export async function getIdeaReportData(
       where: { userId_opportunityId: { userId, opportunityId: op.id } },
       select: { decisionStatus: true, validationChecklist: true },
     }),
-    // M31b — all linked complaints' source dates for the pain trend line.
+    // M31b — all linked complaints for the pain trend line and the
+    // evidence strength caption.
     prisma.complaint.findMany({
       where: { opportunityId: op.id, userId },
-      select: { sourceDate: true },
+      select: { sourceDate: true, sourceKind: true },
     }),
   ]);
 
@@ -171,6 +173,7 @@ export async function getIdeaReportData(
     targetCustomer: op.targetCustomer,
     evidence: op.complaints,
     painTrend: computePainTrend(trendDates.map((d) => d.sourceDate)),
+    evidenceStrength: computeEvidenceStrength(trendDates),
     decisionStatus:
       workspace && isValidDecisionStatus(workspace.decisionStatus)
         ? (workspace.decisionStatus as DecisionStatus)
