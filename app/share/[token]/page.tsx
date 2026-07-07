@@ -4,7 +4,11 @@ import { notFound } from "next/navigation";
 
 import { prisma } from "@/lib/db";
 import { getIdeaReportData, getProjectReportData } from "@/lib/report-data";
-import { buildReceiptHref, buildReceiptLabel } from "@/lib/complaint-sources";
+import {
+  buildReceiptHint,
+  buildReceiptHref,
+  buildReceiptLabel,
+} from "@/lib/complaint-sources";
 import {
   buildEvidenceCaption,
   EVIDENCE_STRENGTH_LABELS,
@@ -171,6 +175,9 @@ export default async function SharePage({
                   e.body.length > 240 ? `${e.body.slice(0, 240)}…` : e.body;
                 const receiptLabel = buildReceiptLabel(e.sourceKind, e.sourceUrl);
                 const receiptHref = buildReceiptHref(e.sourceKind, e.sourceUrl);
+                const receiptHint = receiptHref
+                  ? buildReceiptHint(e.sourceKind, e.title)
+                  : null;
                 return (
                   <li
                     key={i}
@@ -183,6 +190,9 @@ export default async function SharePage({
                           {receiptLabel}
                         </ExternalLink>
                       </span>
+                    )}
+                    {receiptHint && (
+                      <span className="mt-1 block text-xs">{receiptHint}</span>
                     )}
                   </li>
                 );

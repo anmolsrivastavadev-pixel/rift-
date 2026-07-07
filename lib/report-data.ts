@@ -129,8 +129,9 @@ export async function getIdeaReportData(
         take: 5,
         // M31a — receipts are DELIBERATELY included in shared/exported
         // reports: every sourceUrl points at an already-public post, and
-        // evidence with links is the point of sharing.
-        select: { body: true, sourceUrl: true, sourceKind: true },
+        // evidence with links is the point of sharing. title feeds the
+        // App Store "look for the review titled…" hint.
+        select: { body: true, sourceUrl: true, sourceKind: true, title: true },
       },
     },
   });

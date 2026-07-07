@@ -2,7 +2,11 @@ import { MessageSquareOff } from "lucide-react";
 
 import { ComplaintBody } from "@/components/opportunities/complaint-body";
 import { ExternalLink } from "@/components/ui/external-link";
-import { buildReceiptHref, buildReceiptLabel } from "@/lib/complaint-sources";
+import {
+  buildReceiptHint,
+  buildReceiptHref,
+  buildReceiptLabel,
+} from "@/lib/complaint-sources";
 
 export type LinkedComplaint = {
   id: string;
@@ -64,6 +68,16 @@ export function ExampleComplaints({ items }: { items: LinkedComplaint[] }) {
               ) : null;
             })()}
           </p>
+          {buildReceiptHref(c.sourceKind, c.sourceUrl) && (
+            (() => {
+              const hint = buildReceiptHint(c.sourceKind, c.title);
+              return hint ? (
+                <p className="mt-1 text-[11px] text-[var(--color-muted-foreground)]">
+                  {hint}
+                </p>
+              ) : null;
+            })()
+          )}
         </li>
       ))}
     </ul>

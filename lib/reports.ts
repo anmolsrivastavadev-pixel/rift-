@@ -6,7 +6,11 @@
  * evidence, no new AI calls.
  */
 
-import { buildReceiptHref, buildReceiptLabel } from "@/lib/complaint-sources";
+import {
+  buildReceiptHint,
+  buildReceiptHref,
+  buildReceiptLabel,
+} from "@/lib/complaint-sources";
 import { DECISION_LABELS, type DecisionStatus } from "@/lib/decision-board";
 import {
   buildEvidenceCaption,
@@ -153,7 +157,12 @@ export type IdeaReportInput = {
   reason: string | null;
   marketGap: string | null;
   targetCustomer: string | null;
-  evidence: { body: string; sourceUrl: string | null; sourceKind: string | null }[];
+  evidence: {
+    body: string;
+    sourceUrl: string | null;
+    sourceKind: string | null;
+    title: string;
+  }[];
   painTrend: PainTrendResult | null;
   evidenceStrength: EvidenceStrengthResult | null;
   decisionStatus: DecisionStatus | null;
@@ -212,8 +221,11 @@ export function buildIdeaReport(input: IdeaReportInput): string {
       const quote = e.body.length > 240 ? `${e.body.slice(0, 240)}…` : e.body;
       const label = buildReceiptLabel(e.sourceKind, e.sourceUrl);
       const href = buildReceiptHref(e.sourceKind, e.sourceUrl);
+      const hint = href ? buildReceiptHint(e.sourceKind, e.title) : null;
       const receipt = label && href ? ` — [${label}](${href})` : "";
-      lines.push(`- “${quote.replace(/\s+/g, " ").trim()}”${receipt}`);
+      lines.push(
+        `- “${quote.replace(/\s+/g, " ").trim()}”${receipt}${hint ? ` (${hint})` : ""}`
+      );
     }
     lines.push("");
   }

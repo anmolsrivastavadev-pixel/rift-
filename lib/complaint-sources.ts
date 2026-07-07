@@ -56,6 +56,20 @@ export function buildReceiptLabel(
   return COMPLAINT_SOURCE_LABELS.web;
 }
 
+/** Apple provides no per-review deep links, so an App Store receipt can only
+ * land on the reviews LIST. This hint tells the reader which review to look
+ * for (the complaint title is the review's own headline). Null for every
+ * other source — those links land exactly on the original post. */
+export function buildReceiptHint(
+  kind: string | null | undefined,
+  title: string | null | undefined
+): string | null {
+  if (kind !== "appstore") return null;
+  const t = title?.trim();
+  if (!t) return null;
+  return `Apple doesn't link to single reviews — look for the one titled “${t.slice(0, 80)}”. The quote above is that review, word for word.`;
+}
+
 /** The href a receipt should actually open. App Store receipts land on the
  * app's REVIEWS section (`?see-all=reviews`), not its marketing page —
  * applied at render time so complaints stored before this fix benefit too. */
