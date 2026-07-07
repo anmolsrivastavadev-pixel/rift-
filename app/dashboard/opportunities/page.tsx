@@ -6,6 +6,7 @@ import { RunOpportunitiesButton } from "@/components/opportunities/run-button";
 import { OpportunityBrowser } from "@/components/opportunities/opportunity-browser";
 import { Button } from "@/components/ui/button";
 import { requireUser } from "@/lib/auth/current-user";
+import { computePainTrend, PAIN_TREND_LABELS } from "@/lib/pain-trend";
 import { getProjectOrDefault, projectHref } from "@/lib/projects";
 import { getUsageSummary } from "@/lib/quotas";
 
@@ -23,7 +24,7 @@ export default async function OpportunitiesPage({
     firstParam((await searchParams).projectId),
     user
   );
-  const [ops, savedRows, complaintCount, usage] = await Promise.all([
+  const [ops, savedRows, complaintCount, usage, datedComplaints] = await Promise.all([
     prisma.opportunity.findMany({
       where: { userId: user.id, projectId: project.id },
       orderBy: { opportunityScore: "desc" },
@@ -37,9 +38,34 @@ export default async function OpportunitiesPage({
       where: { userId: user.id, projectId: project.id },
     }),
     getUsageSummary(user),
+    // M31b — dated linked complaints only, one query for every card's pain
+    // trend badge (undated rows can't affect the signal, so skip them).
+    prisma.complaint.findMany({
+      where: {
+        userId: user.id,
+        projectId: project.id,
+        opportunityId: { not: null },
+        sourceDate: { not: null },
+      },
+      select: { opportunityId: true, sourceDate: true },
+    }),
   ]);
 
   const savedSet = new Set(savedRows.map((s) => s.opportunityId));
+
+  // M31b — group source dates by idea, compute the display-only trend once
+  // per idea, and only pass a label when there is enough dated evidence.
+  const datesByOpportunity = new Map<string, Date[]>();
+  for (const c of datedComplaints) {
+    if (!c.opportunityId || !c.sourceDate) continue;
+    const list = datesByOpportunity.get(c.opportunityId) ?? [];
+    list.push(c.sourceDate);
+    datesByOpportunity.set(c.opportunityId, list);
+  }
+  const painTrendLabelFor = (opportunityId: string): string | null => {
+    const result = computePainTrend(datesByOpportunity.get(opportunityId) ?? []);
+    return result.trend === "insufficient" ? null : PAIN_TREND_LABELS[result.trend];
+  };
 
   // M26 — free-plan usage line under the run button. Hidden for pro/admin.
   const usageLine =
@@ -68,6 +94,7 @@ export default async function OpportunitiesPage({
     productAngle: o.productAngle,
     createdAt: o.createdAt,
     saved: savedSet.has(o.id),
+    painTrendLabel: painTrendLabelFor(o.id),
   }));
 
   return (

@@ -11,6 +11,7 @@ import {
   CheckCircle2,
   Lightbulb,
   Layers,
+  TrendingUp,
 } from "lucide-react";
 
 import { prisma } from "@/lib/db";
@@ -31,6 +32,12 @@ import { ValidationWorkspace } from "@/components/opportunities/validation-works
 import { ExportButtons } from "@/components/reports/export-buttons";
 import { ShareButton } from "@/components/reports/share-button";
 import { shareUrlForToken } from "@/lib/share";
+import {
+  computePainTrend,
+  buildPainTrendCaption,
+  PAIN_TREND_LABELS,
+  PAIN_TREND_HELPER,
+} from "@/lib/pain-trend";
 import { trackProductEvent } from "@/lib/product-events";
 import { requireUser } from "@/lib/auth/current-user";
 import { projectHref } from "@/lib/project-href";
@@ -63,7 +70,7 @@ export default async function OpportunityDetailPage({
 
   const project = await requireOwnedProject(projectId, user);
 
-  const [op, allOthers, allNeighbours, activeShareLink] = await Promise.all([
+  const [op, allOthers, allNeighbours, activeShareLink, trendDates] = await Promise.all([
     prisma.opportunity.findFirst({
       where: { id, userId: user.id, projectId: project.id },
       include: {
@@ -108,9 +115,18 @@ export default async function OpportunityDetailPage({
       where: { userId: user.id, opportunityId: id, kind: "idea", revokedAt: null },
       select: { id: true, token: true },
     }),
+    // M31b — ALL linked complaints' source dates (not just the 5 examples)
+    // for the display-only pain trend signal.
+    prisma.complaint.findMany({
+      where: { opportunityId: id, userId: user.id },
+      select: { sourceDate: true },
+    }),
   ]);
 
   if (!op) notFound();
+
+  // M31b — display-only pain trend from original complaint dates.
+  const painTrend = computePainTrend(trendDates.map((d) => d.sourceDate));
 
   // M19 — usage event (metadata only, fails silently, never blocks the page).
   await trackProductEvent({
@@ -189,6 +205,11 @@ export default async function OpportunityDetailPage({
           />
           <HeaderStat icon={Users} label="Complaints" value={op.mentions} />
           <HeaderStat
+            icon={TrendingUp}
+            label="Pain trend"
+            value={PAIN_TREND_LABELS[painTrend.trend]}
+          />
+          <HeaderStat
             icon={CheckCircle2}
             label="Created"
             value={op.createdAt.toLocaleDateString()}
@@ -219,6 +240,12 @@ export default async function OpportunityDetailPage({
               Examples from the complaints behind this idea. Complaints found by
               the finder link to the original post.
             </p>
+            {painTrend.trend !== "insufficient" && (
+              <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
+                Pain trend: {PAIN_TREND_LABELS[painTrend.trend]}.{" "}
+                {buildPainTrendCaption(painTrend)} {PAIN_TREND_HELPER}
+              </p>
+            )}
             <div className="mt-3">
               <ExampleComplaints items={op.complaints} />
             </div>

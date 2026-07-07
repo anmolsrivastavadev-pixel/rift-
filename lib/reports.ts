@@ -8,6 +8,11 @@
 
 import { buildReceiptLabel } from "@/lib/complaint-sources";
 import { DECISION_LABELS, type DecisionStatus } from "@/lib/decision-board";
+import {
+  buildPainTrendCaption,
+  PAIN_TREND_LABELS,
+  type PainTrendResult,
+} from "@/lib/pain-trend";
 
 /** "AI Fitness Coach!" -> "ai-fitness-coach" (safe, readable filenames). */
 export function slugifyForFilename(name: string): string {
@@ -144,6 +149,7 @@ export type IdeaReportInput = {
   marketGap: string | null;
   targetCustomer: string | null;
   evidence: { body: string; sourceUrl: string | null; sourceKind: string | null }[];
+  painTrend: PainTrendResult | null;
   decisionStatus: DecisionStatus | null;
   checklistDone: number;
   checklistTotal: number;
@@ -174,6 +180,11 @@ export function buildIdeaReport(input: IdeaReportInput): string {
     lines.push(`- Complaints in cluster: ${input.mentions}`);
     if (input.severity != null) lines.push(`- Severity: ${input.severity}`);
     if (input.confidence != null) lines.push(`- Confidence: ${input.confidence}%`);
+  }
+  if (input.painTrend) {
+    lines.push(
+      `- Pain trend: ${PAIN_TREND_LABELS[input.painTrend.trend]}. ${buildPainTrendCaption(input.painTrend)}`
+    );
   }
   lines.push("");
 

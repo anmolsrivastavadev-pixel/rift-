@@ -2,7 +2,15 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Target, Users, AlertTriangle, Briefcase, Plus, Check } from "lucide-react";
+import {
+  Target,
+  Users,
+  AlertTriangle,
+  Briefcase,
+  Plus,
+  Check,
+  TrendingUp,
+} from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { SaveButton } from "@/components/opportunities/save-button";
@@ -23,6 +31,9 @@ export type OpportunityCardData = {
   productAngle?: string | null;
   createdAt: Date;
   saved: boolean;
+  // M31b — precomputed display-only trend label ("Growing" | "Steady" |
+  // "Fading"); null when there aren't enough dated complaints to show one.
+  painTrendLabel?: string | null;
 };
 
 function scoreColor(score: number): string {
@@ -104,9 +115,23 @@ export function OpportunityCard({
       >
         <div className="flex items-start gap-2 pr-40">
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-[var(--color-muted-foreground)]">
+            <div className="flex flex-wrap items-center gap-1.5 text-[11px] uppercase tracking-wider text-[var(--color-muted-foreground)]">
               <Briefcase className="h-3 w-3" />
               {op.industry}
+              {op.painTrendLabel && (
+                <Badge
+                  variant={
+                    op.painTrendLabel === "Growing"
+                      ? "success"
+                      : op.painTrendLabel === "Fading"
+                        ? "warning"
+                        : "default"
+                  }
+                >
+                  <TrendingUp className="mr-1 h-3 w-3" />
+                  {op.painTrendLabel}
+                </Badge>
+              )}
             </div>
             <h3 className="mt-1.5 line-clamp-2 text-base font-semibold leading-snug tracking-tight text-balance group-hover:text-[var(--color-primary)]">
               {op.title}

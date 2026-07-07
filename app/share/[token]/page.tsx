@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { getIdeaReportData, getProjectReportData } from "@/lib/report-data";
 import { buildReceiptLabel } from "@/lib/complaint-sources";
+import { buildPainTrendCaption, PAIN_TREND_LABELS } from "@/lib/pain-trend";
 import { DECISION_LABELS } from "@/lib/decision-board";
 import { PrintButton } from "@/components/reports/print-button";
 import { ExternalLink } from "@/components/ui/external-link";
@@ -134,7 +135,18 @@ export default async function SharePage({
             <Stat label="Complaints" value={data.mentions} />
             {data.severity != null && <Stat label="Severity" value={data.severity} />}
             {data.confidence != null && <Stat label="Confidence" value={`${data.confidence}%`} />}
+            {data.painTrend && (
+              <Stat
+                label="Pain trend"
+                value={PAIN_TREND_LABELS[data.painTrend.trend]}
+              />
+            )}
           </div>
+          {data.painTrend && (
+            <p className="text-xs text-[var(--color-muted-foreground)]">
+              {buildPainTrendCaption(data.painTrend)}
+            </p>
+          )}
         </Section>
         {why && (
           <Section title="Why this problem exists">

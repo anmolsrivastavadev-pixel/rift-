@@ -9,6 +9,7 @@
  */
 
 import { prisma } from "@/lib/db";
+import { computePainTrend } from "@/lib/pain-trend";
 import { isValidDecisionStatus, type DecisionStatus } from "@/lib/decision-board";
 import { VALIDATION_CHECKLIST_ITEMS } from "@/lib/validation-plan";
 import type { IdeaReportInput, ProjectReportInput } from "@/lib/reports";
@@ -134,10 +135,17 @@ export async function getIdeaReportData(
   });
   if (!op) return null;
 
-  const workspace = await prisma.validationWorkspace.findUnique({
-    where: { userId_opportunityId: { userId, opportunityId: op.id } },
-    select: { decisionStatus: true, validationChecklist: true },
-  });
+  const [workspace, trendDates] = await Promise.all([
+    prisma.validationWorkspace.findUnique({
+      where: { userId_opportunityId: { userId, opportunityId: op.id } },
+      select: { decisionStatus: true, validationChecklist: true },
+    }),
+    // M31b — all linked complaints' source dates for the pain trend line.
+    prisma.complaint.findMany({
+      where: { opportunityId: op.id, userId },
+      select: { sourceDate: true },
+    }),
+  ]);
 
   const checklist = Array.isArray(workspace?.validationChecklist)
     ? (workspace.validationChecklist as unknown[]).map(Boolean)
@@ -162,6 +170,7 @@ export async function getIdeaReportData(
     marketGap: op.marketGap,
     targetCustomer: op.targetCustomer,
     evidence: op.complaints,
+    painTrend: computePainTrend(trendDates.map((d) => d.sourceDate)),
     decisionStatus:
       workspace && isValidDecisionStatus(workspace.decisionStatus)
         ? (workspace.decisionStatus as DecisionStatus)
