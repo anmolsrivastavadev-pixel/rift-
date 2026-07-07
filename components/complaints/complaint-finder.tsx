@@ -100,8 +100,8 @@ export function ComplaintFinder({ projectId }: { projectId: string }) {
 
       <p className="text-xs text-[var(--color-muted-foreground)]">
         Rift searches Reddit, App Store reviews, Hacker News, YouTube comments,
-        and the wider web for real frustrations about your niche. No
-        spreadsheet needed.
+        Stack Exchange, GitHub, and the wider web for real frustrations about
+        your niche. No spreadsheet needed.
       </p>
 
       {result && !pending && <FinderSummary result={result} projectId={projectId} />}

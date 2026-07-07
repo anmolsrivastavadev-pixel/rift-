@@ -578,6 +578,125 @@ export async function fetchYouTubeComplaints(
   }
 }
 
+/* --------------------------------------------------------- Stack Exchange */
+
+const SE_SEARCH_URL = "https://api.stackexchange.com/2.3/search/advanced";
+/** Complaint words that surface frustration questions (parallel per-term
+ * searches, same pattern as Hacker News). */
+const SE_COMPLAINT_TERMS = ["frustrating", "problem"];
+
+interface SEQuestion {
+  question_id?: number;
+  title?: string;
+  body?: string; // HTML
+  link?: string;
+  creation_date?: number; // unix seconds
+}
+
+/**
+ * Questions on Stack Overflow phrased around the niche + a complaint word —
+ * official Stack Exchange API, no key needed (keyless quota 300 req/day; one
+ * finder run uses 2). Shines for developer/tech niches; consumer niches just
+ * return few or zero results (fail-soft).
+ */
+export async function fetchStackExchangeComplaints(
+  keyword: string,
+  limit = 25
+): Promise<SourceResult> {
+  try {
+    const perTerm = await Promise.all(
+      SE_COMPLAINT_TERMS.map(async (term) => {
+        try {
+          const q = encodeURIComponent(`${keyword} ${term}`);
+          const url = `${SE_SEARCH_URL}?order=desc&sort=relevance&q=${q}&site=stackoverflow&filter=withbody&pagesize=15`;
+          const json = (await fetchJson(url)) as { items?: SEQuestion[] };
+          return json.items ?? [];
+        } catch {
+          return [] as SEQuestion[]; // one term failing is fine
+        }
+      })
+    );
+
+    const seen = new Set<number>();
+    const complaints: FoundComplaint[] = [];
+    for (const item of perTerm.flat()) {
+      if (complaints.length >= limit) break;
+      if (!item?.question_id || seen.has(item.question_id)) continue;
+      seen.add(item.question_id);
+      const title = cleanText(stripHtml(item.title ?? ""));
+      const body = cleanText(stripHtml(item.body ?? ""));
+      if (body.length < 30) continue;
+      complaints.push({
+        title: title.slice(0, 200) || body.slice(0, 80),
+        body: body.slice(0, 5000),
+        sourceDate: item.creation_date
+          ? new Date(item.creation_date * 1000).toISOString()
+          : null,
+        source: "stackexchange",
+        sourceUrl: item.link ?? null,
+      });
+    }
+    return { complaints };
+  } catch (err) {
+    return {
+      complaints: [],
+      error: `Stack Exchange search failed (${err instanceof Error ? err.message : "unknown error"}).`,
+    };
+  }
+}
+
+/* ------------------------------------------------------------------ GitHub */
+
+const GITHUB_SEARCH_URL = "https://api.github.com/search/issues";
+
+interface GitHubIssue {
+  title?: string;
+  body?: string | null;
+  html_url?: string;
+  created_at?: string;
+}
+
+/**
+ * Open GitHub issues mentioning the niche — official GitHub search API, no
+ * key needed (unauthenticated limit 10 searches/min; one finder run uses 1).
+ * Like Stack Exchange, this shines for software niches and quietly returns
+ * little for consumer ones.
+ */
+export async function fetchGitHubComplaints(
+  keyword: string,
+  limit = 15
+): Promise<SourceResult> {
+  try {
+    const q = encodeURIComponent(`"${keyword}" in:title,body type:issue`);
+    const url = `${GITHUB_SEARCH_URL}?q=${q}&sort=reactions&per_page=${limit}`;
+    const json = (await fetchJson(url, {
+      Accept: "application/vnd.github+json",
+    })) as { items?: GitHubIssue[] };
+
+    const complaints: FoundComplaint[] = [];
+    for (const item of json.items ?? []) {
+      const title = cleanText(item.title ?? "");
+      const body = cleanText(item.body ?? "");
+      const combined = body.length >= 30 ? `${title}. ${body}` : title;
+      if (combined.length < 30) continue;
+      complaints.push({
+        title: title.slice(0, 200) || combined.slice(0, 80),
+        body: combined.slice(0, 5000),
+        sourceDate: item.created_at ?? null,
+        source: "github",
+        sourceUrl: item.html_url ?? null,
+      });
+    }
+    return { complaints };
+  } catch (err) {
+    let msg = err instanceof Error ? err.message : "unknown error";
+    if (msg === "HTTP 403") {
+      msg += ", GitHub rate limit, try again in a minute";
+    }
+    return { complaints: [], error: `GitHub search failed (${msg}).` };
+  }
+}
+
 /* ------------------------------------------------------------ Hacker News */
 
 const HN_SEARCH_URL = "https://hn.algolia.com/api/v1/search";

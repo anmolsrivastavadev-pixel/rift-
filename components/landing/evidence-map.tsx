@@ -11,7 +11,7 @@ import { RiftMark } from "@/components/logo";
 const nodes = [
   { label: "App reviews", className: "left-[8%] top-[12%]" },
   { label: "Support tickets", className: "left-[4%] top-[45%]" },
-  { label: "Customer calls", className: "left-[16%] bottom-[10%]" },
+  { label: "YouTube comments", className: "left-[16%] bottom-[10%]" },
   { label: "Reddit posts", className: "right-[8%] top-[14%]" },
   { label: "Hacker News", className: "right-[4%] top-[46%]" },
   { label: "Surveys", className: "right-[14%] bottom-[11%]" },

@@ -331,7 +331,8 @@ All actions are `"use server"` files. They import `prisma` from `lib/db.ts` and 
 | `BETTER_AUTH_SECRET` | Better Auth secret for sessions/tokens. | `replace-with-a-long-random-secret` |
 | `RIFT_ADMIN_EMAILS` | M19/M20. Comma-separated, case-insensitive admin allowlist: grants `/dashboard/beta-insights` access and always bypasses the beta gate. Empty = no admins. | `you@example.com` |
 | `RIFT_BETA_MODE` | M20. `off`/unset = dashboard open to all signed-in users. `invite_only` = only admins + emails on the Beta access list; others land on `/beta-access`. | `off` |
-| `TAVILY_API_KEY` | M30. Enables the complaint finder's whole-web source (Tavily search + Gemini extraction). Optional — without it the web source fails soft with a "not configured" note. | `your_tavily_api_key_here` |
+| `TAVILY_API_KEY` | M30. Enables the complaint finder's whole-web source (Tavily search + Gemini extraction; post-M31 runs 3 search angles per finder search). Optional — without it the web source fails soft with a "not configured" note. | `your_tavily_api_key_here` |
+| `YOUTUBE_API_KEY` | Post-M31. Enables the complaint finder's YouTube-comments source (official Data API v3, free key). Optional — without it the source silently sits out. Stack Exchange and GitHub sources need no key. | `your_youtube_api_key_here` |
 | `REDDIT_CLIENT_ID` | M22. Optional. Reddit "script" app client ID for the complaint finder's OAuth search (create at https://www.reddit.com/prefs/apps). Unset = public-endpoint fallback, which Reddit often blocks with HTTP 403 from server IPs. | `your_reddit_client_id_here` |
 | `REDDIT_CLIENT_SECRET` | M22. Optional. Secret paired with `REDDIT_CLIENT_ID`. Never logged. | `your_reddit_client_secret_here` |
 | `REDDIT_USER_AGENT` | M22. Optional. Descriptive User-Agent Reddit asks for, `platform:app-id:version (by /u/username)` format. Defaults to a generic rift-app UA. | `web:rift-app:v0.1 (by /u/name)` |

@@ -28,6 +28,8 @@ import {
   fetchHackerNewsComplaints,
   fetchWebComplaints,
   fetchYouTubeComplaints,
+  fetchStackExchangeComplaints,
+  fetchGitHubComplaints,
   type SourceResult,
 } from "@/lib/complaint-finder";
 import {
@@ -89,6 +91,8 @@ export async function runFinderImport(input: {
     ["hackernews", fetchHackerNewsComplaints(keyword)],
     ["web", fetchWebComplaints(keyword)],
     ["youtube", fetchYouTubeComplaints(keyword)],
+    ["stackexchange", fetchStackExchangeComplaints(keyword)],
+    ["github", fetchGitHubComplaints(keyword)],
   ];
   const settled = await Promise.all(sourceFetchers.map(([, p]) => p));
 
