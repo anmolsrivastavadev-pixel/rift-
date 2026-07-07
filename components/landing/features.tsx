@@ -4,7 +4,7 @@ import { SectionHeader } from "@/components/landing/section-header";
 
 /* Three feature cards, each topped with a small product-style preview built
  * from plain styled boxes (no real data, no images). Each preview plays a
- * looping ~9s mini-demo (see the demo-* keyframes in globals.css); with
+ * looping ~7s mini-demo (see the demo-* keyframes in globals.css); with
  * prefers-reduced-motion everything renders in its final static state.
  */
 

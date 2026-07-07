@@ -160,23 +160,24 @@
   }
 
   /* Looping mini-demo animations for the landing feature previews.
-     All elements share one 9s cycle; per-element stagger comes from
+     All elements share one 7s cycle; per-element stagger comes from
      animation-delay (fill-mode: both hides elements until their turn,
-     and the delay shifts every repeat, so the stagger survives the loop). */
+     and the delay shifts every repeat, so the stagger survives the loop).
+     Hold ends at ~76% so the reset-and-replay reads clearly as a loop. */
   @keyframes demo-item {
     0% {
       opacity: 0;
       transform: translateY(8px);
     }
-    5% {
+    6% {
       opacity: 1;
       transform: translateY(0);
     }
-    86% {
+    76% {
       opacity: 1;
       transform: translateY(0);
     }
-    94%,
+    86%,
     100% {
       opacity: 0;
       transform: translateY(-4px);
@@ -184,7 +185,7 @@
   }
 
   .animate-demo-item {
-    animation: demo-item 9s ease-out infinite both;
+    animation: demo-item 7s ease-out infinite both;
   }
 
   /* Score bars grow from empty to their real width, hold, then reset */
@@ -193,13 +194,13 @@
     2% {
       transform: scaleX(0);
     }
-    12% {
+    14% {
       transform: scaleX(1);
     }
-    86% {
+    76% {
       transform: scaleX(1);
     }
-    94%,
+    86%,
     100% {
       transform: scaleX(0);
     }
@@ -207,7 +208,7 @@
 
   .animate-demo-bar {
     transform-origin: left;
-    animation: demo-bar 9s cubic-bezier(0.22, 1, 0.36, 1) infinite both;
+    animation: demo-bar 7s cubic-bezier(0.22, 1, 0.36, 1) infinite both;
   }
 
   /* Small elements (checkmarks, scores, verdict badges) pop into place */
@@ -216,18 +217,18 @@
       opacity: 0;
       transform: scale(0.5);
     }
-    4% {
+    5% {
       opacity: 1;
       transform: scale(1.12);
     }
-    7% {
+    9% {
       transform: scale(1);
     }
-    86% {
+    76% {
       opacity: 1;
       transform: scale(1);
     }
-    94%,
+    86%,
     100% {
       opacity: 0;
       transform: scale(0.85);
@@ -235,7 +236,7 @@
   }
 
   .animate-demo-pop {
-    animation: demo-pop 9s ease-out infinite both;
+    animation: demo-pop 7s ease-out infinite both;
   }
 
   /* Soft radar ping for "hot" complaint dots; color via --pulse-color */
