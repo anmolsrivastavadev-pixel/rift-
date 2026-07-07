@@ -5,6 +5,7 @@ import { HowItWorks } from "@/components/landing/how-it-works";
 import { Features } from "@/components/landing/features";
 import { EvidenceMap } from "@/components/landing/evidence-map";
 import { OutputWall } from "@/components/landing/output-wall";
+import { ChatgptCompare } from "@/components/landing/chatgpt-compare";
 import { WhyComplaints } from "@/components/landing/why-complaints";
 import { Faq } from "@/components/landing/faq";
 import { CtaBand } from "@/components/landing/cta-band";
@@ -20,6 +21,7 @@ export default function HomePage() {
       <EvidenceMap />
       <HowItWorks />
       <OutputWall />
+      <ChatgptCompare />
       <WhyComplaints />
       <Faq />
       <CtaBand />

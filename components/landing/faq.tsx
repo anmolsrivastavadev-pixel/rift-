@@ -7,6 +7,10 @@ const faqs = [
     a: "Paste app reviews, Reddit posts, support tickets, or things people tell you in real life. Even 5 to 10 sentences is enough. You can also upload a CSV, use the built-in complaint finder, or start with demo data.",
   },
   {
+    q: "Can't I just use ChatGPT for this?",
+    a: "ChatGPT invents plausible ideas, but it can't show you one real person with the problem. Rift starts from real complaints, links each quote back to its source, shows whether the pain is growing or fading, and keeps watching your niche weekly. Use ChatGPT to brainstorm; use Rift when you want evidence.",
+  },
+  {
     q: "Do the scores prove an idea will work?",
     a: "No, and Rift never pretends they do. Scores are transparent sorting guides computed by a fixed formula, so the same data always gives the same score. Real validation means talking to real people.",
   },
