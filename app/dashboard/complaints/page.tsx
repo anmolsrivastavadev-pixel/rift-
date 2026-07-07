@@ -3,10 +3,17 @@ import { ChevronDown } from "lucide-react";
 
 import { ComplaintsInput } from "@/components/complaints/complaints-input";
 import { ComplaintsList } from "@/components/complaints/complaints-list";
+import {
+  NicheWatchPanel,
+  type NicheWatchItem,
+} from "@/components/complaints/niche-watch-panel";
 import { StartFreshButton } from "@/components/complaints/start-fresh-button";
 import { StarterMarkets } from "@/components/complaints/starter-markets";
+import { prisma } from "@/lib/db";
+import { isEmailEnabled } from "@/lib/email";
 import { requireUser } from "@/lib/auth/current-user";
 import { getProjectOrDefault } from "@/lib/projects";
+import { getEffectivePlan } from "@/lib/quotas";
 
 function firstParam(value: string | string[] | undefined): string | undefined {
   return Array.isArray(value) ? value[0] : value;
@@ -21,6 +28,28 @@ export default async function ComplaintsPage({
   const sp = await searchParams;
   const project = await getProjectOrDefault(firstParam(sp.projectId), user);
   const query = firstParam(sp.q) ?? "";
+
+  // M31c — this project's niche watches + the user's active-watch usage.
+  const [watchRows, activeWatchCount, { plan, limits }] = await Promise.all([
+    prisma.nicheWatch.findMany({
+      where: { userId: user.id, projectId: project.id },
+      orderBy: { createdAt: "asc" },
+    }),
+    prisma.nicheWatch.count({ where: { userId: user.id, pausedAt: null } }),
+    getEffectivePlan(user),
+  ]);
+  const watches: NicheWatchItem[] = watchRows.map((w) => ({
+    id: w.id,
+    keyword: w.keyword,
+    paused: w.pausedAt !== null,
+    lastRunAt: w.lastRunAt,
+    lastRunStatus: w.lastRunStatus,
+    lastRunInserted: w.lastRunInserted,
+  }));
+  const watchUsageLine =
+    plan === "free"
+      ? `${activeWatchCount} of ${limits.maxActiveWatches} free niche watch${limits.maxActiveWatches === 1 ? "" : "es"} used.`
+      : null;
 
   return (
     <div className="mx-auto max-w-5xl space-y-8">
@@ -42,6 +71,21 @@ export default async function ComplaintsPage({
         </p>
         <div className="mt-3">
           <ComplaintsInput projectId={project.id} />
+        </div>
+      </section>
+
+      <section>
+        <h2 className="text-base font-semibold">Watch a niche weekly</h2>
+        <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
+          Rift keeps looking for new complaints while you do other things.
+        </p>
+        <div className="mt-3">
+          <NicheWatchPanel
+            projectId={project.id}
+            watches={watches}
+            usageLine={watchUsageLine}
+            emailEnabled={isEmailEnabled()}
+          />
         </div>
       </section>
 

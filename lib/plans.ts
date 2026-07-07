@@ -21,6 +21,8 @@ export type PlanLimits = {
   finderSearchesPerMonth: number;
   /** Complaints stored per project. */
   complaintsPerProject: number;
+  /** M31c — active (non-paused) weekly niche watches at once. */
+  maxActiveWatches: number;
 };
 
 export const PLANS: Record<PlanId, PlanLimits> = {
@@ -29,12 +31,14 @@ export const PLANS: Record<PlanId, PlanLimits> = {
     ideaRunsPerMonth: 10,
     finderSearchesPerMonth: 20,
     complaintsPerProject: 1000,
+    maxActiveWatches: 1,
   },
   pro: {
     maxActiveProjects: 100,
     ideaRunsPerMonth: 500,
     finderSearchesPerMonth: 1000,
     complaintsPerProject: 20000,
+    maxActiveWatches: 10,
   },
 };
 

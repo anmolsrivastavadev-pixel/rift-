@@ -53,6 +53,69 @@ export async function sendEmail({ to, subject, html, text }: SendEmailInput): Pr
   logger.info("email.sent", { to, subject });
 }
 
+/** M31c — Weekly niche watch digest content. Titles only, never complaint
+ * bodies. Sent only to the verified account owner; managing the watch is one
+ * click in-app, so there is no tokenised unsubscribe link. */
+export function buildNicheWatchDigestEmail(input: {
+  projectName: string;
+  keyword: string;
+  inserted: number;
+  topComplaintTitles: string[];
+  complaintsUrl: string;
+  quotaFull: boolean;
+}): { subject: string; html: string; text: string } {
+  const { projectName, keyword, inserted, topComplaintTitles, complaintsUrl, quotaFull } =
+    input;
+  const subject = quotaFull
+    ? `Rift niche watch: "${keyword}" found complaints, but the project is full`
+    : `Rift niche watch: ${inserted} new complaint${inserted === 1 ? "" : "s"} about "${keyword}"`;
+
+  const introText = quotaFull
+    ? `Your weekly watch on "${keyword}" found new complaints, but the project "${projectName}" has reached its complaint limit, so nothing was added. Free up room (Start Fresh or a new project) or upgrade for more space.`
+    : `Your weekly watch on "${keyword}" added ${inserted} new complaint${inserted === 1 ? "" : "s"} to the project "${projectName}".`;
+
+  const titleLinesText = topComplaintTitles.map((t) => `- ${t}`).join("\n");
+  const footerText =
+    "You get this weekly because you watch this niche. Pause or delete the watch on your Complaints page.";
+
+  const text = [
+    introText,
+    ...(topComplaintTitles.length > 0 ? ["", titleLinesText] : []),
+    "",
+    `Open the project: ${complaintsUrl}`,
+    "",
+    footerText,
+  ].join("\n");
+
+  const titleListHtml =
+    topComplaintTitles.length > 0
+      ? `<ul style="font-size: 14px; color: #18181b; padding-left: 20px;">${topComplaintTitles
+          .map((t) => `<li style="margin-bottom: 4px;">${escapeHtml(t)}</li>`)
+          .join("")}</ul>`
+      : "";
+
+  const html = `
+  <div style="font-family: -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 24px; color: #18181b;">
+    <p style="font-size: 15px;">${escapeHtml(introText)}</p>
+    ${titleListHtml}
+    <p style="margin: 24px 0;">
+      <a href="${complaintsUrl}" style="display: inline-block; background: #4f46e5; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 10px; font-size: 14px; font-weight: 600;">Open the project</a>
+    </p>
+    <p style="font-size: 13px; color: #52525b;">${escapeHtml(footerText)}</p>
+    <p style="font-size: 12px; color: #a1a1aa; margin-top: 32px;">Rift: business ideas from real customer pain.</p>
+  </div>`;
+  return { subject, html, text };
+}
+
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 /** M27 — Password reset email content. `url` is Better Auth's signed link. */
 export function buildResetPasswordEmail(url: string): {
   subject: string;

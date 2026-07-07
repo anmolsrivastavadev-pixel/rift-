@@ -97,6 +97,27 @@ export async function checkFinderSearchQuota(user: QuotaUser): Promise<QuotaResu
   };
 }
 
+/** M31c — Active (non-paused) niche watch cap. Cron-run watch imports use
+ * ComplaintImport.sourceType "watch", so they never consume the manual finder
+ * search quota above — users pay for watches via this cap instead. */
+export async function checkWatchQuota(user: QuotaUser): Promise<QuotaResult> {
+  const { plan, limits } = await getEffectivePlan(user);
+  const active = await prisma.nicheWatch.count({
+    where: { userId: user.id, pausedAt: null },
+  });
+  if (active < limits.maxActiveWatches) return { ok: true };
+  if (plan === "free") {
+    return {
+      ok: false,
+      message: `The free plan includes ${limits.maxActiveWatches} active niche watch${limits.maxActiveWatches === 1 ? "" : "es"}. Pause or delete one, or upgrade on the Pricing page.`,
+    };
+  }
+  return {
+    ok: false,
+    message: `You've reached the ${limits.maxActiveWatches}-watch limit. Pause or delete a watch you're not using.`,
+  };
+}
+
 /**
  * M26 — Complaints stored per project. Checked against the batch about to be
  * inserted (after dedupe), so re-importing rows that already exist never

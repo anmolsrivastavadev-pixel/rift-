@@ -38,6 +38,7 @@ model User {
   productEvents      ProductEvent[]
   betaFeedback       BetaFeedback[]
   shareLinks         ShareLink[]
+  nicheWatches       NicheWatch[]
 }
 
 // M16A — Multi-Project Market Tests. Lets a user split market tests into
@@ -61,10 +62,36 @@ model Project {
   productEvents      ProductEvent[]
   betaFeedback       BetaFeedback[]
   shareLinks         ShareLink[]
+  nicheWatches       NicheWatch[]
   createdAt           DateTime           @default(now())
   updatedAt           DateTime           @updatedAt
 
   @@index([userId])
+}
+
+// M31c — Weekly niche watch. One row per (user, project, keyword): the cron
+// route (app/api/cron/niche-watch) runs the complaint finder for each active
+// watch roughly weekly, imports new complaints, and emails a digest.
+// Hard-owned like ComplaintImport/AIRun: Cascade on user and project.
+// pausedAt null = active. lastRunStatus: "ok" | "ok_no_new" | "quota_full" |
+// "failed".
+model NicheWatch {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projectId       String
+  project         Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  keyword         String
+  pausedAt        DateTime?
+  lastRunAt       DateTime?
+  lastRunStatus   String?
+  lastRunInserted Int       @default(0)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@unique([userId, projectId, keyword])
+  @@index([userId, projectId])
+  @@index([projectId])
 }
 
 // M29 — Public share links for project and idea reports. token is 32 hex
@@ -273,7 +300,7 @@ model ComplaintImport {
   user           User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   projectId      String
   project        Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  sourceType     String      // "csv" | "paste" | "demo" | "starter_market" | "finder"
+  sourceType     String      // "csv" | "paste" | "demo" | "starter_market" | "finder" | "watch" (M31c cron — excluded from the manual finder-search quota)
   label          String
   complaintCount Int
   createdAt      DateTime    @default(now())

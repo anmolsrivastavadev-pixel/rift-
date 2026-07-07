@@ -2,22 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 
-import { prisma } from "@/lib/db";
-import { complaintRowSchema } from "@/lib/schemas";
-import { normaliseBodyForKey } from "@/lib/text-import";
-import {
-  fetchRedditComplaints,
-  fetchAppStoreComplaints,
-  fetchHackerNewsComplaints,
-  fetchWebComplaints,
-} from "@/lib/complaint-finder";
-import { sanitiseReceiptUrl } from "@/lib/complaint-sources";
+import { runFinderImport } from "@/lib/finder-import";
 import { requireUser } from "@/lib/auth/current-user";
 import { requireOwnedProject } from "@/lib/projects";
-import { trackProductEvent } from "@/lib/product-events";
-import { checkComplaintQuota, checkFinderSearchQuota } from "@/lib/quotas";
-
-const MAX_INSERT = 200;
+import { checkFinderSearchQuota } from "@/lib/quotas";
 
 export interface FindComplaintsResult {
   inserted: number;
@@ -31,10 +19,15 @@ export interface FindComplaintsResult {
 }
 
 /* Server action: type a niche keyword (e.g. "fitness apps") and Rift fetches
- * real complaints from Reddit search + App Store reviews + Hacker News, then
- * imports them into the current project using the same validation + dedupe
- * rules as the paste-text path. The CSV pipeline and AI pipeline are
+ * real complaints from Reddit search + App Store reviews + Hacker News + the
+ * web, then imports them into the current project using the same validation +
+ * dedupe rules as the paste-text path. The CSV pipeline and AI pipeline are
  * untouched.
+ *
+ * M31c — the fetch/validate/dedupe/insert core lives in lib/finder-import.ts,
+ * shared with the weekly niche-watch cron. This action keeps what is
+ * manual-search-specific: auth, keyword validation, the monthly search quota,
+ * and path revalidation.
  */
 export async function findComplaintsAction(
   _prev: FindComplaintsResult | null,
@@ -72,134 +65,46 @@ export async function findComplaintsAction(
     return { ...base, errors: [searchQuota.message] };
   }
 
-  const [reddit, appStore, hackerNews, web] = await Promise.all([
-    fetchRedditComplaints(keyword),
-    fetchAppStoreComplaints(keyword),
-    fetchHackerNewsComplaints(keyword),
-    fetchWebComplaints(keyword),
-  ]);
+  const result = await runFinderImport({
+    user,
+    projectId: project.id,
+    keyword,
+    sourceType: "finder",
+    label: `Found complaints for “${keyword}”`,
+  });
 
-  const errors: string[] = [];
-  if (reddit.error) errors.push(reddit.error);
-  if (appStore.error) errors.push(appStore.error);
-  if (hackerNews.error) errors.push(hackerNews.error);
-  if (web.error) errors.push(web.error);
-
-  const found = [
-    ...reddit.complaints,
-    ...appStore.complaints,
-    ...hackerNews.complaints,
-    ...web.complaints,
-  ];
-  if (found.length === 0) {
+  const foundTotal =
+    result.redditFound +
+    result.appStoreFound +
+    result.hackerNewsFound +
+    result.webFound;
+  if (foundTotal === 0) {
     return {
       ...base,
+      ...{
+        redditFound: result.redditFound,
+        appStoreFound: result.appStoreFound,
+        hackerNewsFound: result.hackerNewsFound,
+        webFound: result.webFound,
+      },
       errors:
-        errors.length > 0
-          ? errors
+        result.errors.length > 0
+          ? result.errors
           : ["No complaints found for that keyword. Try a broader term."],
     };
-  }
-
-  // Validate with the shared schema, then dedupe within the batch.
-  const seen = new Set<string>();
-  const valid: {
-    title: string;
-    body: string;
-    sourceDate: Date | null;
-    sourceUrl: string | null;
-    sourceKind: string | null;
-  }[] = [];
-  for (const f of found.slice(0, MAX_INSERT)) {
-    const parsed = complaintRowSchema.safeParse({
-      title: f.title,
-      body: f.body,
-      sourceDate: f.sourceDate ?? undefined,
-    });
-    if (!parsed.success) continue;
-    const key = normaliseBodyForKey(parsed.data.body);
-    if (seen.has(key)) continue;
-    seen.add(key);
-    valid.push({
-      title: parsed.data.title ?? parsed.data.body.slice(0, 80),
-      body: parsed.data.body,
-      sourceDate: parsed.data.sourceDate ? new Date(parsed.data.sourceDate) : null,
-      // M31a — receipt: sanitised original-post URL + which source it was.
-      sourceUrl: sanitiseReceiptUrl(f.sourceUrl),
-      sourceKind: f.source,
-    });
-  }
-
-  // Dedupe against complaints already in this project (same rule as the
-  // paste-text import: case- and whitespace-insensitive body comparison).
-  const existing = await prisma.complaint.findMany({
-    where: { userId: user.id, projectId: project.id },
-    select: { body: true },
-  });
-  const existingKeys = new Set(
-    existing.map((c: { body: string }) => normaliseBodyForKey(c.body))
-  );
-  const toInsert = valid.filter(
-    (r) => !existingKeys.has(normaliseBodyForKey(r.body))
-  );
-
-  if (toInsert.length > 0) {
-    // M26 — per-project complaint cap (post-dedupe).
-    const quota = await checkComplaintQuota(user, project.id, toInsert.length);
-    if (!quota.ok) {
-      return {
-        ...base,
-        skipped: found.length,
-        redditFound: reddit.complaints.length,
-        appStoreFound: appStore.complaints.length,
-        hackerNewsFound: hackerNews.complaints.length,
-        webFound: web.complaints.length,
-        errors: [quota.message],
-      };
-    }
-    // M16D — record this find as one import history row and link the
-    // complaints back to it.
-    const complaintImport = await prisma.complaintImport.create({
-      data: {
-        userId: user.id,
-        projectId: project.id,
-        sourceType: "finder",
-        label: `Found complaints for “${keyword}”`,
-        complaintCount: toInsert.length,
-      },
-      select: { id: true },
-    });
-    const CHUNK = 500;
-    for (let i = 0; i < toInsert.length; i += CHUNK) {
-      await prisma.complaint.createMany({
-        data: toInsert.slice(i, i + CHUNK).map((row) => ({
-          ...row,
-          userId: user.id,
-          projectId: project.id,
-          complaintImportId: complaintImport.id,
-        })),
-      });
-    }
-    // M19 — usage metadata only (source + count), never complaint text.
-    await trackProductEvent({
-      userId: user.id,
-      projectId: project.id,
-      type: "complaints_added",
-      metadata: { sourceType: "finder", complaintCount: toInsert.length },
-    });
   }
 
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/complaints");
 
   return {
-    inserted: toInsert.length,
-    skipped: found.length - toInsert.length,
-    redditFound: reddit.complaints.length,
-    appStoreFound: appStore.complaints.length,
-    hackerNewsFound: hackerNews.complaints.length,
-    webFound: web.complaints.length,
-    errors,
+    inserted: result.inserted,
+    skipped: result.skipped,
+    redditFound: result.redditFound,
+    appStoreFound: result.appStoreFound,
+    hackerNewsFound: result.hackerNewsFound,
+    webFound: result.webFound,
+    errors: result.errors,
     keyword,
   };
 }

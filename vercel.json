@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/niche-watch",
+      "schedule": "0 9 * * *"
+    }
+  ]
+}

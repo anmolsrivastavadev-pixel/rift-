@@ -35,7 +35,12 @@ export type ProductEventType =
   | "subscription_started"
   | "subscription_canceled"
   | "share_link_created"
-  | "share_link_revoked";
+  | "share_link_revoked"
+  | "watch_created"
+  | "watch_paused"
+  | "watch_resumed"
+  | "watch_deleted"
+  | "watch_digest_sent";
 
 const MAX_STRING = 120;
 const MAX_KEYS = 10;
