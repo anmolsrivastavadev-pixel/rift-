@@ -10,11 +10,14 @@ import {
   Briefcase,
   Plus,
   Check,
+  Minus,
   TrendingUp,
+  TrendingDown,
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { SaveButton } from "@/components/opportunities/save-button";
+import { PAIN_TREND_HELPER } from "@/lib/pain-trend";
 import { projectHref } from "@/lib/project-href";
 
 export type OpportunityCardData = {
@@ -61,8 +64,17 @@ export function OpportunityCard({
       : op.opportunityScore >= 40
         ? "bg-[var(--color-warning-soft)]"
         : "bg-[var(--color-danger-soft)]";
-  const scoreLabel = `Score ${op.opportunityScore} out of 100`;
   const href = projectHref(`/dashboard/opportunities/${op.id}`, projectId);
+  const TrendIcon =
+    op.painTrendLabel === "Growing"
+      ? TrendingUp
+      : op.painTrendLabel === "Fading"
+        ? TrendingDown
+        : Minus;
+  const cardAriaLabel =
+    `Open idea: ${op.title}, score ${op.opportunityScore} out of 100, ` +
+    `${op.mentions} complaint${op.mentions === 1 ? "" : "s"}` +
+    (op.painTrendLabel ? `, pain trend ${op.painTrendLabel.toLowerCase()}` : "");
   return (
     <div
       className={
@@ -76,7 +88,7 @@ export function OpportunityCard({
       <Link
         href={href}
         className="flex flex-1 flex-col"
-        aria-label={`Open idea: ${op.title}, score ${op.opportunityScore}`}
+        aria-label={cardAriaLabel}
       >
         {/* Header: title owns the left, score owns the top-right so a
             vertical scan down the grid compares scores instantly. */}
@@ -94,8 +106,9 @@ export function OpportunityCard({
                         ? "warning"
                         : "default"
                   }
+                  title={PAIN_TREND_HELPER}
                 >
-                  <TrendingUp className="mr-1 h-3 w-3" />
+                  <TrendIcon className="mr-1 h-3 w-3" />
                   {op.painTrendLabel}
                 </Badge>
               )}
@@ -103,10 +116,13 @@ export function OpportunityCard({
             <h3 className="mt-1.5 line-clamp-2 text-base font-semibold leading-snug tracking-tight text-balance group-hover:text-[var(--color-primary)]">
               {op.title}
             </h3>
+            <p className="mt-1.5 line-clamp-2 text-xs text-[var(--color-muted-foreground)]">
+              {op.summary}
+            </p>
           </div>
           <div
             className={`flex shrink-0 flex-col items-center rounded-xl ${bgScore} px-3 py-2`}
-            aria-label={scoreLabel}
+            aria-hidden="true"
           >
             <div className={`text-xl font-bold leading-none ${sc}`}>
               {op.opportunityScore}
@@ -133,7 +149,7 @@ export function OpportunityCard({
         )}
 
         <div className="mt-4 flex flex-wrap gap-1.5">
-          {op.keywords.slice(0, 4).map((k) => (
+          {op.keywords.slice(0, 2).map((k) => (
             <Badge key={k} variant="default">
               {k}
             </Badge>
@@ -145,7 +161,7 @@ export function OpportunityCard({
           <Stat
             icon={AlertTriangle}
             label="Severity"
-            value={op.severity !== null ? op.severity.toFixed(1) : "—"}
+            value={op.severity !== null ? `${op.severity.toFixed(1)}/10` : "—"}
           />
           <Stat
             icon={Target}

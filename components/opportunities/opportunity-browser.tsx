@@ -10,11 +10,10 @@ import {
   DEFAULT_FILTERS,
   type FilterState,
 } from "@/components/opportunities/filters";
-import {
-  NoOpportunitiesEmpty,
-  NoSearchResultsEmpty,
-} from "@/components/opportunities/empty-states";
+import { NoSearchResultsEmpty } from "@/components/opportunities/empty-states";
+import { RunOpportunitiesButton } from "@/components/opportunities/run-button";
 import { Button } from "@/components/ui/button";
+import { Disclosure } from "@/components/ui/disclosure";
 import { projectHref } from "@/lib/project-href";
 
 type CardData = React.ComponentProps<typeof OpportunityCard>["op"];
@@ -29,9 +28,12 @@ const MAX_COMPARE = 3;
 export function OpportunityBrowser({
   opportunities,
   projectId,
+  dimmed = false,
 }: {
   opportunities: CardData[];
   projectId: string;
+  /** True while a rerun is replacing these ideas — dims the grid. */
+  dimmed?: boolean;
 }) {
   const [filters, setFilters] = React.useState<FilterState>(DEFAULT_FILTERS);
   const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
@@ -141,10 +143,6 @@ export function OpportunityBrowser({
     return sorted;
   }, [filters, opportunities]);
 
-  if (opportunities.length === 0) {
-    return <NoOpportunitiesEmpty projectId={projectId} />;
-  }
-
   const compareParam = Array.from(selectedIds).join(",");
 
   return (
@@ -172,17 +170,28 @@ export function OpportunityBrowser({
       {filtered.length === 0 ? (
         <NoSearchResultsEmpty onReset={onReset} />
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((op) => (
-            <OpportunityCard
-              key={op.id}
-              op={op}
-              projectId={projectId}
-              selected={selectedIds.has(op.id)}
-              onToggleCompare={toggleCompare}
-            />
-          ))}
-        </div>
+        <>
+          {dimmed && (
+            <p className="text-xs text-[var(--color-muted-foreground)]">
+              Replacing these ideas…
+            </p>
+          )}
+          <div
+            className={`grid gap-4 transition-opacity sm:grid-cols-2 lg:grid-cols-3 ${
+              dimmed ? "pointer-events-none opacity-50" : ""
+            }`}
+          >
+            {filtered.map((op) => (
+              <OpportunityCard
+                key={op.id}
+                op={op}
+                projectId={projectId}
+                selected={selectedIds.has(op.id)}
+                onToggleCompare={toggleCompare}
+              />
+            ))}
+          </div>
+        </>
       )}
 
       {/* Sticky compare tray */}
@@ -225,6 +234,64 @@ export function OpportunityBrowser({
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+/**
+ * Client wrapper for the "ideas exist" state: owns the rerun-running flag so
+ * the card grid can dim while a rerun replaces it. Renders the rerun
+ * Disclosure (with the run button) above the browser. The server page passes
+ * `capNotice` as a prerendered node so quota/cap logic stays server-side.
+ */
+export function OpportunityWorkspace({
+  opportunities,
+  projectId,
+  complaintCount,
+  capNotice,
+  quotaExhausted,
+  freeRunLimit,
+  resumeJobId,
+}: {
+  opportunities: CardData[];
+  projectId: string;
+  complaintCount: number;
+  capNotice?: React.ReactNode;
+  quotaExhausted: boolean;
+  freeRunLimit?: number;
+  resumeJobId: string | null;
+}) {
+  const [running, setRunning] = React.useState(false);
+
+  return (
+    <div className="space-y-8">
+      <Disclosure
+        title="Run analysis again"
+        suffix="· replaces current ideas"
+      >
+        <p className="text-xs text-[var(--color-muted-foreground)]">
+          Rift will use {complaintCount} complaint
+          {complaintCount === 1 ? "" : "s"} from this project.
+        </p>
+        {capNotice}
+        <div className="mt-4">
+          <RunOpportunitiesButton
+            projectId={projectId}
+            hasIdeas
+            showSkeletons={false}
+            quotaExhausted={quotaExhausted}
+            freeRunLimit={freeRunLimit}
+            resumeJobId={resumeJobId}
+            onRunningChange={setRunning}
+          />
+        </div>
+      </Disclosure>
+
+      <OpportunityBrowser
+        opportunities={opportunities}
+        projectId={projectId}
+        dimmed={running}
+      />
     </div>
   );
 }

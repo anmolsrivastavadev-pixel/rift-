@@ -192,9 +192,9 @@ export async function runPipeline(
     });
 
     if (all.length === 0) {
-      await setJobProgress({ stage: "error", error: "No complaints to analyse. Upload a CSV first.", message: "No complaints found." });
+      await setJobProgress({ stage: "error", error: "No complaints to analyze. Add complaints first.", message: "No complaints found." });
       logger.warn("pipeline.no_complaints", { jobId });
-      return { created: 0, error: "No complaints to analyse. Upload a CSV first." };
+      return { created: 0, error: "No complaints to analyze. Add complaints first." };
     }
 
     allCount = all.length;
@@ -214,11 +214,11 @@ export async function runPipeline(
     if (cleaned.length === 0) {
       await setJobProgress({ stage: "error", error: "All complaints were empty or duplicates.", message: "No clean complaints." });
       await failRun("All complaints were empty or duplicates.");
-      return { created: 0, error: "All complaints were empty or duplicates. Nothing to analyse." };
+      return { created: 0, error: "All complaints were empty or duplicates. Nothing to analyze." };
     }
 
     /* --- Stage 2 + 3: Clustering + Summaries via Gemini --- */
-    await setJobProgress({ stage: "clustering", message: "Clustering complaints with Gemini…", total: cleaned.length, done: 0, cappedAt });
+    await setJobProgress({ stage: "clustering", message: "Grouping similar complaints…", total: cleaned.length, done: 0, cappedAt });
 
     const clusters = await clusterComplaints(
       cleaned.map((c) => ({ id: c.id, text: c.text }))
@@ -228,15 +228,15 @@ export async function runPipeline(
       stage: "clustering",
       done: cleaned.length,
       total: cleaned.length,
-      message: `Found ${clusters.length} cluster${clusters.length === 1 ? "" : "s"}.`,
+      message: `Found ${clusters.length} problem group${clusters.length === 1 ? "" : "s"}.`,
       cappedAt,
     });
     logger.info("pipeline.clustered", { clusters: clusters.length });
 
     if (clusters.length === 0) {
-      await setJobProgress({ stage: "error", error: "Gemini returned no clusters.", message: "No clusters returned." });
+      await setJobProgress({ stage: "error", error: "No repeated problems found.", message: "No clusters returned." });
       await failRun("The AI returned no idea clusters.");
-      return { created: 0, error: "Gemini returned no clusters from the complaints." };
+      return { created: 0, error: "The AI couldn't find repeated problems in these complaints. Add more complaints and try again." };
     }
 
     const involvedComplaintIds = Array.from(
@@ -263,7 +263,7 @@ export async function runPipeline(
     );
 
     /* --- Stage 4: Opportunity Generation --- */
-    await setJobProgress({ stage: "generating", message: "Generating opportunities…", total: clusters.length, done: 0, cappedAt });
+    await setJobProgress({ stage: "generating", message: "Creating ideas…", total: clusters.length, done: 0, cappedAt });
 
     // Reset existing opportunities first, so re-runs replace stale data.
     // M16A: scoped to this project so other projects' opportunities survive.
@@ -339,7 +339,7 @@ export async function runPipeline(
       });
 
       created.push(op.id);
-      await setJobProgress({ stage: "generating", done: i + 1, total: clusters.length, message: `Saved opportunity ${i + 1} of ${clusters.length}.`, cappedAt });
+      await setJobProgress({ stage: "generating", done: i + 1, total: clusters.length, message: `Saved idea ${i + 1} of ${clusters.length}.`, cappedAt });
       logger.info("pipeline.opportunity_saved", { id: op.id, score, mentions: complaintIds.length });
     }
 
@@ -370,7 +370,7 @@ export async function runPipeline(
     revalidatePath("/dashboard/opportunities");
     revalidatePath("/dashboard/complaints");
 
-    await setJobProgress({ stage: "complete", done: created.length, total: created.length, message: `Complete. ${created.length} opportunit${created.length === 1 ? "y" : "ies"} created.`, cappedAt });
+    await setJobProgress({ stage: "complete", done: created.length, total: created.length, message: `Done — ${created.length} idea${created.length === 1 ? "" : "s"} created.`, cappedAt });
     logger.info("pipeline.completed", { created: created.length });
     return { created: created.length, cappedAt };
   } catch (err) {

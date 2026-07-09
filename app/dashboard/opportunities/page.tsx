@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { ChevronRight, LayoutGrid, Target } from "lucide-react";
+import { LayoutGrid, Target, Upload } from "lucide-react";
 
 import { prisma } from "@/lib/db";
 import { RunOpportunitiesButton } from "@/components/opportunities/run-button";
-import { OpportunityBrowser } from "@/components/opportunities/opportunity-browser";
+import { OpportunityWorkspace } from "@/components/opportunities/opportunity-browser";
 import { Button } from "@/components/ui/button";
 import { requireUser } from "@/lib/auth/current-user";
 import { computePainTrend, PAIN_TREND_LABELS } from "@/lib/pain-trend";
@@ -35,7 +35,7 @@ export default async function OpportunitiesPage({
     user
   );
   const painTrendStart = new Date(new Date().getTime() - PAIN_TREND_QUERY_DAYS * DAY_MS);
-  const [ops, savedRows, complaintCount, usage, datedComplaints] = await Promise.all([
+  const [ops, savedRows, complaintCount, usage, datedComplaints, runningRun] = await Promise.all([
     prisma.opportunity.findMany({
       where: { userId: user.id, projectId: project.id },
       orderBy: { opportunityScore: "desc" },
@@ -60,7 +60,20 @@ export default async function OpportunitiesPage({
       },
       select: { opportunityId: true, sourceDate: true },
     }),
+    // An idea run that's still in flight (e.g. the user navigated away
+    // mid-run) — the run button reattaches its progress poll to this jobId.
+    prisma.aIRun.findFirst({
+      where: { userId: user.id, projectId: project.id, status: "running" },
+      orderBy: { createdAt: "desc" },
+      select: { jobId: true },
+    }),
   ]);
+
+  // Display flag only — runPipeline re-checks the quota server-side.
+  const quotaExhausted =
+    usage.plan === "free" &&
+    usage.ideaRunsThisMonth >= usage.limits.ideaRunsPerMonth;
+  const resumeJobId = runningRun?.jobId ?? null;
 
   const savedSet = new Set(savedRows.map((s) => s.opportunityId));
 
@@ -133,22 +146,30 @@ export default async function OpportunitiesPage({
           </p>
           {ops.length > 0 && usageLine}
         </div>
-        <Button asChild variant="outline">
-          <Link href={projectHref("/dashboard/opportunities/decision-board", project.id)}>
-            <LayoutGrid className="h-4 w-4" /> Compare ideas
-          </Link>
-        </Button>
+        {ops.length > 0 && (
+          <Button asChild variant="outline">
+            <Link href={projectHref("/dashboard/opportunities/decision-board", project.id)}>
+              <LayoutGrid className="h-4 w-4" /> Compare ideas
+            </Link>
+          </Button>
+        )}
       </div>
 
       {/* M17 — one clear next step per state: no complaints → add them first;
           no ideas yet → prominent Find ideas; ideas exist → quiet rerun. */}
       {complaintCount === 0 ? (
-        <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[var(--shadow-card)]">
-          <h2 className="text-base font-semibold">Add complaints first</h2>
-          <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
-            Add complaints to find business ideas.
+        <section className="flex flex-col items-center rounded-2xl border border-dashed border-[var(--color-border)] bg-[var(--color-card)] px-6 py-12 text-center shadow-[var(--shadow-card)]">
+          <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--color-primary-soft)]">
+            <Upload className="h-6 w-6 text-[var(--color-primary)]" aria-hidden />
+          </span>
+          <h2 className="mt-4 text-lg font-semibold tracking-tight">
+            Add complaints first
+          </h2>
+          <p className="mt-1 max-w-md text-sm text-[var(--color-muted-foreground)]">
+            Ideas come from real complaints. Add some, then come back to turn
+            them into ranked ideas.
           </p>
-          <Button asChild className="mt-4">
+          <Button asChild className="mt-5">
             <Link href={projectHref("/dashboard/complaints", project.id)}>
               Add complaints
             </Link>
@@ -169,32 +190,25 @@ export default async function OpportunitiesPage({
           </p>
           {capNotice}
           <div className="mt-5 flex flex-col items-center">
-            <RunOpportunitiesButton projectId={project.id} />
+            <RunOpportunitiesButton
+              projectId={project.id}
+              quotaExhausted={quotaExhausted}
+              freeRunLimit={usage.limits.ideaRunsPerMonth}
+              resumeJobId={resumeJobId}
+            />
             {usageLine}
           </div>
         </section>
       ) : (
-        <details className="group rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5">
-          <summary className="flex cursor-pointer select-none items-center gap-2 text-sm font-semibold transition-colors duration-150 ease-out hover:text-[var(--color-primary)] marker:content-none [&::-webkit-details-marker]:hidden">
-            <ChevronRight className="h-4 w-4 shrink-0 text-[var(--color-muted-foreground)] transition-transform duration-150 ease-out group-open:rotate-90" />
-            Run analysis again
-            <span className="font-normal text-[var(--color-muted-foreground)]">
-              · replaces current ideas
-            </span>
-          </summary>
-          <p className="mt-2 text-xs text-[var(--color-muted-foreground)]">
-            Rift will use {complaintCount} complaint
-            {complaintCount === 1 ? "" : "s"} from this project.
-          </p>
-          {capNotice}
-          <div className="mt-4">
-            <RunOpportunitiesButton projectId={project.id} />
-          </div>
-        </details>
-      )}
-
-      {ops.length > 0 && (
-        <OpportunityBrowser opportunities={cards} projectId={project.id} />
+        <OpportunityWorkspace
+          opportunities={cards}
+          projectId={project.id}
+          complaintCount={complaintCount}
+          capNotice={capNotice}
+          quotaExhausted={quotaExhausted}
+          freeRunLimit={usage.limits.ideaRunsPerMonth}
+          resumeJobId={resumeJobId}
+        />
       )}
     </div>
   );
