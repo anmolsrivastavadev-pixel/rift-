@@ -2,6 +2,7 @@ import { GoogleGenAI } from "@google/genai";
 import { z } from "zod";
 
 import { logger } from "@/lib/logger";
+import { generateJsonWithModelFallback } from "@/lib/gemini-request";
 import {
   clusterSchema,
   clustersResponseSchema,
@@ -14,7 +15,7 @@ import {
  * Configuration
  * ------------------------------------------------------------------------- */
 
-const GEMINI_MODEL = process.env.GEMINI_MODEL ?? "gemini-2.5-flash";
+// Model selection + retirement/overload fallback lives in lib/gemini-request.ts.
 const BATCH_SIZE = 100; // complaints per Gemini call
 export const MAX_COMPLAINTS = 1500; // hard cap to bound cost/latency
 
@@ -234,19 +235,8 @@ return ONLY JSON matching the schema`;
 
   let responseText: string | undefined;
   try {
-    const res = await ai.models.generateContent({
-      model: GEMINI_MODEL,
-      contents: prompt,
-      config: {
-        responseMimeType: "application/json",
-      },
-    });
-    responseText = res.text ?? undefined;
+    responseText = await generateJsonWithModelFallback(ai, prompt, "ai", { offset });
   } catch (err) {
-    logger.error("ai.gemini_failed", {
-      offset,
-      error: err instanceof Error ? err.message : String(err),
-    });
     throw new Error(
       `Gemini request failed (offset ${offset}): ${err instanceof Error ? err.message : String(err)}`
     );

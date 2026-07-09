@@ -2,6 +2,7 @@ import { GoogleGenAI } from "@google/genai";
 import { z } from "zod";
 
 import { logger } from "@/lib/logger";
+import { generateJsonWithModelFallback } from "@/lib/gemini-request";
 
 /* ---------------------------------------------------------------------------
  * Gemini helper that EXTRACTS complaint passages from web page text fetched
@@ -14,7 +15,7 @@ import { logger } from "@/lib/logger";
  * (fail-soft), never a crash.
  * ------------------------------------------------------------------------- */
 
-const GEMINI_MODEL = process.env.GEMINI_MODEL ?? "gemini-2.5-flash";
+// Model selection + retirement/overload fallback lives in lib/gemini-request.ts.
 
 const MAX_COMPLAINTS = 30;
 
@@ -94,12 +95,9 @@ No other text, no markdown fences. Just the raw JSON.`;
     promptChars: prompt.length,
   });
 
-  const res = await ai.models.generateContent({
-    model: GEMINI_MODEL,
-    contents: prompt,
-    config: { responseMimeType: "application/json" },
+  const responseText = await generateJsonWithModelFallback(ai, prompt, "web_extract", {
+    keyword,
   });
-  const responseText = res.text;
   if (!responseText) {
     throw new Error("Gemini returned no text for web extraction");
   }

@@ -73,7 +73,7 @@ Score is **never** computed by Gemini. Gemini only provides severity (1–10) an
 | Validation | Zod 4 |
 | ORM | Prisma 7.8.0 in **driver-adapter mode** (`@prisma/adapter-pg` + `pg`) |
 | Database | PostgreSQL (local Postgres 16 for dev; **Neon** pooled with `?sslmode=require` for production) |
-| AI | Google Gemini via `@google/genai` 2.10.0 — model `gemini-2.5-flash` (overridable via `GEMINI_MODEL`) |
+| AI | Google Gemini via `@google/genai` 2.10.0 — model `gemini-flash-latest` alias with `gemini-flash-lite-latest` fallback (overridable via `GEMINI_MODEL`; see `lib/gemini-request.ts`) |
 | Deployment | Vercel |
 
 ---
@@ -211,7 +211,7 @@ Validation Workspace state (testing checklist + decision status) is database-bac
 
 - One file owns all Gemini access: `lib/ai.ts` (per spec — "one AI service file only").
 - SDK: `@google/genai` v2.10.0 (`new GoogleGenAI({ apiKey })` → `ai.models.generateContent({ model, contents, config: { responseMimeType: "application/json" } })`).
-- Model: `gemini-2.5-flash` (overridable via `GEMINI_MODEL` env var).
+- Model: `gemini-flash-latest` alias, falling back to `gemini-flash-lite-latest` on retired-model/overload/quota errors (overridable via `GEMINI_MODEL`; shared logic in `lib/gemini-request.ts`).
 - **Mock fallback:** when `GEMINI_API_KEY` is absent, `lib/ai.ts` falls back to `mockCluster()` — a deterministic local keyword-grouping heuristic. This keeps the pipeline runnable end-to-end during local dev without a key, produces stable clusters for UI work, and (M9) emits clearly-fake mock market-gap hypothesis fields prefixed "Mock …" so the M9 UI is exercisable without Gemini.
 - Batching: complaints are split into batches of **100** before sending to Gemini to bound token usage and latency.
 - Cross-batch merge: clusters across batches are merged if their keyword Jaccard similarity ≥ 0.5 (case-insensitive).
@@ -326,7 +326,7 @@ All actions are `"use server"` files. They import `prisma` from `lib/db.ts` and 
 |---|---|---|
 | `DATABASE_URL` | PostgreSQL connection string (driver adapter uses it). | `postgresql://postgres:postgres@localhost:5432/rift?schema=public` |
 | `GEMINI_API_KEY` | Google Gemini API key (server-only). Get one free at https://aistudio.google.com/apikey. | `your_gemini_api_key_here` |
-| `GEMINI_MODEL` | Optional. Defaults to `gemini-2.5-flash` in `lib/ai.ts`. | `gemini-2.5-flash` |
+| `GEMINI_MODEL` | Optional. Defaults to the `gemini-flash-latest` alias in `lib/gemini-request.ts`. | `gemini-flash-latest` |
 | `BETTER_AUTH_URL` | Better Auth app origin, no trailing slash. Set to the deployed site origin on Vercel. | `http://localhost:3000` |
 | `NEXT_PUBLIC_APP_URL` | Optional browser auth client origin. Set to the deployed origin on Vercel; leave unset for same-origin `/api/auth`. | `https://your-app.vercel.app` |
 | `BETTER_AUTH_SECRET` | Better Auth secret for sessions/tokens. | `replace-with-a-long-random-secret` |

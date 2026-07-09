@@ -2,6 +2,7 @@ import { GoogleGenAI } from "@google/genai";
 import { z } from "zod";
 
 import { logger } from "@/lib/logger";
+import { generateJsonWithModelFallback } from "@/lib/gemini-request";
 
 /* ---------------------------------------------------------------------------
  * Gemini helper for generating custom starter complaint examples.
@@ -12,7 +13,7 @@ import { logger } from "@/lib/logger";
  * or scoring formula.
  * ------------------------------------------------------------------------- */
 
-const GEMINI_MODEL = process.env.GEMINI_MODEL ?? "gemini-2.5-flash";
+// Model selection + retirement/overload fallback lives in lib/gemini-request.ts.
 
 /* --- Zod schema for the AI response --- */
 
@@ -85,19 +86,8 @@ Do NOT include any other text, explanations, or markdown formatting. Just the ra
 
   let responseText: string | undefined;
   try {
-    const res = await ai.models.generateContent({
-      model: GEMINI_MODEL,
-      contents: prompt,
-      config: {
-        responseMimeType: "application/json",
-      },
-    });
-    responseText = res.text ?? undefined;
+    responseText = await generateJsonWithModelFallback(ai, prompt, "starter_ai", { market });
   } catch (err) {
-    logger.error("starter_ai.gemini_failed", {
-      market,
-      error: err instanceof Error ? err.message : String(err),
-    });
     throw new Error(
       `Gemini request failed for starter complaints: ${err instanceof Error ? err.message : String(err)}`
     );
