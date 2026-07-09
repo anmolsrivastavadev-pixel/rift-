@@ -1,9 +1,8 @@
 /* M28 — Stripe server client, key-gated like Tavily/Resend.
  *
- * Billing is enabled only when BOTH STRIPE_SECRET_KEY and
- * STRIPE_PRICE_PRO_MONTHLY are set; without them the pricing page shows
- * "payments coming soon" and the billing actions return a friendly error.
- * STRIPE_WEBHOOK_SECRET is checked separately inside the webhook route.
+ * Billing is enabled only when STRIPE_SECRET_KEY, STRIPE_PRICE_PRO_MONTHLY,
+ * and STRIPE_WEBHOOK_SECRET are all set; without all three the pricing page
+ * shows "payments coming soon" and checkout cannot sell an unfulfillable plan.
  */
 
 import Stripe from "stripe";
@@ -11,7 +10,11 @@ import Stripe from "stripe";
 let stripeClient: Stripe | null = null;
 
 export function isBillingEnabled(): boolean {
-  return Boolean(process.env.STRIPE_SECRET_KEY && process.env.STRIPE_PRICE_PRO_MONTHLY);
+  return Boolean(
+    process.env.STRIPE_SECRET_KEY &&
+      process.env.STRIPE_PRICE_PRO_MONTHLY &&
+      process.env.STRIPE_WEBHOOK_SECRET
+  );
 }
 
 export function getStripe(): Stripe {

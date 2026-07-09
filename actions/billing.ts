@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 
 import { prisma } from "@/lib/db";
-import { requireUser } from "@/lib/auth/current-user";
+import { BETA_BLOCKED_MESSAGE, BetaAccessError, requireActor } from "@/lib/action-auth";
 import { logger } from "@/lib/logger";
 import { getAppBaseUrl, getProPriceId, getStripe, isBillingEnabled } from "@/lib/stripe";
 
@@ -45,7 +45,13 @@ async function getOrCreateStripeCustomerId(user: {
 
 /** Start a subscription checkout for Rift Pro. */
 export async function createCheckoutSession(): Promise<BillingActionResult> {
-  const user = await requireUser();
+  let user;
+  try {
+    user = await requireActor();
+  } catch (err) {
+    if (err instanceof BetaAccessError) return { ok: false, error: BETA_BLOCKED_MESSAGE };
+    throw err;
+  }
   if (!isBillingEnabled()) {
     return { ok: false, error: BILLING_DISABLED_MESSAGE };
   }
@@ -79,7 +85,13 @@ export async function createCheckoutSession(): Promise<BillingActionResult> {
 
 /** Open the Stripe billing portal (manage / cancel the subscription). */
 export async function createPortalSession(): Promise<BillingActionResult> {
-  const user = await requireUser();
+  let user;
+  try {
+    user = await requireActor();
+  } catch (err) {
+    if (err instanceof BetaAccessError) return { ok: false, error: BETA_BLOCKED_MESSAGE };
+    throw err;
+  }
   if (!isBillingEnabled()) {
     return { ok: false, error: BILLING_DISABLED_MESSAGE };
   }

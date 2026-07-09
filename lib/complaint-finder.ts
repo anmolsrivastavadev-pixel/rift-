@@ -45,6 +45,7 @@ export interface SourceResult {
 }
 
 const FETCH_TIMEOUT_MS = 10_000;
+const WEB_EXTRACTION_TIMEOUT_MS = 60_000;
 const USER_AGENT = "rift-app/0.1 (complaint research; contact via app)";
 
 const REDDIT_TOKEN_URL = "https://www.reddit.com/api/v1/access_token";
@@ -442,7 +443,16 @@ export async function fetchWebComplaints(keyword: string): Promise<SourceResult>
   }
 
   try {
-    const extracted = await extractComplaintsFromPages(keyword, pages);
+    const extracted = await Promise.race([
+      extractComplaintsFromPages(keyword, pages),
+      new Promise<"timeout">((resolve) =>
+        setTimeout(() => resolve("timeout"), WEB_EXTRACTION_TIMEOUT_MS)
+      ),
+    ]);
+    if (extracted === "timeout") {
+      logger.warn("web_finder.extract_timed_out", { keyword, pages: pages.length });
+      return { complaints: [], error: "Web extraction timed out." };
+    }
     // M31a — the extractor echoes a 1-based pageIndex per passage, so each
     // complaint gets ITS page's URL (receipt) and published date. A missing or
     // out-of-range index degrades to no receipt / no date, never a failure.

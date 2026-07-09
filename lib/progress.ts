@@ -21,6 +21,7 @@ export interface ProcessingStatus {
   total?: number;
   done?: number;
   error?: string;
+  cappedAt?: number;
   updatedAt: number;
 }
 

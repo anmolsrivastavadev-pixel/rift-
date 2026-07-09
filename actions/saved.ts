@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { prisma } from "@/lib/db";
-import { requireUser } from "@/lib/auth/current-user";
+import { BETA_BLOCKED_MESSAGE, BetaAccessError, requireActor } from "@/lib/action-auth";
 import { requireOwnedProject } from "@/lib/projects";
 import { trackProductEvent } from "@/lib/product-events";
 
@@ -20,7 +20,13 @@ export async function saveOpportunity(
   _prev: { saved: boolean; error?: string } | null,
   formData: FormData
 ): Promise<{ saved: boolean; error?: string }> {
-  const user = await requireUser();
+  let user;
+  try {
+    user = await requireActor();
+  } catch (err) {
+    if (err instanceof BetaAccessError) return { saved: false, error: BETA_BLOCKED_MESSAGE };
+    throw err;
+  }
   const project = await requireOwnedProject(String(formData.get("projectId") ?? ""), user);
   const id = String(formData.get("opportunityId") ?? "");
   if (!id) return { saved: false, error: "Missing opportunity id" };
@@ -65,7 +71,13 @@ export async function unsaveOpportunity(
   _prev: { saved: boolean; error?: string } | null,
   formData: FormData
 ): Promise<{ saved: boolean; error?: string }> {
-  const user = await requireUser();
+  let user;
+  try {
+    user = await requireActor();
+  } catch (err) {
+    if (err instanceof BetaAccessError) return { saved: false, error: BETA_BLOCKED_MESSAGE };
+    throw err;
+  }
   const project = await requireOwnedProject(String(formData.get("projectId") ?? ""), user);
   const id = String(formData.get("opportunityId") ?? "");
   if (!id) return { saved: false, error: "Missing opportunity id" };

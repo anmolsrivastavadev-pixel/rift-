@@ -5,12 +5,20 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { complaintRowSchema, type UploadResult } from "@/lib/schemas";
 import { parseComplaintsFromText, normaliseBodyForKey } from "@/lib/text-import";
-import { requireUser } from "@/lib/auth/current-user";
+import { BETA_BLOCKED_MESSAGE, BetaAccessError, requireActor } from "@/lib/action-auth";
 import { requireOwnedProject } from "@/lib/projects";
 import { trackProductEvent } from "@/lib/product-events";
 import { checkComplaintQuota } from "@/lib/quotas";
 
 const MAX_ROWS = 5000;
+
+function betaBlockedUploadResult(): UploadResult {
+  return { inserted: 0, skipped: 0, errors: [{ row: 0, reason: BETA_BLOCKED_MESSAGE }] };
+}
+
+function betaBlockedStarterResult(market = ""): StarterResult {
+  return { inserted: 0, skipped: 0, errors: [{ row: 0, reason: BETA_BLOCKED_MESSAGE }], market };
+}
 
 // Column names (lowercased) we accept as the complaint text/body.
 const BODY_KEYS = [
@@ -95,7 +103,13 @@ export async function uploadComplaints(
   _prev: UploadResult | null,
   formData: FormData
 ): Promise<UploadResult> {
-  const user = await requireUser();
+  let user;
+  try {
+    user = await requireActor();
+  } catch (err) {
+    if (err instanceof BetaAccessError) return betaBlockedUploadResult();
+    throw err;
+  }
   const project = await requireOwnedProject(String(formData.get("projectId") ?? ""), user);
   const raw = formData.get("data");
   let rows: unknown[] = [];
@@ -206,7 +220,13 @@ export async function loadDemoComplaints(
   _prev: UploadResult | null,
   formData: FormData
 ): Promise<UploadResult> {
-  const user = await requireUser();
+  let user;
+  try {
+    user = await requireActor();
+  } catch (err) {
+    if (err instanceof BetaAccessError) return betaBlockedUploadResult();
+    throw err;
+  }
   const project = await requireOwnedProject(String(formData.get("projectId") ?? ""), user);
   const valid: { title: string; body: string; sourceDate: Date | null }[] = [];
   const errors: { row: number; reason: string }[] = [];
@@ -292,7 +312,13 @@ export async function loadStarterComplaints(
   _prev: StarterResult | null,
   formData: FormData
 ): Promise<StarterResult> {
-  const user = await requireUser();
+  let user;
+  try {
+    user = await requireActor();
+  } catch (err) {
+    if (err instanceof BetaAccessError) return betaBlockedStarterResult();
+    throw err;
+  }
   const project = await requireOwnedProject(String(formData.get("projectId") ?? ""), user);
   const marketKey = String(formData.get("market") ?? "");
 
@@ -388,7 +414,13 @@ export async function importTextComplaints(
   _prev: UploadResult | null,
   formData: FormData
 ): Promise<UploadResult> {
-  const user = await requireUser();
+  let user;
+  try {
+    user = await requireActor();
+  } catch (err) {
+    if (err instanceof BetaAccessError) return betaBlockedUploadResult();
+    throw err;
+  }
   const project = await requireOwnedProject(String(formData.get("projectId") ?? ""), user);
   const text = String(formData.get("text") ?? "");
 
@@ -484,9 +516,15 @@ export async function createCustomStarterComplaints(
   _prev: StarterResult | null,
   formData: FormData
 ): Promise<StarterResult> {
-  const user = await requireUser();
-  const project = await requireOwnedProject(String(formData.get("projectId") ?? ""), user);
   const market = String(formData.get("market") ?? "").trim();
+  let user;
+  try {
+    user = await requireActor();
+  } catch (err) {
+    if (err instanceof BetaAccessError) return betaBlockedStarterResult(market);
+    throw err;
+  }
+  const project = await requireOwnedProject(String(formData.get("projectId") ?? ""), user);
   if (market.length < 2) {
     return { inserted: 0, skipped: 0, errors: [{ row: 0, reason: "Market name must be at least 2 characters." }], market };
   }

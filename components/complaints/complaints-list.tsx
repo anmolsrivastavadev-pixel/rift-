@@ -31,7 +31,7 @@ export async function ComplaintsList({
         }
       : {}),
   } satisfies Prisma.ComplaintWhereInput;
-  const [rows, total] = await Promise.all([
+  const [initialRows, total] = await Promise.all([
     prisma.complaint.findMany({
       where,
       orderBy: { createdAt: "desc" },
@@ -41,8 +41,23 @@ export async function ComplaintsList({
     prisma.complaint.count({ where }),
   ]);
 
-  const start = total === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
-  const end = Math.min(page * PAGE_SIZE, total);
+  // A stale bookmark or hand-edited ?page= beyond the last page would show
+  // "Showing 9,801-150 of 150" over an empty table — clamp to the last page
+  // and refetch (rare path) instead.
+  const lastPage = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const effectivePage = Math.min(page, lastPage);
+  const rows =
+    effectivePage === page
+      ? initialRows
+      : await prisma.complaint.findMany({
+          where,
+          orderBy: { createdAt: "desc" },
+          skip: (effectivePage - 1) * PAGE_SIZE,
+          take: PAGE_SIZE,
+        });
+
+  const start = total === 0 ? 0 : (effectivePage - 1) * PAGE_SIZE + 1;
+  const end = Math.min(effectivePage * PAGE_SIZE, total);
   const pageHref = (nextPage: number) => {
     const params = new URLSearchParams();
     if (query) params.set("q", query);
@@ -58,20 +73,20 @@ export async function ComplaintsList({
         start={start}
         end={end}
         total={total}
-        page={page}
-        hasNext={page * PAGE_SIZE < total}
-        prevHref={pageHref(page - 1)}
-        nextHref={pageHref(page + 1)}
+        page={effectivePage}
+        hasNext={effectivePage * PAGE_SIZE < total}
+        prevHref={pageHref(effectivePage - 1)}
+        nextHref={pageHref(effectivePage + 1)}
       />
       <ComplaintsTable rows={rows} hasQuery={Boolean(query)} />
       <PaginationSummary
         start={start}
         end={end}
         total={total}
-        page={page}
-        hasNext={page * PAGE_SIZE < total}
-        prevHref={pageHref(page - 1)}
-        nextHref={pageHref(page + 1)}
+        page={effectivePage}
+        hasNext={effectivePage * PAGE_SIZE < total}
+        prevHref={pageHref(effectivePage - 1)}
+        nextHref={pageHref(effectivePage + 1)}
       />
     </div>
   );

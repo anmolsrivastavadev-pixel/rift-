@@ -1,6 +1,7 @@
 "use server";
 
-import { requireUser } from "@/lib/auth/current-user";
+import { BETA_BLOCKED_MESSAGE, BetaAccessError, requireActor } from "@/lib/action-auth";
+import { prisma } from "@/lib/db";
 import {
   buildProjectReport,
   buildIdeaReport,
@@ -26,11 +27,29 @@ export type ExportResult =
   | { ok: true; markdown: string; filename: string }
   | { ok: false; error: string };
 
+async function isActiveProject(userId: string, projectId: string | null): Promise<boolean> {
+  if (!projectId) return false;
+  const project = await prisma.project.findFirst({
+    where: { id: projectId, userId, archivedAt: null },
+    select: { id: true },
+  });
+  return project !== null;
+}
+
 export async function getProjectReport(projectId: string): Promise<ExportResult> {
-  const user = await requireUser();
+  let user;
+  try {
+    user = await requireActor();
+  } catch (err) {
+    if (err instanceof BetaAccessError) return { ok: false, error: BETA_BLOCKED_MESSAGE };
+    throw err;
+  }
 
   const data = await getProjectReportData(user.id, projectId);
   if (!data) {
+    return { ok: false, error: "Project not found." };
+  }
+  if (!(await isActiveProject(user.id, data.projectId))) {
     return { ok: false, error: "Project not found." };
   }
 
@@ -51,10 +70,19 @@ export async function getProjectReport(projectId: string): Promise<ExportResult>
 }
 
 export async function getIdeaReport(opportunityId: string): Promise<ExportResult> {
-  const user = await requireUser();
+  let user;
+  try {
+    user = await requireActor();
+  } catch (err) {
+    if (err instanceof BetaAccessError) return { ok: false, error: BETA_BLOCKED_MESSAGE };
+    throw err;
+  }
 
   const data = await getIdeaReportData(user.id, opportunityId);
   if (!data) {
+    return { ok: false, error: "Idea not found." };
+  }
+  if (!(await isActiveProject(user.id, data.projectId))) {
     return { ok: false, error: "Idea not found." };
   }
 

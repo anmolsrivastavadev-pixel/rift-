@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/db";
-import { requireUser } from "@/lib/auth/current-user";
+import { BetaAccessError, requireActor } from "@/lib/action-auth";
 import { isValidDecisionStatus, type DecisionStatus } from "@/lib/decision-board";
 import { VALIDATION_CHECKLIST_ITEMS } from "@/lib/validation-plan";
 import { trackProductEvent } from "@/lib/product-events";
@@ -27,7 +27,7 @@ type SaveResult = { ok: boolean };
 async function findOwnedOpportunity(opportunityId: string, userId: string) {
   if (!opportunityId) return null;
   return prisma.opportunity.findFirst({
-    where: { id: opportunityId, userId },
+    where: { id: opportunityId, userId, project: { is: { archivedAt: null } } },
     select: { id: true, projectId: true },
   });
 }
@@ -42,7 +42,13 @@ export async function setDecisionStatus(
   opportunityId: string,
   status: DecisionStatus
 ): Promise<SaveResult> {
-  const user = await requireUser();
+  let user;
+  try {
+    user = await requireActor();
+  } catch (err) {
+    if (err instanceof BetaAccessError) return { ok: false };
+    throw err;
+  }
   if (!isValidDecisionStatus(status)) return { ok: false };
 
   const opportunity = await findOwnedOpportunity(opportunityId, user.id);
@@ -75,7 +81,13 @@ export async function saveValidationChecklist(
   opportunityId: string,
   checked: boolean[]
 ): Promise<SaveResult> {
-  const user = await requireUser();
+  let user;
+  try {
+    user = await requireActor();
+  } catch (err) {
+    if (err instanceof BetaAccessError) return { ok: false };
+    throw err;
+  }
 
   const opportunity = await findOwnedOpportunity(opportunityId, user.id);
   if (!opportunity) return { ok: false };
@@ -121,7 +133,13 @@ const MAX_MIGRATION_ENTRIES = 200;
 export async function migrateValidationState(
   entries: MigrationEntry[]
 ): Promise<{ ok: true; migrated: number }> {
-  const user = await requireUser();
+  let user;
+  try {
+    user = await requireActor();
+  } catch (err) {
+    if (err instanceof BetaAccessError) return { ok: true, migrated: 0 };
+    throw err;
+  }
 
   const wanted = (Array.isArray(entries) ? entries : [])
     .slice(0, MAX_MIGRATION_ENTRIES)
@@ -131,7 +149,7 @@ export async function migrateValidationState(
   const ids = Array.from(new Set(wanted.map((e) => e.opportunityId)));
   const [ownedOps, existingRows] = await Promise.all([
     prisma.opportunity.findMany({
-      where: { id: { in: ids }, userId: user.id },
+      where: { id: { in: ids }, userId: user.id, project: { is: { archivedAt: null } } },
       select: { id: true, projectId: true },
     }),
     prisma.validationWorkspace.findMany({

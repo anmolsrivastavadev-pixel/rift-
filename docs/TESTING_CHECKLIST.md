@@ -1,5 +1,7 @@
 # Rift — Testing Checklist
 
+> ⚠ STALE — superseded by `docs/BETA_QA_CHECKLIST.md` (see ROADMAP M21). Kept for history.
+
 > Practical manual checklist for verifying Rift end-to-end. Run the relevant sections before reporting a milestone complete. Do not run destructive database commands from this checklist.
 
 ---

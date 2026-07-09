@@ -10,13 +10,14 @@
  * Behavior notes (kept identical to the pre-M31c action):
  * - complaintRowSchema validation + normaliseBodyForKey dedupe (in-batch and
  *   against the project's existing complaints).
- * - checkComplaintQuota runs post-dedupe; when full, nothing is inserted and
- *   quotaFull is set so callers can explain honestly.
+ * - checkComplaintQuota runs before fetching to avoid external API spend when
+ *   the project is already full, then again post-dedupe for the exact insert
+ *   size.
  * - One ComplaintImport row per import with the caller's sourceType:
  *   "finder" (manual search, counts toward the monthly search quota) or
  *   "watch" (cron, excluded from that quota — watches are capped separately).
- * - Zero-insert imports record no ComplaintImport row (quota quirk documented
- *   in lib/quotas.ts).
+ * - Zero-insert imports record no ComplaintImport row; manual zero-result
+ *   searches count toward quota via ProductEvent in actions/complaint-finder.ts.
  */
 
 import { prisma } from "@/lib/db";
@@ -84,6 +85,15 @@ export async function runFinderImport(input: {
     quotaFull: false,
     insertedTitles: [],
   };
+
+  const roomForOne = await checkComplaintQuota(user, projectId, 1);
+  if (!roomForOne.ok) {
+    return {
+      ...base,
+      errors: [roomForOne.message],
+      quotaFull: true,
+    };
+  }
 
   const sourceFetchers: [ComplaintSourceKind, Promise<SourceResult>][] = [
     ["reddit", fetchRedditComplaints(keyword)],

@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { prisma } from "@/lib/db";
-import { requireUser } from "@/lib/auth/current-user";
+import { BETA_BLOCKED_MESSAGE, BetaAccessError, requireActor } from "@/lib/action-auth";
 import { projectHref } from "@/lib/project-href";
 import { trackProductEvent } from "@/lib/product-events";
 import { checkProjectQuota } from "@/lib/quotas";
@@ -42,7 +42,13 @@ export type RenameProjectResult =
   | { ok: false; error: string };
 
 export async function getProjectsForCurrentUser(): Promise<ProjectSummary[]> {
-  const user = await requireUser();
+  let user;
+  try {
+    user = await requireActor();
+  } catch (err) {
+    if (err instanceof BetaAccessError) return [];
+    throw err;
+  }
   return prisma.project.findMany({
     where: { userId: user.id },
     orderBy: { createdAt: "asc" },
@@ -80,7 +86,13 @@ export async function createProject(
   _prev: CreateProjectResult | null,
   formData: FormData
 ): Promise<CreateProjectResult> {
-  const user = await requireUser();
+  let user;
+  try {
+    user = await requireActor();
+  } catch (err) {
+    if (err instanceof BetaAccessError) return { ok: false, error: BETA_BLOCKED_MESSAGE };
+    throw err;
+  }
   const name = String(formData.get("name") ?? "").trim();
 
   if (name.length < 1) {
@@ -119,7 +131,13 @@ export async function renameProject(
   _prev: RenameProjectResult | null,
   formData: FormData
 ): Promise<RenameProjectResult> {
-  const user = await requireUser();
+  let user;
+  try {
+    user = await requireActor();
+  } catch (err) {
+    if (err instanceof BetaAccessError) return { ok: false, error: BETA_BLOCKED_MESSAGE };
+    throw err;
+  }
   const projectId = String(formData.get("projectId") ?? "").trim();
   const name = String(formData.get("name") ?? "").trim();
 
@@ -176,7 +194,13 @@ export async function archiveProject(
   _prev: ArchiveActionResult | null,
   formData: FormData
 ): Promise<ArchiveActionResult> {
-  const user = await requireUser();
+  let user;
+  try {
+    user = await requireActor();
+  } catch (err) {
+    if (err instanceof BetaAccessError) return { ok: false, error: BETA_BLOCKED_MESSAGE };
+    throw err;
+  }
   const projectId = String(formData.get("projectId") ?? "").trim();
 
   const owned = projectId
@@ -223,7 +247,13 @@ export async function unarchiveProject(
   _prev: ArchiveActionResult | null,
   formData: FormData
 ): Promise<ArchiveActionResult> {
-  const user = await requireUser();
+  let user;
+  try {
+    user = await requireActor();
+  } catch (err) {
+    if (err instanceof BetaAccessError) return { ok: false, error: BETA_BLOCKED_MESSAGE };
+    throw err;
+  }
   const projectId = String(formData.get("projectId") ?? "").trim();
 
   const owned = projectId
@@ -269,7 +299,13 @@ export async function deleteArchivedProject(
   _prev: ArchiveActionResult | null,
   formData: FormData
 ): Promise<ArchiveActionResult> {
-  const user = await requireUser();
+  let user;
+  try {
+    user = await requireActor();
+  } catch (err) {
+    if (err instanceof BetaAccessError) return { ok: false, error: BETA_BLOCKED_MESSAGE };
+    throw err;
+  }
   const projectId = String(formData.get("projectId") ?? "").trim();
   const confirmName = String(formData.get("confirmName") ?? "").trim();
 

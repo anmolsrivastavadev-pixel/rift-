@@ -185,7 +185,9 @@ export default async function OpportunityDetailPage({
     .map((t) => ({ ...t, sourceUrl: t.sourceUrl as string }));
 
   // M19 — usage event (metadata only, fails silently, never blocks the page).
-  void trackProductEvent({
+  // Awaited: a fire-and-forget promise can be frozen with the lambda before
+  // it settles on Vercel, silently dropping the event.
+  await trackProductEvent({
     userId: user.id,
     projectId: project.id,
     opportunityId: op.id,

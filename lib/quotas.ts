@@ -1,12 +1,9 @@
 /* M26 — App-side quota enforcement.
  *
  * All counts derive from existing rows (Project, AIRun, ComplaintImport,
- * Complaint) — no counter tables, so quotas are always consistent with what
- * the history pages show. Month windows are UTC calendar months.
- *
- * Known quirk (generous direction, documented on purpose): a Complaint Finder
- * search that returns zero results records no ComplaintImport row, so it does
- * not count against the finder quota.
+ * Complaint, ProductEvent) — no counter tables. Month windows are UTC calendar
+ * months. Zero-result manual finder searches count via ProductEvent so users
+ * cannot spend external API budget forever without consuming quota.
  *
  * Callers pass the session user from requireUser(); the Better Auth session
  * does not carry User.plan, so getEffectivePlan fetches it from the database.
@@ -81,9 +78,16 @@ export async function checkIdeaRunQuota(user: QuotaUser): Promise<QuotaResult> {
 /** M26 — Complaint Finder searches per UTC month. */
 export async function checkFinderSearchQuota(user: QuotaUser): Promise<QuotaResult> {
   const { plan, limits } = await getEffectivePlan(user);
-  const used = await prisma.complaintImport.count({
-    where: { userId: user.id, sourceType: "finder", createdAt: { gte: monthStartUtc() } },
-  });
+  const since = monthStartUtc();
+  const [insertedSearches, emptySearches] = await Promise.all([
+    prisma.complaintImport.count({
+      where: { userId: user.id, sourceType: "finder", createdAt: { gte: since } },
+    }),
+    prisma.productEvent.count({
+      where: { userId: user.id, type: "finder_search_empty", createdAt: { gte: since } },
+    }),
+  ]);
+  const used = insertedSearches + emptySearches;
   if (used < limits.finderSearchesPerMonth) return { ok: true };
   if (plan === "free") {
     return {
@@ -103,7 +107,7 @@ export async function checkFinderSearchQuota(user: QuotaUser): Promise<QuotaResu
 export async function checkWatchQuota(user: QuotaUser): Promise<QuotaResult> {
   const { plan, limits } = await getEffectivePlan(user);
   const active = await prisma.nicheWatch.count({
-    where: { userId: user.id, pausedAt: null },
+    where: { userId: user.id, pausedAt: null, project: { is: { archivedAt: null } } },
   });
   if (active < limits.maxActiveWatches) return { ok: true };
   if (plan === "free") {
@@ -163,12 +167,22 @@ export type UsageSummary = {
 export async function getUsageSummary(user: QuotaUser): Promise<UsageSummary> {
   const { plan, limits } = await getEffectivePlan(user);
   const since = monthStartUtc();
-  const [activeProjects, ideaRunsThisMonth, finderSearchesThisMonth] = await Promise.all([
+  const [
+    activeProjects,
+    ideaRunsThisMonth,
+    insertedFinderSearchesThisMonth,
+    emptyFinderSearchesThisMonth,
+  ] = await Promise.all([
     prisma.project.count({ where: { userId: user.id, archivedAt: null } }),
     prisma.aIRun.count({ where: { userId: user.id, createdAt: { gte: since } } }),
     prisma.complaintImport.count({
       where: { userId: user.id, sourceType: "finder", createdAt: { gte: since } },
     }),
+    prisma.productEvent.count({
+      where: { userId: user.id, type: "finder_search_empty", createdAt: { gte: since } },
+    }),
   ]);
+  const finderSearchesThisMonth =
+    insertedFinderSearchesThisMonth + emptyFinderSearchesThisMonth;
   return { plan, limits, activeProjects, ideaRunsThisMonth, finderSearchesThisMonth };
 }

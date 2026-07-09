@@ -4,9 +4,10 @@ import { revalidatePath } from "next/cache";
 
 import { emptyFoundBySource, runFinderImport } from "@/lib/finder-import";
 import type { ComplaintSourceKind } from "@/lib/complaint-sources";
-import { requireUser } from "@/lib/auth/current-user";
+import { BETA_BLOCKED_MESSAGE, BetaAccessError, requireActor } from "@/lib/action-auth";
 import { requireOwnedProject } from "@/lib/projects";
 import { checkFinderSearchQuota } from "@/lib/quotas";
+import { trackProductEvent } from "@/lib/product-events";
 
 export interface FindComplaintsResult {
   inserted: number;
@@ -32,13 +33,7 @@ export async function findComplaintsAction(
   _prev: FindComplaintsResult | null,
   formData: FormData
 ): Promise<FindComplaintsResult> {
-  const user = await requireUser();
-  const project = await requireOwnedProject(
-    String(formData.get("projectId") ?? ""),
-    user
-  );
   const keyword = String(formData.get("keyword") ?? "").trim();
-
   const base: FindComplaintsResult = {
     inserted: 0,
     skipped: 0,
@@ -47,6 +42,17 @@ export async function findComplaintsAction(
     keyword,
   };
 
+  let user;
+  try {
+    user = await requireActor();
+  } catch (err) {
+    if (err instanceof BetaAccessError) return { ...base, errors: [BETA_BLOCKED_MESSAGE] };
+    throw err;
+  }
+  const project = await requireOwnedProject(
+    String(formData.get("projectId") ?? ""),
+    user
+  );
   if (keyword.length < 2 || keyword.length > 80) {
     return {
       ...base,
@@ -74,6 +80,12 @@ export async function findComplaintsAction(
     0
   );
   if (foundTotal === 0) {
+    await trackProductEvent({
+      userId: user.id,
+      projectId: project.id,
+      type: "finder_search_empty",
+      metadata: { keyword },
+    });
     return {
       ...base,
       foundBySource: result.foundBySource,

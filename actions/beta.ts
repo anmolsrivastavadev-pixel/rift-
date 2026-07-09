@@ -19,19 +19,26 @@ const EMAIL_RE = /^\S+@\S+\.\S+$/;
 const MAX_FEEDBACK = 2000;
 const FEEDBACK_TYPES = ["bug", "confusing", "idea", "praise", "other"];
 
+export type BetaAdminActionResult = { ok: true } | { ok: false; error: string };
+
 async function requireAdmin() {
   const user = await requireUser();
   if (!isAdminEmail(user.email)) return null;
   return user;
 }
 
-/** Add (or re-invite) a tester email. Invalid input is silently ignored. */
-export async function addBetaTester(formData: FormData): Promise<void> {
+/** Add (or re-invite) a tester email. */
+export async function addBetaTester(
+  _prev: BetaAdminActionResult | null,
+  formData: FormData
+): Promise<BetaAdminActionResult> {
   const admin = await requireAdmin();
-  if (!admin) return;
+  if (!admin) return { ok: false, error: "Admin only." };
 
   const email = normalizeEmail(String(formData.get("email") ?? ""));
-  if (!EMAIL_RE.test(email) || email.length > 254) return;
+  if (!EMAIL_RE.test(email) || email.length > 254) {
+    return { ok: false, error: "Enter a valid email address." };
+  }
 
   await prisma.betaAccess.upsert({
     where: { email },
@@ -40,38 +47,45 @@ export async function addBetaTester(formData: FormData): Promise<void> {
   });
   await trackProductEvent({ userId: admin.id, type: "beta_access_granted" });
   revalidatePath("/dashboard/beta-insights");
+  return { ok: true };
 }
 
-export async function revokeBetaTester(formData: FormData): Promise<void> {
+export async function revokeBetaTester(
+  _prev: BetaAdminActionResult | null,
+  formData: FormData
+): Promise<BetaAdminActionResult> {
   const admin = await requireAdmin();
-  if (!admin) return;
+  if (!admin) return { ok: false, error: "Admin only." };
 
   const id = String(formData.get("accessId") ?? "");
-  if (!id) return;
-  await prisma.betaAccess
-    .update({
-      where: { id },
-      data: { status: "revoked", revokedAt: new Date() },
-    })
-    .catch(() => {});
+  if (!id) return { ok: false, error: "Tester not found." };
+  const updated = await prisma.betaAccess.updateMany({
+    where: { id },
+    data: { status: "revoked", revokedAt: new Date() },
+  });
+  if (updated.count === 0) return { ok: false, error: "Tester not found." };
   await trackProductEvent({ userId: admin.id, type: "beta_access_revoked" });
   revalidatePath("/dashboard/beta-insights");
+  return { ok: true };
 }
 
-export async function reactivateBetaTester(formData: FormData): Promise<void> {
+export async function reactivateBetaTester(
+  _prev: BetaAdminActionResult | null,
+  formData: FormData
+): Promise<BetaAdminActionResult> {
   const admin = await requireAdmin();
-  if (!admin) return;
+  if (!admin) return { ok: false, error: "Admin only." };
 
   const id = String(formData.get("accessId") ?? "");
-  if (!id) return;
-  await prisma.betaAccess
-    .update({
-      where: { id },
-      data: { status: "active", revokedAt: null },
-    })
-    .catch(() => {});
+  if (!id) return { ok: false, error: "Tester not found." };
+  const updated = await prisma.betaAccess.updateMany({
+    where: { id },
+    data: { status: "active", revokedAt: null },
+  });
+  if (updated.count === 0) return { ok: false, error: "Tester not found." };
   await trackProductEvent({ userId: admin.id, type: "beta_access_granted" });
   revalidatePath("/dashboard/beta-insights");
+  return { ok: true };
 }
 
 /* ------------------------------- Feedback -------------------------------- */

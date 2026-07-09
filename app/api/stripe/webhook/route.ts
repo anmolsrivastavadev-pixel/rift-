@@ -10,10 +10,13 @@ import { trackProductEvent } from "@/lib/product-events";
  *  - checkout.session.completed        -> plan "pro"
  *  - customer.subscription.updated     -> "pro" while active/trialing/past_due,
  *                                         "free" otherwise (e.g. unpaid, canceled)
+ *  - customer.subscription.paused      -> same status mapping as updated
+ *  - customer.subscription.resumed     -> same status mapping as updated
  *  - customer.subscription.deleted     -> plan "free"
+ *  - invoice.payment_failed            -> log/track only; grace period stays pro
  *
  * Returns 400 on bad signatures, 503 when Stripe env vars are missing, and
- * 500 on processing errors so Stripe retries the delivery.
+ * 500 on plan-write processing errors so Stripe retries the delivery.
  */
 
 const ACTIVE_STATUSES = new Set(["active", "trialing", "past_due"]);
@@ -69,6 +72,26 @@ async function setPlan(
   logger.info("billing.plan_set", { userId, plan });
 }
 
+async function applySubscriptionStatus(subscription: Stripe.Subscription, eventType: string): Promise<void> {
+  const customerId = customerIdOf(subscription.customer);
+  const userId = await findUserId(customerId);
+  if (!userId) {
+    logger.warn("billing.webhook_user_not_found", { eventType });
+    return;
+  }
+  const active = ACTIVE_STATUSES.has(subscription.status);
+  await setPlan(userId, active ? "pro" : "free", active ? subscription.id : null, customerId);
+}
+
+function isPrismaUniqueViolation(err: unknown): boolean {
+  return (
+    err !== null &&
+    typeof err === "object" &&
+    "code" in err &&
+    (err as { code?: unknown }).code === "P2002"
+  );
+}
+
 function customerIdOf(customer: string | Stripe.Customer | Stripe.DeletedCustomer | null): string | null {
   if (!customer) return null;
   return typeof customer === "string" ? customer : customer.id;
@@ -100,6 +123,20 @@ export async function POST(req: Request): Promise<Response> {
   }
 
   try {
+    await prisma.stripeWebhookEvent.create({
+      data: { id: event.id, type: event.type },
+    });
+  } catch (err) {
+    if (isPrismaUniqueViolation(err)) {
+      // Stripe can deliver the same signed event more than once. Acknowledge
+      // replays with 200 so Stripe does not keep retrying; this is replay
+      // protection only, not full out-of-order event ordering.
+      return Response.json({ received: true });
+    }
+    throw err;
+  }
+
+  try {
     switch (event.type) {
       case "checkout.session.completed": {
         const session = event.data.object;
@@ -119,14 +156,13 @@ export async function POST(req: Request): Promise<Response> {
       }
       case "customer.subscription.updated": {
         const subscription = event.data.object;
-        const customerId = customerIdOf(subscription.customer);
-        const userId = await findUserId(customerId);
-        if (!userId) {
-          logger.warn("billing.webhook_user_not_found", { eventType: event.type });
-          break;
-        }
-        const active = ACTIVE_STATUSES.has(subscription.status);
-        await setPlan(userId, active ? "pro" : "free", active ? subscription.id : null, customerId);
+        await applySubscriptionStatus(subscription, event.type);
+        break;
+      }
+      case "customer.subscription.paused":
+      case "customer.subscription.resumed": {
+        const subscription = event.data.object;
+        await applySubscriptionStatus(subscription, event.type);
         break;
       }
       case "customer.subscription.deleted": {
@@ -140,6 +176,16 @@ export async function POST(req: Request): Promise<Response> {
         await setPlan(userId, "free", null, customerId);
         break;
       }
+      case "invoice.payment_failed": {
+        const invoice = event.data.object;
+        const customerId = customerIdOf(invoice.customer);
+        if (!customerId) break;
+        const userId = await findUserId(customerId);
+        if (!userId) break;
+        logger.warn("billing.payment_failed", { userId });
+        await trackProductEvent({ userId, type: "payment_failed" });
+        break;
+      }
       default:
         // Ignore event types we didn't subscribe to.
         break;
@@ -149,7 +195,9 @@ export async function POST(req: Request): Promise<Response> {
       eventType: event.type,
       error: err instanceof Error ? err.message : String(err),
     });
-    // 500 -> Stripe retries the delivery.
+    // If the plan write failed, remove only the replay marker so Stripe's retry
+    // can try again. Post-write side effects are intentionally non-fatal.
+    await prisma.stripeWebhookEvent.delete({ where: { id: event.id } }).catch(() => undefined);
     return new Response("Webhook processing failed.", { status: 500 });
   }
 

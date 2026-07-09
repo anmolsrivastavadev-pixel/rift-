@@ -5,11 +5,7 @@ import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/auth/current-user";
 import { isAdminEmail } from "@/lib/admin";
 import { isBetaModeEnabled } from "@/lib/beta-access";
-import {
-  addBetaTester,
-  revokeBetaTester,
-  reactivateBetaTester,
-} from "@/actions/beta";
+import { AddBetaTesterForm, BetaTesterRowAction } from "@/components/dashboard/beta-access-admin-actions";
 
 /* M19 — Private, admin-only beta insights.
  *
@@ -196,21 +192,7 @@ export default async function BetaInsightsPage() {
           . Admins from RIFT_ADMIN_EMAILS always have access. No emails are sent,
           so tell testers to sign up with the address you add here.
         </p>
-        <form action={addBetaTester} className="mt-4 flex flex-wrap items-center gap-2">
-          <input
-            name="email"
-            type="email"
-            required
-            placeholder="tester@example.com"
-            className="h-9 w-64 max-w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-background)] px-3 text-sm text-[var(--color-foreground)] placeholder:text-[var(--color-muted-foreground)] outline-none focus:border-[var(--color-primary)]"
-          />
-          <button
-            type="submit"
-            className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--color-primary)] px-3 py-2 text-xs font-medium text-white"
-          >
-            <UserPlus className="h-3.5 w-3.5" /> Add tester
-          </button>
-        </form>
+        <AddBetaTesterForm />
         {betaAccessRows.length > 0 && (
           <ul className="mt-4 space-y-2">
             {betaAccessRows.map((row) => (
@@ -236,27 +218,7 @@ export default async function BetaInsightsPage() {
                       ? "Invited, not signed in yet"
                       : "Access active"}
                 </span>
-                {row.status === "revoked" ? (
-                  <form action={reactivateBetaTester}>
-                    <input type="hidden" name="accessId" value={row.id} />
-                    <button
-                      type="submit"
-                      className="rounded-lg border border-[var(--color-border)] px-2 py-1 text-[11px] text-[var(--color-foreground)] hover:border-[var(--color-primary)]"
-                    >
-                      Restore access
-                    </button>
-                  </form>
-                ) : (
-                  <form action={revokeBetaTester}>
-                    <input type="hidden" name="accessId" value={row.id} />
-                    <button
-                      type="submit"
-                      className="rounded-lg border border-[var(--color-border)] px-2 py-1 text-[11px] text-[var(--color-danger)] hover:border-[var(--color-danger)]"
-                    >
-                      Revoke access
-                    </button>
-                  </form>
-                )}
+                <BetaTesterRowAction accessId={row.id} revoked={row.status === "revoked"} />
               </li>
             ))}
           </ul>

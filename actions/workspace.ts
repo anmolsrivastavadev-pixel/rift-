@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { prisma } from "@/lib/db";
-import { requireUser } from "@/lib/auth/current-user";
+import { BETA_BLOCKED_MESSAGE, BetaAccessError, requireActor } from "@/lib/action-auth";
 import { requireOwnedProject } from "@/lib/projects";
 
 export type WorkspaceResult = {
@@ -24,7 +24,19 @@ export type WorkspaceResult = {
  * references Opportunity). The user's other projects are never touched.
  */
 export async function clearWorkspace(projectId: string): Promise<WorkspaceResult> {
-  const user = await requireUser();
+  let user;
+  try {
+    user = await requireActor();
+  } catch (err) {
+    if (err instanceof BetaAccessError) {
+      return {
+        cleared: false,
+        deleted: { saved: 0, opportunities: 0, complaints: 0 },
+        error: BETA_BLOCKED_MESSAGE,
+      };
+    }
+    throw err;
+  }
   const project = await requireOwnedProject(projectId, user);
   try {
     const saved = await prisma.savedOpportunity.deleteMany({

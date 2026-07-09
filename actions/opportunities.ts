@@ -4,11 +4,11 @@ import { revalidatePath } from "next/cache";
 
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
-import { setProgress, getProgress, type ProcessingStatus } from "@/lib/progress";
+import { setProgress, getProgress, type ProcessingStatus, type Stage } from "@/lib/progress";
 import { cleanComplaints } from "@/lib/cleaning";
-import { clusterComplaints } from "@/lib/ai";
+import { clusterComplaints, MAX_COMPLAINTS } from "@/lib/ai";
 import { computeOpportunityScore } from "@/lib/scoring";
-import { requireUser } from "@/lib/auth/current-user";
+import { BETA_BLOCKED_MESSAGE, BetaAccessError, requireActor } from "@/lib/action-auth";
 import { requireOwnedProject } from "@/lib/projects";
 import { trackProductEvent } from "@/lib/product-events";
 import { checkIdeaRunQuota } from "@/lib/quotas";
@@ -25,14 +25,60 @@ export async function resetOpportunitiesAction(formData: FormData): Promise<void
 
 /* -------------------------------------------------------------------------
  * Status polling (read state set by runPipeline)
+ *
+ * The poll is the *only* way the client sees progress. On Vercel the poll
+ * frequently lands on a different lambda instance to the one running the
+ * pipeline, so the in-memory store (`lib/progress.ts`) is not enough on its
+ * own — we additionally persist throttled progress to the AIRun row.
+ *
+ * The lookup is scoped by BOTH `userId` AND `projectId`, never by `jobId`
+ * alone. This is also the privacy fix: an unknown / foreign ownerId now
+ * returns null, so a guessed jobId cannot read another user's progress.
  * ------------------------------------------------------------------------- */
 export async function getProcessingStatus(
   jobId: string,
   projectId: string
 ): Promise<ProcessingStatus | null> {
-  const user = await requireUser();
+  let user: Awaited<ReturnType<typeof requireActor>>;
+  try {
+    user = await requireActor();
+  } catch (err) {
+    if (err instanceof BetaAccessError) return null;
+    throw err;
+  }
   await requireOwnedProject(projectId, user);
-  return getProgress(jobId);
+
+  // Fast path — same instance that is running the pipeline.
+  const mem = getProgress(jobId);
+  if (mem) return mem;
+
+  // Slow path — different lambda instance. Read the persisted snapshot from
+  // the user's own AIRun row for this job.
+  const run = await prisma.aIRun.findFirst({
+    where: { jobId, userId: user.id, projectId },
+    select: { progress: true },
+  });
+  if (!run || !run.progress) return null;
+  return parseStoredProgress(run.progress);
+}
+
+/* The persisted JSON is a ProcessingStatus minus functions; restore its
+ * shape so the client-facing type stays identical. We tolerate small schema
+ * drift (extra/missing fields) so an older snapshot never breaks the poll. */
+function parseStoredProgress(raw: unknown): ProcessingStatus | null {
+  if (typeof raw !== "object" || raw === null) return null;
+  const o = raw as Record<string, unknown>;
+  const stage = typeof o.stage === "string" ? (o.stage as ProcessingStatus["stage"]) : null;
+  if (!stage) return null;
+  return {
+    stage,
+    message: typeof o.message === "string" ? o.message : undefined,
+    total: typeof o.total === "number" ? o.total : undefined,
+    done: typeof o.done === "number" ? o.done : undefined,
+    error: typeof o.error === "string" ? o.error : undefined,
+    cappedAt: typeof o.cappedAt === "number" ? o.cappedAt : undefined,
+    updatedAt: typeof o.updatedAt === "number" ? o.updatedAt : Date.now(),
+  };
 }
 
 /* -------------------------------------------------------------------------
@@ -41,7 +87,13 @@ export async function getProcessingStatus(
  * project only — other projects are untouched.
  * ------------------------------------------------------------------------- */
 export async function resetOpportunities(formData: FormData): Promise<{ deleted: number }> {
-  const user = await requireUser();
+  let user: Awaited<ReturnType<typeof requireActor>>;
+  try {
+    user = await requireActor();
+  } catch (err) {
+    if (err instanceof BetaAccessError) return { deleted: 0 };
+    throw err;
+  }
   const project = await requireOwnedProject(String(formData.get("projectId") ?? ""), user);
   const deleted = await prisma.opportunity.deleteMany({
     where: { userId: user.id, projectId: project.id },
@@ -68,8 +120,14 @@ export async function resetOpportunities(formData: FormData): Promise<{ deleted:
  * ------------------------------------------------------------------------- */
 export async function runPipeline(
   formData: FormData
-): Promise<{ created: number; error?: string }> {
-  const user = await requireUser();
+): Promise<{ created: number; error?: string; cappedAt?: number }> {
+  let user: Awaited<ReturnType<typeof requireActor>>;
+  try {
+    user = await requireActor();
+  } catch (err) {
+    if (err instanceof BetaAccessError) return { created: 0, error: BETA_BLOCKED_MESSAGE };
+    throw err;
+  }
   const project = await requireOwnedProject(String(formData.get("projectId") ?? ""), user);
   const jobId = String(formData.get("jobId") ?? "");
   if (!jobId) {
@@ -84,12 +142,25 @@ export async function runPipeline(
     return { created: 0, error: quota.message };
   }
 
-  setProgress(jobId, { stage: "cleaning", message: "Cleaning complaints…", total: 0, done: 0 });
+  await setJobProgress({ stage: "cleaning", message: "Cleaning complaints…", total: 0, done: 0 });
 
   // M16D — AI run history row for this pipeline run. Created as "running"
   // before the AI work starts, then marked completed/failed. Metadata only —
   // the pipeline stages themselves are unchanged.
+  //
+  // The row also carries `jobId` + `progress` (post-M31 reliable-progress
+  // change) so the status poll can find live progress across Vercel lambda
+  // instances and survive the in-memory store being on a different instance.
   let runId: string | null = null;
+  // Closure-scoped counter that `createAIRunRow` (declared below) needs before
+  // `all` exists; assigned inside try{} once the complaints are loaded.
+  let allCount = 0;
+  // Throttle state for the DB progress writer (declared here, not inside the
+  // helper section, so they're initialized before try{} runs — accessing a
+  // `let` from inside the try before its declarator would throw a TDZ error.
+  let lastWrittenStage: Stage | null = null;
+  let lastWrittenBucket = -1;
+
   const failRun = async (message: string) => {
     if (!runId) return;
     await prisma.aIRun
@@ -121,55 +192,78 @@ export async function runPipeline(
     });
 
     if (all.length === 0) {
-      setProgress(jobId, { stage: "error", error: "No complaints to analyse. Upload a CSV first.", message: "No complaints found." });
+      await setJobProgress({ stage: "error", error: "No complaints to analyse. Upload a CSV first.", message: "No complaints found." });
       logger.warn("pipeline.no_complaints", { jobId });
       return { created: 0, error: "No complaints to analyse. Upload a CSV first." };
     }
 
-    const run = await prisma.aIRun.create({
-      data: {
-        userId: user.id,
-        projectId: project.id,
-        inputComplaintCount: all.length,
-        status: "running",
-      },
-      select: { id: true },
-    });
-    runId = run.id;
+    allCount = all.length;
+    await createAIRunRow(jobId);
+    if (!runId) {
+      throw new Error("Unable to create AI run history row.");
+    }
 
     const cleaned = cleanComplaints(all);
-    setProgress(jobId, { stage: "cleaning", total: all.length, done: cleaned.length, message: `Cleaned ${cleaned.length} of ${all.length} complaints.` });
-    logger.info("pipeline.cleaned", { raw: all.length, cleaned: cleaned.length });
+    // The clustering stage caps at MAX_COMPLAINTS (see lib/ai.ts). Surface the
+    // cap to the user's progress panel + final result so it isn't silent.
+    const cappedAt =
+      cleaned.length > MAX_COMPLAINTS ? MAX_COMPLAINTS : undefined;
+    await setJobProgress({ stage: "cleaning", total: all.length, done: cleaned.length, message: `Cleaned ${cleaned.length} of ${all.length} complaints.`, cappedAt });
+    logger.info("pipeline.cleaned", { raw: all.length, cleaned: cleaned.length, capped: cappedAt ?? null });
 
     if (cleaned.length === 0) {
-      setProgress(jobId, { stage: "error", error: "All complaints were empty or duplicates.", message: "No clean complaints." });
+      await setJobProgress({ stage: "error", error: "All complaints were empty or duplicates.", message: "No clean complaints." });
       await failRun("All complaints were empty or duplicates.");
       return { created: 0, error: "All complaints were empty or duplicates. Nothing to analyse." };
     }
 
     /* --- Stage 2 + 3: Clustering + Summaries via Gemini --- */
-    setProgress(jobId, { stage: "clustering", message: "Clustering complaints with Gemini…", total: cleaned.length, done: 0 });
+    await setJobProgress({ stage: "clustering", message: "Clustering complaints with Gemini…", total: cleaned.length, done: 0, cappedAt });
 
     const clusters = await clusterComplaints(
       cleaned.map((c) => ({ id: c.id, text: c.text }))
     );
 
-    setProgress(jobId, {
+    await setJobProgress({
       stage: "clustering",
       done: cleaned.length,
       total: cleaned.length,
       message: `Found ${clusters.length} cluster${clusters.length === 1 ? "" : "s"}.`,
+      cappedAt,
     });
     logger.info("pipeline.clustered", { clusters: clusters.length });
 
     if (clusters.length === 0) {
-      setProgress(jobId, { stage: "error", error: "Gemini returned no clusters.", message: "No clusters returned." });
+      await setJobProgress({ stage: "error", error: "Gemini returned no clusters.", message: "No clusters returned." });
       await failRun("The AI returned no idea clusters.");
       return { created: 0, error: "Gemini returned no clusters from the complaints." };
     }
 
+    const involvedComplaintIds = Array.from(
+      new Set(
+        clusters.flatMap((cluster) =>
+          cluster.complaintIndices
+            .map((idx) => cleaned[idx]?.id)
+            .filter((x): x is string => Boolean(x))
+        )
+      )
+    );
+    const involvedComplaints = involvedComplaintIds.length
+      ? await prisma.complaint.findMany({
+          where: {
+            id: { in: involvedComplaintIds },
+            userId: user.id,
+            projectId: project.id,
+          },
+          select: { id: true, sourceDate: true, createdAt: true },
+        })
+      : [];
+    const complaintDateById = new Map(
+      involvedComplaints.map((c) => [c.id, { sourceDate: c.sourceDate, createdAt: c.createdAt }])
+    );
+
     /* --- Stage 4: Opportunity Generation --- */
-    setProgress(jobId, { stage: "generating", message: "Generating opportunities…", total: clusters.length, done: 0 });
+    await setJobProgress({ stage: "generating", message: "Generating opportunities…", total: clusters.length, done: 0, cappedAt });
 
     // Reset existing opportunities first, so re-runs replace stale data.
     // M16A: scoped to this project so other projects' opportunities survive.
@@ -200,10 +294,9 @@ export async function runPipeline(
 
       // Trend buckets by the day each complaint was added to Rift (not the
       // parsed source date, which can be years old and made charts look wrong).
-      const linked = await prisma.complaint.findMany({
-        where: { id: { in: complaintIds }, userId: user.id, projectId: project.id },
-        select: { createdAt: true },
-      });
+      const linked = complaintIds
+        .map((complaintId) => complaintDateById.get(complaintId))
+        .filter((c): c is { sourceDate: Date | null; createdAt: Date } => Boolean(c));
       const trend = bucketTrend(linked.map((c) => c.createdAt));
 
       const op = await prisma.opportunity.create({
@@ -246,11 +339,11 @@ export async function runPipeline(
       });
 
       created.push(op.id);
-      setProgress(jobId, { stage: "generating", done: i + 1, total: clusters.length, message: `Saved opportunity ${i + 1} of ${clusters.length}.` });
+      await setJobProgress({ stage: "generating", done: i + 1, total: clusters.length, message: `Saved opportunity ${i + 1} of ${clusters.length}.`, cappedAt });
       logger.info("pipeline.opportunity_saved", { id: op.id, score, mentions: complaintIds.length });
     }
 
-    setProgress(jobId, { stage: "saving", done: created.length, total: created.length, message: "Saving results…" });
+    await setJobProgress({ stage: "saving", done: created.length, total: created.length, message: "Saving results…", cappedAt });
 
     if (runId) {
       await prisma.aIRun
@@ -277,18 +370,112 @@ export async function runPipeline(
     revalidatePath("/dashboard/opportunities");
     revalidatePath("/dashboard/complaints");
 
-    setProgress(jobId, { stage: "complete", done: created.length, total: created.length, message: `Complete. ${created.length} opportunit${created.length === 1 ? "y" : "ies"} created.` });
+    await setJobProgress({ stage: "complete", done: created.length, total: created.length, message: `Complete. ${created.length} opportunit${created.length === 1 ? "y" : "ies"} created.`, cappedAt });
     logger.info("pipeline.completed", { created: created.length });
-    return { created: created.length };
+    return { created: created.length, cappedAt };
   } catch (err) {
     // Log + store the real error (admins can see it on the AIRun row), but
     // never surface raw provider/internal messages to the user.
     const message = err instanceof Error ? err.message : String(err);
     const friendly = "Idea generation failed. Please try again in a moment.";
     logger.error("pipeline.failed", { jobId, error: message });
-    setProgress(jobId, { stage: "error", error: friendly, message: "Pipeline failed." });
+    await setJobProgress({ stage: "error", error: friendly, message: "Pipeline failed." });
     await failRun(message);
     return { created: 0, error: friendly };
+  }
+
+  /* ---------------------------------------------------------------------
+   * Local progress helpers (closure over jobId/runId/user/project).
+   * ---------------------------------------------------------------------
+   * setJobProgress keeps the in-memory write (`lib/progress.ts`) for fast
+   * local dev — SAME shape — and additionally persists a throttled snapshot
+   * to the AIRun row. DB writes fire on:
+   *   - stage transitions,
+   *   - the 10-point percent bucket changing (within a stage),
+   *   - terminal states (complete / error).
+   * Per-item writes are skipped so a 1,500-complaint run doesn't add
+   * hundreds of Neon round-trips.
+   */
+  function progressBucket(s: ProcessingStatus): number {
+    if (typeof s.total === "number" && typeof s.done === "number" && s.total > 0) {
+      // 10-point granularity (0, 10, …, 100). clamp at 100.
+      return Math.min(100, Math.floor((s.done / s.total) * 10) * 10);
+    }
+    return -1;
+  }
+
+  async function persistProgress(s: ProcessingStatus): Promise<void> {
+    if (!runId) return;
+    try {
+      await prisma.aIRun.update({
+        where: { id: runId },
+        data: { progress: s as unknown as object },
+      });
+    } catch {
+      // Bookkeeping must never fail the pipeline.
+    }
+  }
+
+  async function setJobProgress(
+    patch: Partial<Omit<ProcessingStatus, "updatedAt">>
+  ): Promise<void> {
+    setProgress(jobId, patch);
+    if (!runId) return;
+    const s = getProgress(jobId);
+    if (!s) return;
+    const stage = s.stage;
+    const bucket = progressBucket(s);
+    const isTerminal = stage === "complete" || stage === "error";
+    const stageChanged = stage !== lastWrittenStage;
+    const bucketChanged = bucket !== -1 && bucket !== lastWrittenBucket;
+    if (!isTerminal && !stageChanged && !bucketChanged) return;
+    lastWrittenStage = stage;
+    if (bucket !== -1) lastWrittenBucket = bucket;
+    await persistProgress(s);
+  }
+
+  /* Create the AIRun row with jobId + seeded progress. A retried run that
+   * reuses the same client jobId will hit the (@unique jobId) constraint —
+   * catch Prisma P2002 and mint a fresh suffix instead of crashing. */
+  async function createAIRunRow(tryId: string): Promise<void> {
+    const seed = getProgress(jobId) ?? {
+      stage: "cleaning" as const,
+      message: "Cleaning complaints…",
+      total: 0,
+      done: 0,
+      updatedAt: Date.now(),
+    };
+    try {
+      const run = await prisma.aIRun.create({
+        data: {
+          userId: user.id,
+          projectId: project.id,
+          inputComplaintCount: allCount,
+          status: "running",
+          jobId: tryId,
+          progress: seed as unknown as object,
+        },
+        select: { id: true },
+      });
+      runId = run.id;
+      lastWrittenStage = seed.stage;
+      lastWrittenBucket = progressBucket(seed);
+    } catch (err: unknown) {
+      const code =
+        err && typeof err === "object" && "code" in err
+          ? (err as { code: unknown }).code
+          : null;
+      if (code === "P2002") {
+        // Same-client retry reused by a previous run's row. Mint a fresh
+        // suffix so the pipeline keeps running — the cross-instance poll
+        // falls back to in-memory on the running instance; rare in practice
+        // because the form is disabled while a run is in flight.
+        const fresh = `${jobId}-${Math.random().toString(36).slice(2, 8)}`;
+        await createAIRunRow(fresh);
+      } else {
+        throw err;
+      }
+    }
   }
 }
 

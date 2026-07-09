@@ -3,7 +3,7 @@
 import { randomBytes } from "crypto";
 
 import { prisma } from "@/lib/db";
-import { requireUser } from "@/lib/auth/current-user";
+import { BETA_BLOCKED_MESSAGE, BetaAccessError, requireActor } from "@/lib/action-auth";
 import { shareUrlForToken } from "@/lib/share";
 import { trackProductEvent } from "@/lib/product-events";
 
@@ -31,13 +31,13 @@ async function verifyOwnership(
 ): Promise<boolean> {
   if (kind === "project") {
     const project = await prisma.project.findFirst({
-      where: { id: targetId, userId },
+      where: { id: targetId, userId, archivedAt: null },
       select: { id: true },
     });
     return project !== null;
   }
   const opportunity = await prisma.opportunity.findFirst({
-    where: { id: targetId, userId },
+    where: { id: targetId, userId, project: { is: { archivedAt: null } } },
     select: { id: true },
   });
   return opportunity !== null;
@@ -47,7 +47,13 @@ export async function createShareLink(
   kind: ShareLinkKind,
   targetId: string
 ): Promise<ShareLinkResult> {
-  const user = await requireUser();
+  let user;
+  try {
+    user = await requireActor();
+  } catch (err) {
+    if (err instanceof BetaAccessError) return { ok: false, error: BETA_BLOCKED_MESSAGE };
+    throw err;
+  }
 
   if (kind !== "project" && kind !== "idea") {
     return { ok: false, error: "Unknown share type." };
@@ -89,10 +95,24 @@ export async function createShareLink(
 }
 
 export async function revokeShareLink(linkId: string): Promise<RevokeShareLinkResult> {
-  const user = await requireUser();
+  let user;
+  try {
+    user = await requireActor();
+  } catch (err) {
+    if (err instanceof BetaAccessError) return { ok: false, error: BETA_BLOCKED_MESSAGE };
+    throw err;
+  }
 
   const link = await prisma.shareLink.findFirst({
-    where: { id: linkId, userId: user.id },
+    where: {
+      id: linkId,
+      userId: user.id,
+      OR: [
+        { projectId: null, opportunityId: null },
+        { project: { is: { archivedAt: null } } },
+        { opportunity: { is: { project: { is: { archivedAt: null } } } } },
+      ],
+    },
     select: { id: true, kind: true, projectId: true, opportunityId: true, revokedAt: true },
   });
   if (!link) {

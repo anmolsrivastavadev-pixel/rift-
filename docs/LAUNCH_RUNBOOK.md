@@ -172,6 +172,23 @@ before (or immediately after) merging the M25–M29 pull request.
 4. Stripe → Developers → Webhooks → update the endpoint URL to the new
    domain (or add a second endpoint and delete the old one).
 
+## Flipping Stripe To LIVE
+
+1. In Vercel, replace all three Stripe env vars with live-mode values:
+   `STRIPE_SECRET_KEY`, `STRIPE_PRICE_PRO_MONTHLY`, and
+   `STRIPE_WEBHOOK_SECRET`. Billing stays disabled until all three are present.
+2. In Stripe Live mode, create the webhook endpoint at
+   `https://YOUR-DOMAIN/api/stripe/webhook` and subscribe it to
+   `checkout.session.completed`, `customer.subscription.updated`,
+   `customer.subscription.deleted`, `customer.subscription.paused`,
+   `customer.subscription.resumed`, and `invoice.payment_failed`.
+3. Copy the live webhook signing secret into Vercel and redeploy.
+4. Send a test event from the Stripe dashboard and confirm a
+   `StripeWebhookEvent` row appears in the database.
+5. Open `/pricing`: with all three Stripe vars present, Upgrade should be
+   available; with any one missing, the page should show the payments-disabled
+   state instead of letting a customer pay.
+
 ## Step 4 — QA the paid features
 
 Run the four new sections at the bottom of `docs/BETA_QA_CHECKLIST.md`

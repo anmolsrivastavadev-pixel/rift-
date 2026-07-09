@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { prisma } from "@/lib/db";
-import { requireUser } from "@/lib/auth/current-user";
+import { BETA_BLOCKED_MESSAGE, BetaAccessError, requireActor } from "@/lib/action-auth";
 import { requireOwnedProject } from "@/lib/projects";
 import { trackProductEvent } from "@/lib/product-events";
 import { checkWatchQuota } from "@/lib/quotas";
@@ -24,7 +24,13 @@ export async function createNicheWatchAction(
   _prev: NicheWatchActionResult | null,
   formData: FormData
 ): Promise<NicheWatchActionResult> {
-  const user = await requireUser();
+  let user;
+  try {
+    user = await requireActor();
+  } catch (err) {
+    if (err instanceof BetaAccessError) return { ok: false, error: BETA_BLOCKED_MESSAGE };
+    throw err;
+  }
   const project = await requireOwnedProject(
     String(formData.get("projectId") ?? ""),
     user
@@ -77,11 +83,17 @@ export async function toggleNicheWatchAction(
   _prev: NicheWatchActionResult | null,
   formData: FormData
 ): Promise<NicheWatchActionResult> {
-  const user = await requireUser();
+  let user;
+  try {
+    user = await requireActor();
+  } catch (err) {
+    if (err instanceof BetaAccessError) return { ok: false, error: BETA_BLOCKED_MESSAGE };
+    throw err;
+  }
   const watchId = String(formData.get("watchId") ?? "").trim();
 
   const watch = await prisma.nicheWatch.findFirst({
-    where: { id: watchId, userId: user.id },
+    where: { id: watchId, userId: user.id, project: { is: { archivedAt: null } } },
     select: { id: true, projectId: true, pausedAt: true },
   });
   if (!watch) {
@@ -114,11 +126,17 @@ export async function deleteNicheWatchAction(
   _prev: NicheWatchActionResult | null,
   formData: FormData
 ): Promise<NicheWatchActionResult> {
-  const user = await requireUser();
+  let user;
+  try {
+    user = await requireActor();
+  } catch (err) {
+    if (err instanceof BetaAccessError) return { ok: false, error: BETA_BLOCKED_MESSAGE };
+    throw err;
+  }
   const watchId = String(formData.get("watchId") ?? "").trim();
 
   const watch = await prisma.nicheWatch.findFirst({
-    where: { id: watchId, userId: user.id },
+    where: { id: watchId, userId: user.id, project: { is: { archivedAt: null } } },
     select: { id: true, projectId: true },
   });
   if (!watch) {

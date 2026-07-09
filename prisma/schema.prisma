@@ -94,6 +94,15 @@ model NicheWatch {
   @@index([projectId])
 }
 
+// Billing go-live hardening — stores Stripe event ids after signature
+// verification so duplicate webhook deliveries are acknowledged once and do
+// not repeat plan writes.
+model StripeWebhookEvent {
+  id        String   @id
+  type      String
+  createdAt DateTime @default(now())
+}
+
 // M29 — Public share links for project and idea reports. token is 32 hex
 // chars from crypto.randomBytes(16). kind: "project" | "idea". revokedAt null
 // = live; a revoked or cascade-deleted link must 404, never dangle publicly —
@@ -314,6 +323,13 @@ model ComplaintImport {
 // M16D — AI run history. One row per "Find ideas" pipeline run, recording the
 // input complaint count, how many ideas came out, and whether it failed.
 // status: "running" | "completed" | "failed".
+//
+// Reliable-progress columns (added post-M31): `jobId` ties the poll request
+// back to its run across Vercel lambda instances; `progress` mirrors the
+// in-memory progress object (throttled) so a poll landing on a different
+// instance can still see live stage / percent. Both are nullable so legacy
+// rows stay valid. `@unique` allows many NULLs (Postgres semantics) — a
+// retried run that reuses the same client jobId falls back to a fresh suffix.
 model AIRun {
   id                     String    @id @default(cuid())
   userId                 String
@@ -326,6 +342,8 @@ model AIRun {
   outputOpportunityCount Int       @default(0)
   status                 String
   errorMessage           String?
+  jobId                  String?   @unique
+  progress               Json?
   createdAt              DateTime  @default(now())
   completedAt            DateTime?
   opportunities          Opportunity[]

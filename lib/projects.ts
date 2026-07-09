@@ -89,17 +89,22 @@ export async function getProjectOrDefault(
  * deep link never returns another user's data — even when the underlying rows'
  * `userId` filter would have hidden them anyway (defense in depth).
  *
- * Archived projects still pass this check on purpose: it guards OWNERSHIP, and
- * actions like unarchiveProject and owned deep links (e.g. an opportunity
- * detail page) must keep working for the user's own archived data.
+ * Archived projects are rejected by default so stale forms cannot keep writing
+ * to an archived workspace. Pass allowArchived only for project-management
+ * paths that intentionally operate on archived projects.
  */
 export async function requireOwnedProject(
   projectId: string | null | undefined,
-  user: AuthUser
+  user: AuthUser,
+  opts: { allowArchived?: boolean } = {}
 ): Promise<ProjectRef> {
   if (!projectId) notFound();
   const project = await prisma.project.findFirst({
-    where: { id: projectId, userId: user.id },
+    where: {
+      id: projectId,
+      userId: user.id,
+      ...(opts.allowArchived ? {} : { archivedAt: null }),
+    },
     select: projectSelect,
   });
   if (!project) notFound();
