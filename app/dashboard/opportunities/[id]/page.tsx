@@ -1,15 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { after } from "next/server";
 import {
   ArrowLeft,
   Briefcase,
   ChevronRight,
   Users,
-  AlertTriangle,
   Target,
-  Sparkles,
   Hash,
-  CheckCircle2,
   Lightbulb,
   Layers,
   TrendingUp,
@@ -30,6 +28,8 @@ import { RelatedOpportunityCard } from "@/components/opportunities/related-oppor
 import { NoRelatedEmpty } from "@/components/opportunities/no-related-empty";
 import { PrevNextNav } from "@/components/opportunities/prev-next-nav";
 import { MarketGapHypothesis } from "@/components/opportunities/market-gap-hypothesis";
+import { IdeaDecisionControl } from "@/components/opportunities/decision-status-select";
+import { isValidDecisionStatus } from "@/lib/decision-board";
 import { TalkToComplainers } from "@/components/opportunities/talk-to-complainers";
 import { ValidationWorkspace } from "@/components/opportunities/validation-workspace";
 import { buildOutreachMessage } from "@/lib/complainer-outreach";
@@ -80,7 +80,7 @@ export default async function OpportunityDetailPage({
 
   const project = await requireOwnedProject(projectId, user);
 
-  const [op, allOthers, allNeighbours, activeShareLink, trendDates, receiptThreads] = await Promise.all([
+  const [op, allOthers, allNeighbours, activeShareLink, trendDates, receiptThreads, workspace] = await Promise.all([
     prisma.opportunity.findFirst({
       where: { id, userId: user.id, projectId: project.id },
       include: {
@@ -155,6 +155,12 @@ export default async function OpportunityDetailPage({
         sourceDate: true,
       },
     }),
+    // M16C — saved validation checklist + decision status for this user +
+    // opportunity (runs in parallel with the other reads).
+    prisma.validationWorkspace.findUnique({
+      where: { userId_opportunityId: { userId: user.id, opportunityId: id } },
+      select: { validationChecklist: true, decisionStatus: true },
+    }),
   ]);
 
   if (!op) notFound();
@@ -185,23 +191,25 @@ export default async function OpportunityDetailPage({
     .map((t) => ({ ...t, sourceUrl: t.sourceUrl as string }));
 
   // M19 — usage event (metadata only, fails silently, never blocks the page).
-  // Awaited: a fire-and-forget promise can be frozen with the lambda before
-  // it settles on Vercel, silently dropping the event.
-  await trackProductEvent({
-    userId: user.id,
-    projectId: project.id,
-    opportunityId: op.id,
-    type: "idea_opened",
-  });
+  // after(): runs once the response is sent, so it never blocks render, and
+  // Next keeps the lambda alive until the callback settles — the event isn't
+  // dropped the way a bare fire-and-forget promise could be on Vercel.
+  after(() =>
+    trackProductEvent({
+      userId: user.id,
+      projectId: project.id,
+      opportunityId: op.id,
+      type: "idea_opened",
+    })
+  );
 
-  // M16C — load the saved validation checklist for this user + opportunity.
-  const workspace = await prisma.validationWorkspace.findUnique({
-    where: { userId_opportunityId: { userId: user.id, opportunityId: op.id } },
-    select: { validationChecklist: true },
-  });
   const initialChecklist = Array.isArray(workspace?.validationChecklist)
     ? (workspace.validationChecklist as unknown[]).map(Boolean)
     : null;
+  const savedDecision = workspace?.decisionStatus;
+  const decisionStatus = isValidDecisionStatus(savedDecision)
+    ? savedDecision
+    : "undecided";
 
   const bd = op.scoreBreakdown as {
     weights?: { count: number; severity: number; confidence: number };
@@ -252,13 +260,25 @@ export default async function OpportunityDetailPage({
               {op.title}
             </h1>
           </div>
-          <SaveButton
-            opportunityId={op.id}
-            projectId={project.id}
-            saved={op.savedOpportunities.length > 0}
-            size="sm"
-            showLabel
-          />
+          <div className="flex shrink-0 flex-col items-end gap-2">
+            <SaveButton
+              opportunityId={op.id}
+              projectId={project.id}
+              saved={op.savedOpportunities.length > 0}
+              size="sm"
+              showLabel
+            />
+            <div className="flex flex-col items-end gap-1">
+              <IdeaDecisionControl
+                opportunityId={op.id}
+                initialStatus={decisionStatus}
+                title={op.title}
+              />
+              <p className="text-xs text-[var(--color-muted-foreground)]">
+                Your decision — saved to your account.
+              </p>
+            </div>
+          </div>
         </div>
         <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-[var(--color-muted-foreground)]">
           <Badge
@@ -276,26 +296,11 @@ export default async function OpportunityDetailPage({
         </div>
         <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
           <HeaderStat icon={Target} label="Score" value={op.opportunityScore} highlight />
-          <HeaderStat
-            icon={AlertTriangle}
-            label="Severity"
-            value={op.severity !== null ? op.severity.toFixed(1) : "—"}
-          />
-          <HeaderStat
-            icon={Sparkles}
-            label="Confidence"
-            value={op.confidence !== null ? `${op.confidence}%` : "—"}
-          />
           <HeaderStat icon={Users} label="Complaints" value={op.mentions} />
           <HeaderStat
             icon={TrendingUp}
             label="Pain trend"
             value={PAIN_TREND_LABELS[painTrend.trend]}
-          />
-          <HeaderStat
-            icon={CheckCircle2}
-            label="Created"
-            value={op.createdAt.toLocaleDateString()}
           />
         </div>
       </header>
@@ -466,26 +471,33 @@ export default async function OpportunityDetailPage({
           </section>
 
           {/* M18 — private Markdown export; M29 — public share link */}
-          <div className="flex flex-col gap-2">
-            <ExportButtons
-              kind="idea"
-              targetId={op.id}
-              exportLabel="Export idea"
-              copyLabel="Copy idea report"
-            />
-            <ShareButton
-              kind="idea"
-              targetId={op.id}
-              initialLink={
-                activeShareLink
-                  ? {
-                      linkId: activeShareLink.id,
-                      url: shareUrlForToken(activeShareLink.token),
-                    }
-                  : null
-              }
-            />
-          </div>
+          <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[var(--shadow-card)]">
+            <h2 className="text-sm font-semibold">Share or export</h2>
+            <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
+              Download this idea as a text report, or create a public link.
+              Anyone with the link can view this idea until you revoke it.
+            </p>
+            <div className="mt-3 flex flex-col gap-2">
+              <ExportButtons
+                kind="idea"
+                targetId={op.id}
+                exportLabel="Download report"
+                copyLabel="Copy report text"
+              />
+              <ShareButton
+                kind="idea"
+                targetId={op.id}
+                initialLink={
+                  activeShareLink
+                    ? {
+                        linkId: activeShareLink.id,
+                        url: shareUrlForToken(activeShareLink.token),
+                      }
+                    : null
+                }
+              />
+            </div>
+          </section>
 
           {/* M17 — compact next-step hint */}
           <div className="rounded-2xl border border-[var(--color-primary)]/30 bg-[var(--color-primary)]/5 p-4">
@@ -493,14 +505,23 @@ export default async function OpportunityDetailPage({
               Next step
             </p>
             <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
-              Ask 3 people if they have this problem. Then mark this idea in{" "}
+              Use the{" "}
+              <a
+                href="#testing-guide"
+                className="font-medium text-[var(--color-primary)] hover:underline"
+              >
+                testing guide
+              </a>{" "}
+              below to ask 3 people if they have this problem, then mark your
+              decision above.
+            </p>
+            <p className="mt-1 text-xs">
               <Link
                 href={projectHref("/dashboard/opportunities/decision-board", project.id)}
                 className="font-medium text-[var(--color-primary)] hover:underline"
               >
-                Compare ideas
+                See all your decisions
               </Link>
-              .
             </p>
           </div>
 

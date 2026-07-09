@@ -32,9 +32,9 @@ export function TalkToComplainers({
   if (threads.length === 0) return null;
 
   return (
-    <section>
+    <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[var(--shadow-card)]">
       <h2 className="flex items-center gap-2 text-base font-semibold">
-        <MessagesSquare className="h-4 w-4 text-[var(--color-muted-foreground)]" />
+        <MessagesSquare className="h-4 w-4 text-[var(--color-primary)]" />
         Talk to the people behind the complaints
       </h2>
       <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">

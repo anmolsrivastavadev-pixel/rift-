@@ -29,11 +29,10 @@ export function PrevNextNav({
           <ArrowLeft className="h-4 w-4" /> Previous
         </Link>
       ) : (
-        <span aria-disabled="true" role="link" className={`${base} ${disabledCls}`}>
+        <button type="button" disabled className={`${base} ${disabledCls}`}>
           <ArrowLeft className="h-4 w-4" /> Previous
-        </span>
+        </button>
       )}
-      <span className="text-xs text-[var(--color-muted-foreground)]">By created date</span>
       {nextId ? (
         <Link
           href={projectHref(`/dashboard/opportunities/${nextId}`, projectId)}
@@ -42,9 +41,9 @@ export function PrevNextNav({
           Next <ArrowRight className="h-4 w-4" />
         </Link>
       ) : (
-        <span aria-disabled="true" role="link" className={`${base} ${disabledCls}`}>
+        <button type="button" disabled className={`${base} ${disabledCls}`}>
           Next <ArrowRight className="h-4 w-4" />
-        </span>
+        </button>
       )}
     </nav>
   );

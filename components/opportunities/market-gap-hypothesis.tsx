@@ -53,7 +53,9 @@ export function MarketGapHypothesis({ data }: { data: MarketGapData }) {
           </p>
         ) : null}
         <p className="mt-3 text-xs text-[var(--color-muted-foreground)]">
-          Find ideas again to add more context for this idea.
+          This idea was created before Rift added deeper analysis. Run
+          &ldquo;Find ideas&rdquo; on this project again to fill in the market
+          gap, target customer, and product angle.
         </p>
       </section>
     );

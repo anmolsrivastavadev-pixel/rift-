@@ -37,7 +37,7 @@ export function buildOutreachMessage(input: {
     .map((q) => `- ${q}`)
     .join("\n");
   return [
-    `Hi — I came across your post about ${input.problemTitle.toLowerCase()}. I'm researching this exact frustration (not selling anything), and your post really matched what I keep hearing from others.`,
+    `Hi — I came across your post about ${input.problemTitle}. I'm researching this exact frustration (not selling anything), and your post really matched what I keep hearing from others.`,
     "",
     "If you have a minute, I'd love to know:",
     questionLines,
