@@ -142,8 +142,6 @@ export async function runPipeline(
     return { created: 0, error: quota.message };
   }
 
-  await setJobProgress({ stage: "cleaning", message: "Cleaning complaints…", total: 0, done: 0 });
-
   // M16D — AI run history row for this pipeline run. Created as "running"
   // before the AI work starts, then marked completed/failed. Metadata only —
   // the pipeline stages themselves are unchanged.
@@ -155,11 +153,13 @@ export async function runPipeline(
   // Closure-scoped counter that `createAIRunRow` (declared below) needs before
   // `all` exists; assigned inside try{} once the complaints are loaded.
   let allCount = 0;
-  // Throttle state for the DB progress writer (declared here, not inside the
-  // helper section, so they're initialized before try{} runs — accessing a
-  // `let` from inside the try before its declarator would throw a TDZ error.
+  // Throttle state for the DB progress writer. These `let`s MUST be declared
+  // before the first setJobProgress call: the helper is hoisted, but reading a
+  // `let` before its declarator runs throws a TDZ ReferenceError.
   let lastWrittenStage: Stage | null = null;
   let lastWrittenBucket = -1;
+
+  await setJobProgress({ stage: "cleaning", message: "Cleaning complaints…", total: 0, done: 0 });
 
   const failRun = async (message: string) => {
     if (!runId) return;
