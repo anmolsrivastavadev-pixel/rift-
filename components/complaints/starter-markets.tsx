@@ -1,14 +1,23 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
-import { Zap, Loader2, CheckCircle2 } from "lucide-react";
+import { Zap, Loader2, CheckCircle2, AlertTriangle, Sparkles } from "lucide-react";
 import { useActionState } from "react";
 
-import { loadStarterComplaints, createCustomStarterComplaints, type StarterResult } from "@/actions/complaints";
+import {
+  loadStarterComplaints,
+  createCustomStarterComplaints,
+  loadDemoComplaints,
+  type StarterResult,
+} from "@/actions/complaints";
+import type { UploadResult } from "@/lib/schemas";
 import { MARKET_KEYS, MARKET_LABELS } from "@/lib/starter-complaints";
 import { Button } from "@/components/ui/button";
-import { projectHref } from "@/lib/project-href";
+import { Input } from "@/components/ui/input";
+import {
+  DemoSummary,
+  ImportNextStepLink,
+} from "@/components/complaints/import-summary";
 
 export function StarterMarkets({ projectId }: { projectId: string }) {
   const [state, action, pending] = useActionState<StarterResult | null, FormData>(
@@ -19,6 +28,10 @@ export function StarterMarkets({ projectId }: { projectId: string }) {
     createCustomStarterComplaints,
     null
   );
+  const [demoState, demoAction, demoPending] = useActionState<
+    UploadResult | null,
+    FormData
+  >(loadDemoComplaints, null);
   const [customMarket, setCustomMarket] = React.useState("");
 
   return (
@@ -36,6 +49,22 @@ export function StarterMarkets({ projectId }: { projectId: string }) {
       </div>
 
       <div className="mt-4 flex flex-wrap gap-2">
+        <form action={demoAction}>
+          <input type="hidden" name="projectId" value={projectId} />
+          <Button
+            type="submit"
+            variant="outline"
+            size="sm"
+            disabled={demoPending}
+          >
+            {demoPending ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Sparkles className="h-3.5 w-3.5" />
+            )}
+            General demo
+          </Button>
+        </form>
         {MARKET_KEYS.map((key) => (
           <form key={key} action={action}>
             <input type="hidden" name="projectId" value={projectId} />
@@ -62,16 +91,18 @@ export function StarterMarkets({ projectId }: { projectId: string }) {
         </p>
         <form action={customAction} className="flex gap-2">
           <input type="hidden" name="projectId" value={projectId} />
-          <input
-            name="market"
-            value={customMarket}
-            onChange={(e) => setCustomMarket(e.target.value)}
-            placeholder="e.g. pet grooming, electric bikes, coworking spaces"
-            required
-            minLength={2}
-            maxLength={80}
-            className="flex-1 rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-1.5 text-sm text-[var(--color-foreground)] placeholder:text-[var(--color-muted-foreground)] focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20 outline-none"
-          />
+          <div className="min-w-0 flex-1">
+            <Input
+              name="market"
+              value={customMarket}
+              onChange={(e) => setCustomMarket(e.target.value)}
+              placeholder="e.g. pet grooming, electric bikes, coworking spaces"
+              aria-label="Market or niche for example complaints"
+              required
+              minLength={2}
+              maxLength={80}
+            />
+          </div>
           <Button type="submit" size="sm" disabled={customPending || customMarket.trim().length < 2}>
             {customPending ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -94,7 +125,17 @@ export function StarterMarkets({ projectId }: { projectId: string }) {
           Generating starter complaints for your market...
         </p>
       )}
+      {demoPending && (
+        <p className="mt-3 text-sm text-[var(--color-muted-foreground)]">
+          Loading demo complaints...
+        </p>
+      )}
 
+      {demoState && (
+        <div className="mt-4">
+          <DemoSummary result={demoState} projectId={projectId} />
+        </div>
+      )}
       {state && <StarterSummary result={state} projectId={projectId} />}
       {customState && <StarterSummary result={customState} projectId={projectId} />}
 
@@ -120,16 +161,7 @@ function StarterSummary({
           <p className="font-medium">
             {result.market} starter complaints are already loaded.
           </p>
-          <p className="text-xs text-[var(--color-muted-foreground)]">
-            Head to{" "}
-            <Link
-              href={projectHref("/dashboard/opportunities", projectId)}
-              className="font-medium text-[var(--color-primary)] hover:underline"
-            >
-              Ideas → Find ideas
-            </Link>{" "}
-            to see what Rift finds.
-          </p>
+          <ImportNextStepLink projectId={projectId} />
         </div>
       </div>
     );
@@ -138,7 +170,7 @@ function StarterSummary({
   if (result.inserted === 0 && result.errors.length > 0) {
     return (
       <div className="mt-4 flex items-start gap-2 rounded-[12px] border border-[var(--color-danger)]/40 bg-[var(--color-danger)]/10 p-4 text-sm text-[var(--color-danger)]">
-        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
+        <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
         <div>
           <p className="font-medium">Could not load starter complaints.</p>
           {result.errors.slice(0, 3).map((e, i) => (
@@ -156,19 +188,11 @@ function StarterSummary({
       <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
       <div className="space-y-1">
         <p className="font-medium">
-          {result.market} starter complaints loaded ({result.inserted}).
+          Loaded {result.inserted} example complaints for {result.market}. Next:
+          turn them into ideas.
           {result.skipped > 0 && ` ${result.skipped} already existed.`}
         </p>
-        <p className="text-xs text-[var(--color-muted-foreground)]">
-          Now go to{" "}
-          <Link
-            href={projectHref("/dashboard/opportunities", projectId)}
-            className="font-medium text-[var(--color-primary)] hover:underline"
-          >
-            Ideas → Find ideas
-          </Link>{" "}
-          to find ideas.
-        </p>
+        <ImportNextStepLink projectId={projectId} />
       </div>
     </div>
   );

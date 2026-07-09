@@ -1,17 +1,11 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
-import { Upload, ClipboardPaste, FileText, Download, Sparkles, Loader2, Globe } from "lucide-react";
-import { useActionState } from "react";
+import { Upload, ClipboardPaste, FileText, Globe } from "lucide-react";
 
-import { loadDemoComplaints } from "@/actions/complaints";
-import type { UploadResult } from "@/lib/schemas";
-import { Button } from "@/components/ui/button";
 import { CsvUploader } from "@/components/complaints/csv-uploader";
 import { TextInput } from "@/components/complaints/text-input";
 import { ComplaintFinder } from "@/components/complaints/complaint-finder";
-import { DemoSummary } from "@/components/complaints/import-summary";
 
 type Tab = "find" | "csv" | "paste" | "file";
 
@@ -22,12 +16,27 @@ const TABS: { id: Tab; label: string; icon: React.ComponentType<{ className?: st
   { id: "file", label: "Upload text file", icon: FileText },
 ];
 
-export function ComplaintsInput({ projectId }: { projectId: string }) {
+export function ComplaintsInput({
+  projectId,
+  finderUsageLine,
+}: {
+  projectId: string;
+  finderUsageLine?: string;
+}) {
   const [tab, setTab] = React.useState<Tab>("find");
-  const [demoState, demoAction, demoPending] = useActionState<
-    UploadResult | null,
-    FormData
-  >(loadDemoComplaints, null);
+
+  function handleTablistKeyDown(e: React.KeyboardEvent<HTMLDivElement>) {
+    if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+    e.preventDefault();
+    const current = TABS.findIndex((t) => t.id === tab);
+    const nextIndex =
+      e.key === "ArrowRight"
+        ? (current + 1) % TABS.length
+        : (current - 1 + TABS.length) % TABS.length;
+    const nextId = TABS[nextIndex].id;
+    setTab(nextId);
+    document.getElementById(`rift-input-tab-${nextId}`)?.focus();
+  }
 
   return (
     <div className="space-y-6">
@@ -35,6 +44,7 @@ export function ComplaintsInput({ projectId }: { projectId: string }) {
       <div
         role="tablist"
         aria-label="Input method"
+        onKeyDown={handleTablistKeyDown}
         className="flex flex-wrap gap-2 rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-1.5 shadow-sm"
       >
         {TABS.map(({ id, label, icon: Icon }) => {
@@ -50,7 +60,7 @@ export function ComplaintsInput({ projectId }: { projectId: string }) {
               onClick={() => setTab(id)}
               className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm transition-colors duration-150 ease-out focus-visible:outline focus-visible:[outline-offset:2px] focus-visible:[outline-color:var(--color-primary)] ${
                 active
-                  ? "bg-[var(--color-primary)] text-white"
+                  ? "bg-[var(--color-primary-fill)] text-[var(--color-primary-foreground)]"
                   : "text-[var(--color-muted-foreground)] hover:bg-[var(--color-surface)] hover:text-[var(--color-foreground)]"
               }`}
             >
@@ -67,36 +77,13 @@ export function ComplaintsInput({ projectId }: { projectId: string }) {
         id={`rift-input-panel-${tab}`}
         aria-labelledby={`rift-input-tab-${tab}`}
       >
-        {tab === "find" && <ComplaintFinder projectId={projectId} />}
+        {tab === "find" && (
+          <ComplaintFinder projectId={projectId} usageLine={finderUsageLine} />
+        )}
         {tab === "csv" && <CsvUploader projectId={projectId} />}
         {tab === "paste" && <TextInput mode="paste" projectId={projectId} />}
         {tab === "file" && <TextInput mode="file" projectId={projectId} />}
       </div>
-
-      <div className="flex flex-wrap items-center gap-3 border-t border-[var(--color-border)] pt-4">
-        <Button asChild variant="secondary" size="md">
-          <Link href="/sample_complaints.csv" download>
-            <Download className="h-4 w-4" /> Sample file
-          </Link>
-        </Button>
-
-        <form action={demoAction}>
-          <input type="hidden" name="projectId" value={projectId} />
-          <Button type="submit" variant="outline" disabled={demoPending}>
-            {demoPending ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" /> Loading demo…
-              </>
-            ) : (
-              <>
-                <Sparkles className="h-4 w-4" /> Use examples
-              </>
-            )}
-          </Button>
-        </form>
-      </div>
-
-      {demoState && <DemoSummary result={demoState} projectId={projectId} />}
     </div>
   );
 }

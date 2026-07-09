@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, AlertTriangle } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 import type { UploadResult } from "@/lib/schemas";
 import { Button } from "@/components/ui/button";
+import { Notice } from "@/components/ui/notice";
 import { projectHref } from "@/lib/project-href";
 
 /* Shared import summaries used by the CSV demo path and the text import path.
@@ -37,39 +38,24 @@ export function DemoSummary({
 }) {
   if (result.inserted === 0) {
     return (
-      <div className="flex items-start gap-2 rounded-[12px] border border-[var(--color-primary)]/40 bg-[var(--color-primary)]/10 p-4 text-sm text-[var(--color-primary)]">
-        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
-        <div className="space-y-1">
-          <p className="font-medium">
-            Example complaints are already loaded. You can find ideas now.
-          </p>
-          <p className="text-xs text-[var(--color-muted-foreground)]">
-            Demo data is fake and safe to test with.{" "}
-            <Link
-              href={projectHref("/dashboard/opportunities", projectId)}
-              className="font-medium text-[var(--color-primary)] hover:underline"
-            >
-              Ideas → Find ideas
-            </Link>{" "}
-            to generate scored ideas.
-          </p>
-        </div>
-      </div>
+      <Notice
+        variant="info"
+        title="Example complaints are already loaded. You can find ideas now."
+      >
+        <p className="text-xs">Demo data is fake and safe to test with.</p>
+        <ImportNextStepLink projectId={projectId} />
+      </Notice>
     );
   }
 
   return (
-    <div className="flex items-start gap-2 rounded-[12px] border border-[var(--color-success)]/40 bg-[var(--color-success)]/10 p-4 text-sm text-[var(--color-success)]">
-      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
-      <div className="space-y-1">
-        <p className="font-medium">
-          Example complaints added ({result.inserted}). Now find ideas.
-        </p>
-        <p className="text-xs text-[var(--color-muted-foreground)]">
-          These examples are safe to test with. <ImportNextStepLink projectId={projectId} />
-        </p>
-      </div>
-    </div>
+    <Notice
+      variant="success"
+      title={`Loaded ${result.inserted} example complaints. Next: turn them into ideas.`}
+    >
+      <p className="text-xs">These examples are safe to test with.</p>
+      <ImportNextStepLink projectId={projectId} />
+    </Notice>
   );
 }
 
@@ -88,51 +74,39 @@ export function TextImportSummary({
   // inserted === 0 with no errors => every parsed complaint was already loaded.
   if (result.inserted === 0 && result.errors.length === 0) {
     return (
-      <div className="flex items-start gap-2 rounded-[12px] border border-[var(--color-primary)]/40 bg-[var(--color-primary)]/10 p-4 text-sm text-[var(--color-primary)]">
-        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
-        <div className="space-y-1">
-          <p className="font-medium">
-            These complaints are already loaded. You can find ideas now.
-          </p>
-          <ImportNextStepLink projectId={projectId} />
-        </div>
-      </div>
+      <Notice
+        variant="info"
+        title="These complaints are already loaded. You can find ideas now."
+      >
+        <ImportNextStepLink projectId={projectId} />
+      </Notice>
     );
   }
 
   if (result.inserted === 0 && result.errors.length > 0) {
     return (
-      <div className="flex items-start gap-2 rounded-[12px] border border-[var(--color-danger)]/40 bg-[var(--color-danger)]/10 p-4 text-sm text-[var(--color-danger)]">
-        <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
-        <div>
-          <p className="font-medium">No complaints were imported{fromLabel}.</p>
-          {result.errors.slice(0, 5).map((e, i) => (
-            <p key={i} className="text-xs">
-              {e.reason}
-            </p>
-          ))}
-        </div>
-      </div>
+      <Notice variant="danger" title={`No complaints were imported${fromLabel}.`}>
+        {result.errors.slice(0, 5).map((e, i) => (
+          <p key={i} className="text-xs">
+            {e.reason}
+          </p>
+        ))}
+      </Notice>
     );
   }
 
   return (
-    <div className="flex items-start gap-2 rounded-[12px] border border-[var(--color-success)]/40 bg-[var(--color-success)]/10 p-4 text-sm text-[var(--color-success)]">
-      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
-      <div className="space-y-1">
-        <p className="font-medium">
-          Imported {result.inserted} complaint
-          {result.inserted === 1 ? "" : "s"}
-          {fromLabel}. Now find ideas.
+    <Notice
+      variant="success"
+      title={`Imported ${result.inserted} complaint${result.inserted === 1 ? "" : "s"}${fromLabel}. Now find ideas.`}
+    >
+      {result.skipped > 0 && (
+        <p className="text-xs">
+          Skipped {result.skipped} entr{result.skipped === 1 ? "y" : "ies"}
+          {" "}(too short, invalid, or already loaded).
         </p>
-        {result.skipped > 0 && (
-          <p className="text-xs">
-            Skipped {result.skipped} entr{result.skipped === 1 ? "y" : "ies"}
-            {" "}(too short, invalid, or already loaded).
-          </p>
-        )}
-        <ImportNextStepLink projectId={projectId} />
-      </div>
-    </div>
+      )}
+      <ImportNextStepLink projectId={projectId} />
+    </Notice>
   );
 }

@@ -14,6 +14,7 @@ import { importTextComplaints } from "@/actions/complaints";
 import type { UploadResult } from "@/lib/schemas";
 import { SOURCE_TYPES, type SourceType } from "@/lib/text-import";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/input";
 import { TextImportSummary } from "@/components/complaints/import-summary";
 
 const inputCls =
@@ -54,7 +55,9 @@ export function TextInput({
       const hidden = document.getElementById("rift-text-data") as HTMLInputElement | null;
       if (hidden) hidden.value = "";
       setFileError(
-        `“${file.name}” is not a supported file type. Upload a .txt, .md, or .csv file (CSV belongs on the CSV tab).`
+        /\.csv$/i.test(file.name)
+          ? "For .csv files, use the Upload spreadsheet tab — this tab takes .txt or .md files."
+          : `“${file.name}” is not a supported file type. This tab takes .txt or .md files.`
       );
       return;
     }
@@ -120,14 +123,14 @@ export function TextInput({
           <span className="font-medium uppercase tracking-wide">
             Paste complaints / reviews
           </span>
-          <textarea
+          <Textarea
             name="__textarea"
+            required
             aria-label="Paste complaints, one per line or separated by blank lines"
             placeholder={
               "One complaint per line, or one paragraph per complaint separated by a blank line.\n\n- The onboarding takes way too long.\n- Pricing is confusing and hidden behind too many pages.\n- I can’t tell which plan I should choose."
             }
             rows={10}
-            className="w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-3 text-sm text-[var(--color-foreground)] outline-none focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20"
             onInput={(e) => {
               const t = e.currentTarget;
               const hidden = document.getElementById("rift-text-data") as HTMLInputElement | null;
@@ -180,7 +183,11 @@ export function TextInput({
         </div>
       )}
 
-      <Button type="submit" disabled={pending} className="min-w-32">
+      <Button
+        type="submit"
+        disabled={pending || (mode === "file" && !fileName)}
+        className="min-w-32"
+      >
         {pending ? (
           <>
             <Loader2 className="h-4 w-4 animate-spin" /> Importing…

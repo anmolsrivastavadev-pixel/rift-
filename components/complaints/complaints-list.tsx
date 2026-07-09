@@ -66,6 +66,12 @@ export async function ComplaintsList({
     return projectHref(`/dashboard/complaints${suffix ? `?${suffix}` : ""}`, projectId);
   };
 
+  // A brand-new project has nothing to search or paginate — show only the
+  // empty-state card instead of chrome around an empty table.
+  if (total === 0 && !query) {
+    return <ComplaintsTable rows={rows} hasQuery={false} />;
+  }
+
   return (
     <div className="space-y-4">
       <ComplaintSearch initial={query} />
@@ -79,15 +85,17 @@ export async function ComplaintsList({
         nextHref={pageHref(effectivePage + 1)}
       />
       <ComplaintsTable rows={rows} hasQuery={Boolean(query)} />
-      <PaginationSummary
-        start={start}
-        end={end}
-        total={total}
-        page={effectivePage}
-        hasNext={effectivePage * PAGE_SIZE < total}
-        prevHref={pageHref(effectivePage - 1)}
-        nextHref={pageHref(effectivePage + 1)}
-      />
+      {total > PAGE_SIZE && (
+        <PaginationSummary
+          start={start}
+          end={end}
+          total={total}
+          page={effectivePage}
+          hasNext={effectivePage * PAGE_SIZE < total}
+          prevHref={pageHref(effectivePage - 1)}
+          nextHref={pageHref(effectivePage + 1)}
+        />
+      )}
     </div>
   );
 }

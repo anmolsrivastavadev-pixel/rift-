@@ -65,7 +65,12 @@ export function ComplaintsTable({
               <th className="px-4 py-3 font-medium">Title</th>
               <th className="px-4 py-3 font-medium">Source date</th>
               <th className="px-4 py-3 font-medium">Sentiment</th>
-              <th className="px-4 py-3 font-medium">Severity</th>
+              <th
+                className="px-4 py-3 font-medium"
+                title="How painful the complaint sounds, when scored"
+              >
+                Severity
+              </th>
               <th className="px-4 py-3 font-medium">Added</th>
             </tr>
           </thead>

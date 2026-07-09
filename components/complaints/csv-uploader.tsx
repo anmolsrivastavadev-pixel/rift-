@@ -2,12 +2,14 @@
 
 import * as React from "react";
 import { useActionState } from "react";
+import Link from "next/link";
 import Papa from "papaparse";
 import {
   Upload,
   FileText,
   CheckCircle2,
   AlertTriangle,
+  Download,
   Loader2,
 } from "lucide-react";
 
@@ -45,13 +47,8 @@ export function CsvUploader({ projectId }: { projectId: string }) {
         const hidden = document.getElementById(
           "rift-upload-data"
         ) as HTMLInputElement | null;
-        if (hidden) {
-          hidden.value = JSON.stringify(res.data);
-          const form = document.getElementById(
-            "rift-upload-form"
-          ) as HTMLFormElement | null;
-          form?.requestSubmit();
-        }
+        // Stage the parsed rows; the user reviews and clicks Upload themselves.
+        if (hidden) hidden.value = JSON.stringify(res.data);
       },
       error: (err) => setParseError(err.message),
     });
@@ -104,6 +101,15 @@ export function CsvUploader({ projectId }: { projectId: string }) {
           )}
         </button>
 
+        <div className="flex flex-wrap items-center gap-2 text-xs text-[var(--color-muted-foreground)]">
+          <span>Not sure about the format?</span>
+          <Button asChild variant="secondary" size="sm">
+            <Link href="/sample_complaints.csv" download>
+              <Download className="h-4 w-4" /> Download a sample file
+            </Link>
+          </Button>
+        </div>
+
         <input
           ref={inputRef}
           type="file"
@@ -115,7 +121,7 @@ export function CsvUploader({ projectId }: { projectId: string }) {
           }}
         />
 
-        <Button type="submit" disabled={pending} className="min-w-32">
+        <Button type="submit" disabled={pending || !fileName} className="min-w-32">
           {pending ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" /> Uploading…
@@ -148,6 +154,10 @@ function UploadSummary({
   projectId: string;
 }) {
   if (result.inserted === 0 && result.errors.length > 0) {
+    // Quota/plan errors come through as row 0 — offer the upgrade path.
+    const needsUpgrade = result.errors.some(
+      (e) => e.reason.includes("Upgrade") || e.reason.includes("Pricing")
+    );
     return (
       <div className="flex items-start gap-2 rounded-[12px] border border-[var(--color-danger)]/40 bg-[var(--color-danger)]/10 p-4 text-sm text-[var(--color-danger)]">
         <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
@@ -155,9 +165,16 @@ function UploadSummary({
           <p className="font-medium">No rows were imported.</p>
           {result.errors.slice(0, 5).map((e, i) => (
             <p key={i} className="text-xs">
-              Row {e.row}: {e.reason}
+              {e.row > 0 ? `Row ${e.row}: ${e.reason}` : e.reason}
             </p>
           ))}
+          {needsUpgrade && (
+            <div className="mt-2">
+              <Button asChild size="sm" variant="outline">
+                <Link href="/pricing">See plans</Link>
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     );

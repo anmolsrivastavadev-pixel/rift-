@@ -1,13 +1,17 @@
 "use client";
 
+import * as React from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Search } from "lucide-react";
+
+import { Input } from "@/components/ui/input";
 
 export function ComplaintSearch({ initial = "" }: { initial?: string }) {
   const router = useRouter();
   const params = useSearchParams();
+  const timeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  function update(value: string) {
+  function commit(value: string) {
     const next = new URLSearchParams(params.toString());
     if (value) next.set("q", value);
     else next.delete("q");
@@ -15,15 +19,34 @@ export function ComplaintSearch({ initial = "" }: { initial?: string }) {
     router.replace(`/dashboard/complaints?${next.toString()}`);
   }
 
+  // Debounce URL updates so each keystroke doesn't refetch the whole list.
+  function schedule(value: string) {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => commit(value), 300);
+  }
+
+  React.useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
+
   return (
-    <div className="relative w-full max-w-sm">
-      <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--color-muted-foreground)]" />
-      <input
+    <div className="w-full max-w-sm">
+      <Input
         type="search"
+        icon={Search}
         defaultValue={initial}
-        onChange={(e) => update(e.target.value)}
+        onChange={(e) => schedule(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            if (timeoutRef.current) clearTimeout(timeoutRef.current);
+            commit(e.currentTarget.value);
+          }
+        }}
         placeholder="Search complaints…"
-        className="h-10 w-full rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] pl-9 pr-3 text-sm outline-none transition-colors focus:border-[var(--color-primary)]"
+        aria-label="Search complaints"
       />
     </div>
   );

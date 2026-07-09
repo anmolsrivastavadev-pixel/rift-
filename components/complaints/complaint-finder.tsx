@@ -2,13 +2,16 @@
 
 import * as React from "react";
 import { useActionState } from "react";
-import { Globe, Loader2, Search, CheckCircle2, AlertTriangle, Shuffle } from "lucide-react";
+import Link from "next/link";
+import { Globe, Loader2, Search, Shuffle } from "lucide-react";
 
 import {
   findComplaintsAction,
   type FindComplaintsResult,
 } from "@/actions/complaint-finder";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Notice } from "@/components/ui/notice";
 import { ImportNextStepLink } from "@/components/complaints/import-summary";
 import {
   COMPLAINT_SOURCE_NAMES,
@@ -21,7 +24,13 @@ import { pickNiches } from "@/lib/niche-suggestions";
  * from Reddit, App Store reviews, Hacker News, and the wider web into the
  * current project.
  */
-export function ComplaintFinder({ projectId }: { projectId: string }) {
+export function ComplaintFinder({
+  projectId,
+  usageLine,
+}: {
+  projectId: string;
+  usageLine?: string;
+}) {
   const [result, action, pending] = useActionState<
     FindComplaintsResult | null,
     FormData
@@ -43,10 +52,10 @@ export function ComplaintFinder({ projectId }: { projectId: string }) {
     <div className="space-y-4">
       <form ref={formRef} action={action} className="flex flex-wrap items-center gap-3">
         <input type="hidden" name="projectId" value={projectId} />
-        <div className="relative min-w-0 flex-1">
-          <Globe className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--color-muted-foreground)]" />
-          <input
+        <div className="min-w-0 flex-1">
+          <Input
             ref={inputRef}
+            icon={Globe}
             type="text"
             name="keyword"
             required
@@ -55,7 +64,6 @@ export function ComplaintFinder({ projectId }: { projectId: string }) {
             placeholder="Type a niche, e.g. fitness apps"
             aria-label="Niche keyword"
             disabled={pending}
-            className="h-10 w-full rounded-[12px] border border-[var(--color-border)] bg-[var(--color-background)] pl-9 pr-3 text-sm text-[var(--color-foreground)] outline-none focus:border-[var(--color-primary)] focus-visible:outline focus-visible:[outline-offset:2px] focus-visible:[outline-color:var(--color-primary)]"
           />
         </div>
         <Button type="submit" disabled={pending}>
@@ -71,40 +79,105 @@ export function ComplaintFinder({ projectId }: { projectId: string }) {
         </Button>
       </form>
 
-      {/* M30 — one-click niche suggestions so nobody faces a blank box */}
-      <div className="flex flex-wrap items-center gap-1.5">
-        <span className="text-xs text-[var(--color-muted-foreground)]">
-          Not sure? Try one of these:
-        </span>
-        {niches.map((niche) => (
+      {pending ? (
+        <SearchingStatus />
+      ) : (
+        /* M30 — one-click niche suggestions so nobody faces a blank box */
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className="text-xs text-[var(--color-muted-foreground)]">
+            Not sure? Try one of these:
+          </span>
+          {niches.map((niche) => (
+            <button
+              key={niche}
+              type="button"
+              disabled={pending}
+              onClick={() => applyNiche(niche)}
+              className="rounded-full border border-[var(--color-border)] bg-[var(--color-card)] px-2.5 py-1 text-xs text-[var(--color-muted-foreground)] transition-colors hover:border-[var(--color-primary)]/60 hover:text-[var(--color-foreground)] disabled:opacity-50"
+            >
+              {niche}
+            </button>
+          ))}
           <button
-            key={niche}
             type="button"
             disabled={pending}
-            onClick={() => applyNiche(niche)}
-            className="rounded-full border border-[var(--color-border)] bg-[var(--color-card)] px-2.5 py-1 text-xs text-[var(--color-muted-foreground)] transition-colors hover:border-[var(--color-primary)]/60 hover:text-[var(--color-foreground)] disabled:opacity-50"
+            onClick={() => setNicheOffset((o) => o + 6)}
+            aria-label="Show different niche ideas"
+            className="inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs text-[var(--color-primary)] transition-colors hover:bg-[var(--color-card)] disabled:opacity-50"
           >
-            {niche}
+            <Shuffle className="h-3 w-3" /> more
           </button>
-        ))}
-        <button
-          type="button"
-          disabled={pending}
-          onClick={() => setNicheOffset((o) => o + 6)}
-          aria-label="Show different niche ideas"
-          className="inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs text-[var(--color-primary)] transition-colors hover:bg-[var(--color-card)] disabled:opacity-50"
-        >
-          <Shuffle className="h-3 w-3" /> more
-        </button>
-      </div>
+        </div>
+      )}
 
       <p className="text-xs text-[var(--color-muted-foreground)]">
         Rift searches Reddit, App Store reviews, Hacker News, YouTube comments,
         Stack Exchange, GitHub, and the wider web for real frustrations about
         your niche. No spreadsheet needed.
       </p>
+      {usageLine && (
+        <p className="text-xs text-[var(--color-muted-foreground)]">
+          {usageLine}
+        </p>
+      )}
 
       {result && !pending && <FinderSummary result={result} projectId={projectId} />}
+    </div>
+  );
+}
+
+const FINDER_STATUS_SOURCES = [
+  "Reddit",
+  "App Store reviews",
+  "Hacker News",
+  "YouTube",
+  "Stack Exchange",
+  "GitHub",
+  "the web",
+];
+
+/* Pending status card — replaces the niche-chip row while a search runs so
+ * the 30–60s wait reads as progress, not a hang. */
+function SearchingStatus() {
+  const [sourceIndex, setSourceIndex] = React.useState(0);
+
+  React.useEffect(() => {
+    const timer = setInterval(() => {
+      setSourceIndex((i) => (i + 1) % FINDER_STATUS_SOURCES.length);
+    }, 1800);
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-4 text-sm"
+    >
+      <p className="flex items-center gap-2 font-medium text-[var(--color-foreground)]">
+        <Loader2 className="h-4 w-4 animate-spin text-[var(--color-primary)]" />
+        Searching 7 sources…
+      </p>
+      <p className="mt-1.5 text-xs text-[var(--color-muted-foreground)]">
+        Checking {FINDER_STATUS_SOURCES[sourceIndex]}…
+      </p>
+      <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
+        This usually takes 30–60 seconds — stay on this page.
+      </p>
+    </div>
+  );
+}
+
+function mentionsUpgrade(text: string): boolean {
+  return text.includes("Upgrade") || text.includes("Pricing");
+}
+
+function SeePlansButton() {
+  return (
+    <div className="mt-2">
+      <Button asChild size="sm" variant="outline">
+        <Link href="/pricing">See plans</Link>
+      </Button>
     </div>
   );
 }
@@ -123,45 +196,55 @@ function FinderSummary({
   ).map((k) => `${result.foundBySource[k]} from ${COMPLAINT_SOURCE_NAMES[k]}`);
 
   if (result.inserted === 0) {
-    return (
-      <div className="flex items-start gap-2 rounded-[12px] border border-[var(--color-warning)]/40 bg-[var(--color-warning)]/10 p-4 text-sm text-[var(--color-warning)]">
-        <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
-        <div className="space-y-1">
-          <p className="font-medium">
-            {found > 0
-              ? "These complaints are already loaded."
-              : `No new complaints found for “${result.keyword}”.`}
-          </p>
-          {result.errors.map((e, i) => (
+    // Blocked/error runs lead with the real reason (e.g. a quota message),
+    // not a misleading "no complaints found" headline.
+    if (found === 0 && result.errors.length > 0) {
+      return (
+        <Notice variant="warning" title={result.errors[0]}>
+          {result.errors.slice(1).map((e, i) => (
             <p key={i} className="text-xs">
               {e}
             </p>
           ))}
-          {found > 0 && <ImportNextStepLink projectId={projectId} />}
-        </div>
-      </div>
+          {mentionsUpgrade(result.errors[0]) && <SeePlansButton />}
+        </Notice>
+      );
+    }
+
+    return (
+      <Notice
+        variant="warning"
+        title={
+          found > 0
+            ? "These complaints are already loaded."
+            : `No new complaints found for “${result.keyword}”.`
+        }
+      >
+        {result.errors.map((e, i) => (
+          <p key={i} className="text-xs">
+            {e}
+          </p>
+        ))}
+        {found > 0 && <ImportNextStepLink projectId={projectId} />}
+      </Notice>
     );
   }
 
   return (
-    <div className="flex items-start gap-2 rounded-[12px] border border-[var(--color-success)]/40 bg-[var(--color-success)]/10 p-4 text-sm text-[var(--color-success)]">
-      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
-      <div className="space-y-1">
-        <p className="font-medium">
-          Imported {result.inserted} complaint{result.inserted === 1 ? "" : "s"} about
-          “{result.keyword}”. Now find ideas.
+    <Notice
+      variant="success"
+      title={`Imported ${result.inserted} complaint${result.inserted === 1 ? "" : "s"} about “${result.keyword}”. Now find ideas.`}
+    >
+      <p className="text-xs">
+        {sourceParts.join(", ")}
+        {result.skipped > 0 ? `, ${result.skipped} skipped (duplicates)` : ""}.
+      </p>
+      {result.errors.map((e, i) => (
+        <p key={i} className="text-xs">
+          {e}
         </p>
-        <p className="text-xs text-[var(--color-muted-foreground)]">
-          {sourceParts.join(", ")}
-          {result.skipped > 0 ? `, ${result.skipped} skipped (duplicates)` : ""}.
-        </p>
-        {result.errors.map((e, i) => (
-          <p key={i} className="text-xs text-[var(--color-muted-foreground)]">
-            {e}
-          </p>
-        ))}
-        <ImportNextStepLink projectId={projectId} />
-      </div>
-    </div>
+      ))}
+      <ImportNextStepLink projectId={projectId} />
+    </Notice>
   );
 }
