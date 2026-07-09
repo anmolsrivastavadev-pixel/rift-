@@ -203,7 +203,10 @@ export function Hero() {
             className={`group relative overflow-hidden border border-[var(--color-border)] shadow-[var(--shadow-elevated)] ${
               isFull
                 ? "flex items-center justify-center rounded-none bg-black"
-                : "aspect-video rounded-2xl bg-[var(--color-card)]"
+                : // Must match the rendered HeroDemo composition ratio
+                  // (1040x1200, see promo-video/src/Root.tsx). A mismatched
+                  // ratio + object-cover crops the demo to its middle band.
+                  "mx-auto aspect-[13/15] w-full max-w-[520px] rounded-2xl bg-[var(--color-card)]"
             }`}
           >
             <video
