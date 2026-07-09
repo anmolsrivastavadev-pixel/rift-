@@ -31,9 +31,9 @@ export function computeNextAction(
 
   if (complaintCount === 0) {
     return {
-      title: "Add data",
-      description: "Paste complaints, upload a file, or start with examples.",
-      cta: "Add data",
+      title: "Add complaints",
+      description: "Paste reviews, upload a file, or let the finder search for you.",
+      cta: "Add complaints",
       href: "/dashboard/complaints",
     };
   }

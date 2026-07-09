@@ -203,31 +203,36 @@ export default async function DashboardPage({
             {project.name}
           </h1>
           <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
-            {complaintCount.toLocaleString()} complaints ·{" "}
-            {opportunityCount.toLocaleString()} ideas
+            {complaintCount === 0
+              ? "A fresh project — add complaints to get started."
+              : `${complaintCount.toLocaleString()} complaints · ${opportunityCount.toLocaleString()} ideas`}
           </p>
         </div>
-        {/* M18 — private Markdown export; M29 — public share link */}
-        <div className="flex flex-wrap items-center justify-end gap-2">
-          <ExportButtons
-            kind="project"
-            targetId={projectId}
-            exportLabel="Export report"
-            copyLabel="Copy report"
-          />
-          <ShareButton
-            kind="project"
-            targetId={projectId}
-            initialLink={
-              activeShareLink
-                ? {
-                    linkId: activeShareLink.id,
-                    url: shareUrlForToken(activeShareLink.token),
-                  }
-                : null
-            }
-          />
-        </div>
+        {/* M18 — private Markdown export; M29 — public share link. Hidden on
+            an empty project: exporting or sharing nothing is a dead end that
+            competes with the single onboarding CTA. */}
+        {complaintCount > 0 && (
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <ExportButtons
+              kind="project"
+              targetId={projectId}
+              exportLabel="Export report"
+              copyLabel="Copy report"
+            />
+            <ShareButton
+              kind="project"
+              targetId={projectId}
+              initialLink={
+                activeShareLink
+                  ? {
+                      linkId: activeShareLink.id,
+                      url: shareUrlForToken(activeShareLink.token),
+                    }
+                  : null
+              }
+            />
+          </div>
+        )}
       </div>
 
       {/* M17/M21 — exactly ONE guidance block, never two competing CTAs:
@@ -275,6 +280,7 @@ export default async function DashboardPage({
             label="Highest score"
             value={highestScore !== null ? highestScore.toString() : "—"}
             hint="Idea score (0–100)"
+            href={projectHref("/dashboard/opportunities", projectId)}
           />
         </div>
       )}
@@ -310,7 +316,7 @@ export default async function DashboardPage({
               <Link
                 key={o.id}
                 href={projectHref(`/dashboard/opportunities/${o.id}`, projectId)}
-                className="group flex flex-col rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-5 shadow-[0_1px_3px_0_rgb(0_0_0/_0.04),0_1px_2px_-1px_rgb(0_0_0/_0.06)] transition-all duration-150 ease-out hover:-translate-y-0.5 hover:border-[var(--color-primary)]/40 hover:shadow-[0_4px_12px_0_rgb(0_0_0/_0.06),0_2px_4px_-2px_rgb(0_0_0/_0.04)]"
+                className="group flex flex-col rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-5 shadow-[var(--shadow-card)] transition-all duration-150 ease-out hover:-translate-y-0.5 hover:border-[var(--color-primary)]/40 hover:shadow-[var(--shadow-card-hover)]"
               >
                 <div className="flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-[var(--color-muted-foreground)]">
                   <Briefcase className="h-3 w-3" />

@@ -61,8 +61,8 @@ export function OnboardingCard({
       label: "Pick one to test",
       description: "Compare your top ideas side by side and mark one Pursue.",
       done: state.hasTestingProgress,
-      href: projectHref("/dashboard/opportunities", projectId),
-      cta: "Pick an idea",
+      href: projectHref("/dashboard/opportunities/decision-board", projectId),
+      cta: "Compare ideas",
     },
   ];
   const active = steps.find((s) => !s.done) ?? steps[steps.length - 1];

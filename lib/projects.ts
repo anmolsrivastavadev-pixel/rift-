@@ -35,7 +35,7 @@ export type ProjectRef = {
   createdAt: Date;
 };
 
-const DEFAULT_PROJECT_NAME = "Default project";
+const DEFAULT_PROJECT_NAME = "My first market";
 
 /**
  * Resolve the project a page/action should operate on.

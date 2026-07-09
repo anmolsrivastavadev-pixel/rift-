@@ -63,7 +63,7 @@ export function FounderCommandClient({
       {stats.opportunityCount > 0 && (
         <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[var(--shadow-card)]">
           <h3 className="text-sm font-semibold">Decision status</h3>
-          <div className="mt-3 grid grid-cols-4 gap-2 text-center">
+          <div className="mt-3 grid grid-cols-2 gap-2 text-center sm:grid-cols-4">
             <SnapshotCount label="Pursue" value={decisionCounts.pursue} accent="success" />
             <SnapshotCount label="Park" value={decisionCounts.park} accent="warning" />
             <SnapshotCount label="Reject" value={decisionCounts.reject} accent="danger" />
@@ -74,7 +74,7 @@ export function FounderCommandClient({
               href={projectHref("/dashboard/opportunities/decision-board", projectId)}
               className="text-xs text-[var(--color-primary)] hover:underline"
             >
-              Open Compare ideas →
+              Open Decisions →
             </Link>
             <span className="flex items-center gap-1 text-[11px] text-[var(--color-muted-foreground)]">
               <Info className="h-3 w-3" /> Decisions are saved to your account.
