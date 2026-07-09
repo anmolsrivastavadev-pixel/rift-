@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect } from "react";
-import { AlertTriangle, RefreshCw } from "lucide-react";
+import { RefreshCw } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { ErrorPanel } from "@/components/error-panel";
 import {
   isStaleDeployError,
   STALE_DEPLOY_MESSAGE,
@@ -26,25 +27,23 @@ export default function Error({
   const stale = isStaleDeployError(error);
 
   return (
-    <div className="mx-auto max-w-md space-y-6 py-24 text-center">
-      <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-[12px] bg-[var(--color-danger)]/10 text-[var(--color-danger)]">
-        <AlertTriangle className="h-6 w-6" />
-      </div>
-      <div className="space-y-2">
-        <h1 className="text-2xl font-semibold tracking-tight">
-          {stale ? STALE_DEPLOY_TITLE : "Something went wrong"}
-        </h1>
-        <p className="text-sm text-[var(--color-muted-foreground)]">
-          {stale ? STALE_DEPLOY_MESSAGE : "An unexpected error occurred. Please try again."}
-        </p>
-      </div>
+    <ErrorPanel
+      title={stale ? STALE_DEPLOY_TITLE : "Something went wrong"}
+      message={
+        stale
+          ? STALE_DEPLOY_MESSAGE
+          : "An unexpected error occurred. Please try again."
+      }
+    >
       {stale ? (
-        <Button onClick={() => window.location.reload()}>
+        <Button onClick={() => window.location.reload()} className="mx-auto">
           <RefreshCw className="h-4 w-4" /> Reload page
         </Button>
       ) : (
-        <Button onClick={reset}>Try again</Button>
+        <Button onClick={reset} className="mx-auto">
+          Try again
+        </Button>
       )}
-    </div>
+    </ErrorPanel>
   );
 }

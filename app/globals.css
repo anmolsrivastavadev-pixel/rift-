@@ -274,44 +274,7 @@
     background-position: center top;
   }
 
-  /* Glass-morphism surface (dark) */
-  .glass {
-    background-color: rgba(255, 255, 255, 0.04);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
   }
-
-  /* Subtle card press effect */
-  .press-effect {
-    transition: transform 0.15s ease-out;
-  }
-
-  .press-effect:active {
-    transform: scale(0.97);
-  }
-
-  /* Focus ring consistent pattern */
-  .focus-ring {
-    outline: none;
-  }
-
-  .focus-ring:focus-visible {
-    outline: none;
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgb(59 130 246 / 0.2);
-    border-radius: var(--radius);
-  }
-
-  /* Smooth shadow transition for cards */
-  .card-shadow {
-    box-shadow: var(--shadow-card);
-    transition: box-shadow 0.15s ease-out, transform 0.15s ease-out;
-  }
-
-  .card-shadow:hover {
-    box-shadow: var(--shadow-card-hover);
-  }
-}
 
 /* M29 — print styles for the public share page ("Save as PDF"). Forces a
    clean white document and hides interactive chrome. Scoped to .share-report
