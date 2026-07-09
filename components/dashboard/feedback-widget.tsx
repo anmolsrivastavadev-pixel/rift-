@@ -6,6 +6,8 @@ import { useActionState } from "react";
 import { MessageSquare, Loader2, Check, AlertCircle } from "lucide-react";
 
 import { submitBetaFeedback, type FeedbackResult } from "@/actions/beta";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/input";
 
 /* M20 — compact in-app feedback form for beta users. Lives in the dashboard
  * shell (sidebar footer + mobile selector row). Collapsed to a single quiet
@@ -23,32 +25,45 @@ const TYPES = [
 export function FeedbackWidget({ projectId }: { projectId: string }) {
   const pathname = usePathname();
   const [open, setOpen] = React.useState(false);
+  const [showSuccess, setShowSuccess] = React.useState(false);
   const [state, formAction, pending] = useActionState<FeedbackResult | null, FormData>(
     submitBetaFeedback,
     null
   );
 
-  // Collapse the form after a successful submit.
+  // Collapse the form after a successful submit and show the success line
+  // briefly before it auto-clears.
   const closedAfterRef = React.useRef<FeedbackResult | null>(null);
   React.useEffect(() => {
     if (state && state.ok && closedAfterRef.current !== state) {
       closedAfterRef.current = state;
       setOpen(false);
+      setShowSuccess(true);
     }
   }, [state]);
+
+  // Auto-clear the success message after 4 seconds.
+  React.useEffect(() => {
+    if (!showSuccess) return;
+    const t = setTimeout(() => setShowSuccess(false), 4000);
+    return () => clearTimeout(t);
+  }, [showSuccess]);
 
   if (!open) {
     return (
       <div className="space-y-1">
         <button
           type="button"
-          onClick={() => setOpen(true)}
+          onClick={() => {
+            setShowSuccess(false);
+            setOpen(true);
+          }}
           className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-[var(--color-muted-foreground)] transition-all duration-150 ease-out hover:bg-[var(--color-surface)] hover:text-[var(--color-foreground)]"
         >
           <MessageSquare className="h-4 w-4" />
           Feedback
         </button>
-        {state && state.ok && (
+        {showSuccess && (
           <p className="flex items-center gap-1 px-3 text-[11px] text-[var(--color-success)]">
             <Check className="h-3 w-3" /> Thanks, feedback saved.
           </p>
@@ -92,23 +107,19 @@ export function FeedbackWidget({ projectId }: { projectId: string }) {
           ))}
         </select>
       </div>
-      <textarea
+      <Textarea
         name="message"
         required
         maxLength={2000}
         rows={3}
         placeholder="What happened, or what would help?"
-        className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-background)] px-2 py-1.5 text-xs text-[var(--color-foreground)] placeholder:text-[var(--color-muted-foreground)] outline-none focus:border-[var(--color-primary)]"
+        className="h-auto min-h-0 px-2 py-1.5 text-xs"
       />
       <div className="flex items-center gap-2">
-        <button
-          type="submit"
-          disabled={pending}
-          className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--color-primary)] px-2.5 py-1.5 text-xs font-medium text-white transition-all duration-150 ease-out hover:brightness-110 active:scale-[0.97] focus-visible:outline-none focus-visible:shadow-[0_0_0_3px_rgba(59,130,246,0.2)] disabled:opacity-50"
-        >
+        <Button type="submit" size="sm" disabled={pending}>
           {pending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <MessageSquare className="h-3.5 w-3.5" />}
           Send
-        </button>
+        </Button>
         <button
           type="button"
           onClick={() => setOpen(false)}

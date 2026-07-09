@@ -3,6 +3,7 @@ import { ValidationStateMigrator } from "@/components/dashboard/validation-state
 import { requireUser } from "@/lib/auth/current-user";
 import { isAdminEmail } from "@/lib/admin";
 import { requireBetaAccess } from "@/lib/beta-access";
+import { getEffectivePlan } from "@/lib/quotas";
 import {
   getProjectOrDefault,
   listProjectsForUser,
@@ -21,6 +22,9 @@ export default async function DashboardLayout({
   const project = await getProjectOrDefault(null, user);
   const projects = await listProjectsForUser(user);
   const archivedProjects = await listArchivedProjectsForUser(user);
+  // Read-only effective plan (admins always resolve to "pro"). Passed to the
+  // shell only to badge the Plan & pricing link — never written here.
+  const { plan } = await getEffectivePlan(user);
 
   return (
     <DashboardShell
@@ -29,6 +33,7 @@ export default async function DashboardLayout({
       archivedProjects={archivedProjects}
       currentProjectId={project.id}
       isAdmin={isAdminEmail(user.email)}
+      plan={plan}
     >
       <ValidationStateMigrator userId={user.id} />
       {children}

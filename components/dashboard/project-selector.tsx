@@ -14,6 +14,7 @@ import {
   Check,
   ChevronDown,
   ChevronRight,
+  SlidersHorizontal,
 } from "lucide-react";
 import { useActionState } from "react";
 
@@ -28,6 +29,8 @@ import {
   type ArchiveActionResult,
 } from "@/actions/projects";
 import { projectHref } from "@/lib/project-href";
+import { Button } from "@/components/ui/button";
+import { NativeSelect } from "@/components/ui/input";
 
 export type ProjectOption = {
   id: string;
@@ -54,10 +57,12 @@ export function ProjectSelector({
   projects,
   archivedProjects,
   currentProjectId,
+  onNavigate,
 }: {
   projects: ProjectOption[];
   archivedProjects: ProjectOption[];
   currentProjectId: string;
+  onNavigate?: () => void;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -65,6 +70,7 @@ export function ProjectSelector({
   const [mode, setMode] = React.useState<"idle" | "create" | "rename" | "archive">("idle");
   const [notice, setNotice] = React.useState<string | null>(null);
   const [showArchived, setShowArchived] = React.useState(false);
+  const [manageOpen, setManageOpen] = React.useState(false);
   const queryProjectId = search.get("projectId");
   const selectedProjectId = queryProjectId && projects.some((project) => project.id === queryProjectId)
     ? queryProjectId
@@ -73,7 +79,10 @@ export function ProjectSelector({
   const canArchive = projects.length > 1;
 
   function navigateToProject(projectId: string) {
-    router.push(projectHref(`${pathname}?${search.toString()}`, projectId));
+    // Drop the current query string: switching projects resets page-local
+    // state (filters/sort/tab). projectHref re-adds the projectId param.
+    router.push(projectHref(pathname, projectId));
+    onNavigate?.();
   }
 
   function openForm(next: "create" | "rename" | "archive") {
@@ -81,26 +90,43 @@ export function ProjectSelector({
     setMode(next);
   }
 
+  // Auto-clear success notices after 4 seconds.
+  React.useEffect(() => {
+    if (!notice) return;
+    const t = setTimeout(() => setNotice(null), 4000);
+    return () => clearTimeout(t);
+  }, [notice]);
+
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-1.5 px-2 text-[10px] uppercase tracking-wider text-[var(--color-muted-foreground)]">
         <Folder className="h-3 w-3" />
-        Project
+        <span className="flex-1">Project</span>
+        <button
+          type="button"
+          onClick={() => setManageOpen((v) => !v)}
+          title="Manage projects"
+          aria-label="Manage projects"
+          aria-expanded={manageOpen}
+          className="flex h-6 w-6 items-center justify-center rounded-md text-[var(--color-muted-foreground)] transition-colors hover:bg-[var(--color-surface)] hover:text-[var(--color-foreground)]"
+        >
+          <SlidersHorizontal className="h-3.5 w-3.5" />
+        </button>
       </div>
 
-      <select
+      <NativeSelect
         key={selectedProjectId}
         aria-label="Select project"
         defaultValue={selectedProjectId}
         onChange={(e) => navigateToProject(e.target.value)}
-        className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] px-2 py-1.5 text-sm text-[var(--color-foreground)] outline-none transition-colors focus:border-[var(--color-primary)] focus-visible:outline focus-visible:[outline-offset:2px] focus-visible:[outline-color:var(--color-primary)]"
+        className="h-8 px-2 text-sm"
       >
         {projects.map((p) => (
           <option key={p.id} value={p.id}>
             {p.name}
           </option>
         ))}
-      </select>
+      </NativeSelect>
 
       {mode === "create" && (
         <NewProjectForm
@@ -141,57 +167,59 @@ export function ProjectSelector({
             onClick={() => openForm("create")}
             className="flex w-full items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs text-[var(--color-muted-foreground)] transition-colors hover:bg-[var(--color-surface)] hover:text-[var(--color-foreground)]"
           >
-            <Plus className="h-3.5 w-3.5" /> Create project
+            <Plus className="h-3.5 w-3.5" /> New project
           </button>
-          <button
-            type="button"
-            onClick={() => openForm("rename")}
-            className="flex w-full items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs text-[var(--color-muted-foreground)] transition-colors hover:bg-[var(--color-surface)] hover:text-[var(--color-foreground)]"
-          >
-            <Pencil className="h-3.5 w-3.5" /> Rename project
-          </button>
-          {canArchive && (
-            <button
-              type="button"
-              onClick={() => openForm("archive")}
-              className="flex w-full items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs text-[var(--color-muted-foreground)] transition-colors hover:bg-[var(--color-surface)] hover:text-[var(--color-foreground)]"
-            >
-              <Archive className="h-3.5 w-3.5" /> Archive project
-            </button>
-          )}
           {notice && (
             <p className="flex items-start gap-1 px-2 text-[11px] text-[var(--color-primary)]">
               <Check className="mt-0.5 h-3 w-3 shrink-0" /> {notice}
             </p>
           )}
-          <p className="px-2 text-[10px] leading-snug text-[var(--color-muted-foreground)]/80">
-            Use separate projects for different niches.
-          </p>
-        </div>
-      )}
 
-      {archivedProjects.length > 0 && (
-        <div className="space-y-1 border-t border-[var(--color-border)] pt-2">
-          <button
-            type="button"
-            onClick={() => setShowArchived((v) => !v)}
-            className="flex w-full items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs text-[var(--color-muted-foreground)] transition-colors hover:bg-[var(--color-surface)] hover:text-[var(--color-foreground)]"
-          >
-            {showArchived ? (
-              <ChevronDown className="h-3.5 w-3.5" />
-            ) : (
-              <ChevronRight className="h-3.5 w-3.5" />
-            )}
-            Archived projects ({archivedProjects.length})
-          </button>
-          {showArchived && (
-            <div className="space-y-1">
-              <p className="px-2 text-[10px] leading-snug text-[var(--color-muted-foreground)]/80">
-                Archived projects are hidden, not deleted.
-              </p>
-              {archivedProjects.map((p) => (
-                <ArchivedProjectRow key={p.id} projectId={p.id} projectName={p.name} />
-              ))}
+          {manageOpen && (
+            <div className="space-y-1 border-t border-[var(--color-border)] pt-2">
+              <button
+                type="button"
+                onClick={() => openForm("rename")}
+                className="flex w-full items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs text-[var(--color-muted-foreground)] transition-colors hover:bg-[var(--color-surface)] hover:text-[var(--color-foreground)]"
+              >
+                <Pencil className="h-3.5 w-3.5" /> Rename project
+              </button>
+              {canArchive && (
+                <button
+                  type="button"
+                  onClick={() => openForm("archive")}
+                  className="flex w-full items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs text-[var(--color-muted-foreground)] transition-colors hover:bg-[var(--color-surface)] hover:text-[var(--color-foreground)]"
+                >
+                  <Archive className="h-3.5 w-3.5" /> Archive project
+                </button>
+              )}
+
+              {archivedProjects.length > 0 && (
+                <div className="space-y-1 border-t border-[var(--color-border)] pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowArchived((v) => !v)}
+                    className="flex w-full items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs text-[var(--color-muted-foreground)] transition-colors hover:bg-[var(--color-surface)] hover:text-[var(--color-foreground)]"
+                  >
+                    {showArchived ? (
+                      <ChevronDown className="h-3.5 w-3.5" />
+                    ) : (
+                      <ChevronRight className="h-3.5 w-3.5" />
+                    )}
+                    Archived projects ({archivedProjects.length})
+                  </button>
+                  {showArchived && (
+                    <div className="space-y-1">
+                      <p className="px-2 text-[10px] leading-snug text-[var(--color-muted-foreground)]/80">
+                        Archived projects are hidden, not deleted.
+                      </p>
+                      {archivedProjects.map((p) => (
+                        <ArchivedProjectRow key={p.id} projectId={p.id} projectName={p.name} />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -233,15 +261,14 @@ function NewProjectForm({
         autoFocus
         className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] px-2 py-1.5 text-sm text-[var(--color-foreground)] placeholder:text-[var(--color-muted-foreground)] outline-none focus:border-[var(--color-primary)]"
       />
+      <p className="px-0.5 text-[10px] leading-snug text-[var(--color-muted-foreground)]/80">
+        Use separate projects for different niches.
+      </p>
       <div className="flex items-center gap-2">
-        <button
-          type="submit"
-          disabled={pending}
-          className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--color-primary)] px-2.5 py-1.5 text-xs font-medium text-white transition-all duration-150 ease-out hover:brightness-110 active:scale-[0.97] focus-visible:outline-none focus-visible:shadow-[0_0_0_3px_rgba(59,130,246,0.2)] disabled:opacity-50"
-        >
+        <Button type="submit" size="sm" disabled={pending}>
           {pending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
           Create
-        </button>
+        </Button>
         <button
           type="button"
           onClick={onCancel}
@@ -299,14 +326,10 @@ function RenameProjectForm({
         className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] px-2 py-1.5 text-sm text-[var(--color-foreground)] placeholder:text-[var(--color-muted-foreground)] outline-none focus:border-[var(--color-primary)]"
       />
       <div className="flex items-center gap-2">
-        <button
-          type="submit"
-          disabled={pending}
-          className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--color-primary)] px-2.5 py-1.5 text-xs font-medium text-white transition-all duration-150 ease-out hover:brightness-110 active:scale-[0.97] focus-visible:outline-none focus-visible:shadow-[0_0_0_3px_rgba(59,130,246,0.2)] disabled:opacity-50"
-        >
+        <Button type="submit" size="sm" disabled={pending}>
           {pending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Pencil className="h-3.5 w-3.5" />}
           Save name
-        </button>
+        </Button>
         <button
           type="button"
           onClick={onCancel}
@@ -350,14 +373,10 @@ function ArchiveProjectForm({
         Archiving hides this project. It does not delete your data.
       </p>
       <div className="flex items-center gap-2">
-        <button
-          type="submit"
-          disabled={pending}
-          className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--color-primary)] px-2.5 py-1.5 text-xs font-medium text-white transition-all duration-150 ease-out hover:brightness-110 active:scale-[0.97] focus-visible:outline-none focus-visible:shadow-[0_0_0_3px_rgba(59,130,246,0.2)] disabled:opacity-50"
-        >
+        <Button type="submit" size="sm" disabled={pending}>
           {pending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Archive className="h-3.5 w-3.5" />}
           Archive project
-        </button>
+        </Button>
         <button
           type="button"
           onClick={onCancel}
@@ -456,18 +475,14 @@ function ArchivedProjectRow({
             />
           </label>
           <div className="flex items-center gap-2">
-            <button
-              type="submit"
-              disabled={deletePending}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--color-danger)] px-2.5 py-1.5 text-xs font-medium text-white transition-all duration-150 ease-out hover:brightness-110 active:scale-[0.97] focus-visible:outline-none focus-visible:shadow-[0_0_0_3px_rgba(59,130,246,0.2)] disabled:opacity-50"
-            >
+            <Button variant="danger" type="submit" size="sm" disabled={deletePending}>
               {deletePending ? (
                 <Loader2 className="h-3.5 w-3.5 animate-spin" />
               ) : (
                 <Trash2 className="h-3.5 w-3.5" />
               )}
               Delete permanently
-            </button>
+            </Button>
             <button
               type="button"
               onClick={() => setConfirmingDelete(false)}
