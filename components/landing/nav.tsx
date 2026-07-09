@@ -8,6 +8,7 @@ import { MobileMenu } from "@/components/landing/mobile-menu";
 const navLinks = [
   { href: "/#how-it-works", label: "How it works" },
   { href: "/#features", label: "Features" },
+  { href: "/#why-not-chatgpt", label: "Why not ChatGPT?" },
   { href: "/pricing", label: "Pricing" },
   { href: "/#faq", label: "FAQ" },
 ];

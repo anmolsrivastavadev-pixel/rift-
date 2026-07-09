@@ -9,6 +9,7 @@ const columns = [
     links: [
       { href: "/#how-it-works", label: "How it works" },
       { href: "/#features", label: "Features" },
+      { href: "/#why-not-chatgpt", label: "Why not ChatGPT?" },
       { href: "/#faq", label: "FAQ" },
       { href: "/pricing", label: "Pricing" },
     ],

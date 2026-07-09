@@ -240,14 +240,15 @@ export default async function SharePage({
             Powered by{" "}
             <Link href="/" className="font-medium underline hover:text-[var(--color-foreground)]">
               Rift
-            </Link>
-            . Business ideas from real customer pain.
+            </Link>{" "}
+            — turn customer complaints into scored, evidence-backed business
+            ideas.
           </p>
           <Link
             href="/sign-up"
             className="print-hide mt-3 inline-flex items-center rounded-xl bg-[var(--color-primary-fill)] px-4 py-2 text-sm font-medium text-[var(--color-primary-foreground)] shadow-sm transition-all duration-150 ease-out hover:brightness-110 active:scale-[0.97]"
           >
-            Turn your customer complaints into ideas. Start free
+            Start free
           </Link>
         </footer>
       </div>

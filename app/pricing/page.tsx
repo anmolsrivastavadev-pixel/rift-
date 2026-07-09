@@ -51,7 +51,7 @@ function ProCta({ signedIn, plan }: { signedIn: boolean; plan: "free" | "pro" })
   if (!signedIn) {
     return (
       <Button asChild className="mt-6 w-full">
-        <Link href="/sign-up">Start free</Link>
+        <Link href="/sign-up">Start free, upgrade anytime</Link>
       </Button>
     );
   }
@@ -188,8 +188,21 @@ export default async function PricingPage() {
           </div>
 
           <p className="mx-auto mt-10 max-w-xl text-center text-xs text-[var(--color-muted-foreground)]">
-            Pro is {PRO_PRICE_LABEL}, billed through Stripe. Prices in USD.
-            Questions? Use the feedback button inside the app.
+            Pro is {PRO_PRICE_LABEL}, billed through Stripe. Prices in USD.{" "}
+            {user ? (
+              <>Questions? Use the feedback button inside the app.</>
+            ) : (
+              <>
+                Questions? See the{" "}
+                <Link
+                  href="/#faq"
+                  className="underline hover:text-[var(--color-foreground)]"
+                >
+                  FAQ on the homepage
+                </Link>
+                .
+              </>
+            )}
           </p>
         </Container>
       </main>

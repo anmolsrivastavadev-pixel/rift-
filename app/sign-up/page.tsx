@@ -3,8 +3,13 @@
 import { useState } from "react";
 import Link from "next/link";
 import { authClient } from "@/lib/auth/client";
+import { AuthCard } from "@/components/auth/auth-card";
 import { Button } from "@/components/ui/button";
+import { Input, fieldClass } from "@/components/ui/input";
+import { Notice } from "@/components/ui/notice";
 import { PasswordInput } from "@/components/auth/password-input";
+
+const DUPLICATE_ERROR = "That email already has an account.";
 
 export default function SignUpPage() {
   const [email, setEmail] = useState("");
@@ -26,7 +31,12 @@ export default function SignUpPage() {
       });
 
       if (authError) {
-        setError(authError.message || "Sign up failed");
+        // Better Auth answers a taken email with "User already exists" (or
+        // similar). Map that to a friendly message with a sign-in link; keep
+        // the raw message only as a last resort.
+        const raw = authError.message ?? "";
+        const isDuplicate = /exist|already/i.test(raw);
+        setError(isDuplicate ? DUPLICATE_ERROR : raw || "Sign up failed");
         setLoading(false);
         return;
       }
@@ -39,101 +49,128 @@ export default function SignUpPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4">
-      <div className="w-full max-w-sm rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-8 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.3),0_1px_2px_-1px_rgb(0_0_0_/_0.2)]">
-        <div className="text-center">
-          <h1 className="text-2xl font-semibold tracking-tight text-[var(--color-foreground)]">
-            <Link href="/" className="hover:text-[var(--color-primary)]">
-              Rift
-            </Link>
-          </h1>
-          <p className="mt-2 text-sm text-[var(--color-muted-foreground)]">
-            Create your account
+    <AuthCard
+      title="Rift"
+      subtitle={
+        <>
+          Create your account
+          <span className="mt-2 block text-xs">
+            Rift is in private beta — new accounts may need founder approval
+            before the dashboard opens.
+          </span>
+        </>
+      }
+      footer={
+        <>
+          Already have an account?{" "}
+          <Link
+            href="/sign-in"
+            className="font-medium text-[var(--color-primary)] transition-colors hover:underline"
+          >
+            Sign in
+          </Link>
+        </>
+      }
+    >
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-[var(--color-foreground)]"
+          >
+            Email
+          </label>
+          <Input
+            id="email"
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="mt-1"
+          />
+        </div>
+
+        <div>
+          <label
+            htmlFor="password"
+            className="block text-sm font-medium text-[var(--color-foreground)]"
+          >
+            Password
+          </label>
+          <PasswordInput
+            id="password"
+            required
+            minLength={8}
+            autoComplete="new-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className={`${fieldClass} mt-1`}
+          />
+          <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
+            At least 8 characters.
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-          <div>
-            <label htmlFor="name" className="block text-sm font-medium text-[var(--color-foreground)]">
-              Name{" "}
-              <span className="font-normal text-[var(--color-muted-foreground)]">
-                (optional)
-              </span>
-            </label>
-            <input
-              id="name"
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="mt-1 block w-full rounded-[10px] border border-[var(--color-border)] bg-[var(--color-background)] px-3 py-2 text-sm text-[var(--color-foreground)] placeholder:text-[var(--color-muted-foreground)] outline-none focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20"
-            />
-          </div>
+        <div>
+          <label
+            htmlFor="name"
+            className="block text-sm font-medium text-[var(--color-foreground)]"
+          >
+            Name{" "}
+            <span className="font-normal text-[var(--color-muted-foreground)]">
+              (optional)
+            </span>
+          </label>
+          <Input
+            id="name"
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="mt-1"
+          />
+        </div>
 
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-[var(--color-foreground)]">
-              Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 block w-full rounded-[10px] border border-[var(--color-border)] bg-[var(--color-background)] px-3 py-2 text-sm text-[var(--color-foreground)] placeholder:text-[var(--color-muted-foreground)] outline-none focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-[var(--color-foreground)]">
-              Password
-            </label>
-            <PasswordInput
-              id="password"
-              required
-              minLength={8}
-              autoComplete="new-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 block w-full rounded-[10px] border border-[var(--color-border)] bg-[var(--color-background)] px-3 py-2 text-sm text-[var(--color-foreground)] placeholder:text-[var(--color-muted-foreground)] outline-none focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20"
-            />
-            <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
-              At least 8 characters.
-            </p>
-          </div>
-
-          {error && (
-            <p
-              role="alert"
-              className="rounded-[10px] border border-[var(--color-danger)]/30 bg-[var(--color-danger-soft)] px-3 py-2 text-sm text-[var(--color-danger)]"
-            >
+        {error && (
+          <Notice variant="danger">
+            <p>
               {error}
+              {error === DUPLICATE_ERROR && (
+                <>
+                  {" "}
+                  <Link
+                    href="/sign-in"
+                    className="font-medium text-[var(--color-primary)] hover:underline"
+                  >
+                    Sign in instead
+                  </Link>
+                </>
+              )}
             </p>
-          )}
+          </Notice>
+        )}
 
-          <Button type="submit" disabled={loading} className="w-full">
-            {loading ? "Creating account…" : "Sign up"}
-          </Button>
-        </form>
+        <Button type="submit" disabled={loading} className="w-full">
+          {loading ? "Creating account…" : "Sign up"}
+        </Button>
+      </form>
 
-        <p className="mt-4 text-center text-xs text-[var(--color-muted-foreground)]">
-          By creating an account you agree to the{" "}
-          <Link href="/terms" className="underline hover:text-[var(--color-foreground)]">
-            Terms
-          </Link>{" "}
-          and{" "}
-          <Link href="/privacy" className="underline hover:text-[var(--color-foreground)]">
-            Privacy Policy
-          </Link>
-          .
-        </p>
-
-        <p className="mt-4 text-center text-sm text-[var(--color-muted-foreground)]">
-          Already have an account?{" "}
-          <Link href="/sign-in" className="text-[var(--color-primary)] font-medium hover:underline transition-colors">
-            Sign in
-          </Link>
-        </p>
-      </div>
-    </div>
+      <p className="text-center text-xs text-[var(--color-muted-foreground)]">
+        By creating an account you agree to the{" "}
+        <Link
+          href="/terms"
+          className="underline hover:text-[var(--color-foreground)]"
+        >
+          Terms
+        </Link>{" "}
+        and{" "}
+        <Link
+          href="/privacy"
+          className="underline hover:text-[var(--color-foreground)]"
+        >
+          Privacy Policy
+        </Link>
+        .
+      </p>
+    </AuthCard>
   );
 }

@@ -4,13 +4,18 @@ import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { authClient } from "@/lib/auth/client";
+import { AuthCard } from "@/components/auth/auth-card";
 import { Button } from "@/components/ui/button";
+import { fieldClass } from "@/components/ui/input";
+import { Notice } from "@/components/ui/notice";
 import { PasswordInput } from "@/components/auth/password-input";
 
 /* M27 — set a new password. Better Auth's emailed link goes through
  * /api/auth/reset-password/:token and redirects here with ?token=... on
  * success or ?error=INVALID_TOKEN when the link is expired/used. Wrapped in
- * Suspense because useSearchParams requires it during prerender.
+ * Suspense because useSearchParams requires it during prerender. Both fields
+ * are password fields, so the shared field styling arrives via fieldClass
+ * (the class the shared Input uses) passed into PasswordInput.
  */
 
 function ResetPasswordForm() {
@@ -60,11 +65,11 @@ function ResetPasswordForm() {
 
   if (invalidLink) {
     return (
-      <div className="space-y-4 text-center">
-        <p className="text-sm">
+      <div className="space-y-4">
+        <Notice variant="danger">
           This reset link is invalid or has expired. Request a fresh one — it
           only takes a moment.
-        </p>
+        </Notice>
         <Button asChild className="w-full">
           <Link href="/forgot-password">Request a new link</Link>
         </Button>
@@ -74,10 +79,10 @@ function ResetPasswordForm() {
 
   if (done) {
     return (
-      <div className="space-y-4 text-center">
-        <p className="text-sm">
+      <div className="space-y-4">
+        <Notice variant="success">
           Your password has been updated. Sign in with the new one.
-        </p>
+        </Notice>
         <Button asChild className="w-full">
           <Link href="/sign-in">Go to sign in</Link>
         </Button>
@@ -97,7 +102,7 @@ function ResetPasswordForm() {
           autoComplete="new-password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="mt-1 block w-full rounded-[10px] border border-[var(--color-border)] bg-[var(--color-background)] px-3 py-2 text-sm text-[var(--color-foreground)] placeholder:text-[var(--color-muted-foreground)] outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]"
+          className={`${fieldClass} mt-1`}
         />
       </div>
 
@@ -111,18 +116,11 @@ function ResetPasswordForm() {
           autoComplete="new-password"
           value={confirm}
           onChange={(e) => setConfirm(e.target.value)}
-          className="mt-1 block w-full rounded-[10px] border border-[var(--color-border)] bg-[var(--color-background)] px-3 py-2 text-sm text-[var(--color-foreground)] placeholder:text-[var(--color-muted-foreground)] outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]"
+          className={`${fieldClass} mt-1`}
         />
       </div>
 
-      {error && (
-        <p
-          role="alert"
-          className="rounded-[10px] border border-[var(--color-danger)]/30 bg-[var(--color-danger-soft)] px-3 py-2 text-sm text-[var(--color-danger)]"
-        >
-          {error}
-        </p>
-      )}
+      {error && <Notice variant="danger">{error}</Notice>}
 
       <Button type="submit" disabled={loading} className="w-full">
         {loading ? "Updating…" : "Update password"}
@@ -131,24 +129,28 @@ function ResetPasswordForm() {
   );
 }
 
+function ResetPasswordSkeleton() {
+  return (
+    <div className="space-y-4" aria-hidden>
+      <div>
+        <div className="h-4 w-28 animate-pulse rounded-lg bg-[var(--color-surface)]" />
+        <div className="mt-1 h-10 w-full animate-pulse rounded-lg bg-[var(--color-surface)]" />
+      </div>
+      <div>
+        <div className="h-4 w-40 animate-pulse rounded-lg bg-[var(--color-surface)]" />
+        <div className="mt-1 h-10 w-full animate-pulse rounded-lg bg-[var(--color-surface)]" />
+      </div>
+      <div className="h-10 w-full animate-pulse rounded-lg bg-[var(--color-surface)]" />
+    </div>
+  );
+}
+
 export default function ResetPasswordPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center px-4">
-      <div className="w-full max-w-sm space-y-6 rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-8 shadow-[0_1px_3px_0_rgb(0_0_0_/_0.3),0_1px_2px_-1px_rgb(0_0_0_/_0.2)]">
-        <div className="text-center">
-          <h1 className="text-2xl font-semibold tracking-tight">
-            <Link href="/" className="hover:text-[var(--color-primary)]">
-              Rift
-            </Link>
-          </h1>
-          <p className="mt-2 text-sm text-[var(--color-muted-foreground)]">
-            Choose a new password
-          </p>
-        </div>
-        <Suspense fallback={null}>
-          <ResetPasswordForm />
-        </Suspense>
-      </div>
-    </div>
+    <AuthCard title="Rift" subtitle="Choose a new password">
+      <Suspense fallback={<ResetPasswordSkeleton />}>
+        <ResetPasswordForm />
+      </Suspense>
+    </AuthCard>
   );
 }

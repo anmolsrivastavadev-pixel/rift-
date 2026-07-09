@@ -19,6 +19,8 @@ export default async function BetaAccessPage() {
   const user = await requireUser();
   if (await hasBetaAccess(user)) redirect("/dashboard");
 
+  const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL;
+
   return (
     <main className="flex min-h-screen items-center justify-center">
       <Container className="max-w-md py-16 text-center">
@@ -37,14 +39,37 @@ export default async function BetaAccessPage() {
             {user.email}
           </span>
         </p>
-        <p className="mt-4 text-xs text-[var(--color-muted-foreground)]">
-          Ask the founder to add this email to the beta. Once it’s added, just
-          reload this page.
-        </p>
+        {supportEmail ? (
+          <p className="mt-4 text-xs text-[var(--color-muted-foreground)]">
+            We usually reply within a day. Once your email is added, just
+            reload this page.
+          </p>
+        ) : (
+          <p className="mt-4 text-xs text-[var(--color-muted-foreground)]">
+            Invites are approved by the founder — check back soon, or reply to
+            any Rift email you&apos;ve received. Once your email is added, just
+            reload this page.
+          </p>
+        )}
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-          <Button asChild>
-            <Link href="/dashboard">Check again</Link>
-          </Button>
+          {supportEmail ? (
+            <>
+              <Button asChild>
+                <a
+                  href={`mailto:${supportEmail}?subject=Rift beta invite request`}
+                >
+                  Request an invite
+                </a>
+              </Button>
+              <Button asChild variant="outline">
+                <Link href="/dashboard">Check again</Link>
+              </Button>
+            </>
+          ) : (
+            <Button asChild>
+              <Link href="/dashboard">Check again</Link>
+            </Button>
+          )}
           <Button asChild variant="outline">
             <Link href="/">Back to home</Link>
           </Button>
