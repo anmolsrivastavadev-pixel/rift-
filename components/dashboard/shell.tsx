@@ -10,7 +10,6 @@ import {
   Target,
   Bookmark,
   CreditCard,
-  LayoutGrid,
   LogOut,
   User,
   ChevronRight,
@@ -44,8 +43,9 @@ const navGroups: { label: string; items: NavItem[] }[] = [
   {
     label: "Ideas",
     items: [
+      // M34: the standalone "Decisions" board was folded into the Ideas page
+      // (decision filter + compare-from-selection), so it left the nav.
       { href: "/dashboard/opportunities", label: "All ideas", icon: Target },
-      { href: "/dashboard/opportunities/decision-board", label: "Decisions", icon: LayoutGrid },
       { href: "/dashboard/saved", label: "Saved ideas", icon: Bookmark },
     ],
   },

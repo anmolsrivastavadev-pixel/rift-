@@ -1,16 +1,22 @@
+import { redirect } from "next/navigation";
+
 import { prisma } from "@/lib/db";
 import {
   DecisionBoardClient,
   type DecisionBoardOpportunity,
 } from "@/components/opportunities/decision-board-client";
 import { requireUser } from "@/lib/auth/current-user";
-import { getProjectOrDefault } from "@/lib/projects";
+import { getProjectOrDefault, projectHref } from "@/lib/projects";
 import { isValidDecisionStatus, type DecisionStatus } from "@/lib/decision-board";
 
 function firstParam(value: string | string[] | undefined): string | undefined {
   return Array.isArray(value) ? value[0] : value;
 }
 
+/* M34 — this route is compare-only: it renders the 2–3 ideas named in
+ * `?compare=id,id`. Without a compare selection there is nothing to show
+ * here any more (the old standalone decisions board was folded into the
+ * Ideas page's decision filter), so it redirects back to Ideas. */
 export default async function DecisionBoardPage({
   searchParams,
 }: {
@@ -23,36 +29,30 @@ export default async function DecisionBoardPage({
   const user = await requireUser();
   const params = await searchParams;
   const project = await getProjectOrDefault(firstParam(params.projectId), user);
-  const compareParam = firstParam(params.compare);
   // Arrived from the Saved page? Point the back link there instead of Ideas.
   const fromSaved = firstParam(params.from) === "saved";
 
-  const ops = await prisma.opportunity.findMany({
-    where: { userId: user.id, projectId: project.id },
-    orderBy: { opportunityScore: "desc" },
-    take: 100,
-  });
+  const compareIds = (firstParam(params.compare) ?? "")
+    .split(",")
+    .map((id) => id.trim())
+    .filter(Boolean);
 
-  let filteredOps = ops;
-  let isCompareMode = false;
-  let compareIds: string[] = [];
-
-  if (compareParam) {
-    compareIds = compareParam
-      .split(",")
-      .map((id) => id.trim())
-      .filter(Boolean);
-    if (compareIds.length > 0) {
-      filteredOps = ops.filter((o) => compareIds.includes(o.id));
-      isCompareMode = true;
-    }
+  if (compareIds.length === 0) {
+    redirect(projectHref("/dashboard/opportunities", project.id));
   }
+
+  // Fetch exactly the selected ideas, scoped to the owner + project. Foreign
+  // or deleted ids simply don't match and the client renders its empty state.
+  const ops = await prisma.opportunity.findMany({
+    where: { userId: user.id, projectId: project.id, id: { in: compareIds } },
+    orderBy: { opportunityScore: "desc" },
+  });
 
   // M16C — load saved decision statuses for these opportunities from the DB.
   const workspaces = await prisma.validationWorkspace.findMany({
     where: {
       userId: user.id,
-      opportunityId: { in: filteredOps.map((o) => o.id) },
+      opportunityId: { in: ops.map((o) => o.id) },
     },
     select: { opportunityId: true, decisionStatus: true },
   });
@@ -63,7 +63,7 @@ export default async function DecisionBoardPage({
     }
   }
 
-  const opportunities: DecisionBoardOpportunity[] = filteredOps.map((o) => ({
+  const opportunities: DecisionBoardOpportunity[] = ops.map((o) => ({
     id: o.id,
     title: o.title,
     summary: o.summary,
@@ -86,7 +86,6 @@ export default async function DecisionBoardPage({
       // from the server) never carries over from another project.
       key={project.id}
       opportunities={opportunities}
-      isCompareMode={isCompareMode}
       projectId={project.id}
       initialStatuses={initialStatuses}
       backHref={fromSaved ? "/dashboard/saved" : undefined}

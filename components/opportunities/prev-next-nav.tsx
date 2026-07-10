@@ -2,7 +2,8 @@ import Link from "next/link";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { projectHref } from "@/lib/project-href";
 
-/* Prev / Next navigation, ordered by createdAt DESC.
+/* Prev / Next navigation. Since M34 the detail page feeds it neighbours in
+ * the same score-ranked order as the Ideas list, so Next walks down the list.
  * Buttons disabled when no neighbour exists.
  */
 export function PrevNextNav({

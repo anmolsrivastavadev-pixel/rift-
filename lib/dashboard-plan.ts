@@ -52,7 +52,7 @@ export function computeNextAction(
       title: "Pick one to test",
       description: "Compare your ideas and mark the best one Pursue.",
       cta: "Compare ideas",
-      href: "/dashboard/opportunities/decision-board",
+      href: "/dashboard/opportunities",
     };
   }
 
@@ -69,6 +69,6 @@ export function computeNextAction(
     title: "Revisit your ideas",
     description: "Nothing marked Pursue yet. Compare again and pick one.",
     cta: "Compare ideas",
-    href: "/dashboard/opportunities/decision-board",
+    href: "/dashboard/opportunities",
   };
 }

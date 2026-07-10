@@ -14,6 +14,7 @@ import {
   Check,
   ChevronDown,
   ChevronRight,
+  Info,
   SlidersHorizontal,
 } from "lucide-react";
 import { useActionState } from "react";
@@ -30,7 +31,6 @@ import {
 } from "@/actions/projects";
 import { projectHref } from "@/lib/project-href";
 import { Button } from "@/components/ui/button";
-import { NativeSelect } from "@/components/ui/input";
 
 export type ProjectOption = {
   id: string;
@@ -38,10 +38,12 @@ export type ProjectOption = {
 };
 
 /**
- * M16A/M16B1/M16B2 — Sidebar project selector + inline forms.
+ * M16A/M16B1/M16B2/M34 — Sidebar project list + inline forms.
  *
- * - Url is the source of truth (the native `<select>` uses defaultValue).
- * - Changing the select navigates to the current path with `?projectId=…`.
+ * - Url is the source of truth; the current project is derived from it.
+ * - Projects render as a visible vertical list (M34 — replaced the old
+ *   dropdown so switching projects is a deliberate, visible action). Clicking
+ *   a row navigates to the current path with `?projectId=…`.
  * - Creating a project submits via `useActionState`; on success it navigates to
  *   the new project on the current path.
  * - Renaming keeps the same project id, so the URL and all project-scoped data
@@ -114,19 +116,40 @@ export function ProjectSelector({
         </button>
       </div>
 
-      <NativeSelect
-        key={selectedProjectId}
-        aria-label="Select project"
-        defaultValue={selectedProjectId}
-        onChange={(e) => navigateToProject(e.target.value)}
-        className="h-8 px-2 text-sm"
+      <div
+        role="list"
+        aria-label="Your projects"
+        className="max-h-48 space-y-0.5 overflow-y-auto pr-1"
       >
-        {projects.map((p) => (
-          <option key={p.id} value={p.id}>
-            {p.name}
-          </option>
-        ))}
-      </NativeSelect>
+        {projects.map((p) => {
+          const isCurrent = p.id === selectedProjectId;
+          return (
+            <button
+              key={p.id}
+              type="button"
+              role="listitem"
+              onClick={() => {
+                if (!isCurrent) navigateToProject(p.id);
+              }}
+              aria-current={isCurrent ? "true" : undefined}
+              title={p.name}
+              className={`flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm transition-colors duration-150 ease-out ${
+                isCurrent
+                  ? "bg-[var(--color-primary-soft)] font-medium text-[var(--color-foreground)]"
+                  : "text-[var(--color-muted-foreground)] hover:bg-[var(--color-surface)] hover:text-[var(--color-foreground)]"
+              }`}
+            >
+              <Folder
+                className={`h-3.5 w-3.5 shrink-0 ${isCurrent ? "text-[var(--color-primary)]" : ""}`}
+              />
+              <span className="min-w-0 flex-1 truncate">{p.name}</span>
+              {isCurrent && (
+                <Check className="h-3.5 w-3.5 shrink-0 text-[var(--color-primary)]" />
+              )}
+            </button>
+          );
+        })}
+      </div>
 
       {mode === "create" && (
         <NewProjectForm
@@ -252,18 +275,25 @@ function NewProjectForm({
 
   return (
     <form action={formAction} className="space-y-2">
-      <input
-        name="name"
-        type="text"
-        required
-        maxLength={60}
-        placeholder="e.g. Dog groomers"
-        autoFocus
-        className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] px-2 py-1.5 text-sm text-[var(--color-foreground)] placeholder:text-[var(--color-muted-foreground)] outline-none focus:border-[var(--color-primary)]"
-      />
-      <p className="px-0.5 text-xs leading-snug text-[var(--color-muted-foreground)]/80">
-        Use separate projects for different niches.
-      </p>
+      <div className="flex items-center gap-1.5">
+        <input
+          name="name"
+          type="text"
+          required
+          maxLength={60}
+          placeholder="e.g. Dog groomers"
+          autoFocus
+          className="min-w-0 flex-1 rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] px-2 py-1.5 text-sm text-[var(--color-foreground)] placeholder:text-[var(--color-muted-foreground)] outline-none focus:border-[var(--color-primary)]"
+        />
+        <span
+          title="Use separate projects for different niches."
+          aria-label="Use separate projects for different niches."
+          tabIndex={0}
+          className="shrink-0 text-[var(--color-muted-foreground)]"
+        >
+          <Info className="h-3.5 w-3.5" aria-hidden />
+        </span>
+      </div>
       <div className="flex items-center gap-2">
         <Button type="submit" size="sm" disabled={pending}>
           {pending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}

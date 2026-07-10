@@ -83,10 +83,11 @@ export interface NeighbourCandidate {
   createdAt: Date;
 }
 
-/* Given the current id and ALL opportunities ordered by createdAt DESC,
- * return the ids of the previous and next opportunity in that order.
- * "Next" = the one created immediately AFTER current (smaller createdAt arr idx).
- * "Prev" = the one created immediately BEFORE current (larger createdAt arr idx).
+/* Order-agnostic array walker: given the current id and a pre-ordered list,
+ * return the neighbouring ids. "next" moves toward index 0, "prev" moves
+ * toward the end — the CALLER owns the ordering and the button semantics.
+ * (Since M34 the detail page orders by opportunityScore DESC to match the
+ * Ideas list, and maps this helper's "prev" to its Next button.)
  */
 export function selectPrevNext(
   currentId: string,
@@ -94,7 +95,6 @@ export function selectPrevNext(
 ): { prev: string | null; next: string | null } {
   const idx = orderedDesc.findIndex((o) => o.id === currentId);
   if (idx === -1) return { prev: null, next: null };
-  // orderedDesc[0] is newest. Prev (older) = idx+1, Next (newer) = idx-1.
   const prev = idx + 1 < orderedDesc.length ? orderedDesc[idx + 1].id : null;
   const next = idx - 1 >= 0 ? orderedDesc[idx - 1].id : null;
   return { prev, next };

@@ -10,6 +10,7 @@ import {
   Hash,
   Lightbulb,
   Layers,
+  ShieldAlert,
   TrendingUp,
 } from "lucide-react";
 
@@ -115,9 +116,12 @@ export default async function OpportunityDetailPage({
         createdAt: true,
       },
     }),
+    // Prev/next neighbours in the same order the Ideas list renders (score
+    // desc), so the buttons walk the ranked list the user came from. Id
+    // tiebreaker keeps equal-score neighbours stable.
     prisma.opportunity.findMany({
       where: { userId: user.id, projectId: project.id },
-      orderBy: { createdAt: "desc" },
+      orderBy: [{ opportunityScore: "desc" }, { id: "desc" }],
       select: { id: true, createdAt: true },
     }),
     // M29 — live share link for this idea, if any.
@@ -229,8 +233,10 @@ export default async function OpportunityDetailPage({
   };
   const related = selectRelated(current, allOthers, 3);
 
-  // Prev / Next (createdAt DESC).
-  const { prev: prevId, next: nextId } = selectPrevNext(id, allNeighbours as NeighbourCandidate[]);
+  // Prev / Next walk the score-ranked list top-to-bottom. The helper's "next"
+  // moves toward index 0 (up the list), so it maps to our Previous button and
+  // its "prev" (down the list) maps to Next.
+  const { prev: nextId, next: prevId } = selectPrevNext(id, allNeighbours as NeighbourCandidate[]);
 
   // Keywords sorted alphabetically.
   const sortedKeywords = [...op.keywords].sort((a, b) =>
@@ -443,6 +449,42 @@ export default async function OpportunityDetailPage({
             </details>
           )}
 
+          {/* Risk flags — surfaced in the sidebar so the risks are visible
+              while simply reading the idea (founder feedback: previously they
+              only appeared inside the testing guide / compare table). The
+              testing guide below keeps the full actionable "Risks to test"
+              list. Hidden when the AI flagged nothing. */}
+          {op.riskFlags.length > 0 && (
+            <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[var(--shadow-card)]">
+              <h2 className="flex items-center gap-2 text-sm font-semibold">
+                <ShieldAlert className="h-4 w-4 text-[var(--color-danger)]" />
+                Risk flags
+              </h2>
+              <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
+                Things that could sink this idea — check them before you build.
+              </p>
+              <ul className="mt-3 space-y-2">
+                {op.riskFlags.slice(0, 4).map((risk) => (
+                  <li
+                    key={risk}
+                    className="flex items-start gap-2 text-sm leading-snug text-[var(--color-foreground)]/90"
+                  >
+                    <span
+                      aria-hidden
+                      className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-danger)]"
+                    />
+                    {risk}
+                  </li>
+                ))}
+              </ul>
+              {op.riskFlags.length > 4 && (
+                <p className="mt-2 text-xs text-[var(--color-muted-foreground)]">
+                  +{op.riskFlags.length - 4} more in the testing guide below.
+                </p>
+              )}
+            </section>
+          )}
+
           {/* Related ideas */}
           <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[var(--shadow-card)]">
             <h2 className="flex items-center gap-2 text-sm font-semibold">
@@ -517,10 +559,10 @@ export default async function OpportunityDetailPage({
             </p>
             <p className="mt-1 text-xs">
               <Link
-                href={projectHref("/dashboard/opportunities/decision-board", project.id)}
+                href={projectHref("/dashboard/opportunities", project.id)}
                 className="font-medium text-[var(--color-primary)] hover:underline"
               >
-                See all your decisions
+                See all your ideas and decisions
               </Link>
             </p>
           </div>
@@ -529,8 +571,8 @@ export default async function OpportunityDetailPage({
       </div>
 
       {/* Full-width Validation Workspace — below the two-column layout so it
-          has room to breathe. Owns interview questions + risks (rendered once,
-          not duplicated as standalone sections). */}
+          has room to breathe. Owns interview questions and the full actionable
+          "Risks to test" list; the sidebar shows only a compact risk summary. */}
       <ValidationWorkspace
         initialChecklist={initialChecklist}
         input={{

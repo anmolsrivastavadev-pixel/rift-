@@ -1,15 +1,20 @@
 import { ChevronRight, Inbox } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
+import {
+  COMPLAINT_SOURCE_NAMES,
+  buildReceiptHref,
+  isComplaintSourceKind,
+} from "@/lib/complaint-sources";
+import { ExternalLink } from "@/components/ui/external-link";
 
 type Row = {
   id: string;
   title: string;
   body: string;
   sourceDate: Date | null;
-  sentiment: number | null;
-  severity: number | null;
   createdAt: Date;
+  sourceKind: string | null;
+  sourceUrl: string | null;
 };
 
 function fmtDate(d: Date | null): string {
@@ -21,16 +26,15 @@ function fmtDate(d: Date | null): string {
   });
 }
 
-function sentimentLabel(s: number | null): {
-  text: string;
-  variant: "default" | "success" | "warning" | "danger";
-} {
-  // Unscored (fresh import) is a quiet neutral dash — amber read as "broken".
-  if (s === null) return { text: "—", variant: "default" };
-  if (s <= -0.4) return { text: "Negative", variant: "danger" };
-  // Neutral is normal data, not a warning state.
-  if (s < 0.2) return { text: "Neutral", variant: "default" };
-  return { text: "Positive", variant: "success" };
+/* Column display name for a source kind. COMPLAINT_SOURCE_NAMES is written for
+ * sentence context ("12 from the web"), so "web" gets a column-friendly
+ * override here instead of editing the shared lib. Complaints without a
+ * sourceKind were added by the user (CSV, paste, demo). */
+function sourceName(kind: string | null): string {
+  if (kind === "web") return "Web";
+  if (isComplaintSourceKind(kind)) return COMPLAINT_SOURCE_NAMES[kind];
+  if (kind) return "Web";
+  return "Added manually";
 }
 
 export function ComplaintsTable({
@@ -63,20 +67,23 @@ export function ComplaintsTable({
           <thead>
             <tr className="border-b border-[var(--color-border)] bg-[var(--color-background)] text-left text-xs uppercase tracking-wide text-[var(--color-muted-foreground)]">
               <th className="px-4 py-3 font-medium">Title</th>
-              <th className="px-4 py-3 font-medium">Source date</th>
-              <th className="px-4 py-3 font-medium">Sentiment</th>
               <th
                 className="px-4 py-3 font-medium"
-                title="How painful the complaint sounds, when scored"
+                title="Where this complaint came from. Found complaints link to the original post."
               >
-                Severity
+                Source
               </th>
-              <th className="px-4 py-3 font-medium">Added</th>
+              <th
+                className="px-4 py-3 font-medium"
+                title="The original post date when known, otherwise the date it was added to Rift"
+              >
+                Date
+              </th>
             </tr>
           </thead>
           <tbody>
             {rows.map((r) => {
-              const s = sentimentLabel(r.sentiment);
+              const href = buildReceiptHref(r.sourceKind, r.sourceUrl);
               return (
                 <tr
                   key={r.id}
@@ -110,21 +117,14 @@ export function ComplaintsTable({
                     </details>
                   </td>
                   <td className="whitespace-nowrap px-4 py-3 text-[var(--color-muted-foreground)]">
-                    {fmtDate(r.sourceDate)}
-                  </td>
-                  <td className="px-4 py-3">
-                    <Badge
-                      variant={s.variant}
-                      className={s.variant === "default" ? "text-[var(--color-muted-foreground)]" : undefined}
-                    >
-                      {s.text}
-                    </Badge>
-                  </td>
-                  <td className="px-4 py-3 text-[var(--color-muted-foreground)]">
-                    {r.severity !== null ? r.severity.toFixed(0) : "—"}
+                    {href ? (
+                      <ExternalLink href={href}>{sourceName(r.sourceKind)}</ExternalLink>
+                    ) : (
+                      <span>{sourceName(r.sourceKind)}</span>
+                    )}
                   </td>
                   <td className="whitespace-nowrap px-4 py-3 text-[var(--color-muted-foreground)]">
-                    {fmtDate(r.createdAt)}
+                    {fmtDate(r.sourceDate ?? r.createdAt)}
                   </td>
                 </tr>
               );

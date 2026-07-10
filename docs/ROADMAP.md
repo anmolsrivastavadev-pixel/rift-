@@ -364,6 +364,19 @@ The Start Fresh Test patch addresses workspace-mixing confusion:
 - **Not changed:** Gemini prompt, scoring, cleaning/parsing, CSV/import/server actions, search/filter/sort/save behavior (visual packaging only), Prisma schema, auth/billing config, no new dependencies.
 - **Deliberately deferred (audit findings left for a later pass):** project-selector admin-action declutter, collapsed-rail project context, mobile drawer slide animation, complaints search debounce, starter-market per-chip spinner fix, error-boundary visual unification, landing OutputWall mini-previews and section-header axis unification.
 
+### M34 — Feedback round: project switcher, compare folded into Ideas, risks in view, honest complaints table
+- **Status:** ✅ Done (July 2026, on the `redesign-m34` branch after the P1–P8 redesign passes; driven by outside reviewer feedback the founder collected)
+- **Purpose:** Act on the actionable items from a real product review: project switching felt buried in a dropdown; Compare Ideas felt like a confusing separate section; risks were invisible outside the compare table; the complaints list showed permanently-empty Sentiment/Severity columns and no source names; the idea Previous/Next buttons felt broken.
+- **What was built:**
+  - **Project switcher (`components/dashboard/project-selector.tsx`):** the native dropdown became a visible vertical list of projects (folder icon + name, current project highlighted with a check, scrollable past ~6 projects, `aria-current`). Create/rename/archive/restore/delete flows unchanged. The "Use separate projects for different niches." helper moved into an Info-icon tooltip on the new-project form.
+  - **Compare folded into Ideas:** the standalone "Decisions" nav item and its status-tile board are gone. The Ideas page now loads decision statuses (`ValidationWorkspace`), shows Pursuing/Parked/Rejected badges on cards, and gained a visible "Decision" filter (Any/Pursuing/Parked/Rejected/Undecided) — an explicitly **founder-authorized extension of the otherwise-frozen OpportunityBrowser/OpportunityFilters logic**. An optional `?decision=` query seeds the filter for deep links. `/dashboard/opportunities/decision-board` is now compare-only: it renders the `?compare=id,id` table (unchanged rows: score, evidence strength, problem, solution, difficulty, biggest risks, decision control, from=saved back link) and redirects to Ideas when no selection is present. Dashboard/onboarding/next-step links repointed to Ideas. Dead code removed: `NoDecisionStatusEmpty`, `computeTestingPriority` + Testing Priority labels/helper (and their test).
+  - **Risks on the idea page:** the detail page's right sidebar gained a compact "Risk flags" card (up to 4 flags, "+N more in the testing guide below", hidden when the AI flagged nothing). The testing guide keeps the full "Risks to test" list.
+  - **Prev/Next fix:** neighbours are now ordered by `opportunityScore DESC` (id tiebreaker) — the same order as the Ideas list — instead of `createdAt DESC`, and mapped so Next walks DOWN the ranked list. Previously the buttons walked creation order while the list was score-sorted, so they felt random and Previous was dead on the oldest idea. `selectPrevNext` itself is unchanged (order-agnostic walker, now covered by `tests/opportunity-relations.test.ts`).
+  - **Complaints table:** columns are now Title / Source / Date. Source shows the plain source name (Reddit, Hacker News, App Store reviews, …) linked to the original post via the existing receipt helpers, or "Added manually" for CSV/paste rows. The always-empty Sentiment and Severity columns were dropped (display only — `Complaint.sentiment`/`severity` stay in the schema as reserved fields) and the two date columns collapsed into one (source date, falling back to added date).
+- **Important behavior:** the Ideas browser remounts per project (`key={project.id}`) so compare selections never leak across projects (same M21 bug class). Bare `/dashboard/opportunities/decision-board` visits redirect to Ideas with the projectId preserved. Nav active-state: "All ideas" stays lit on the compare view.
+- **Not included (recorded as unscheduled ideas below, per the same review):** competitive-intelligence retention pivot, TAM/SAM/SOM market sizing, feature-request management. No schema, Gemini prompt, scoring, cleaning, or CSV pipeline changes; no new dependencies.
+- **Verified:** `pnpm exec tsc --noEmit`, `pnpm lint`, `pnpm test` (27 pass), `pnpm build` all pass.
+
 ---
 
 ## Planned milestones (founder-approved sequence, July 2026)
@@ -389,6 +402,15 @@ Do **not** start any of these without an explicit user prompt for that specific 
 
 ### Light mode + theming
 - Toggle light/dark; persist preference locally. Pure UX; no schema changes.
+
+### Competitive-intelligence retention pivot (reviewer suggestion, July 2026)
+- Reposition/extend niche watches into ongoing competitor monitoring after a user locks in an idea: point the pain radar at named competitors and alert when their customers complain. Addresses the "user finds an idea and never comes back" retention risk. Strategic — needs founder scoping before any build.
+
+### TAM/SAM/SOM + market difficulty signals (reviewer suggestion, July 2026)
+- Market size, competition, and difficulty estimates per idea. Currently **blocked by the standing "no market-size or competition signals beyond what's already stored" rule** — that rule must be explicitly lifted by the founder before this can be scoped.
+
+### Feature-request management integration (reviewer suggestion, July 2026)
+- Once a founder has real users, ingest/aggregate/score their own customers' feedback and feature requests (a second income channel and retention hook). Touches schema + pipeline; needs its own milestone.
 
 ### Notification & in-app messaging
 - Server-side status when long jobs complete; optional email digest. (Email capability arrives in M27.)

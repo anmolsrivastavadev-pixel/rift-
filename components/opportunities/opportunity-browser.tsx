@@ -8,6 +8,7 @@ import { OpportunityCard } from "@/components/opportunities/opportunity-card";
 import {
   OpportunityFilters,
   DEFAULT_FILTERS,
+  type DecisionFilter,
   type FilterState,
 } from "@/components/opportunities/filters";
 import { NoSearchResultsEmpty } from "@/components/opportunities/empty-states";
@@ -15,8 +16,11 @@ import { RunOpportunitiesButton } from "@/components/opportunities/run-button";
 import { Button } from "@/components/ui/button";
 import { Disclosure } from "@/components/ui/disclosure";
 import { projectHref } from "@/lib/project-href";
+import type { DecisionStatus } from "@/lib/decision-board";
 
-type CardData = React.ComponentProps<typeof OpportunityCard>["op"];
+type CardData = React.ComponentProps<typeof OpportunityCard>["op"] & {
+  decisionStatus?: DecisionStatus | null;
+};
 
 const MAX_COMPARE = 3;
 
@@ -29,13 +33,18 @@ export function OpportunityBrowser({
   opportunities,
   projectId,
   dimmed = false,
+  initialDecision,
 }: {
   opportunities: CardData[];
   projectId: string;
   /** True while a rerun is replacing these ideas — dims the grid. */
   dimmed?: boolean;
+  /** Optional ?decision= deep-link seed (validated by the server page). */
+  initialDecision?: DecisionFilter;
 }) {
-  const [filters, setFilters] = React.useState<FilterState>(DEFAULT_FILTERS);
+  const [filters, setFilters] = React.useState<FilterState>(() =>
+    initialDecision ? { ...DEFAULT_FILTERS, decision: initialDecision } : DEFAULT_FILTERS
+  );
   const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
   const [maxReached, setMaxReached] = React.useState(false);
 
@@ -121,6 +130,10 @@ export function OpportunityBrowser({
     if (filters.minComplaints > 0) {
       list = list.filter((o) => o.mentions >= filters.minComplaints);
     }
+    if (filters.decision !== "any") {
+      // Ideas without a saved decision count as "undecided".
+      list = list.filter((o) => (o.decisionStatus ?? "undecided") === filters.decision);
+    }
 
     const sorted = [...list];
     switch (filters.sort) {
@@ -188,6 +201,7 @@ export function OpportunityBrowser({
                 projectId={projectId}
                 selected={selectedIds.has(op.id)}
                 onToggleCompare={toggleCompare}
+                decisionStatus={op.decisionStatus}
               />
             ))}
           </div>
@@ -273,6 +287,7 @@ export function OpportunityWorkspace({
   quotaExhausted,
   freeRunLimit,
   resumeJobId,
+  initialDecision,
 }: {
   opportunities: CardData[];
   projectId: string;
@@ -281,6 +296,7 @@ export function OpportunityWorkspace({
   quotaExhausted: boolean;
   freeRunLimit?: number;
   resumeJobId: string | null;
+  initialDecision?: DecisionFilter;
 }) {
   const [running, setRunning] = React.useState(false);
 
@@ -312,6 +328,7 @@ export function OpportunityWorkspace({
         opportunities={opportunities}
         projectId={projectId}
         dimmed={running}
+        initialDecision={initialDecision}
       />
     </div>
   );

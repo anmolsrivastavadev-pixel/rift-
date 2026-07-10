@@ -71,10 +71,10 @@ export function FounderCommandClient({
           </div>
           <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
             <Link
-              href={projectHref("/dashboard/opportunities/decision-board", projectId)}
+              href={projectHref("/dashboard/opportunities", projectId)}
               className="text-xs text-[var(--color-primary)] hover:underline"
             >
-              Open Decisions →
+              Review your ideas →
             </Link>
             <span className="flex items-center gap-1 text-xs text-[var(--color-muted-foreground)]">
               <Info className="h-3 w-3" /> Decisions are saved to your account.

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LayoutGrid, Target, Upload } from "lucide-react";
+import { Target, Upload } from "lucide-react";
 
 import { prisma } from "@/lib/db";
 import { RunOpportunitiesButton } from "@/components/opportunities/run-button";
@@ -7,6 +7,7 @@ import { OpportunityWorkspace } from "@/components/opportunities/opportunity-bro
 import { Button } from "@/components/ui/button";
 import { requireUser } from "@/lib/auth/current-user";
 import { computePainTrend, PAIN_TREND_LABELS } from "@/lib/pain-trend";
+import { isValidDecisionStatus, type DecisionStatus } from "@/lib/decision-board";
 import { getProjectOrDefault, projectHref } from "@/lib/projects";
 import { getUsageSummary } from "@/lib/quotas";
 import { MAX_COMPLAINTS } from "@/lib/ai";
@@ -27,13 +28,15 @@ function firstParam(value: string | string[] | undefined): string | undefined {
 export default async function OpportunitiesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ projectId?: string | string[] }>;
+  searchParams: Promise<{ projectId?: string | string[]; decision?: string | string[] }>;
 }) {
   const user = await requireUser();
-  const project = await getProjectOrDefault(
-    firstParam((await searchParams).projectId),
-    user
-  );
+  const params = await searchParams;
+  const project = await getProjectOrDefault(firstParam(params.projectId), user);
+  // Optional ?decision= deep link seeds the client-side decision filter.
+  // Invalid values silently fall back to no filtering.
+  const rawDecision = firstParam(params.decision);
+  const initialDecision = isValidDecisionStatus(rawDecision) ? rawDecision : undefined;
   const painTrendStart = new Date(new Date().getTime() - PAIN_TREND_QUERY_DAYS * DAY_MS);
   const [ops, savedRows, complaintCount, usage, datedComplaints, runningRun] = await Promise.all([
     prisma.opportunity.findMany({
@@ -76,6 +79,20 @@ export default async function OpportunitiesPage({
   const resumeJobId = runningRun?.jobId ?? null;
 
   const savedSet = new Set(savedRows.map((s) => s.opportunityId));
+
+  // M34 — saved decision statuses so cards can show Pursuing/Parked/Rejected
+  // badges and the browser can filter by decision. Queried by opportunity id
+  // (not projectId — legacy ValidationWorkspace rows can have a null one).
+  const workspaces = await prisma.validationWorkspace.findMany({
+    where: { userId: user.id, opportunityId: { in: ops.map((o) => o.id) } },
+    select: { opportunityId: true, decisionStatus: true },
+  });
+  const statusById = new Map<string, DecisionStatus>();
+  for (const w of workspaces) {
+    if (isValidDecisionStatus(w.decisionStatus)) {
+      statusById.set(w.opportunityId, w.decisionStatus);
+    }
+  }
 
   // M31b — group source dates by idea, compute the display-only trend once
   // per idea, and only pass a label when there is enough dated evidence.
@@ -130,6 +147,7 @@ export default async function OpportunitiesPage({
     createdAt: o.createdAt,
     saved: savedSet.has(o.id),
     painTrendLabel: painTrendLabelFor(o.id),
+    decisionStatus: statusById.get(o.id) ?? null,
   }));
 
   return (
@@ -144,15 +162,13 @@ export default async function OpportunitiesPage({
               {project.name}
             </span>
           </p>
+          {ops.length > 0 && (
+            <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
+              Select 2–3 ideas below to compare them side by side.
+            </p>
+          )}
           {ops.length > 0 && usageLine}
         </div>
-        {ops.length > 0 && (
-          <Button asChild variant="outline">
-            <Link href={projectHref("/dashboard/opportunities/decision-board", project.id)}>
-              <LayoutGrid className="h-4 w-4" /> Compare ideas
-            </Link>
-          </Button>
-        )}
       </div>
 
       {/* M17 — one clear next step per state: no complaints → add them first;
@@ -201,6 +217,7 @@ export default async function OpportunitiesPage({
         </section>
       ) : (
         <OpportunityWorkspace
+          key={project.id}
           opportunities={cards}
           projectId={project.id}
           complaintCount={complaintCount}
@@ -208,6 +225,7 @@ export default async function OpportunitiesPage({
           quotaExhausted={quotaExhausted}
           freeRunLimit={usage.limits.ideaRunsPerMonth}
           resumeJobId={resumeJobId}
+          initialDecision={initialDecision}
         />
       )}
     </div>

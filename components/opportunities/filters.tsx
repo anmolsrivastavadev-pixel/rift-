@@ -3,12 +3,18 @@
 import * as React from "react";
 import { RotateCcw, SlidersHorizontal } from "lucide-react";
 
+import type { DecisionStatus } from "@/lib/decision-board";
+
 export type SortKey =
   | "score-desc"
   | "score-asc"
   | "severity-desc"
   | "mentions-desc"
   | "newest";
+
+/** "any" = no decision filtering; the rest match the saved decision status
+ * (ideas without a saved status count as "undecided"). */
+export type DecisionFilter = "any" | DecisionStatus;
 
 export interface FilterState {
   query: string;
@@ -17,6 +23,7 @@ export interface FilterState {
   minSeverity: number; // 0..10
   minComplaints: number; // 0..N
   sort: SortKey;
+  decision: DecisionFilter; // M34 — founder-authorized filter extension
 }
 
 export const DEFAULT_FILTERS: FilterState = {
@@ -26,7 +33,16 @@ export const DEFAULT_FILTERS: FilterState = {
   minSeverity: 0,
   minComplaints: 0,
   sort: "score-desc",
+  decision: "any",
 };
+
+const decisionLabels: { key: DecisionFilter; label: string }[] = [
+  { key: "any", label: "Any" },
+  { key: "pursue", label: "Pursuing" },
+  { key: "park", label: "Parked" },
+  { key: "reject", label: "Rejected" },
+  { key: "undecided", label: "Undecided" },
+];
 
 const sortLabels: { key: SortKey; label: string }[] = [
   { key: "score-desc", label: "Highest score" },
@@ -75,7 +91,8 @@ export function OpportunityFilters({
     state.minScore === DEFAULT_FILTERS.minScore &&
     state.minSeverity === DEFAULT_FILTERS.minSeverity &&
     state.minComplaints === DEFAULT_FILTERS.minComplaints &&
-    state.sort === DEFAULT_FILTERS.sort;
+    state.sort === DEFAULT_FILTERS.sort &&
+    state.decision === DEFAULT_FILTERS.decision;
 
   return (
     <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-4 shadow-[var(--shadow-card)]">
@@ -104,6 +121,21 @@ export function OpportunityFilters({
             {industries.map((i) => (
               <option key={i} value={i}>
                 {i}
+              </option>
+            ))}
+          </select>
+        </Field>
+
+        <Field label="Decision">
+          <select
+            value={state.decision}
+            onChange={(e) => setState({ decision: e.target.value as DecisionFilter })}
+            aria-label="Filter by decision"
+            className={`${inputCls} focus-visible:border-[var(--color-primary)] focus-visible:outline focus-visible:[outline-offset:2px] focus-visible:[outline-color:var(--color-primary)]`}
+          >
+            {decisionLabels.map((d) => (
+              <option key={d.key} value={d.key}>
+                {d.label}
               </option>
             ))}
           </select>

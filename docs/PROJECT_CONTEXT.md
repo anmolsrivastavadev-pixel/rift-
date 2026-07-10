@@ -47,7 +47,7 @@ Sign in
   → Open detail page (AI reasoning + breakdown + related + prev/next)
   → Validation Workspace (checklist + copy brief)
   → Validation Evidence Log (aggregate evidence tracking)
-  → Compare Ideas board (decide: Pursue / Park / Reject)
+  → Decide Pursue / Park / Reject on the idea page (filter by decision on Ideas; select 2–3 ideas to compare side by side)
   → Start fresh test (clear current project for a new niche)
   → Deploy to Vercel + Neon
 ```
@@ -117,8 +117,8 @@ components/
                          related-opportunity-card, no-related-empty, prev-next-nav,
                          example-complaints, complaint-body, empty-states, run-button,
                          market-gap-hypothesis (M9), validation-workspace + validation-checklist
-                         + copy-validation-brief (M10), decision-board-client +
-                         decision-status-select (M11), validation-evidence-log (M12)
+                         + copy-validation-brief (M10), decision-board-client (compare-only
+                         since M34) + decision-status-select (M11), validation-evidence-log (M12)
 
 lib/
 ├─ db.ts                 Prisma client singleton (driver-adapter mode)
@@ -271,7 +271,7 @@ Dashboard routes use query-param project routing in M16A: `?projectId=...`. If t
 | `/dashboard/complaints` | dynamic | Upload UI + complaints list + search (?q=) |
 | `/dashboard/opportunities` | static | AI engine + OpportunityBrowser (client-side search/filter/sort) |
 | `/dashboard/opportunities/[id]` | dynamic | Detail page |
-| `/dashboard/opportunities/decision-board` | static | Decision Board (M11) |
+| `/dashboard/opportunities/decision-board` | dynamic | Compare 2–3 selected ideas side by side (M11, compare-only since M34 — without `?compare=` it redirects to Ideas) |
 | `/dashboard/saved` | static | Saved opportunities grid |
 | `/pricing` | dynamic | M25 public pricing page (Free vs Pro $9/mo; CTA adapts to session + billing keys) |
 | `/privacy`, `/terms` | static | M27 plain-English legal pages |
@@ -286,7 +286,7 @@ Dashboard routes use query-param project routing in M16A: `?projectId=...`. If t
 
 ## Current key components
 
-- `ProjectSelector` (`components/dashboard/project-selector.tsx`) — client. Native select plus name-only new-project form. Uses server-provided project list/current default and navigates by changing `?projectId=...`.
+- `ProjectSelector` (`components/dashboard/project-selector.tsx`) — client. Visible vertical project list (current project highlighted; M34 replaced the old native select) plus name-only new-project form. Uses server-provided project list/current default and navigates by changing `?projectId=...`.
 - `OpportunityBrowser` (`components/opportunities/opportunity-browser.tsx`) — client. Holds all filter/sort/search state in `useState`; everything operates on the already-loaded dataset; **no DB calls** while interacting. Emits `aria-live` count.
 - `OpportunityFilters` (`components/opportunities/filters.tsx`) — client. Search input, Industry select, 3 range sliders, sort select, Reset button. All inputs have `aria-label`s + visible focus.
 - `OpportunityCard` (`components/opportunities/opportunity-card.tsx`) — server. Card with title, score (color-coded), industry, Product Opportunity (stored as `suggestedSoftware`), keywords (max 4), 3 mini-stats, save button, and a compact score helper line. Title uses `line-clamp-2`, Product Opportunity uses `line-clamp-1`. Hover animation: `hover:-translate-y-0.5 hover:shadow-md` (150ms ease-out).
