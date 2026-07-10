@@ -195,45 +195,66 @@ export function OpportunityBrowser({
       )}
 
       {/* Sticky compare tray */}
-      {selectedIds.size > 0 && (
-        <div className="fixed inset-x-0 bottom-0 z-50 border-t border-[var(--color-border)] bg-[var(--color-card)] shadow-lg">
-          <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
-            <div>
-              <p className="text-sm font-medium text-[var(--color-foreground)]">
-                {selectedIds.size} idea{selectedIds.size === 1 ? "" : "s"} selected
-              </p>
-              <p className="text-xs text-[var(--color-muted-foreground)]">
-                {selectedIds.size < 2
-                  ? "Select at least one more idea to compare."
-                  : "Compare them and pick one to test."}
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button variant="ghost" size="sm" onClick={clearSelection}>
-                Clear
-              </Button>
-              {/* An anchor can't be :disabled, so render a real disabled
-                  button until 2+ ideas are selected. */}
-              {selectedIds.size < 2 ? (
-                <Button disabled>
-                  <LayoutGrid className="h-4 w-4" /> Compare selected ideas
-                </Button>
-              ) : (
-                <Button asChild>
-                  <Link
-                    href={projectHref(
-                      `/dashboard/opportunities/decision-board?compare=${compareParam}`,
-                      projectId
-                    )}
-                  >
-                    <LayoutGrid className="h-4 w-4" /> Compare selected ideas
-                  </Link>
-                </Button>
-              )}
-            </div>
-          </div>
+      <CompareTray
+        count={selectedIds.size}
+        onClear={clearSelection}
+        href={projectHref(
+          `/dashboard/opportunities/decision-board?compare=${compareParam}`,
+          projectId
+        )}
+      />
+    </div>
+  );
+}
+
+/**
+ * Sticky select-to-compare tray, shared by the Ideas browser and the Saved
+ * page. Renders nothing until at least one idea is selected; the compare
+ * button stays disabled until 2+ are selected. `href` is the fully-built
+ * decision-board compare link (caller owns projectId / from params).
+ */
+export function CompareTray({
+  count,
+  onClear,
+  href,
+}: {
+  count: number;
+  onClear: () => void;
+  href: string;
+}) {
+  if (count === 0) return null;
+  return (
+    <div className="fixed inset-x-0 bottom-0 z-50 border-t border-[var(--color-border)] bg-[var(--color-card)] shadow-lg">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
+        <div>
+          <p className="text-sm font-medium text-[var(--color-foreground)]">
+            {count} idea{count === 1 ? "" : "s"} selected
+          </p>
+          <p className="text-xs text-[var(--color-muted-foreground)]">
+            {count < 2
+              ? "Select at least one more idea to compare."
+              : "Compare them and pick one to test."}
+          </p>
         </div>
-      )}
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="sm" onClick={onClear}>
+            Clear
+          </Button>
+          {/* An anchor can't be :disabled, so render a real disabled
+              button until 2+ ideas are selected. */}
+          {count < 2 ? (
+            <Button disabled>
+              <LayoutGrid className="h-4 w-4" /> Compare selected ideas
+            </Button>
+          ) : (
+            <Button asChild>
+              <Link href={href}>
+                <LayoutGrid className="h-4 w-4" /> Compare selected ideas
+              </Link>
+            </Button>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

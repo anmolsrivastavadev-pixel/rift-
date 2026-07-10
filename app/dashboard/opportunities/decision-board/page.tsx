@@ -17,12 +17,15 @@ export default async function DecisionBoardPage({
   searchParams: Promise<{
     compare?: string | string[];
     projectId?: string | string[];
+    from?: string | string[];
   }>;
 }) {
   const user = await requireUser();
   const params = await searchParams;
   const project = await getProjectOrDefault(firstParam(params.projectId), user);
   const compareParam = firstParam(params.compare);
+  // Arrived from the Saved page? Point the back link there instead of Ideas.
+  const fromSaved = firstParam(params.from) === "saved";
 
   const ops = await prisma.opportunity.findMany({
     where: { userId: user.id, projectId: project.id },
@@ -86,6 +89,8 @@ export default async function DecisionBoardPage({
       isCompareMode={isCompareMode}
       projectId={project.id}
       initialStatuses={initialStatuses}
+      backHref={fromSaved ? "/dashboard/saved" : undefined}
+      backLabel={fromSaved ? "Back to saved ideas" : undefined}
     />
   );
 }

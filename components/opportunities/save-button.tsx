@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { useActionState } from "react";
+import { useRouter } from "next/navigation";
 import { Bookmark, BookmarkCheck, Loader2 } from "lucide-react";
 
 import { saveAction, unsaveAction } from "@/actions/saved";
@@ -14,6 +15,7 @@ export function SaveButton({
   saved,
   size = "md",
   showLabel = false,
+  refreshOnUnsave = false,
 }: {
   opportunityId: string;
   projectId: string;
@@ -22,7 +24,11 @@ export function SaveButton({
   /** Render a visible "Save"/"Saved" label (M24 feedback: the bare bookmark
    * icon was cryptic next to the fully-labeled compare button). */
   showLabel?: boolean;
+  /** Refresh the route after a successful unsave so server-rendered lists
+   * (the Saved page) drop the card and keep their counts honest. */
+  refreshOnUnsave?: boolean;
 }) {
+  const router = useRouter();
   const initial: State = { saved };
   const [state, formAction, pending] = useActionState<State, FormData>(
     async (_prev, formData) => {
@@ -32,6 +38,9 @@ export function SaveButton({
       const res = isCurrentlySaved
         ? await unsaveAction(formData)
         : await saveAction(formData);
+      if (refreshOnUnsave && isCurrentlySaved && !res.saved && !res.error) {
+        router.refresh();
+      }
       return res;
     },
     initial
@@ -48,15 +57,15 @@ export function SaveButton({
   const iconCls = showLabel ? "h-3 w-3" : size === "sm" ? "h-3.5 w-3.5" : "h-4 w-4";
 
   return (
-    <form action={formAction}>
+    <form action={formAction} className="inline-flex flex-col items-end gap-1">
       <input type="hidden" name="opportunityId" value={opportunityId} />
       <input type="hidden" name="projectId" value={projectId} />
       <button
         type="submit"
         disabled={pending}
         aria-pressed={isSaved}
-        aria-label={isSaved ? "Remove from saved" : "Save opportunity"}
-        title={isSaved ? "Remove from saved" : "Save opportunity"}
+        aria-label={isSaved ? "Remove from saved ideas" : "Save idea"}
+        title={isSaved ? "Remove from saved ideas" : "Save idea"}
         className={`inline-flex ${dim} items-center justify-center border transition-colors disabled:opacity-50 ${
           isSaved
             ? "border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)]"
@@ -70,6 +79,14 @@ export function SaveButton({
         )}
         {showLabel && (isSaved ? "Saved" : "Save")}
       </button>
+      {/* Status region: polite live announcement of save failures. */}
+      <span aria-live="polite">
+        {state?.error && (
+          <span role="alert" className="text-xs text-[var(--color-danger)]">
+            {state.error}
+          </span>
+        )}
+      </span>
     </form>
   );
 }

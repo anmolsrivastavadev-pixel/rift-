@@ -19,6 +19,15 @@ import { Badge } from "@/components/ui/badge";
 import { SaveButton } from "@/components/opportunities/save-button";
 import { PAIN_TREND_HELPER } from "@/lib/pain-trend";
 import { projectHref } from "@/lib/project-href";
+import type { DecisionStatus } from "@/lib/decision-board";
+
+const DECISION_BADGES: Partial<
+  Record<DecisionStatus, { label: string; variant: "success" | "warning" | "danger" }>
+> = {
+  pursue: { label: "Pursuing", variant: "success" },
+  park: { label: "Parked", variant: "warning" },
+  reject: { label: "Rejected", variant: "danger" },
+};
 
 export type OpportunityCardData = {
   id: string;
@@ -51,12 +60,21 @@ export function OpportunityCard({
   projectId,
   selected = false,
   onToggleCompare,
+  decisionStatus,
+  refreshOnUnsave,
 }: {
   op: OpportunityCardData;
   projectId: string;
   selected?: boolean;
   onToggleCompare?: (id: string) => void;
+  /** Optional decision status badge (Saved page). Nothing renders when
+   * absent or "undecided" — the Ideas page stays unchanged. */
+  decisionStatus?: DecisionStatus | null;
+  /** Forwarded to SaveButton — refresh the route after a successful unsave
+   * so server-rendered lists (Saved page) stay honest. */
+  refreshOnUnsave?: boolean;
 }) {
+  const decisionBadge = decisionStatus ? DECISION_BADGES[decisionStatus] : undefined;
   const sc = scoreColor(op.opportunityScore);
   const bgScore =
     op.opportunityScore >= 70
@@ -111,6 +129,9 @@ export function OpportunityCard({
                   <TrendIcon className="mr-1 h-3 w-3" />
                   {op.painTrendLabel}
                 </Badge>
+              )}
+              {decisionBadge && (
+                <Badge variant={decisionBadge.variant}>{decisionBadge.label}</Badge>
               )}
             </div>
             <h3 className="mt-1.5 line-clamp-2 text-base font-semibold leading-snug tracking-tight text-balance group-hover:text-[var(--color-primary)]">
@@ -216,6 +237,7 @@ export function OpportunityCard({
             saved={op.saved}
             size="sm"
             showLabel
+            refreshOnUnsave={refreshOnUnsave}
           />
         </div>
       </div>

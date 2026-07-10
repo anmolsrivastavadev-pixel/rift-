@@ -46,6 +46,34 @@ export function NoSearchResultsEmpty({ onReset }: { onReset: () => void }) {
   );
 }
 
+/* Decisions board: a status filter is active but nothing carries that
+ * status. Rendered from a client component — onShowAll resets the filter. */
+export function NoDecisionStatusEmpty({
+  label,
+  onShowAll,
+}: {
+  label: string;
+  onShowAll: () => void;
+}) {
+  return (
+    <div className="rounded-2xl border border-dashed border-[var(--color-border)] bg-[var(--color-card)] p-12 text-center shadow-sm">
+      <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--color-surface)] text-[var(--color-muted-foreground)]">
+        <SearchX className="h-6 w-6" />
+      </div>
+      <h3 className="mt-4 text-base font-semibold">
+        Nothing marked {label} yet
+      </h3>
+      <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
+        Click Pursue, Park, or Reject on any idea to build your decision
+        record.
+      </p>
+      <Button variant="outline" className="mt-4" onClick={onShowAll}>
+        Show all ideas
+      </Button>
+    </div>
+  );
+}
+
 export function NoSavedEmpty({ projectId }: { projectId: string }) {
   return (
     <div className="rounded-2xl border border-dashed border-[var(--color-border)] bg-[var(--color-card)] p-12 text-center shadow-sm">

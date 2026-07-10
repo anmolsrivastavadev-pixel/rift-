@@ -15,6 +15,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 
 import { Button } from "@/components/ui/button";
+import { NoDecisionStatusEmpty } from "@/components/opportunities/empty-states";
 import {
   computeTestingPriority,
   TESTING_PRIORITY_LABELS,
@@ -52,6 +53,15 @@ const FILTERS: { value: FilterValue; label: string }[] = [
   { value: "park", label: "Park" },
   { value: "reject", label: "Reject" },
   { value: "undecided", label: "Undecided" },
+];
+
+/* Section order for the grouped default view: decided work first, the
+ * undecided backlog next, rejected history last. Empty sections are omitted. */
+const STATUS_SECTIONS: { status: DecisionStatus; heading: string }[] = [
+  { status: "pursue", heading: "Pursue" },
+  { status: "park", heading: "Park" },
+  { status: "undecided", heading: "Undecided" },
+  { status: "reject", heading: "Rejected" },
 ];
 
 function scoreColor(score: number): string {
@@ -105,11 +115,17 @@ export function DecisionBoardClient({
   isCompareMode = false,
   projectId,
   initialStatuses,
+  backHref,
+  backLabel,
 }: {
   opportunities: DecisionBoardOpportunity[];
   isCompareMode?: boolean;
   projectId: string;
   initialStatuses: Record<string, DecisionStatus>;
+  /** Override the back link (e.g. "/dashboard/saved" when arriving from the
+   * Saved page). projectId is appended via projectHref either way. */
+  backHref?: string;
+  backLabel?: string;
 }) {
   const { statuses, hydrated, setStatus } = useDecisionStatuses(initialStatuses);
   const [filter, setFilter] = React.useState<FilterValue>("all");
@@ -136,7 +152,12 @@ export function DecisionBoardClient({
   if (opportunities.length === 0) {
     return (
       <div className="mx-auto max-w-6xl space-y-8">
-        <DecisionBoardHeader isCompareMode={isCompareMode} projectId={projectId} />
+        <DecisionBoardHeader
+          isCompareMode={isCompareMode}
+          projectId={projectId}
+          backHref={backHref}
+          backLabel={backLabel}
+        />
         <div className="rounded-2xl border border-dashed border-[var(--color-border)] bg-[var(--color-card)] p-12 text-center">
           <Target className="mx-auto h-10 w-10 text-[var(--color-muted-foreground)]" />
           <h2 className="mt-4 text-base font-semibold">No ideas to compare yet</h2>
@@ -172,7 +193,12 @@ export function DecisionBoardClient({
         : null;
     return (
       <div className="mx-auto max-w-6xl space-y-8">
-        <DecisionBoardHeader isCompareMode={isCompareMode} projectId={projectId} />
+        <DecisionBoardHeader
+          isCompareMode={isCompareMode}
+          projectId={projectId}
+          backHref={backHref}
+          backLabel={backLabel}
+        />
 
         {/* Side-by-side comparison table: fixed layout keeps the columns
             equal, and the sticky label column stays visible while scrolling
@@ -237,7 +263,7 @@ export function DecisionBoardClient({
               <CompareRow
                 label="Problem"
                 values={filtered.map((op) => (
-                  <span key={op.id} className="text-[var(--color-foreground)]/90 line-clamp-3">{op.summary}</span>
+                  <span key={op.id} className="text-[var(--color-foreground)]/90">{op.summary}</span>
                 ))}
               />
               <CompareRow
@@ -278,6 +304,7 @@ export function DecisionBoardClient({
                       opportunityId={op.id}
                       value={status}
                       onChange={(s) => setStatus(op.id, s)}
+                      title={op.title}
                     />
                   );
                 })}
@@ -295,7 +322,12 @@ export function DecisionBoardClient({
 
   return (
     <div className="mx-auto max-w-6xl space-y-8">
-        <DecisionBoardHeader isCompareMode={false} projectId={projectId} />
+        <DecisionBoardHeader
+          isCompareMode={false}
+          projectId={projectId}
+          backHref={backHref}
+          backLabel={backLabel}
+        />
 
       {/* Summary tiles double as the status filter — one section instead of
           tiles + a duplicate chip row saying the same thing. */}
@@ -310,6 +342,7 @@ export function DecisionBoardClient({
                 key={f.value}
                 label={f.value === "all" ? "Total" : f.label}
                 value={value}
+                disabled={f.value !== "all" && value === 0}
                 accent={
                   f.value === "pursue"
                     ? "success"
@@ -337,17 +370,54 @@ export function DecisionBoardClient({
         </div>
       </div>
 
-      {/* Opportunity comparison cards */}
-      <div className="grid gap-4 lg:grid-cols-2">
-        {filtered.map((op) => {
-          const status = resolveStatus(op.id);
-          const priority = computeTestingPriority({
-            opportunityScore: op.opportunityScore,
-            mentions: op.mentions,
-            confidence: op.confidence,
-            riskFlags: op.riskFlags,
-          });
-          return (
+      {/* Decision cards: grouped by status in the base view, a flat grid
+          when a status tile filters the board. Card markup is shared. */}
+      {filter === "all" ? (
+        <div className="space-y-8">
+          {STATUS_SECTIONS.map(({ status, heading }) => {
+            const group = opportunities.filter(
+              (o) => resolveStatus(o.id) === status
+            );
+            if (group.length === 0) return null;
+            return (
+              <section key={status} className="space-y-3">
+                <h2 className="flex items-baseline gap-2 text-sm font-semibold tracking-tight">
+                  {heading}
+                  <span className="text-xs font-normal text-[var(--color-muted-foreground)]">
+                    {group.length}
+                  </span>
+                </h2>
+                <div className="grid gap-4 lg:grid-cols-2">
+                  {group.map(renderCard)}
+                </div>
+              </section>
+            );
+          })}
+        </div>
+      ) : filtered.length === 0 ? (
+        <NoDecisionStatusEmpty
+          label={FILTERS.find((f) => f.value === filter)?.label ?? filter}
+          onShowAll={() => setFilter("all")}
+        />
+      ) : (
+        <div className="grid gap-4 lg:grid-cols-2">{filtered.map(renderCard)}</div>
+      )}
+
+      <p className="flex items-center gap-1 text-[11px] text-[var(--color-muted-foreground)]">
+        <Info className="h-3 w-3" /> Decisions are saved to your account.
+      </p>
+    </div>
+  );
+
+  function renderCard(op: DecisionBoardOpportunity) {
+    const status = resolveStatus(op.id);
+    const priority = computeTestingPriority({
+      opportunityScore: op.opportunityScore,
+      mentions: op.mentions,
+      confidence: op.confidence,
+      riskFlags: op.riskFlags,
+    });
+    return (
             <div
               key={op.id}
               className="flex flex-col rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[var(--shadow-card)]"
@@ -427,44 +497,36 @@ export function DecisionBoardClient({
                   opportunityId={op.id}
                   value={status}
                   onChange={(s) => setStatus(op.id, s)}
+                  title={op.title}
                 />
               </div>
             </div>
           );
-        })}
-      </div>
-
-      {filtered.length === 0 && (
-        <p className="text-center text-sm text-[var(--color-muted-foreground)]">
-          No ideas match this filter.
-        </p>
-      )}
-
-      <p className="flex items-center gap-1 text-[11px] text-[var(--color-muted-foreground)]">
-        <Info className="h-3 w-3" /> Decisions are saved to your account.
-      </p>
-    </div>
-  );
+  }
 }
 
 function DecisionBoardHeader({
   isCompareMode,
   projectId,
+  backHref,
+  backLabel,
 }: {
   isCompareMode: boolean;
   projectId: string;
+  backHref?: string;
+  backLabel?: string;
 }) {
   return (
     <div>
       <Button asChild variant="ghost" size="sm">
-        <Link href={projectHref("/dashboard/opportunities", projectId)}>
-          <ArrowLeft className="h-4 w-4" /> Back to ideas
+        <Link href={projectHref(backHref ?? "/dashboard/opportunities", projectId)}>
+          <ArrowLeft className="h-4 w-4" /> {backLabel ?? "Back to ideas"}
         </Link>
       </Button>
       <div className="mt-4 flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">
-            {isCompareMode ? "Compare selected ideas" : "Compare ideas"}
+            {isCompareMode ? "Compare selected ideas" : "Your decisions"}
           </h1>
           {isCompareMode ? (
             <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
@@ -472,8 +534,8 @@ function DecisionBoardHeader({
             </p>
           ) : (
             <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
-              Pick 2–3 ideas on the Ideas page and press &ldquo;Compare
-              selected ideas&rdquo; — they appear here side by side.
+              Mark each idea Pursue, Park, or Reject — or pick 2–3 ideas to
+              compare side by side.
             </p>
           )}
         </div>
@@ -495,12 +557,15 @@ function SummaryCard({
   accent,
   active = false,
   onClick,
+  disabled = false,
 }: {
   label: string;
   value: number;
   accent?: "success" | "warning" | "danger" | "muted";
   active?: boolean;
   onClick?: () => void;
+  /** Zero-count tiles: muted, non-clickable, announced as disabled. */
+  disabled?: boolean;
 }) {
   // Zero counts stay muted regardless of accent — a green "0" is false signal.
   const colorClass =
@@ -516,12 +581,15 @@ function SummaryCard({
   return (
     <button
       type="button"
-      onClick={onClick}
+      onClick={disabled ? undefined : onClick}
       aria-pressed={active}
+      aria-disabled={disabled || undefined}
       className={`rounded-xl border p-4 text-center transition-all duration-150 ease-out ${
-        active
-          ? "border-[var(--color-primary)] bg-[var(--color-card)] ring-1 ring-[var(--color-primary)]/30"
-          : "border-[var(--color-border)] bg-[var(--color-card)] hover:border-[var(--color-primary)]/40"
+        disabled
+          ? "cursor-default border-[var(--color-border)] bg-[var(--color-card)] opacity-60"
+          : active
+            ? "border-[var(--color-primary)] bg-[var(--color-card)] ring-1 ring-[var(--color-primary)]/30"
+            : "border-[var(--color-border)] bg-[var(--color-card)] hover:border-[var(--color-primary)]/40"
       }`}
     >
       <span className={`block text-2xl font-bold ${colorClass}`}>{value}</span>
