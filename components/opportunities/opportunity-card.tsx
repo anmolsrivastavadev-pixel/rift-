@@ -112,7 +112,7 @@ export function OpportunityCard({
             vertical scan down the grid compares scores instantly. */}
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-1.5 text-[11px] uppercase tracking-wider text-[var(--color-muted-foreground)]">
+            <div className="flex flex-wrap items-center gap-1.5 text-xs uppercase tracking-wider text-[var(--color-muted-foreground)]">
               <Briefcase className="h-3 w-3" />
               {op.industry}
               {op.painTrendLabel && (
@@ -155,14 +155,14 @@ export function OpportunityCard({
         </div>
 
         <p className="mt-2 line-clamp-1 text-sm text-[var(--color-foreground)]/80">
-          <span className="text-[11px] font-medium uppercase tracking-wider text-[var(--color-muted-foreground)]">
+          <span className="text-xs font-medium uppercase tracking-wider text-[var(--color-muted-foreground)]">
             Build
           </span>{" "}
           {op.suggestedSoftware}
         </p>
 
         {(op.targetCustomer || op.productAngle) && (
-          <p className="mt-1.5 line-clamp-1 text-[11px] text-[var(--color-muted-foreground)]">
+          <p className="mt-1.5 line-clamp-1 text-xs text-[var(--color-muted-foreground)]">
             {[op.targetCustomer && `For ${op.targetCustomer}`, op.productAngle]
               .filter(Boolean)
               .join(" · ")}
@@ -212,7 +212,7 @@ export function OpportunityCard({
                 e.stopPropagation();
                 onToggleCompare(op.id);
               }}
-              className={`inline-flex items-center gap-1 rounded-lg border px-2.5 py-1 text-[11px] font-medium transition-all duration-150 ease-out active:scale-[0.95] ${
+              className={`inline-flex items-center gap-1 rounded-lg border px-2.5 py-1 text-xs font-medium transition-all duration-150 ease-out active:scale-[0.95] ${
                 selected
                   ? "border-[var(--color-primary)] bg-[var(--color-primary-soft)] text-[var(--color-primary)]"
                   : "border-[var(--color-border)] bg-[var(--color-card)] text-[var(--color-muted-foreground)] hover:border-[var(--color-primary)]/40 hover:text-[var(--color-primary)]"
@@ -258,7 +258,7 @@ function Stat({
     <div className="flex flex-col items-center text-center">
       <Icon className="h-3.5 w-3.5 text-[var(--color-muted-foreground)]" />
       <span className="mt-1 font-medium text-[var(--color-foreground)]">{value}</span>
-      <span className="text-[10px] text-[var(--color-muted-foreground)]">{label}</span>
+      <span className="text-xs text-[var(--color-muted-foreground)]">{label}</span>
     </div>
   );
 }

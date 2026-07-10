@@ -162,7 +162,7 @@ export function OpportunityBrowser({
       </p>
 
       {maxReached && (
-        <p className="rounded-[8px] bg-[var(--color-warning)]/10 px-3 py-2 text-xs text-[var(--color-warning)]" role="alert">
+        <p className="rounded-lg bg-[var(--color-warning)]/10 px-3 py-2 text-xs text-[var(--color-warning)]" role="alert">
           Compare up to 3 ideas at a time.
         </p>
       )}

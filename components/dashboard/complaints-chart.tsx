@@ -14,7 +14,7 @@ const fmtDay = (d: string) =>
 export function ComplaintsChart({ data }: { data: DayBucket[] }) {
   if (data.length === 0) {
     return (
-      <div className="flex h-64 items-center justify-center rounded-[12px] border border-dashed border-[var(--color-border)] text-sm text-[var(--color-muted-foreground)]">
+      <div className="flex h-64 items-center justify-center rounded-xl border border-dashed border-[var(--color-border)] text-sm text-[var(--color-muted-foreground)]">
         No data to chart yet. Upload complaints to see a trend.
       </div>
     );

@@ -27,7 +27,7 @@ export function AddBetaTesterForm() {
       <button
         type="submit"
         disabled={pending}
-        className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--color-primary)] px-3 py-2 text-xs font-medium text-white disabled:cursor-not-allowed disabled:opacity-60"
+        className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--color-primary-fill)] px-3 py-2 text-xs font-medium text-white disabled:cursor-not-allowed disabled:opacity-60"
       >
         <UserPlus className="h-3.5 w-3.5" /> {pending ? "Adding..." : "Add tester"}
       </button>
@@ -52,14 +52,14 @@ export function BetaTesterRowAction({ accessId, revoked }: { accessId: string; r
         disabled={pending}
         className={
           revoked
-            ? "rounded-lg border border-[var(--color-border)] px-2 py-1 text-[11px] text-[var(--color-foreground)] hover:border-[var(--color-primary)] disabled:cursor-not-allowed disabled:opacity-60"
-            : "rounded-lg border border-[var(--color-border)] px-2 py-1 text-[11px] text-[var(--color-danger)] hover:border-[var(--color-danger)] disabled:cursor-not-allowed disabled:opacity-60"
+            ? "rounded-lg border border-[var(--color-border)] px-2 py-1 text-xs text-[var(--color-foreground)] hover:border-[var(--color-primary)] disabled:cursor-not-allowed disabled:opacity-60"
+            : "rounded-lg border border-[var(--color-border)] px-2 py-1 text-xs text-[var(--color-danger)] hover:border-[var(--color-danger)] disabled:cursor-not-allowed disabled:opacity-60"
         }
       >
         {pending ? "Saving..." : revoked ? "Restore access" : "Revoke access"}
       </button>
       {state && !state.ok ? (
-        <p className="max-w-40 text-right text-[11px] text-[var(--color-danger)]">{state.error}</p>
+        <p className="max-w-40 text-right text-xs text-[var(--color-danger)]">{state.error}</p>
       ) : null}
     </form>
   );

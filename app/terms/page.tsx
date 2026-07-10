@@ -29,7 +29,7 @@ export default function TermsPage() {
               <p>
                 Rift turns customer complaints into business idea suggestions.
                 You import complaints, Rift groups them with AI and scores the
-                opportunities it finds. It&apos;s a research tool. The ideas
+                ideas it finds. It&apos;s a research tool. The ideas
                 are starting points to validate, not guarantees that a business
                 will work.
               </p>

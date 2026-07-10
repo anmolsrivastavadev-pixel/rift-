@@ -30,7 +30,7 @@ function PreviewFindPain() {
             }`}
             aria-hidden
           />
-          <p className="truncate text-[11px] text-[var(--color-muted-foreground)]">
+          <p className="truncate text-xs text-[var(--color-muted-foreground)]">
             {row.text}
           </p>
         </div>
@@ -60,7 +60,7 @@ function PreviewScores() {
           style={{ animationDelay: `${row.delay}s` }}
         >
           <div className="mb-1.5 flex items-center justify-between">
-            <p className="text-[11px] text-[var(--color-muted-foreground)]">{row.label}</p>
+            <p className="text-xs text-[var(--color-muted-foreground)]">{row.label}</p>
             <span
               className="animate-demo-pop text-xs font-semibold tabular-nums"
               style={{ color: row.tone, animationDelay: `${row.delay + 0.7}s` }}
@@ -109,26 +109,26 @@ function PreviewDecide() {
           >
             <Check className="h-2.5 w-2.5 text-[var(--color-success)]" aria-hidden />
           </span>
-          <p className="truncate text-[11px] text-[var(--color-muted-foreground)]">
+          <p className="truncate text-xs text-[var(--color-muted-foreground)]">
             {item.text}
           </p>
         </div>
       ))}
       <div className="flex justify-center gap-2 pt-1.5">
         <span
-          className="animate-demo-pop rounded-full bg-[var(--color-success-soft)] px-3 py-1 text-[10px] font-semibold text-[var(--color-success)]"
+          className="animate-demo-pop rounded-full bg-[var(--color-success-soft)] px-3 py-1 text-xs font-semibold text-[var(--color-success)]"
           style={{ animationDelay: "3.1s" }}
         >
           Pursue
         </span>
         <span
-          className="animate-demo-item rounded-full border border-[var(--color-border)] px-3 py-1 text-[10px] text-[var(--color-muted-foreground)]"
+          className="animate-demo-item rounded-full border border-[var(--color-border)] px-3 py-1 text-xs text-[var(--color-muted-foreground)]"
           style={{ animationDelay: "2.5s" }}
         >
           Park
         </span>
         <span
-          className="animate-demo-item rounded-full border border-[var(--color-border)] px-3 py-1 text-[10px] text-[var(--color-muted-foreground)]"
+          className="animate-demo-item rounded-full border border-[var(--color-border)] px-3 py-1 text-xs text-[var(--color-muted-foreground)]"
           style={{ animationDelay: "2.6s" }}
         >
           Reject
@@ -196,7 +196,7 @@ export function Features() {
                 {f.preview}
               </div>
               <div className="flex flex-1 flex-col p-5">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-primary)]">
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-primary)]">
                   {f.n}
                 </p>
                 <h3 className="mt-2 text-base font-semibold text-[var(--color-foreground)]">
@@ -209,7 +209,7 @@ export function Features() {
                   {f.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-2.5 py-1 text-[11px] text-[var(--color-muted-foreground)]"
+                      className="rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-2.5 py-1 text-xs text-[var(--color-muted-foreground)]"
                     >
                       {tag}
                     </span>

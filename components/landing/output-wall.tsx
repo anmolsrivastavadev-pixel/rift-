@@ -35,7 +35,7 @@ export function OutputWall() {
       <Container className="grid items-start gap-10 lg:grid-cols-[2fr_3fr] lg:gap-16">
         {/* Sticky headline */}
         <div className="lg:sticky lg:top-24">
-          <span className="inline-flex items-center gap-2 rounded-full border border-[var(--color-primary)]/30 bg-[var(--color-primary-soft)] px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-primary)]">
+          <span className="inline-flex items-center gap-2 rounded-full border border-[var(--color-primary)]/30 bg-[var(--color-primary-soft)] px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-primary)]">
             <FileText className="h-3.5 w-3.5" aria-hidden />
             What comes out
           </span>
@@ -60,7 +60,7 @@ export function OutputWall() {
                   "radial-gradient(circle at 100% 0%, rgba(59,130,246,0.09), transparent 60%)",
               }}
             >
-              <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-primary)]">
+              <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-primary)]">
                 {o.label}
               </span>
               <p className="mt-4 text-xl font-semibold leading-snug tracking-tight text-[var(--color-foreground)] sm:text-2xl">

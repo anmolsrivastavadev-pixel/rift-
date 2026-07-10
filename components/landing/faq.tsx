@@ -35,7 +35,7 @@ export function Faq() {
         <div className="grid gap-10 lg:grid-cols-[2fr_3fr] lg:gap-16">
           {/* Left column */}
           <div>
-            <span className="inline-flex items-center gap-2 rounded-full border border-[var(--color-primary)]/30 bg-[var(--color-primary-soft)] px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-primary)]">
+            <span className="inline-flex items-center gap-2 rounded-full border border-[var(--color-primary)]/30 bg-[var(--color-primary-soft)] px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-primary)]">
               <HelpCircle className="h-3.5 w-3.5" aria-hidden />
               FAQ
             </span>

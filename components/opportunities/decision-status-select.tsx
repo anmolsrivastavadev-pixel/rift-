@@ -84,7 +84,7 @@ export function DecisionStatusSelect({
         })}
       </div>
       {saveFailed && (
-        <span role="alert" className="text-[11px] text-[var(--color-danger)]">
+        <span role="alert" className="text-xs text-[var(--color-danger)]">
           {"Couldn't save that decision — check your connection and try again."}
         </span>
       )}

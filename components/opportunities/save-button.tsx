@@ -50,10 +50,10 @@ export function SaveButton({
   const Icon = isSaved ? BookmarkCheck : Bookmark;
   // Labeled variant matches the compare chip; icon-only keeps the square.
   const dim = showLabel
-    ? "gap-1 rounded-lg px-2.5 py-1 text-[11px] font-medium"
+    ? "gap-1 rounded-lg px-2.5 py-1 text-xs font-medium"
     : size === "sm"
-      ? "h-7 w-7 rounded-[10px]"
-      : "h-8 w-8 rounded-[10px]";
+      ? "h-7 w-7 rounded-lg"
+      : "h-8 w-8 rounded-lg";
   const iconCls = showLabel ? "h-3 w-3" : size === "sm" ? "h-3.5 w-3.5" : "h-4 w-4";
 
   return (

@@ -47,7 +47,7 @@ export function Footer() {
               Business ideas from real customer pain. Grouped by AI, scored
               transparently, validated by you.
             </p>
-            <p className="mt-6 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-muted-foreground)]/70">
+            <p className="mt-6 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-muted-foreground)]/70">
               Find your first idea today
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
@@ -67,7 +67,7 @@ export function Footer() {
           >
             {columns.map((col) => (
               <div key={col.title}>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-muted-foreground)]/70">
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-muted-foreground)]/70">
                   {col.title}
                 </p>
                 <ul className="mt-4 space-y-2.5">

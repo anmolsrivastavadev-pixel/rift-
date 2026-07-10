@@ -104,7 +104,7 @@ export function ExportButtons({
       </Button>
       {notice && (
         <span
-          className={`flex items-center gap-1 text-[11px] ${
+          className={`flex items-center gap-1 text-xs ${
             notice.ok ? "text-[var(--color-success)]" : "text-[var(--color-danger)]"
           }`}
           aria-live="polite"

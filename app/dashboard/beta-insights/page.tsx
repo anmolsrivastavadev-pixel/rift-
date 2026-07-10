@@ -6,6 +6,7 @@ import { requireUser } from "@/lib/auth/current-user";
 import { isAdminEmail } from "@/lib/admin";
 import { isBetaModeEnabled } from "@/lib/beta-access";
 import { AddBetaTesterForm, BetaTesterRowAction } from "@/components/dashboard/beta-access-admin-actions";
+import { StatCard } from "@/components/dashboard/stat-card";
 
 /* M19 — Private, admin-only beta insights.
  *
@@ -137,7 +138,7 @@ export default async function BetaInsightsPage() {
   ];
 
   return (
-    <div className="mx-auto max-w-4xl space-y-8">
+    <div className="mx-auto max-w-6xl space-y-8">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Beta insights</h1>
         <p className="mt-1 text-sm text-[var(--color-muted-foreground)]">
@@ -148,15 +149,7 @@ export default async function BetaInsightsPage() {
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         {totals.map((t) => (
-          <div
-            key={t.label}
-            className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-4 text-center"
-          >
-            <p className="text-2xl font-bold">{t.value}</p>
-            <p className="mt-0.5 text-[10px] uppercase tracking-wide text-[var(--color-muted-foreground)]">
-              {t.label}
-            </p>
-          </div>
+          <StatCard key={t.label} label={t.label} value={t.value} />
         ))}
       </div>
 
@@ -240,7 +233,7 @@ export default async function BetaInsightsPage() {
             {recentFeedback.map((f) => (
               <li
                 key={f.id}
-                className="rounded-[12px] border border-[var(--color-border)]/60 p-3 text-xs"
+                className="rounded-xl border border-[var(--color-border)] p-3 text-xs"
               >
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
                   <span className="font-medium text-[var(--color-foreground)]">

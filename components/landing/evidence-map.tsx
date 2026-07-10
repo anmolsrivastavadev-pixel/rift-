@@ -25,7 +25,7 @@ export function EvidenceMap() {
       <Container className="grid items-center gap-10 lg:grid-cols-[4fr_5fr] lg:gap-16">
         {/* Copy */}
         <div>
-          <span className="inline-flex items-center gap-2 rounded-full border border-[var(--color-primary)]/30 bg-[var(--color-primary-soft)] px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-primary)]">
+          <span className="inline-flex items-center gap-2 rounded-full border border-[var(--color-primary)]/30 bg-[var(--color-primary-soft)] px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-primary)]">
             <Inbox className="h-3.5 w-3.5" aria-hidden />
             Bring your own evidence
           </span>

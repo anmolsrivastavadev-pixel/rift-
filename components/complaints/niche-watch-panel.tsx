@@ -76,7 +76,7 @@ export function NicheWatchPanel({
             placeholder="Niche to watch, e.g. fitness apps"
             aria-label="Niche keyword to watch weekly"
             disabled={creating}
-            className="h-10 w-full rounded-[12px] border border-[var(--color-border)] bg-[var(--color-background)] pl-9 pr-3 text-sm text-[var(--color-foreground)] outline-none focus:border-[var(--color-primary)] focus-visible:outline focus-visible:[outline-offset:2px] focus-visible:[outline-color:var(--color-primary)]"
+            className="h-10 w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-background)] pl-9 pr-3 text-sm text-[var(--color-foreground)] outline-none focus:border-[var(--color-primary)] focus-visible:outline focus-visible:[outline-offset:2px] focus-visible:[outline-color:var(--color-primary)]"
           />
         </div>
         <Button type="submit" disabled={creating} variant="secondary">
@@ -95,7 +95,7 @@ export function NicheWatchPanel({
       {createResult && !createResult.ok && (
         <div
           role="alert"
-          className="flex items-start gap-2 rounded-[12px] border border-[var(--color-warning)]/40 bg-[var(--color-warning)]/10 p-3 text-xs text-[var(--color-warning)]"
+          className="flex items-start gap-2 rounded-xl border border-[var(--color-warning)]/40 bg-[var(--color-warning)]/10 p-3 text-xs text-[var(--color-warning)]"
         >
           <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
           {createResult.error}
@@ -140,7 +140,7 @@ function WatchRow({ watch }: { watch: NicheWatchItem }) {
     null;
 
   return (
-    <li className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-3">
+    <li className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-3">
       <div className="flex flex-wrap items-center gap-2">
         <span className="min-w-0 flex-1 truncate text-sm font-medium">
           {watch.keyword}

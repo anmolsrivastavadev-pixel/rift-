@@ -127,7 +127,7 @@ function Field({
     <div className="flex gap-3">
       <Icon className="mt-0.5 h-4 w-4 shrink-0 text-[var(--color-muted-foreground)]" />
       <div>
-        <p className="text-[11px] font-medium uppercase tracking-wide text-[var(--color-muted-foreground)]">
+        <p className="text-xs font-medium uppercase tracking-wide text-[var(--color-muted-foreground)]">
           {label}
         </p>
         <p className="mt-0.5 text-sm leading-relaxed whitespace-normal break-words text-[var(--color-foreground)]/90">

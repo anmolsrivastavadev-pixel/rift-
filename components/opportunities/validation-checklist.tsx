@@ -97,7 +97,7 @@ export function ValidationChecklist({
           </li>
         ))}
       </ul>
-      <p className="mt-3 flex items-center gap-1 text-[11px] text-[var(--color-muted-foreground)]">
+      <p className="mt-3 flex items-center gap-1 text-xs text-[var(--color-muted-foreground)]">
         <Info className="h-3 w-3" /> Saved to your account.
       </p>
     </div>

@@ -25,10 +25,10 @@ export function RelatedOpportunityCard({
   return (
     <Link
       href={projectHref(`/dashboard/opportunities/${op.id}`, projectId)}
-      className="group block rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-4 transition-shadow duration-150 ease-out hover:shadow-md focus-visible:outline focus-visible:[outline-offset:2px] focus-visible:[outline-color:var(--color-primary)]"
-      aria-label={`Open related opportunity: ${op.title}, score ${op.opportunityScore}${shared > 0 ? `, ${shared} shared keyword${shared === 1 ? "" : "s"}` : ""}`}
+      className="group block rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-4 transition-shadow duration-150 ease-out hover:shadow-md focus-visible:outline focus-visible:[outline-offset:2px] focus-visible:[outline-color:var(--color-primary)]"
+      aria-label={`Open related idea: ${op.title}, score ${op.opportunityScore}${shared > 0 ? `, ${shared} shared keyword${shared === 1 ? "" : "s"}` : ""}`}
     >
-      <div className="flex items-center gap-1.5 text-[11px] uppercase tracking-wide text-[var(--color-muted-foreground)]">
+      <div className="flex items-center gap-1.5 text-xs uppercase tracking-wide text-[var(--color-muted-foreground)]">
         <Briefcase className="h-3 w-3" />
         {op.industry}
       </div>
@@ -39,7 +39,7 @@ export function RelatedOpportunityCard({
         <span className="flex items-center gap-1 text-xs text-[var(--color-muted-foreground)]">
           <Target className="h-3 w-3" />
           <span className="font-medium text-[var(--color-foreground)]">{op.opportunityScore}</span>
-          <span className="text-[10px]">/ 100</span>
+          <span className="text-xs">/ 100</span>
         </span>
         {shared > 0 && (
           <Badge variant="primary">{shared} shared keyword{shared === 1 ? "" : "s"}</Badge>

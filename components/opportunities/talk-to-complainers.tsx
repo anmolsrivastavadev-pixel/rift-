@@ -44,7 +44,7 @@ export function TalkToComplainers({
         {threads.map((t) => (
           <li
             key={t.id}
-            className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-3"
+            className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-3"
           >
             <span className="min-w-0 flex-1 truncate text-sm">{t.title}</span>
             <span className="text-[10px] uppercase tracking-wide text-[var(--color-muted-foreground)]">

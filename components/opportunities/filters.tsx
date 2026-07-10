@@ -133,7 +133,7 @@ export function OpportunityFilters({
           <SlidersHorizontal className="h-3 w-3" aria-hidden />
           More filters
           {advancedActive > 0 && (
-            <span className="rounded-full bg-[var(--color-primary-soft)] px-1.5 py-0.5 text-[10px] font-semibold text-[var(--color-primary)]">
+            <span className="rounded-full bg-[var(--color-primary-soft)] px-1.5 py-0.5 text-xs font-semibold text-[var(--color-primary)]">
               {advancedActive}
               <span className="sr-only"> active</span>
             </span>

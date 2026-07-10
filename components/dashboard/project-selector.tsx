@@ -170,7 +170,7 @@ export function ProjectSelector({
             <Plus className="h-3.5 w-3.5" /> New project
           </button>
           {notice && (
-            <p className="flex items-start gap-1 px-2 text-[11px] text-[var(--color-primary)]">
+            <p className="flex items-start gap-1 px-2 text-xs text-[var(--color-primary)]">
               <Check className="mt-0.5 h-3 w-3 shrink-0" /> {notice}
             </p>
           )}
@@ -210,7 +210,7 @@ export function ProjectSelector({
                   </button>
                   {showArchived && (
                     <div className="space-y-1">
-                      <p className="px-2 text-[10px] leading-snug text-[var(--color-muted-foreground)]/80">
+                      <p className="px-2 text-xs leading-snug text-[var(--color-muted-foreground)]/80">
                         Archived projects are hidden, not deleted.
                       </p>
                       {archivedProjects.map((p) => (
@@ -261,7 +261,7 @@ function NewProjectForm({
         autoFocus
         className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] px-2 py-1.5 text-sm text-[var(--color-foreground)] placeholder:text-[var(--color-muted-foreground)] outline-none focus:border-[var(--color-primary)]"
       />
-      <p className="px-0.5 text-[10px] leading-snug text-[var(--color-muted-foreground)]/80">
+      <p className="px-0.5 text-xs leading-snug text-[var(--color-muted-foreground)]/80">
         Use separate projects for different niches.
       </p>
       <div className="flex items-center gap-2">
@@ -278,7 +278,7 @@ function NewProjectForm({
         </button>
       </div>
       {state && !state.ok && (
-        <p className="flex items-start gap-1 text-[11px] text-[var(--color-danger)]">
+        <p className="flex items-start gap-1 text-xs text-[var(--color-danger)]">
           <AlertCircle className="mt-0.5 h-3 w-3 shrink-0" /> {state.error}
         </p>
       )}
@@ -339,7 +339,7 @@ function RenameProjectForm({
         </button>
       </div>
       {state && !state.ok && (
-        <p className="flex items-start gap-1 text-[11px] text-[var(--color-danger)]">
+        <p className="flex items-start gap-1 text-xs text-[var(--color-danger)]">
           <AlertCircle className="mt-0.5 h-3 w-3 shrink-0" /> {state.error}
         </p>
       )}
@@ -369,7 +369,7 @@ function ArchiveProjectForm({
       <p className="text-xs text-[var(--color-foreground)]">
         Archive <span className="font-medium">{projectName}</span>?
       </p>
-      <p className="text-[10px] leading-snug text-[var(--color-muted-foreground)]">
+      <p className="text-xs leading-snug text-[var(--color-muted-foreground)]">
         Archiving hides this project. It does not delete your data.
       </p>
       <div className="flex items-center gap-2">
@@ -386,7 +386,7 @@ function ArchiveProjectForm({
         </button>
       </div>
       {state && !state.ok && (
-        <p className="flex items-start gap-1 text-[11px] text-[var(--color-danger)]">
+        <p className="flex items-start gap-1 text-xs text-[var(--color-danger)]">
           <AlertCircle className="mt-0.5 h-3 w-3 shrink-0" /> {state.error}
         </p>
       )}
@@ -428,7 +428,7 @@ function ArchivedProjectRow({
             <button
               type="submit"
               disabled={restorePending}
-              className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] text-[var(--color-primary)] transition-colors hover:bg-[var(--color-surface)] disabled:opacity-50"
+              className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-[var(--color-primary)] transition-colors hover:bg-[var(--color-surface)] disabled:opacity-50"
             >
               {restorePending ? (
                 <Loader2 className="h-3 w-3 animate-spin" />
@@ -441,7 +441,7 @@ function ArchivedProjectRow({
           <button
             type="button"
             onClick={() => setConfirmingDelete((v) => !v)}
-            className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] text-[var(--color-danger)] transition-colors hover:bg-[var(--color-danger-soft)] disabled:opacity-50"
+            className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-[var(--color-danger)] transition-colors hover:bg-[var(--color-danger-soft)] disabled:opacity-50"
           >
             <Trash2 className="h-3 w-3" />
             Delete permanently
@@ -449,7 +449,7 @@ function ArchivedProjectRow({
         </div>
       </div>
       {restoreState && !restoreState.ok && (
-        <p className="flex items-start gap-1 text-[11px] text-[var(--color-danger)]">
+        <p className="flex items-start gap-1 text-xs text-[var(--color-danger)]">
           <AlertCircle className="mt-0.5 h-3 w-3 shrink-0" /> {restoreState.error}
         </p>
       )}
@@ -459,11 +459,11 @@ function ArchivedProjectRow({
           className="space-y-2 rounded-lg border border-[var(--color-danger)]/40 bg-[var(--color-card)] p-2"
         >
           <input type="hidden" name="projectId" value={projectId} />
-          <p className="text-[10px] leading-snug text-[var(--color-muted-foreground)]">
+          <p className="text-xs leading-snug text-[var(--color-muted-foreground)]">
             This removes the project, complaints, ideas, and saved ideas. This
             cannot be undone.
           </p>
-          <label className="block text-[10px] text-[var(--color-muted-foreground)]">
+          <label className="block text-xs text-[var(--color-muted-foreground)]">
             Type the project name to confirm.
             <input
               name="confirmName"
@@ -492,7 +492,7 @@ function ArchivedProjectRow({
             </button>
           </div>
           {deleteState && !deleteState.ok && (
-            <p className="flex items-start gap-1 text-[11px] text-[var(--color-danger)]">
+            <p className="flex items-start gap-1 text-xs text-[var(--color-danger)]">
               <AlertCircle className="mt-0.5 h-3 w-3 shrink-0" /> {deleteState.error}
             </p>
           )}

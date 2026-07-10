@@ -42,7 +42,7 @@ export function ComplaintsTable({
 }) {
   if (rows.length === 0) {
     return (
-      <div className="rounded-[12px] border border-dashed border-[var(--color-border)] bg-[var(--color-card)] p-12 text-center">
+      <div className="rounded-xl border border-dashed border-[var(--color-border)] bg-[var(--color-card)] p-12 text-center">
         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
           <Inbox className="h-6 w-6" />
         </div>
@@ -57,7 +57,7 @@ export function ComplaintsTable({
   }
 
   return (
-    <div className="overflow-hidden rounded-[12px] border border-[var(--color-border)]">
+    <div className="overflow-hidden rounded-xl border border-[var(--color-border)]">
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>

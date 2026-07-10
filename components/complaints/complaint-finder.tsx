@@ -152,7 +152,7 @@ function SearchingStatus() {
     <div
       role="status"
       aria-live="polite"
-      className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-4 text-sm"
+      className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-4 text-sm"
     >
       <p className="flex items-center gap-2 font-medium text-[var(--color-foreground)]">
         <Loader2 className="h-4 w-4 animate-spin text-[var(--color-primary)]" />

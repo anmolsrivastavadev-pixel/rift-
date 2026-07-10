@@ -28,7 +28,7 @@ export function ErrorPanel({
         className
       )}
     >
-      <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-[12px] bg-[var(--color-danger)]/10 text-[var(--color-danger)]">
+      <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--color-danger)]/10 text-[var(--color-danger)]">
         <AlertTriangle className="h-6 w-6" />
       </div>
       <div className="space-y-2">

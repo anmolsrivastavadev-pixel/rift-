@@ -33,7 +33,7 @@ export default async function BetaAccessPage() {
         <p className="mt-3 text-sm text-[var(--color-muted-foreground)]">
           Your account is signed in, but this beta is invite-only right now.
         </p>
-        <p className="mt-4 rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] px-4 py-3 text-sm">
+        <p className="mt-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] px-4 py-3 text-sm">
           Signed in as{" "}
           <span className="font-medium text-[var(--color-foreground)]">
             {user.email}

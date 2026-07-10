@@ -15,12 +15,12 @@ export function PrevNextNav({
   projectId: string;
 }) {
   const base =
-    "inline-flex items-center gap-1.5 rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-2 text-sm transition-colors duration-150 ease-out";
+    "inline-flex items-center gap-1.5 rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-2 text-sm transition-colors duration-150 ease-out";
   const enabledCls = "hover:border-[var(--color-primary)]/60 hover:text-[var(--color-primary)]";
   const disabledCls = "cursor-not-allowed opacity-50";
 
   return (
-    <nav aria-label="Opportunity navigation" className="mt-6 flex items-center justify-between gap-3">
+    <nav aria-label="Idea navigation" className="mt-6 flex items-center justify-between gap-3">
       {prevId ? (
         <Link
           href={projectHref(`/dashboard/opportunities/${prevId}`, projectId)}

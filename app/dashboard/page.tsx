@@ -318,7 +318,7 @@ export default async function DashboardPage({
                 href={projectHref(`/dashboard/opportunities/${o.id}`, projectId)}
                 className="group flex flex-col rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-5 shadow-[var(--shadow-card)] transition-all duration-150 ease-out hover:-translate-y-0.5 hover:border-[var(--color-primary)]/40 hover:shadow-[var(--shadow-card-hover)]"
               >
-                <div className="flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-[var(--color-muted-foreground)]">
+                <div className="flex items-center gap-1.5 text-xs uppercase tracking-wider text-[var(--color-muted-foreground)]">
                   <Briefcase className="h-3 w-3" />
                   {o.industry}
                 </div>

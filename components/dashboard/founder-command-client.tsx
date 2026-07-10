@@ -44,7 +44,7 @@ export function FounderCommandClient({
       <section className="rounded-2xl border border-[var(--color-primary)]/30 bg-[var(--color-primary)]/5 p-6 shadow-[var(--shadow-card)]">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-[11px] uppercase tracking-wide text-[var(--color-primary)]">
+            <p className="text-xs uppercase tracking-wide text-[var(--color-primary)]">
               Next step
             </p>
             <h2 className="mt-1 text-lg font-semibold tracking-tight">{nextAction.title}</h2>
@@ -76,7 +76,7 @@ export function FounderCommandClient({
             >
               Open Decisions →
             </Link>
-            <span className="flex items-center gap-1 text-[11px] text-[var(--color-muted-foreground)]">
+            <span className="flex items-center gap-1 text-xs text-[var(--color-muted-foreground)]">
               <Info className="h-3 w-3" /> Decisions are saved to your account.
             </span>
           </div>
@@ -110,7 +110,7 @@ function SnapshotCount({
   return (
     <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-2">
       <p className={`text-lg font-bold ${colorClass}`}>{value}</p>
-      <p className="text-[11px] text-[var(--color-muted-foreground)]">{label}</p>
+      <p className="text-xs text-[var(--color-muted-foreground)]">{label}</p>
     </div>
   );
 }

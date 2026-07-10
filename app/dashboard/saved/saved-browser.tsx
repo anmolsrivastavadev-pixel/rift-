@@ -69,7 +69,7 @@ export function SavedBrowser({
     <div className={`space-y-4 ${selectedIds.size > 0 ? "pb-24" : ""}`}>
       {maxReached && (
         <p
-          className="rounded-[8px] bg-[var(--color-warning)]/10 px-3 py-2 text-xs text-[var(--color-warning)]"
+          className="rounded-lg bg-[var(--color-warning)]/10 px-3 py-2 text-xs text-[var(--color-warning)]"
           role="alert"
         >
           Compare up to 3 ideas at a time.

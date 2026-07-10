@@ -19,7 +19,7 @@ export function SectionHeader({
   return (
     <div>
       <div className="flex justify-center">
-        <span className="inline-flex items-center gap-2 rounded-full border border-[var(--color-primary)]/30 bg-[var(--color-primary-soft)] px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-primary)]">
+        <span className="inline-flex items-center gap-2 rounded-full border border-[var(--color-primary)]/30 bg-[var(--color-primary-soft)] px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-primary)]">
           <Icon className="h-3.5 w-3.5" aria-hidden />
           {badge}
         </span>

@@ -64,7 +64,7 @@ export function FeedbackWidget({ projectId }: { projectId: string }) {
           Feedback
         </button>
         {showSuccess && (
-          <p className="flex items-center gap-1 px-3 text-[11px] text-[var(--color-success)]">
+          <p className="flex items-center gap-1 px-3 text-xs text-[var(--color-success)]">
             <Check className="h-3 w-3" /> Thanks, feedback saved.
           </p>
         )}
@@ -129,7 +129,7 @@ export function FeedbackWidget({ projectId }: { projectId: string }) {
         </button>
       </div>
       {state && !state.ok && (
-        <p className="flex items-start gap-1 text-[11px] text-[var(--color-danger)]">
+        <p className="flex items-start gap-1 text-xs text-[var(--color-danger)]">
           <AlertCircle className="mt-0.5 h-3 w-3 shrink-0" /> {state.error}
         </p>
       )}

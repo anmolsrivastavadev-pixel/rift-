@@ -28,13 +28,13 @@ export type LinkedComplaint = {
 export function ExampleComplaints({ items }: { items: LinkedComplaint[] }) {
   if (items.length === 0) {
     return (
-      <div className="rounded-[12px] border border-dashed border-[var(--color-border)] bg-[var(--color-card)] p-8 text-center">
-        <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-[10px] bg-[var(--color-muted-foreground)]/10 text-[var(--color-muted-foreground)]">
+      <div className="rounded-xl border border-dashed border-[var(--color-border)] bg-[var(--color-card)] p-8 text-center">
+        <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--color-muted-foreground)]/10 text-[var(--color-muted-foreground)]">
           <MessageSquareOff className="h-5 w-5" />
         </div>
         <h3 className="mt-3 text-sm font-semibold">No linked complaints</h3>
         <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
-          This opportunity was not linked to any specific complaint by the AI.
+          This idea was not linked to any specific complaint by the AI.
         </p>
       </div>
     );
@@ -45,7 +45,7 @@ export function ExampleComplaints({ items }: { items: LinkedComplaint[] }) {
       {items.map((c, i) => (
         <li
           key={c.id}
-          className="rounded-[12px] border border-[var(--color-border)] bg-[var(--color-card)] p-4 transition-shadow duration-150 ease-out hover:shadow-sm"
+          className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-4 transition-shadow duration-150 ease-out hover:shadow-sm"
         >
           <p className="truncate text-sm font-medium">
             {c.title.trim() !== "" ? c.title : `Complaint ${i + 1}`}
@@ -72,7 +72,7 @@ export function ExampleComplaints({ items }: { items: LinkedComplaint[] }) {
             (() => {
               const hint = buildReceiptHint(c.sourceKind, c.title);
               return hint ? (
-                <p className="mt-1 text-[11px] text-[var(--color-muted-foreground)]">
+                <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
                   {hint}
                 </p>
               ) : null;

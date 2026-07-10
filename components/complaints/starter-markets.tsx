@@ -110,7 +110,7 @@ export function StarterMarkets({ projectId }: { projectId: string }) {
             Generate
           </Button>
         </form>
-        <p className="mt-1 text-[11px] text-[var(--color-muted-foreground)]">
+        <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
           Examples are for exploring. Real complaints are stronger.
         </p>
       </div>
@@ -139,7 +139,7 @@ export function StarterMarkets({ projectId }: { projectId: string }) {
       {state && <StarterSummary result={state} projectId={projectId} />}
       {customState && <StarterSummary result={customState} projectId={projectId} />}
 
-      <p className="mt-3 text-[11px] text-[var(--color-muted-foreground)]">
+      <p className="mt-3 text-xs text-[var(--color-muted-foreground)]">
         Examples are not proof of demand.
       </p>
     </section>
@@ -155,7 +155,7 @@ function StarterSummary({
 }) {
   if (result.inserted === 0 && result.errors.length === 0) {
     return (
-      <div className="mt-4 flex items-start gap-2 rounded-[12px] border border-[var(--color-primary)]/40 bg-[var(--color-primary)]/10 p-4 text-sm text-[var(--color-primary)]">
+      <div className="mt-4 flex items-start gap-2 rounded-xl border border-[var(--color-primary)]/40 bg-[var(--color-primary)]/10 p-4 text-sm text-[var(--color-primary)]">
         <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
         <div className="space-y-1">
           <p className="font-medium">
@@ -169,7 +169,7 @@ function StarterSummary({
 
   if (result.inserted === 0 && result.errors.length > 0) {
     return (
-      <div className="mt-4 flex items-start gap-2 rounded-[12px] border border-[var(--color-danger)]/40 bg-[var(--color-danger)]/10 p-4 text-sm text-[var(--color-danger)]">
+      <div className="mt-4 flex items-start gap-2 rounded-xl border border-[var(--color-danger)]/40 bg-[var(--color-danger)]/10 p-4 text-sm text-[var(--color-danger)]">
         <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
         <div>
           <p className="font-medium">Could not load starter complaints.</p>
@@ -184,7 +184,7 @@ function StarterSummary({
   }
 
   return (
-    <div className="mt-4 flex items-start gap-2 rounded-[12px] border border-[var(--color-success)]/40 bg-[var(--color-success)]/10 p-4 text-sm text-[var(--color-success)]">
+    <div className="mt-4 flex items-start gap-2 rounded-xl border border-[var(--color-success)]/40 bg-[var(--color-success)]/10 p-4 text-sm text-[var(--color-success)]">
       <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
       <div className="space-y-1">
         <p className="font-medium">

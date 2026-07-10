@@ -69,7 +69,7 @@ export function ProjectHistory({
                     {SOURCE_LABELS[item.sourceType] ?? item.sourceType}
                   </p>
                 </div>
-                <span className="shrink-0 text-[11px] text-[var(--color-muted-foreground)]">
+                <span className="shrink-0 text-xs text-[var(--color-muted-foreground)]">
                   {formatDate(item.createdAt)}
                 </span>
               </li>
@@ -104,7 +104,7 @@ export function ProjectHistory({
                     {run.status === "failed" && run.errorMessage ? ` · ${run.errorMessage}` : ""}
                   </p>
                 </div>
-                <span className="shrink-0 text-[11px] text-[var(--color-muted-foreground)]">
+                <span className="shrink-0 text-xs text-[var(--color-muted-foreground)]">
                   {formatDate(run.createdAt)}
                 </span>
               </li>

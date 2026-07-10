@@ -137,7 +137,7 @@ export function TextInput({
               if (hidden) hidden.value = t.value;
             }}
           />
-          <span className="mt-1 text-[11px] text-[var(--color-muted-foreground)]">
+          <span className="mt-1 text-xs text-[var(--color-muted-foreground)]">
             Short entries and exact duplicates are skipped.
           </span>
         </label>
@@ -175,7 +175,7 @@ export function TextInput({
             </p>
           )}
           {fileError && (
-            <div className="flex items-start gap-2 rounded-[12px] border border-[var(--color-danger)]/40 bg-[var(--color-danger)]/10 p-3 text-sm text-[var(--color-danger)]">
+            <div className="flex items-start gap-2 rounded-xl border border-[var(--color-danger)]/40 bg-[var(--color-danger)]/10 p-3 text-sm text-[var(--color-danger)]">
               <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
               <span>{fileError}</span>
             </div>

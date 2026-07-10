@@ -88,7 +88,7 @@ export function HowItWorks() {
                 <p className="text-xs text-[var(--color-muted-foreground)]">
                   Grouping 24 complaints…
                 </p>
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-primary-soft)] px-3 py-1 text-[11px] font-medium text-[var(--color-primary)]">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-primary-soft)] px-3 py-1 text-xs font-medium text-[var(--color-primary)]">
                   <Sparkles className="h-3 w-3" aria-hidden /> AI at work
                 </span>
               </div>
@@ -99,7 +99,7 @@ export function HowItWorks() {
                       <p className="text-xs font-medium text-[var(--color-foreground)]">
                         {c.label}
                       </p>
-                      <span className="text-[11px] tabular-nums text-[var(--color-muted-foreground)]">
+                      <span className="text-xs tabular-nums text-[var(--color-muted-foreground)]">
                         {c.count}
                       </span>
                     </div>
@@ -113,7 +113,7 @@ export function HowItWorks() {
                 ))}
               </div>
             </div>
-            <p className="px-3 py-2.5 text-center text-[11px] uppercase tracking-wider text-[var(--color-muted-foreground)]/70">
+            <p className="px-3 py-2.5 text-center text-xs uppercase tracking-wider text-[var(--color-muted-foreground)]/70">
               Step 2 · Repeated problems become scored ideas
             </p>
           </div>

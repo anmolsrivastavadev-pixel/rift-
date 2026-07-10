@@ -365,7 +365,7 @@ export default async function OpportunityDetailPage({
           <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[var(--shadow-card)]">
             <h2 className="flex items-center gap-2 text-base font-semibold">
               <Lightbulb className="h-4 w-4 text-[var(--color-warning)]" />
-              Product opportunity
+              Product idea
             </h2>
             <p className="mt-1 text-xs text-[var(--color-muted-foreground)]">
               A possible solution someone could build.
@@ -593,7 +593,7 @@ function BarRow({
         <span>
           {label}
           {definition && (
-            <span className="ml-1 text-[10px] normal-case tracking-normal opacity-70">
+            <span className="ml-1 text-xs normal-case tracking-normal opacity-70">
               ({definition})
             </span>
           )}

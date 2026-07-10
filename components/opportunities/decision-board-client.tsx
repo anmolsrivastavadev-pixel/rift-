@@ -313,7 +313,7 @@ export function DecisionBoardClient({
           </table>
         </div>
 
-        <p className="flex items-center gap-1 text-[11px] text-[var(--color-muted-foreground)]">
+        <p className="flex items-center gap-1 text-xs text-[var(--color-muted-foreground)]">
           <Info className="h-3 w-3" /> Decisions are saved to your account.
         </p>
       </div>
@@ -360,7 +360,7 @@ export function DecisionBoardClient({
             );
           })}
         </div>
-        <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-[11px] text-[var(--color-muted-foreground)]">
+        <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs text-[var(--color-muted-foreground)]">
           <span className="flex items-center gap-1">
             <Info className="h-3 w-3" /> {TESTING_PRIORITY_HELPER}
           </span>
@@ -403,7 +403,7 @@ export function DecisionBoardClient({
         <div className="grid gap-4 lg:grid-cols-2">{filtered.map(renderCard)}</div>
       )}
 
-      <p className="flex items-center gap-1 text-[11px] text-[var(--color-muted-foreground)]">
+      <p className="flex items-center gap-1 text-xs text-[var(--color-muted-foreground)]">
         <Info className="h-3 w-3" /> Decisions are saved to your account.
       </p>
     </div>
@@ -424,7 +424,7 @@ export function DecisionBoardClient({
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <div className="flex items-center gap-1.5 text-[11px] uppercase tracking-wide text-[var(--color-muted-foreground)]">
+                  <div className="flex items-center gap-1.5 text-xs uppercase tracking-wide text-[var(--color-muted-foreground)]">
                     <Briefcase className="h-3 w-3" />
                     {op.industry}
                   </div>
@@ -613,7 +613,7 @@ function Stat({
     <span className="inline-flex items-center gap-1">
       <Icon className="h-3 w-3" />
       <span className="font-medium text-[var(--color-foreground)]">{value}</span>
-      <span className="text-[10px]">{label}</span>
+      <span className="text-xs">{label}</span>
     </span>
   );
 }
