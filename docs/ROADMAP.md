@@ -377,6 +377,11 @@ The Start Fresh Test patch addresses workspace-mixing confusion:
 - **Not included (recorded as unscheduled ideas below, per the same review):** competitive-intelligence retention pivot, TAM/SAM/SOM market sizing, feature-request management. No schema, Gemini prompt, scoring, cleaning, or CSV pipeline changes; no new dependencies.
 - **Verified:** `pnpm exec tsc --noEmit`, `pnpm lint`, `pnpm test` (27 pass), `pnpm build` all pass.
 
+### Free beta switch (founder-prompted, July 2026)
+- **Status:** ✅ Done (immediately after M34 — the founder hit the free-plan 10-runs/month cap while beta testing their own app)
+- **What was built:** `FREE_BETA = true` constant in `lib/plans.ts`. While on: `resolvePlanId` returns "pro" for every account (Pro limits everywhere, all quota/upgrade nags and "See plans" notices disappear since they key off `plan === "free"`), both billing server actions refuse to start ("Rift is free during the beta — no payment needed."), the pricing page keeps BOTH plan cards but replaces the Pro CTA with an "Included free during the beta" badge and beta copy, and the sidebar Plan & pricing badge reads "beta". `User.plan` in the database is never touched; the Stripe webhook and keys are untouched and dormant.
+- **To turn payments back on (founder instruction required):** flip `FREE_BETA` to `false` in `lib/plans.ts` — everything reverts to the real Free/Pro split. `tests/plans.test.ts` asserts correct behavior for both positions of the switch.
+
 ---
 
 ## Planned milestones (founder-approved sequence, July 2026)

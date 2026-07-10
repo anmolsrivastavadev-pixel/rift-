@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { BETA_BLOCKED_MESSAGE, BetaAccessError, requireActor } from "@/lib/action-auth";
 import { logger } from "@/lib/logger";
+import { FREE_BETA } from "@/lib/plans";
 import { getAppBaseUrl, getProPriceId, getStripe, isBillingEnabled } from "@/lib/stripe";
 
 /* M28 — Stripe checkout + billing portal server actions.
@@ -21,6 +22,9 @@ export type BillingActionResult = { ok: false; error: string };
 
 const BILLING_DISABLED_MESSAGE =
   "Payments aren't live yet. Rift is free during the private beta.";
+
+const FREE_BETA_MESSAGE =
+  "Rift is free during the beta — no payment needed. Every account already has the Pro limits.";
 
 async function getOrCreateStripeCustomerId(user: {
   id: string;
@@ -51,6 +55,10 @@ export async function createCheckoutSession(): Promise<BillingActionResult> {
   } catch (err) {
     if (err instanceof BetaAccessError) return { ok: false, error: BETA_BLOCKED_MESSAGE };
     throw err;
+  }
+  // Free beta: refuse to start a checkout even with live Stripe keys.
+  if (FREE_BETA) {
+    return { ok: false, error: FREE_BETA_MESSAGE };
   }
   if (!isBillingEnabled()) {
     return { ok: false, error: BILLING_DISABLED_MESSAGE };
@@ -91,6 +99,10 @@ export async function createPortalSession(): Promise<BillingActionResult> {
   } catch (err) {
     if (err instanceof BetaAccessError) return { ok: false, error: BETA_BLOCKED_MESSAGE };
     throw err;
+  }
+  // Free beta: nobody has a paid subscription to manage; keep Stripe closed.
+  if (FREE_BETA) {
+    return { ok: false, error: FREE_BETA_MESSAGE };
   }
   if (!isBillingEnabled()) {
     return { ok: false, error: BILLING_DISABLED_MESSAGE };

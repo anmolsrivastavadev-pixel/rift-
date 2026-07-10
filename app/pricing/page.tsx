@@ -15,7 +15,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { getCurrentUser } from "@/lib/auth/current-user";
-import { PLANS, PRO_PRICE_LABEL } from "@/lib/plans";
+import { FREE_BETA, PLANS, PRO_PRICE_LABEL } from "@/lib/plans";
 import { getEffectivePlan } from "@/lib/quotas";
 import { isBillingEnabled } from "@/lib/stripe";
 import {
@@ -48,6 +48,24 @@ function FeatureList({ items }: { items: string[] }) {
 }
 
 function ProCta({ signedIn, plan }: { signedIn: boolean; plan: "free" | "pro" }) {
+  // Free beta: both plans stay visible, but nothing on this page can start a
+  // payment. Every account already has the Pro limits.
+  if (FREE_BETA) {
+    return (
+      <div className="mt-6 space-y-3">
+        <Badge variant="success">Included free during the beta</Badge>
+        {!signedIn && (
+          <Button asChild className="w-full">
+            <Link href="/sign-up">Start free</Link>
+          </Button>
+        )}
+        <p className="text-xs text-[var(--color-muted-foreground)]">
+          Every beta account gets the Pro limits at no cost. Paid plans start
+          only after the beta ends.
+        </p>
+      </div>
+    );
+  }
   if (!signedIn) {
     return (
       <Button asChild className="mt-6 w-full">
@@ -109,8 +127,19 @@ export default async function PricingPage() {
               Simple, honest pricing
             </h1>
             <p className="mt-4 text-sm text-[var(--color-muted-foreground)] sm:text-base">
-              Start free and validate your first ideas. Upgrade when you&apos;re
-              running more market tests than the free plan covers.
+              {FREE_BETA ? (
+                <>
+                  Rift is completely free during the beta — every account gets
+                  the Pro limits. These are the plans that will exist after the
+                  beta ends.
+                </>
+              ) : (
+                <>
+                  Start free and validate your first ideas. Upgrade when
+                  you&apos;re running more market tests than the free plan
+                  covers.
+                </>
+              )}
             </p>
           </div>
 
@@ -188,7 +217,10 @@ export default async function PricingPage() {
           </div>
 
           <p className="mx-auto mt-10 max-w-xl text-center text-xs text-[var(--color-muted-foreground)]">
-            Pro is {PRO_PRICE_LABEL}, billed through Stripe. Prices in USD.{" "}
+            {FREE_BETA
+              ? "No payments during the beta. After the beta, Pro will be "
+              : "Pro is "}
+            {PRO_PRICE_LABEL}, billed through Stripe. Prices in USD.{" "}
             {user ? (
               <>Questions? Use the feedback button inside the app.</>
             ) : (

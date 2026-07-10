@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-import { PLANS, getPlanLimits, isPlanId, resolvePlanId } from "../lib/plans";
+import { FREE_BETA, PLANS, getPlanLimits, isPlanId, resolvePlanId } from "../lib/plans";
 
 test("locks free and pro plan limits", () => {
   assert.deepEqual(PLANS.free, {
@@ -25,7 +25,12 @@ test("resolves stored plans and unknown values", () => {
   assert.equal(isPlanId("pro"), true);
   assert.equal(isPlanId("enterprise"), false);
   assert.equal(resolvePlanId("pro", "user@example.com"), "pro");
-  assert.equal(resolvePlanId("enterprise", "user@example.com"), "free");
+  // During the free beta everyone resolves to pro; once FREE_BETA is flipped
+  // off, unknown/missing stored plans must fall back to "free" again.
+  assert.equal(
+    resolvePlanId("enterprise", "user@example.com"),
+    FREE_BETA ? "pro" : "free"
+  );
   assert.equal(getPlanLimits("free").ideaRunsPerMonth, 10);
 });
 

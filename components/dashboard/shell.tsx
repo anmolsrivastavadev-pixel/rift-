@@ -84,7 +84,7 @@ export function DashboardShell({
   archivedProjects: ProjectOption[];
   currentProjectId: string;
   isAdmin?: boolean;
-  plan?: "free" | "pro";
+  plan?: "free" | "pro" | "beta";
 }) {
   const pathname = usePathname();
   const search = useSearchParams();
@@ -415,7 +415,7 @@ function ShellFooter({
 }: {
   user: User;
   projectId: string;
-  plan: "free" | "pro";
+  plan: "free" | "pro" | "beta";
   onNavigate?: () => void;
   className?: string;
 }) {

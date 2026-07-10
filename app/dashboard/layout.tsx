@@ -3,6 +3,7 @@ import { ValidationStateMigrator } from "@/components/dashboard/validation-state
 import { requireUser } from "@/lib/auth/current-user";
 import { isAdminEmail } from "@/lib/admin";
 import { requireBetaAccess } from "@/lib/beta-access";
+import { FREE_BETA } from "@/lib/plans";
 import { getEffectivePlan } from "@/lib/quotas";
 import {
   getProjectOrDefault,
@@ -23,8 +24,11 @@ export default async function DashboardLayout({
   const projects = await listProjectsForUser(user);
   const archivedProjects = await listArchivedProjectsForUser(user);
   // Read-only effective plan (admins always resolve to "pro"). Passed to the
-  // shell only to badge the Plan & pricing link — never written here.
-  const { plan } = await getEffectivePlan(user);
+  // shell only to badge the Plan & pricing link — never written here. During
+  // the free beta the badge says "beta" instead of a plan name, since nobody
+  // is actually paying.
+  const { plan: effectivePlan } = await getEffectivePlan(user);
+  const plan = FREE_BETA ? "beta" : effectivePlan;
 
   return (
     <DashboardShell

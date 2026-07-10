@@ -10,6 +10,17 @@
 
 import { isAdminEmail } from "@/lib/admin";
 
+/**
+ * Founder switch — free beta mode.
+ *
+ * While true, every account resolves to the Pro limits and all payment UI
+ * stays out of the app (pricing CTAs become "free during the beta" notes,
+ * billing actions refuse to start). Both plans stay visible on /pricing.
+ * Flip to false to restore the real Free/Pro split — only on the founder's
+ * explicit instruction.
+ */
+export const FREE_BETA = true;
+
 export type PlanId = "free" | "pro";
 
 export type PlanLimits = {
@@ -51,11 +62,14 @@ export function isPlanId(value: string | null | undefined): value is PlanId {
 /**
  * Resolve the effective plan from the stored User.plan value and the user's
  * email. Unknown stored values fall back to "free"; admins are always "pro".
+ * During the free beta (FREE_BETA) everyone resolves to "pro" so no quota or
+ * upgrade nag ever fires — User.plan in the database is never touched.
  */
 export function resolvePlanId(
   storedPlan: string | null | undefined,
   email: string | null | undefined
 ): PlanId {
+  if (FREE_BETA) return "pro";
   if (isAdminEmail(email)) return "pro";
   return isPlanId(storedPlan) ? storedPlan : "free";
 }
