@@ -131,7 +131,7 @@ export function Hero() {
             initial={{ opacity: 0, y: reduceMotion ? 0 : 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35, ease: "easeOut" }}
-            className="text-[12px] font-bold uppercase tracking-[0.08em] text-[var(--color-muted-foreground)]"
+            className="flex items-center gap-3 text-[12px] font-bold uppercase tracking-[0.12em] text-[var(--color-primary)] before:h-px before:w-8 before:bg-[var(--color-primary)]/60"
           >
             Idea research from customer pain
           </motion.p>
@@ -142,7 +142,7 @@ export function Hero() {
             transition={{ duration: 0.45, ease: "easeOut", delay: 0.05 }}
             className="mt-5 text-4xl font-extrabold leading-[1.05] tracking-tight text-[var(--color-foreground)] sm:text-6xl sm:leading-none xl:text-[5rem]"
           >
-            Turn complaints into business ideas worth testing.
+            Turn complaints into business ideas <span className="text-[var(--color-primary)]">worth testing.</span>
           </motion.h1>
 
           <motion.p
@@ -200,7 +200,7 @@ export function Hero() {
         >
           <div
             ref={videoWrapRef}
-            className={`group relative overflow-hidden border border-[var(--color-border)] shadow-[var(--shadow-elevated)] ${
+            className={`group relative overflow-hidden border border-blue-400/20 shadow-[var(--shadow-elevated)] ring-1 ring-white/[0.03] ${
               isFull
                 ? "flex items-center justify-center rounded-none bg-black"
                 : // Must match the rendered HeroDemo composition ratio

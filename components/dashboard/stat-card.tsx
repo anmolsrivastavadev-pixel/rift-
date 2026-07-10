@@ -44,7 +44,7 @@ export function StatCard({
   );
 
   const baseClasses =
-    "block rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[var(--shadow-card)] transition-all duration-150 ease-out";
+    "panel-highlight block rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 shadow-[var(--shadow-card)] transition-all duration-150 ease-out";
 
   if (href) {
     return (
