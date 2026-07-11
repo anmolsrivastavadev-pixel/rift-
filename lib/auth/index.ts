@@ -1,6 +1,7 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "@/lib/db";
+import { rateLimitStorage } from "@/lib/auth/rate-limit-storage";
 import { buildResetPasswordEmail, isEmailEnabled, sendEmail } from "@/lib/email";
 
 const appBaseUrl = process.env.BETTER_AUTH_URL;
@@ -41,6 +42,16 @@ export const auth = betterAuth({
   session: {
     expiresIn: 60 * 60 * 24 * 7,
     updateAge: 60 * 60 * 24,
+  },
+  // Audit response (founder-authorized): per-IP rate limiting on auth
+  // endpoints. Better Auth's default rules already tighten sign-in/sign-up
+  // (3 per 10s) and password reset (3 per 60s); what was missing on Vercel
+  // is storage that survives across serverless instances, so the counters
+  // live in Postgres via an atomic upsert (lib/auth/rate-limit-storage.ts).
+  // enabled: true (not just production) so the behavior is testable locally.
+  rateLimit: {
+    enabled: true,
+    customStorage: rateLimitStorage,
   },
 });
 

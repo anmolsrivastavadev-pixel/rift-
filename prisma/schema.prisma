@@ -395,3 +395,11 @@ model SavedOpportunity {
   @@unique([userId, opportunityId]) // one save per user per opportunity
   @@index([projectId])
 }
+
+// Better Auth rate limiting (audit response, founder-authorized): one row per
+// ip+path bucket, written atomically by lib/auth/rate-limit-storage.ts.
+model RateLimit {
+  key         String @id
+  count       Int
+  lastRequest BigInt
+}
