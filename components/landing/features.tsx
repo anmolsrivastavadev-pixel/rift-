@@ -164,7 +164,7 @@ const features = [
 
 export function Features() {
   return (
-    <section id="features" className="relative scroll-mt-24 py-20 sm:py-28">
+    <section id="features" className="relative overflow-hidden scroll-mt-24 py-20 sm:py-28">
       <div
         aria-hidden
         className="pointer-events-none absolute left-1/2 top-0 -z-10 h-[500px] w-[1000px] -translate-x-1/2 rounded-full blur-3xl"

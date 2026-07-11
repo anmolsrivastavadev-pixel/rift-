@@ -23,7 +23,7 @@ const outputs = [
 
 export function OutputWall() {
   return (
-    <section className="relative py-20 sm:py-28">
+    <section className="relative overflow-hidden py-20 sm:py-28">
       <div
         aria-hidden
         className="pointer-events-none absolute right-0 top-1/4 -z-10 h-[500px] w-[800px] translate-x-1/4 rounded-full blur-3xl"
