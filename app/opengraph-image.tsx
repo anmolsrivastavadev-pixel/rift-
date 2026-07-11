@@ -10,10 +10,20 @@ export const alt = "Rift: turn complaints into business ideas worth testing.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
+const headlineWords = [
+  ...["Turn", "complaints", "into", "business", "ideas"].map((text) => ({
+    text,
+    accent: false,
+  })),
+  { text: "worth", accent: true },
+  { text: "testing.", accent: true },
+];
+
+/* Keep in sync with metaChips in components/landing/hero.tsx */
 const chips = [
+  "Every idea comes with receipts",
+  "Searches 7 sources at once",
   "Free during the private beta",
-  "No credit card required",
-  "Works with 5–10 complaints",
 ];
 
 export default function OpenGraphImage() {
@@ -130,18 +140,46 @@ export default function OpenGraphImage() {
           </div>
         </div>
 
-        {/* Headline — same voice as the hero */}
-        <div
-          style={{
-            fontSize: 92,
-            fontWeight: 800,
-            lineHeight: 1.02,
-            letterSpacing: -4,
-            maxWidth: 1040,
-            display: "flex",
-          }}
-        >
-          Turn complaints into business ideas worth testing.
+        {/* Kicker + headline — same voice and accent as the hero */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+            <div style={{ width: 40, height: 2, backgroundColor: "rgba(107,158,255,0.6)" }} />
+            <div
+              style={{
+                color: "#6b9eff",
+                fontSize: 22,
+                fontWeight: 700,
+                letterSpacing: 4,
+              }}
+            >
+              IDEA RESEARCH FROM CUSTOMER PAIN
+            </div>
+          </div>
+          {/* Satori can't mix raw text and elements in one node, so the
+              headline is word-by-word spans in a wrapping flex row. */}
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              fontSize: 92,
+              fontWeight: 800,
+              lineHeight: 1.02,
+              letterSpacing: -4,
+              maxWidth: 1040,
+            }}
+          >
+            {headlineWords.map((word, i) => (
+              <span
+                key={i}
+                style={{
+                  color: word.accent ? "#6b9eff" : "#ffffff",
+                  marginRight: 22,
+                }}
+              >
+                {word.text}
+              </span>
+            ))}
+          </div>
         </div>
 
         {/* Meta chips, like the hero */}
@@ -154,9 +192,9 @@ export default function OpenGraphImage() {
                 border: "2px solid #242424",
                 backgroundColor: "#0a0a0a",
                 borderRadius: 999,
-                padding: "12px 26px",
+                padding: "12px 34px",
                 color: "#a1a1a1",
-                fontSize: 25,
+                fontSize: 23,
               }}
             >
               {chip}
