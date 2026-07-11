@@ -28,12 +28,24 @@ export function CsvUploader({ projectId }: { projectId: string }) {
     null
   );
 
+  // Cap the file before parsing so a huge upload can't freeze the browser
+  // tab buffering it all into memory. 8 MB comfortably fits the 5000-row
+  // server cap while staying under the 10 MB server-action body limit.
+  const MAX_FILE_BYTES = 8 * 1024 * 1024;
+
   function handleFile(file: File) {
     const okTypes = ["text/csv", "application/csv", "text/plain"];
     const isCsvByName = /\.csv$/i.test(file.name);
     if (!okTypes.includes(file.type) && !isCsvByName) {
       setParseError(
         `"${file.name}" is not a spreadsheet file. Please upload a .csv file (you selected a ${file.type || "binary"} file).`
+      );
+      setFileName(null);
+      return;
+    }
+    if (file.size > MAX_FILE_BYTES) {
+      setParseError(
+        `"${file.name}" is too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Please upload a CSV under 8 MB — Rift imports up to 5,000 rows.`
       );
       setFileName(null);
       return;

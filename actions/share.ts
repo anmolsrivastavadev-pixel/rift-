@@ -103,15 +103,14 @@ export async function revokeShareLink(linkId: string): Promise<RevokeShareLinkRe
     throw err;
   }
 
+  // Scoped by userId only — revoking must work even if the project was
+  // archived after the link was made (audit: an archived project otherwise
+  // left its public link live and un-revokable). Ownership is fully enforced
+  // by userId; the archivedAt filter here only removed the owner's control.
   const link = await prisma.shareLink.findFirst({
     where: {
       id: linkId,
       userId: user.id,
-      OR: [
-        { projectId: null, opportunityId: null },
-        { project: { is: { archivedAt: null } } },
-        { opportunity: { is: { project: { is: { archivedAt: null } } } } },
-      ],
     },
     select: { id: true, kind: true, projectId: true, opportunityId: true, revokedAt: true },
   });
