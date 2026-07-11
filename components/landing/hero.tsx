@@ -10,7 +10,11 @@ import { Button } from "@/components/ui/button";
 /* Hero — founder-approved "research cockpit" layout (July 2026 mockup):
  * huge left-aligned headline beside a looping Remotion demo video of the
  * research cockpit (source composition: promo-video/src/HeroDemo.tsx,
- * rendered to public/hero-demo.mp4 with a poster frame for slow loads).
+ * re-encoded to public/hero-demo-v2.mp4 with a poster frame; a WebM sibling
+ * saved only ~4% so H.264 ships alone — universally hardware-decoded).
+ * The video is preload="none" and only starts (and therefore downloads)
+ * once the hero is actually on screen, so the poster is all the initial
+ * page load pays for.
  */
 
 const metaChips = [
@@ -31,7 +35,7 @@ export function Hero() {
   const videoWrapRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isFull, setIsFull] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
+  const [isPaused, setIsPaused] = useState(true);
   const [isMuted, setIsMuted] = useState(true);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -45,6 +49,27 @@ export function Hero() {
     if (reduceMotion) {
       videoRef.current?.pause();
     }
+  }, [reduceMotion]);
+
+  // Autoplay replacement: with preload="none" the browser downloads nothing
+  // until play() is called, so start the loop the first time the hero
+  // scrolls into view (never for reduced-motion users).
+  useEffect(() => {
+    if (reduceMotion) return;
+    const v = videoRef.current;
+    const wrap = videoWrapRef.current;
+    if (!v || !wrap) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          void v.play();
+          io.disconnect();
+        }
+      },
+      { threshold: 0.25 }
+    );
+    io.observe(wrap);
+    return () => io.disconnect();
   }, [reduceMotion]);
 
   // Keep state in sync when the user exits with Esc instead of the button.
@@ -211,7 +236,7 @@ export function Hero() {
           >
             <video
               ref={videoRef}
-              autoPlay
+              preload="none"
               loop
               muted
               playsInline
@@ -223,7 +248,7 @@ export function Hero() {
               aria-label="Demo of Rift grouping complaints into a scored idea"
               className={isFull ? "block h-full max-w-full" : "block h-full w-full object-cover"}
             >
-              <source src="/hero-demo.mp4" type="video/mp4" />
+              <source src="/hero-demo-v2.mp4" type="video/mp4" />
             </video>
             {/* Bottom control bar: play/pause, grayscale seek bar, time,
                 fullscreen. Hidden until hover/focus (always shown while

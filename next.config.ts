@@ -59,6 +59,17 @@ const nextConfig: NextConfig = {
         source: "/:path*",
         headers: securityHeaders,
       },
+      {
+        // Versioned hero video assets: filename changes on re-render, so
+        // browsers can cache them forever
+        source: "/hero-demo-v2.:ext(mp4|webm)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
     ];
   },
 };
