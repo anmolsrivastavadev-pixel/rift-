@@ -11,8 +11,24 @@ export const metadata: Metadata = {
 
 /* M27 — plain-English privacy policy. Static page, no data reads. Honest and
  * specific to what Rift actually does; updated whenever data handling changes.
+ * Extended July 2026 (audit response): operator identity, retention, hosting,
+ * subprocessors, rights, cookies, age. The support address comes from
+ * NEXT_PUBLIC_SUPPORT_EMAIL (same convention as the beta-access page) and the
+ * copy falls back to the feedback button until that mailbox exists.
  */
 export default function PrivacyPage() {
+  const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL;
+  const contactRoute = supportEmail ? (
+    <>
+      email{" "}
+      <a href={`mailto:${supportEmail}`} className="underline">
+        {supportEmail}
+      </a>
+    </>
+  ) : (
+    <>use the in-app feedback button</>
+  );
+
   return (
     <div className="flex min-h-screen flex-col bg-[var(--color-background)]">
       <LandingNav />
@@ -22,9 +38,19 @@ export default function PrivacyPage() {
             <header>
               <h1 className="text-3xl font-semibold tracking-tight">Privacy Policy</h1>
               <p className="mt-2 text-[var(--color-muted-foreground)]">
-                Last updated: July 5, 2026
+                Last updated: July 11, 2026
               </p>
             </header>
+
+            <section className="space-y-3">
+              <h2 className="text-lg font-semibold">Who runs Rift</h2>
+              <p>
+                Rift is operated by Anmol Srivastava, an independent founder
+                based in the United Kingdom. For anything about your data —
+                questions, corrections, exports, or deletion — {contactRoute}.
+                That route works even if you can&apos;t sign in anymore.
+              </p>
+            </section>
 
             <section className="space-y-3">
               <h2 className="text-lg font-semibold">The short version</h2>
@@ -98,12 +124,106 @@ export default function PrivacyPage() {
             </section>
 
             <section className="space-y-3">
+              <h2 className="text-lg font-semibold">Where your data lives</h2>
+              <p>
+                Rift runs on Vercel, and your data is stored in a Neon
+                PostgreSQL database hosted in London (AWS eu-west-2). Some of
+                the services below process data in the United States; where
+                that happens, it&apos;s covered by those providers&apos;
+                standard data-protection terms for international transfers.
+              </p>
+            </section>
+
+            <section className="space-y-3">
+              <h2 className="text-lg font-semibold">Who else touches your data</h2>
+              <p>
+                Rift uses a small set of service providers, each only for the
+                job named here:
+              </p>
+              <ul className="list-disc space-y-2 pl-5">
+                <li>
+                  <strong>Vercel</strong> — hosts and serves the app.
+                </li>
+                <li>
+                  <strong>Neon</strong> — the PostgreSQL database (London).
+                </li>
+                <li>
+                  <strong>Google (Gemini API)</strong> — groups your complaints
+                  into ideas when you click &quot;Find ideas&quot;.
+                </li>
+                <li>
+                  <strong>Stripe</strong> — payments, if you ever upgrade.
+                </li>
+                <li>
+                  <strong>Resend</strong> — sends the transactional emails.
+                </li>
+              </ul>
+              <p>
+                No advertising networks, no data brokers, and we never sell
+                your data.
+              </p>
+            </section>
+
+            <section className="space-y-3">
+              <h2 className="text-lg font-semibold">Cookies and analytics</h2>
+              <p>
+                Rift sets one cookie: the session cookie that keeps you signed
+                in. There are no third-party analytics scripts, ad trackers, or
+                social pixels. We record first-party usage events (things like
+                &quot;a CSV was imported&quot; — counts and metadata only,
+                never the text of your complaints) to understand what&apos;s
+                working.
+              </p>
+            </section>
+
+            <section className="space-y-3">
+              <h2 className="text-lg font-semibold">How long we keep things</h2>
+              <ul className="list-disc space-y-2 pl-5">
+                <li>
+                  Your account and content are kept for as long as your account
+                  exists.
+                </li>
+                <li>
+                  Deleting a project removes its complaints, ideas, and history
+                  immediately.
+                </li>
+                <li>
+                  When you ask us to delete your account, we remove your data
+                  within 30 days. Short-lived database backups age out on their
+                  own within about a week after that.
+                </li>
+              </ul>
+            </section>
+
+            <section className="space-y-3">
+              <h2 className="text-lg font-semibold">Your rights</h2>
+              <p>
+                It&apos;s your data. You can ask to see what we hold about you,
+                fix anything that&apos;s wrong, export your reports (Markdown
+                export is built into the app), or have everything deleted. To
+                exercise any of these, {contactRoute}. If you&apos;re in the UK
+                or EU, these are your legal rights under data-protection law,
+                and you can also complain to your local supervisory authority
+                (in the UK, the ICO) — though we&apos;d appreciate the chance
+                to fix things first.
+              </p>
+            </section>
+
+            <section className="space-y-3">
+              <h2 className="text-lg font-semibold">Age</h2>
+              <p>
+                Rift isn&apos;t for children. You need to be at least 16 to
+                have an account.
+              </p>
+            </section>
+
+            <section className="space-y-3">
               <h2 className="text-lg font-semibold">Deleting your data</h2>
               <p>
                 Deleting a project permanently removes its complaints, ideas,
-                and history. To delete your whole account and its data, send us
-                a message through the in-app feedback button (or reply to your
-                beta invite) and we&apos;ll take care of it.
+                and history. To delete your whole account and its data,
+                {" "}{contactRoute} (or send a message through the in-app
+                feedback button) and we&apos;ll take care of it.
               </p>
             </section>
 

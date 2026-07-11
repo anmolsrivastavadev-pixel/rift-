@@ -9,8 +9,24 @@ export const metadata: Metadata = {
   description: "The plain-English terms for using Rift.",
 };
 
-/* M27 — plain-English terms of service. Static page, no data reads. */
+/* M27 — plain-English terms of service. Static page, no data reads.
+ * Extended July 2026 (audit response): operator identity, governing law,
+ * disputes, refunds, suspension and post-termination handling. Support
+ * address via NEXT_PUBLIC_SUPPORT_EMAIL, falling back to the feedback button.
+ */
 export default function TermsPage() {
+  const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL;
+  const contactRoute = supportEmail ? (
+    <>
+      email{" "}
+      <a href={`mailto:${supportEmail}`} className="underline">
+        {supportEmail}
+      </a>
+    </>
+  ) : (
+    <>use the in-app feedback button</>
+  );
+
   return (
     <div className="flex min-h-screen flex-col bg-[var(--color-background)]">
       <LandingNav />
@@ -20,7 +36,7 @@ export default function TermsPage() {
             <header>
               <h1 className="text-3xl font-semibold tracking-tight">Terms of Service</h1>
               <p className="mt-2 text-[var(--color-muted-foreground)]">
-                Last updated: July 5, 2026
+                Last updated: July 11, 2026
               </p>
             </header>
 
@@ -32,6 +48,11 @@ export default function TermsPage() {
                 ideas it finds. It&apos;s a research tool. The ideas
                 are starting points to validate, not guarantees that a business
                 will work.
+              </p>
+              <p>
+                Rift is operated by Anmol Srivastava, an independent founder
+                based in the United Kingdom. Questions about these terms?{" "}
+                {contactRoute}.
               </p>
             </section>
 
@@ -64,6 +85,26 @@ export default function TermsPage() {
             </section>
 
             <section className="space-y-3">
+              <h2 className="text-lg font-semibold">Refunds and cancellation</h2>
+              <ul className="list-disc space-y-2 pl-5">
+                <li>
+                  Cancelling stops future charges; you keep Pro until the end
+                  of the period you already paid for. We don&apos;t prorate
+                  partial months.
+                </li>
+                <li>
+                  If something on our side went clearly wrong — say you were
+                  charged after cancelling — {contactRoute} and we&apos;ll put
+                  it right.
+                </li>
+                <li>
+                  Nothing here takes away refund rights the law gives you (for
+                  UK customers, the Consumer Rights Act 2015).
+                </li>
+              </ul>
+            </section>
+
+            <section className="space-y-3">
               <h2 className="text-lg font-semibold">Fair use</h2>
               <p>
                 Don&apos;t abuse the service: no scraping the app itself, no
@@ -85,10 +126,38 @@ export default function TermsPage() {
 
             <section className="space-y-3">
               <h2 className="text-lg font-semibold">Ending things</h2>
+              <ul className="list-disc space-y-2 pl-5">
+                <li>
+                  You can stop using Rift and ask us to delete your account at
+                  any time — {contactRoute} or use the in-app feedback button.
+                </li>
+                <li>
+                  Before your account is deleted, you can export your reports
+                  with the built-in Markdown export. After deletion, your data
+                  is removed as described in the Privacy Policy.
+                </li>
+                <li>
+                  We can suspend or terminate accounts that break these terms.
+                  For anything short of clear abuse, we&apos;ll warn you first
+                  and give you a chance to export your data.
+                </li>
+              </ul>
+            </section>
+
+            <section className="space-y-3">
+              <h2 className="text-lg font-semibold">Age</h2>
+              <p>You need to be at least 16 to use Rift.</p>
+            </section>
+
+            <section className="space-y-3">
+              <h2 className="text-lg font-semibold">Governing law and disputes</h2>
               <p>
-                You can stop using Rift and ask us to delete your account at
-                any time via the in-app feedback button. We can terminate
-                accounts that break these terms.
+                These terms are governed by the law of England and Wales, and
+                the courts of England and Wales have jurisdiction — though if
+                you&apos;re a consumer elsewhere, you keep any protections your
+                local law says you can&apos;t sign away. If something goes
+                wrong, {contactRoute} first: almost everything can be sorted
+                out with a conversation before anyone involves a court.
               </p>
             </section>
 
