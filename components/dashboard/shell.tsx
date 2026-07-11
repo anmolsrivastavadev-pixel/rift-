@@ -434,7 +434,12 @@ function ShellFooter({
       </Link>
       {/* M20 — compact beta feedback entry point */}
       <FeedbackWidget projectId={projectId} />
-      <div className="flex items-center gap-2.5 rounded-xl bg-[var(--color-card)] px-3 py-2.5">
+      <Link
+        href="/dashboard/account"
+        onClick={onNavigate}
+        title="Account settings"
+        className="flex items-center gap-2.5 rounded-xl bg-[var(--color-card)] px-3 py-2.5 transition-all duration-150 ease-out hover:bg-[var(--color-surface)]"
+      >
         <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
           <User className="h-3.5 w-3.5" />
         </div>
@@ -448,7 +453,7 @@ function ShellFooter({
             </p>
           )}
         </div>
-      </div>
+      </Link>
       <button
         onClick={handleSignOut}
         className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-[var(--color-muted-foreground)] transition-all duration-150 ease-out hover:bg-[var(--color-danger-soft)] hover:text-[var(--color-danger)] active:scale-[0.97]"

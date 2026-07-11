@@ -128,8 +128,9 @@ export default function TermsPage() {
               <h2 className="text-lg font-semibold">Ending things</h2>
               <ul className="list-disc space-y-2 pl-5">
                 <li>
-                  You can stop using Rift and ask us to delete your account at
-                  any time — {contactRoute} or use the in-app feedback button.
+                  You can delete your account yourself at any time from the
+                  Account page in the dashboard. Locked out? {contactRoute}{" "}
+                  and we&apos;ll handle it.
                 </li>
                 <li>
                   Before your account is deleted, you can export your reports

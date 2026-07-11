@@ -221,9 +221,11 @@ export default function PrivacyPage() {
               <h2 className="text-lg font-semibold">Deleting your data</h2>
               <p>
                 Deleting a project permanently removes its complaints, ideas,
-                and history. To delete your whole account and its data,
-                {" "}{contactRoute} (or send a message through the in-app
-                feedback button) and we&apos;ll take care of it.
+                and history. To delete your whole account and everything in
+                it, use the &quot;Delete my account&quot; button on the
+                Account page in the dashboard — it works immediately, no email
+                needed. If you can&apos;t sign in anymore, {contactRoute} and
+                we&apos;ll take care of it.
               </p>
             </section>
 
