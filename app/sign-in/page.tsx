@@ -1,5 +1,11 @@
+import type { Metadata } from "next";
 import { SignInForm } from "@/components/auth/sign-in-form";
 import { isEmailEnabled } from "@/lib/email";
+
+export const metadata: Metadata = {
+  title: "Sign in",
+  description: "Sign in to your Rift account.",
+};
 
 /* M27 — thin server wrapper: the form itself lives in
  * components/auth/sign-in-form.tsx; this page only decides whether the

@@ -98,6 +98,7 @@ function ResetPasswordForm() {
         </label>
         <PasswordInput
           id="password"
+          name="password"
           required
           autoComplete="new-password"
           value={password}
@@ -112,6 +113,7 @@ function ResetPasswordForm() {
         </label>
         <PasswordInput
           id="confirm"
+          name="confirmPassword"
           required
           autoComplete="new-password"
           value={confirm}

@@ -77,7 +77,9 @@ export function SignInForm({ resetEnabled }: { resetEnabled: boolean }) {
           </label>
           <Input
             id="email"
+            name="email"
             type="email"
+            autoComplete="username"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -91,6 +93,7 @@ export function SignInForm({ resetEnabled }: { resetEnabled: boolean }) {
           </label>
           <PasswordInput
             id="password"
+            name="password"
             required
             autoComplete="current-password"
             value={password}

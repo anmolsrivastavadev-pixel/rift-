@@ -120,7 +120,7 @@ export default async function PricingPage() {
   return (
     <div className="flex min-h-screen flex-col bg-[var(--color-background)]">
       <LandingNav />
-      <main className="flex-1">
+      <main id="main-content" className="flex-1">
         <Container className="py-16 sm:py-24">
           <div className="mx-auto max-w-2xl text-center">
             <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">

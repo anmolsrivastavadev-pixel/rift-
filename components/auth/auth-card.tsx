@@ -19,7 +19,10 @@ export function AuthCard({
   className,
 }: AuthCardProps) {
   return (
-    <div className="flex min-h-screen items-center justify-center px-4">
+    <main
+      id="main-content"
+      className="flex min-h-screen items-center justify-center px-4"
+    >
       <div
         className={cn(
           "w-full max-w-sm space-y-6 rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-8 shadow-[var(--shadow-card)]",
@@ -45,6 +48,6 @@ export function AuthCard({
           </p>
         )}
       </div>
-    </div>
+    </main>
   );
 }

@@ -22,7 +22,7 @@ export default async function BetaAccessPage() {
   const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL;
 
   return (
-    <main className="flex min-h-screen items-center justify-center">
+    <main id="main-content" className="flex min-h-screen items-center justify-center">
       <Container className="max-w-md py-16 text-center">
         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--color-primary-soft)] ring-1 ring-[var(--color-primary)]/10">
           <Lock className="h-6 w-6 text-[var(--color-primary)]" />

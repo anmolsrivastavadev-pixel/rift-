@@ -82,7 +82,9 @@ export default function SignUpPage() {
           </label>
           <Input
             id="email"
+            name="email"
             type="email"
+            autoComplete="email"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -99,6 +101,7 @@ export default function SignUpPage() {
           </label>
           <PasswordInput
             id="password"
+            name="password"
             required
             minLength={8}
             autoComplete="new-password"
@@ -123,7 +126,9 @@ export default function SignUpPage() {
           </label>
           <Input
             id="name"
+            name="name"
             type="text"
+            autoComplete="name"
             value={name}
             onChange={(e) => setName(e.target.value)}
             className="mt-1"

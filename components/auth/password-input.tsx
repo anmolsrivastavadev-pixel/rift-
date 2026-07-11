@@ -9,6 +9,7 @@ import { Eye, EyeOff } from "lucide-react";
  */
 export function PasswordInput({
   id,
+  name,
   value,
   onChange,
   required,
@@ -17,6 +18,7 @@ export function PasswordInput({
   className,
 }: {
   id: string;
+  name?: string;
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   required?: boolean;
@@ -30,6 +32,7 @@ export function PasswordInput({
     <div className="relative">
       <input
         id={id}
+        name={name}
         type={visible ? "text" : "password"}
         required={required}
         minLength={minLength}

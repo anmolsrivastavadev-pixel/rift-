@@ -9,6 +9,7 @@ import { RiftMark } from "@/components/logo";
  */
 
 const nodes = [
+  { label: "The web", className: "left-1/2 top-[5%] -translate-x-1/2" },
   { label: "App reviews", className: "left-[8%] top-[12%]" },
   { label: "GitHub issues", className: "left-[4%] top-[45%]" },
   { label: "YouTube comments", className: "left-[16%] bottom-[10%]" },

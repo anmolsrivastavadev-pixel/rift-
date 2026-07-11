@@ -16,7 +16,7 @@ export default function PrivacyPage() {
   return (
     <div className="flex min-h-screen flex-col bg-[var(--color-background)]">
       <LandingNav />
-      <main className="flex-1">
+      <main id="main-content" className="flex-1">
         <Container className="py-16">
           <article className="mx-auto max-w-2xl space-y-8 text-sm leading-6">
             <header>

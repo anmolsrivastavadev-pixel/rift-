@@ -13,7 +13,7 @@ import { Footer } from "@/components/landing/footer";
 
 export default function HomePage() {
   return (
-    <main className="flex-1 bg-grid-faint">
+    <main id="main-content" className="flex-1 bg-grid-faint">
       <LandingNav />
       <Hero />
       <TagRibbon />

@@ -397,7 +397,7 @@ export function DashboardShell({
       )}
 
       <div className="relative min-w-0 flex-1 pt-14 md:pt-0">
-        <main className="px-4 py-8 sm:px-8 sm:py-10 lg:px-10 xl:px-12">{children}</main>
+        <main id="main-content" className="px-4 py-8 sm:px-8 sm:py-10 lg:px-10 xl:px-12">{children}</main>
       </div>
     </div>
   );
