@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Container } from "@/components/container";
 import { LandingNav } from "@/components/landing/nav";
 import { Footer } from "@/components/landing/footer";
+import { SUPPORT_EMAIL } from "@/lib/contact";
 
 export const metadata: Metadata = {
   title: "Terms of Service",
@@ -12,19 +13,16 @@ export const metadata: Metadata = {
 /* M27 — plain-English terms of service. Static page, no data reads.
  * Extended July 2026 (audit response): operator identity, governing law,
  * disputes, refunds, suspension and post-termination handling. Support
- * address via NEXT_PUBLIC_SUPPORT_EMAIL, falling back to the feedback button.
+ * address from lib/contact.
  */
 export default function TermsPage() {
-  const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL;
-  const contactRoute = supportEmail ? (
+  const contactRoute = (
     <>
       email{" "}
-      <a href={`mailto:${supportEmail}`} className="underline">
-        {supportEmail}
+      <a href={`mailto:${SUPPORT_EMAIL}`} className="underline">
+        {SUPPORT_EMAIL}
       </a>
     </>
-  ) : (
-    <>use the in-app feedback button</>
   );
 
   return (

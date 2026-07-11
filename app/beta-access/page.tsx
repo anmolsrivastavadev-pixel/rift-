@@ -6,6 +6,7 @@ import { requireUser } from "@/lib/auth/current-user";
 import { hasBetaAccess } from "@/lib/beta-access";
 import { Container } from "@/components/container";
 import { Button } from "@/components/ui/button";
+import { SUPPORT_EMAIL } from "@/lib/contact";
 
 /* M20 — Landing spot for signed-in users without beta access. If beta mode is
  * off or the user already has access (or is an admin), this page just sends
@@ -19,7 +20,7 @@ export default async function BetaAccessPage() {
   const user = await requireUser();
   if (await hasBetaAccess(user)) redirect("/dashboard");
 
-  const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL;
+  const supportEmail = SUPPORT_EMAIL;
 
   return (
     <main id="main-content" className="flex min-h-screen items-center justify-center">

@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Container } from "@/components/container";
 import { LandingNav } from "@/components/landing/nav";
 import { Footer } from "@/components/landing/footer";
+import { SUPPORT_EMAIL } from "@/lib/contact";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
@@ -12,21 +13,16 @@ export const metadata: Metadata = {
 /* M27 — plain-English privacy policy. Static page, no data reads. Honest and
  * specific to what Rift actually does; updated whenever data handling changes.
  * Extended July 2026 (audit response): operator identity, retention, hosting,
- * subprocessors, rights, cookies, age. The support address comes from
- * NEXT_PUBLIC_SUPPORT_EMAIL (same convention as the beta-access page) and the
- * copy falls back to the feedback button until that mailbox exists.
+ * subprocessors, rights, cookies, age. Support address from lib/contact.
  */
 export default function PrivacyPage() {
-  const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL;
-  const contactRoute = supportEmail ? (
+  const contactRoute = (
     <>
       email{" "}
-      <a href={`mailto:${supportEmail}`} className="underline">
-        {supportEmail}
+      <a href={`mailto:${SUPPORT_EMAIL}`} className="underline">
+        {SUPPORT_EMAIL}
       </a>
     </>
-  ) : (
-    <>use the in-app feedback button</>
   );
 
   return (
