@@ -124,7 +124,7 @@ export function Hero() {
         <div className="animate-fade-up" style={{ animationDelay: "0.2s" }}>
           <div className="relative mx-auto w-full max-w-md rounded-2xl border border-[#3b82f6]/20 bg-[var(--color-card)] p-6 shadow-[var(--shadow-elevated)] ring-1 ring-white/[0.03] sm:p-7">
             <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-muted-foreground)]">
-              Example — what one result looks like
+              Example: what one result looks like
             </p>
 
             {/* Beat 1: the input */}
@@ -174,7 +174,7 @@ export function Hero() {
                   Automatic booking reminders for independent groomers
                 </p>
                 <p className="mt-1.5 text-sm leading-relaxed text-[var(--color-muted-foreground)]">
-                  Idea score 86 of 100 — based on how often the problem
+                  Idea score 86 of 100, based on how often the problem
                   appears, how severe it sounds, and how consistent the
                   complaints are.
                 </p>

@@ -18,7 +18,7 @@ const quotes = [
     source: "Reddit",
   },
   {
-    text: "Love my groomer but booking is a mess — I text her and hope she sees it.",
+    text: "Love my groomer but booking is a mess. I text her and hope she sees it.",
     source: "App review",
   },
   {
@@ -60,7 +60,7 @@ export function ExampleWalkthrough() {
               </span>
             </>
           }
-          lead="This is one real-shaped result, end to end. It's sample data — your results are built from real complaints in the market you choose."
+          lead="This is one real-shaped result, end to end. It's sample data. Your results are built from real complaints in the market you choose."
         />
 
         <div className="mt-12 grid items-start gap-6 lg:grid-cols-2 lg:gap-8">
@@ -109,7 +109,7 @@ export function ExampleWalkthrough() {
                   Who has the problem
                 </dt>
                 <dd className="mt-1 text-base leading-relaxed text-[var(--color-foreground)]/90">
-                  Pet owners who book with small, independent groomers — and
+                  Pet owners who book with small, independent groomers, and
                   the groomers losing money to missed appointments.
                 </dd>
               </div>
@@ -129,10 +129,11 @@ export function ExampleWalkthrough() {
                 <dd className="mt-1 text-base leading-relaxed text-[var(--color-foreground)]/90">
                   <span className="font-semibold text-[var(--color-primary)]">
                     86 of 100
-                  </span>{" "}
-                  — a fixed formula combining how often the problem appears,
-                  how severe it sounds, and how consistent the complaints are.
-                  The same complaints always give the same score.
+                  </span>
+                  , from a fixed formula combining how often the problem
+                  appears, how severe it sounds, and how consistent the
+                  complaints are. The same complaints always give the same
+                  score.
                 </dd>
               </div>
             </dl>

@@ -13,7 +13,7 @@ const steps = [
   {
     n: "1",
     title: "Tell Rift an industry",
-    text: "Type any market you're curious about — or paste reviews, support messages, and complaints you already have.",
+    text: "Type any market you're curious about, or paste reviews, support messages, and complaints you already have.",
   },
   {
     n: "2",
@@ -73,7 +73,7 @@ export function HowItWorks() {
             <DemoVideo />
             <p className="mt-3 text-center text-sm text-[var(--color-muted-foreground)]">
               Prefer to watch? The whole flow in 90 seconds. The video is
-              optional — everything it shows is explained on this page.
+              optional, and everything it shows is explained on this page.
             </p>
           </div>
         </div>

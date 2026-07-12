@@ -8,8 +8,8 @@ const faqs: { q: string; a: React.ReactNode }[] = [
     a: (
       <>
         No. Rift is built for first-time founders and side-project builders.
-        If you can type a market you&apos;re curious about, you can use it —
-        the{" "}
+        If you can type a market you&apos;re curious about, you can use it.
+        The{" "}
         <Link
           href="/#example"
           className="text-[var(--color-primary)] hover:underline"
@@ -55,7 +55,7 @@ const faqs: { q: string; a: React.ReactNode }[] = [
   },
   {
     q: "What does Rift cost?",
-    a: "Nothing right now — everything is free during the beta, and no credit card is ever asked for. After the beta there will be a Free plan and a Pro plan at $9/month with higher limits. See the pricing page for details.",
+    a: "Nothing right now. Everything is free during the beta, and no credit card is ever asked for. After the beta there will be a Free plan and a Pro plan at $9/month with higher limits. See the pricing page for details.",
   },
 ];
 

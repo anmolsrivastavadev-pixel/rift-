@@ -24,12 +24,12 @@ const items = [
   {
     icon: ShieldCheck,
     title: "AI that shows its working",
-    text: "AI groups and summarises the complaints — that's it. It never invents market sizes or statistics, and every conclusion links back to the complaints it came from.",
+    text: "AI groups and summarises the complaints, and that's it. It never invents market sizes or statistics, and every conclusion links back to the complaints it came from.",
   },
   {
     icon: Lock,
     title: "Your data stays yours",
-    text: "Feedback you paste is private to your account and only used to build your results. Nothing is public unless you create a share link, and you can delete your account — and everything in it — at any time.",
+    text: "Feedback you paste is private to your account and only used to build your results. Nothing is public unless you create a share link, and you can delete your account, and everything in it, at any time.",
   },
 ];
 
@@ -48,7 +48,7 @@ export function Trust() {
               </span>
             </>
           }
-          lead="Rift is a research tool, so you deserve to know exactly how it reaches its conclusions — and what happens to anything you paste in."
+          lead="Rift is a research tool, so you deserve to know exactly how it reaches its conclusions, and what happens to anything you paste in."
         />
 
         <div className="mt-12 grid gap-5 sm:grid-cols-2">

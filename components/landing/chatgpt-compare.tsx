@@ -12,15 +12,15 @@ import { SectionHeader } from "@/components/landing/section-header";
 const rows = [
   {
     chat: "Skims a few pages once, pastes a few links, forgets it all tomorrow",
-    rift: "Collects hundreds of complaints from 7 sources into one evidence base — deduped, stored, every quote linked to its source",
+    rift: "Collects hundreds of complaints from 7 sources into one evidence base. Deduped, stored, and every quote linked to its source",
   },
   {
     chat: "A different answer every time you ask",
-    rift: "A fixed 0–100 scoring formula — the same complaints always give the same score, with the breakdown in the open",
+    rift: "A fixed 0–100 scoring formula. The same complaints always give the same score, with the breakdown in the open",
   },
   {
     chat: "No dated history, so it can't tell if a problem is growing",
-    rift: "Shows a pain trend from dated complaints — and says “Not enough data” instead of guessing",
+    rift: "Shows a pain trend from dated complaints, and says “Not enough data” instead of guessing",
   },
   {
     chat: "Only answers while you're typing",
