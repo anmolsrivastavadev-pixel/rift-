@@ -40,7 +40,7 @@ export default function OpenGraphImage() {
           padding: 72,
           backgroundColor: "#000000",
           backgroundImage:
-            "radial-gradient(circle at 62% 0%, rgba(154,64,18,0.36), transparent 58%), radial-gradient(circle at 0% 100%, rgba(192,86,33,0.14), transparent 45%)",
+            "radial-gradient(circle at 62% 0%, rgba(29,78,216,0.36), transparent 58%), radial-gradient(circle at 0% 100%, rgba(37,99,235,0.14), transparent 45%)",
           color: "#ffffff",
           fontFamily: "sans-serif",
           position: "relative",
@@ -96,7 +96,7 @@ export default function OpenGraphImage() {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  color: "#A04213",
+                  color: "#2563EB",
                   fontSize: 72,
                   fontWeight: 800,
                   clipPath: "polygon(0% 0%, 66% 0%, 37% 100%, 0% 100%)",
@@ -114,7 +114,7 @@ export default function OpenGraphImage() {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  color: "#E08A5E",
+                  color: "#3B7CFF",
                   fontSize: 72,
                   fontWeight: 800,
                   clipPath: "polygon(66% 0%, 100% 0%, 100% 100%, 37% 100%)",
@@ -128,11 +128,11 @@ export default function OpenGraphImage() {
           <div
             style={{
               display: "flex",
-              border: "2px solid rgba(224,138,94,0.4)",
-              backgroundColor: "rgba(224,138,94,0.12)",
+              border: "2px solid rgba(59,130,246,0.4)",
+              backgroundColor: "rgba(59,130,246,0.12)",
               borderRadius: 999,
               padding: "10px 26px",
-              color: "#f0c4a8",
+              color: "#a8c7fa",
               fontSize: 26,
               fontWeight: 600,
             }}
@@ -145,7 +145,7 @@ export default function OpenGraphImage() {
         <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
           <div
             style={{
-              color: "#e08a5e",
+              color: "#3b82f6",
               fontSize: 24,
               fontWeight: 600,
             }}
@@ -169,7 +169,7 @@ export default function OpenGraphImage() {
               <span
                 key={i}
                 style={{
-                  color: word.accent ? "#e08a5e" : "#ffffff",
+                  color: word.accent ? "#3b82f6" : "#ffffff",
                   marginRight: 22,
                 }}
               >

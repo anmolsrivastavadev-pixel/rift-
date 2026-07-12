@@ -59,7 +59,7 @@ export function EvidenceMap() {
           <div
             aria-hidden
             className="pointer-events-none absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl"
-            style={{ background: "rgba(224,138,94,0.12)" }}
+            style={{ background: "rgba(59,130,246,0.12)" }}
           />
           {/* Connection lines */}
           {lines.map((rot) => (
@@ -69,12 +69,12 @@ export function EvidenceMap() {
               className={`absolute left-1/2 top-1/2 hidden h-px w-[78%] -translate-x-1/2 sm:block ${rot}`}
               style={{
                 background:
-                  "linear-gradient(90deg, transparent, rgba(224,138,94,0.40), transparent)",
+                  "linear-gradient(90deg, transparent, rgba(59,130,246,0.40), transparent)",
               }}
             />
           ))}
           {/* Core */}
-          <div className="relative mx-auto mt-8 flex h-32 w-32 flex-col items-center justify-center gap-1.5 rounded-3xl border border-[var(--color-border)] bg-[#14100c] shadow-[var(--shadow-elevated)] sm:absolute sm:left-1/2 sm:top-1/2 sm:mt-0 sm:-translate-x-1/2 sm:-translate-y-1/2">
+          <div className="relative mx-auto mt-8 flex h-32 w-32 flex-col items-center justify-center gap-1.5 rounded-3xl border border-[var(--color-border)] bg-[#0a0a0a] shadow-[var(--shadow-elevated)] sm:absolute sm:left-1/2 sm:top-1/2 sm:mt-0 sm:-translate-x-1/2 sm:-translate-y-1/2">
             <RiftMark size={44} id="evidence-mark" />
             <span className="text-sm font-bold text-[var(--color-foreground)]">
               Rift
@@ -84,7 +84,7 @@ export function EvidenceMap() {
           {nodes.map((node) => (
             <div
               key={node.label}
-              className={`absolute hidden sm:block ${node.className} rounded-xl border border-[var(--color-border)] bg-[#14100c] px-4 py-2.5 text-xs font-semibold text-[var(--color-foreground)] shadow-[var(--shadow-card)]`}
+              className={`absolute hidden sm:block ${node.className} rounded-xl border border-[var(--color-border)] bg-[#0a0a0a] px-4 py-2.5 text-xs font-semibold text-[var(--color-foreground)] shadow-[var(--shadow-card)]`}
             >
               {node.label}
             </div>
@@ -94,7 +94,7 @@ export function EvidenceMap() {
             {nodes.map((node) => (
               <span
                 key={node.label}
-                className="rounded-xl border border-[var(--color-border)] bg-[#14100c] px-4 py-2.5 text-xs font-semibold text-[var(--color-foreground)]"
+                className="rounded-xl border border-[var(--color-border)] bg-[#0a0a0a] px-4 py-2.5 text-xs font-semibold text-[var(--color-foreground)]"
               >
                 {node.label}
               </span>

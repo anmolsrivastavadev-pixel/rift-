@@ -28,7 +28,7 @@ export function Hero() {
           className="absolute inset-0"
           style={{
             background:
-              "radial-gradient(110% 90% at 60% 12%, rgba(154,64,18,0.20) 0%, rgba(84,35,10,0.10) 45%, transparent 75%)",
+              "radial-gradient(110% 90% at 60% 12%, rgba(37,99,235,0.20) 0%, rgba(23,58,138,0.10) 45%, transparent 75%)",
           }}
         />
       </div>
@@ -122,7 +122,7 @@ export function Hero() {
             thread joins the three beats. This is the page's one signature
             element; everything else stays quiet. */}
         <div className="animate-fade-up" style={{ animationDelay: "0.2s" }}>
-          <div className="relative mx-auto w-full max-w-md rounded-2xl border border-[#e08a5e]/20 bg-[var(--color-card)] p-6 shadow-[var(--shadow-elevated)] ring-1 ring-white/[0.03] sm:p-7">
+          <div className="relative mx-auto w-full max-w-md rounded-2xl border border-[#3b82f6]/20 bg-[var(--color-card)] p-6 shadow-[var(--shadow-elevated)] ring-1 ring-white/[0.03] sm:p-7">
             <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-muted-foreground)]">
               Example — what one result looks like
             </p>
@@ -138,7 +138,7 @@ export function Hero() {
             </div>
 
             {/* Thread */}
-            <div aria-hidden className="ml-5 h-6 w-px bg-gradient-to-b from-transparent via-[#e08a5e]/50 to-[#e08a5e]/50" />
+            <div aria-hidden className="ml-5 h-6 w-px bg-gradient-to-b from-transparent via-[#3b82f6]/50 to-[#3b82f6]/50" />
 
             {/* Beat 2: the repeated problem, with evidence */}
             <div>
@@ -161,7 +161,7 @@ export function Hero() {
             </div>
 
             {/* Thread */}
-            <div aria-hidden className="ml-5 h-6 w-px bg-[#e08a5e]/50" />
+            <div aria-hidden className="ml-5 h-6 w-px bg-[#3b82f6]/50" />
 
             {/* Beat 3: the idea */}
             <div>

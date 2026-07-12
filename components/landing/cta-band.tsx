@@ -16,7 +16,7 @@ export function CtaBand() {
       className="border-y border-[var(--color-primary)]/30"
       style={{
         background:
-          "linear-gradient(120deg, rgba(154,64,18,0.35) 0%, rgba(192,86,33,0.22) 55%, rgba(224,138,94,0.26) 100%)",
+          "linear-gradient(120deg, rgba(29,78,216,0.35) 0%, rgba(37,99,235,0.22) 55%, rgba(59,130,246,0.26) 100%)",
       }}
     >
       <Container className="flex flex-col items-start gap-6 py-12 sm:py-14 md:flex-row md:items-center md:justify-between">

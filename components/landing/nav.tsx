@@ -19,7 +19,7 @@ const navLinks = [
 export function LandingNav() {
   return (
     <header className="sticky top-0 z-50 px-4 pt-3">
-      <div className="relative mx-auto flex h-14 w-full max-w-6xl items-center justify-between rounded-2xl border border-[var(--color-border)] bg-[#16120e]/88 px-3 pl-4 shadow-[var(--shadow-elevated)] backdrop-blur-xl">
+      <div className="relative mx-auto flex h-14 w-full max-w-6xl items-center justify-between rounded-2xl border border-[var(--color-border)] bg-[#0a0a0a]/88 px-3 pl-4 shadow-[var(--shadow-elevated)] backdrop-blur-xl">
         <Link
           href="/"
           className="flex items-center gap-2 text-base font-bold tracking-tight"

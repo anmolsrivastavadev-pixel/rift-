@@ -122,7 +122,7 @@ export function DemoVideo() {
   return (
     <div
       ref={videoWrapRef}
-      className={`group relative overflow-hidden border border-[#e08a5e]/20 shadow-[var(--shadow-elevated)] ring-1 ring-white/[0.03] ${
+      className={`group relative overflow-hidden border border-[#3b82f6]/20 shadow-[var(--shadow-elevated)] ring-1 ring-white/[0.03] ${
         isFull
           ? "flex items-center justify-center rounded-none bg-black"
           : // Must match the rendered HeroDemo composition ratio
