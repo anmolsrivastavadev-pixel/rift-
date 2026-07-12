@@ -30,11 +30,11 @@ const rows = [
 
 export function ChatgptCompare() {
   return (
-    <section id="why-not-chatgpt" className="scroll-mt-24 py-20 sm:py-28">
+    <section id="why-rift" className="scroll-mt-24 py-20 sm:py-28">
       <Container>
         <SectionHeader
           icon={Scale}
-          badge="Why not ChatGPT?"
+          badge="Why Rift?"
           heading={
             <>
               A chat forgets.{" "}

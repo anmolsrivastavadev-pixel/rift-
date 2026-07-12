@@ -22,28 +22,29 @@ const lines = ["rotate-0", "rotate-[30deg]", "-rotate-[30deg]"];
 
 export function EvidenceMap() {
   return (
-    <section className="py-20 sm:py-28">
+    <section id="sources" className="scroll-mt-24 py-20 sm:py-28">
       <Container className="grid items-center gap-10 lg:grid-cols-[4fr_5fr] lg:gap-16">
         {/* Copy */}
         <div>
-          <span className="inline-flex items-center gap-2 rounded-full border border-[var(--color-primary)]/30 bg-[var(--color-primary-soft)] px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-primary)]">
-            <Inbox className="h-3.5 w-3.5" aria-hidden />
-            Bring your own evidence
-          </span>
-          <h2 className="mt-6 text-balance text-3xl font-bold tracking-tight text-[var(--color-foreground)] sm:text-4xl">
-            Every scattered complaint,{" "}
+          <p className="flex items-center gap-2 text-sm font-semibold text-[var(--color-primary)]">
+            <Inbox className="h-4 w-4" aria-hidden />
+            Where the evidence comes from
+          </p>
+          <h2 className="mt-5 text-balance text-3xl font-bold tracking-tight text-[var(--color-foreground)] sm:text-4xl">
+            Seven named sources,{" "}
             <span className="text-[var(--color-primary)]">
-              one research graph.
+              searched at once.
             </span>
           </h2>
-          <p className="mt-4 leading-relaxed text-[var(--color-muted-foreground)]">
-            Paste it, upload a CSV, or let the built-in finder search all
-            seven sources for you. Every source lands in one project and
+          <p className="mt-4 text-base leading-relaxed text-[var(--color-muted-foreground)] sm:text-lg">
+            When you type a market, Rift searches these seven places for real
+            customer complaints. You can also paste your own reviews, support
+            messages, or a spreadsheet. Everything lands in one project and
             feeds one set of scored ideas.
           </p>
           <div className="mt-7 flex flex-wrap gap-3">
             <Button asChild className="rounded-full px-5">
-              <Link href="/sign-up">Start free</Link>
+              <Link href="/sign-up">Try Rift free</Link>
             </Button>
             <Button asChild variant="secondary" className="rounded-full px-5">
               <Link href="/#faq">Read the FAQ</Link>
@@ -58,7 +59,7 @@ export function EvidenceMap() {
           <div
             aria-hidden
             className="pointer-events-none absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl"
-            style={{ background: "rgba(59,130,246,0.14)" }}
+            style={{ background: "rgba(224,138,94,0.12)" }}
           />
           {/* Connection lines */}
           {lines.map((rot) => (
@@ -68,12 +69,12 @@ export function EvidenceMap() {
               className={`absolute left-1/2 top-1/2 hidden h-px w-[78%] -translate-x-1/2 sm:block ${rot}`}
               style={{
                 background:
-                  "linear-gradient(90deg, transparent, rgba(96,165,250,0.45), transparent)",
+                  "linear-gradient(90deg, transparent, rgba(224,138,94,0.40), transparent)",
               }}
             />
           ))}
           {/* Core */}
-          <div className="relative mx-auto mt-8 flex h-32 w-32 flex-col items-center justify-center gap-1.5 rounded-3xl border border-[var(--color-border)] bg-[#0d1117] shadow-[var(--shadow-elevated)] sm:absolute sm:left-1/2 sm:top-1/2 sm:mt-0 sm:-translate-x-1/2 sm:-translate-y-1/2">
+          <div className="relative mx-auto mt-8 flex h-32 w-32 flex-col items-center justify-center gap-1.5 rounded-3xl border border-[var(--color-border)] bg-[#14100c] shadow-[var(--shadow-elevated)] sm:absolute sm:left-1/2 sm:top-1/2 sm:mt-0 sm:-translate-x-1/2 sm:-translate-y-1/2">
             <RiftMark size={44} id="evidence-mark" />
             <span className="text-sm font-bold text-[var(--color-foreground)]">
               Rift
@@ -83,7 +84,7 @@ export function EvidenceMap() {
           {nodes.map((node) => (
             <div
               key={node.label}
-              className={`absolute hidden sm:block ${node.className} rounded-xl border border-[var(--color-border)] bg-[#0d1117] px-4 py-2.5 text-xs font-semibold text-[var(--color-foreground)] shadow-[var(--shadow-card)]`}
+              className={`absolute hidden sm:block ${node.className} rounded-xl border border-[var(--color-border)] bg-[#14100c] px-4 py-2.5 text-xs font-semibold text-[var(--color-foreground)] shadow-[var(--shadow-card)]`}
             >
               {node.label}
             </div>
@@ -93,7 +94,7 @@ export function EvidenceMap() {
             {nodes.map((node) => (
               <span
                 key={node.label}
-                className="rounded-xl border border-[var(--color-border)] bg-[#0d1117] px-4 py-2.5 text-xs font-semibold text-[var(--color-foreground)]"
+                className="rounded-xl border border-[var(--color-border)] bg-[#14100c] px-4 py-2.5 text-xs font-semibold text-[var(--color-foreground)]"
               >
                 {node.label}
               </span>

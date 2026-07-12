@@ -2,23 +2,23 @@
 
 /* ----------------------------------------------------------------------------
    Rift design tokens (Tailwind v4 @theme)
-   Dark, premium, founder-friendly palette.
+   "The Lamplit Study" — warm charcoal inks with a single copper accent.
  ---------------------------------------------------------------------------- */
 @theme {
-  /* Surfaces - deep ink with cool, research-cockpit depth */
-  --color-background: #06080d;
-  --color-surface: rgba(255, 255, 255, 0.045);
-  --color-card: #0c1017;
-  --color-border: #252c38;
-  --color-foreground: #f5f7fb;
-  --color-muted-foreground: #98a2b3;
+  /* Surfaces - warm near-black with lamplit depth */
+  --color-background: #0d0b09;
+  --color-surface: rgba(255, 244, 235, 0.05);
+  --color-card: #16120e;
+  --color-border: #33291f;
+  --color-foreground: #f7f4f0;
+  --color-muted-foreground: #b3a89b;
 
   /* Accents */
-  --color-primary: #6b9eff;
+  --color-primary: #e08a5e;
   /* Button/badge fill — darker than --color-primary so white label text
-     clears WCAG AA 4.5:1 (5.2:1 here vs 3.7:1 on #3b82f6) */
-  --color-primary-fill: #2563eb;
-  --color-primary-soft: rgba(76, 130, 238, 0.14);
+     clears WCAG AA 4.5:1 */
+  --color-primary-fill: #a04213;
+  --color-primary-soft: rgba(224, 138, 94, 0.14);
   --color-primary-foreground: #ffffff;
   --color-success: #22c55e;
   --color-success-soft: rgba(34, 197, 94, 0.12);
@@ -60,7 +60,7 @@
 
   body {
     background-color: var(--color-background);
-    background-image: radial-gradient(circle at 82% -10%, rgba(37, 99, 235, 0.13), transparent 32rem);
+    background-image: radial-gradient(circle at 82% -10%, rgba(192, 86, 33, 0.12), transparent 32rem);
     background-attachment: fixed;
     color: var(--color-foreground);
     font-family: var(--font-sans);
@@ -88,22 +88,6 @@
     text-wrap: balance;
   }
 
-  /* Slow-moving glow for hero background */
-  @keyframes drift {
-    0%, 100% {
-      transform: translate(-50%, -50%) scale(1);
-      opacity: 0.10;
-    }
-    50% {
-      transform: translate(-50%, -60%) scale(1.05);
-      opacity: 0.07;
-    }
-  }
-
-  .animate-drift {
-    animation: drift 8s ease-in-out infinite;
-  }
-
   /* Gentle fade-up for sections */
   @keyframes fade-up {
     from {
@@ -118,6 +102,12 @@
 
   .animate-fade-up {
     animation: fade-up 0.5s ease-out both;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-fade-up {
+      animation: none;
+    }
   }
 
   /* Shimmer skeleton loading */
@@ -137,153 +127,23 @@
     animation: shimmer 2s ease-in-out infinite;
   }
 
-  /* Endless scroll for the landing-page capability ribbon. The track holds
-     two copies of the chip list, so -50% loops seamlessly. */
-  @keyframes ribbon-scroll {
-    from {
-      transform: translateX(0);
-    }
-    to {
-      transform: translateX(-50%);
-    }
-  }
-
-  .animate-ribbon {
-    animation: ribbon-scroll 60s linear infinite;
-  }
-
-  .animate-ribbon-reverse {
-    animation: ribbon-scroll 60s linear infinite reverse;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .animate-ribbon,
-    .animate-ribbon-reverse {
-      animation: none;
-    }
-  }
-
-  /* Looping mini-demo animations for the landing feature previews.
-     All elements share one 7s cycle; per-element stagger comes from
-     animation-delay (fill-mode: both hides elements until their turn,
-     and the delay shifts every repeat, so the stagger survives the loop).
-     Hold ends at ~76% so the reset-and-replay reads clearly as a loop. */
-  @keyframes demo-item {
-    0% {
-      opacity: 0;
-      transform: translateY(8px);
-    }
-    6% {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    76% {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    86%,
-    100% {
-      opacity: 0;
-      transform: translateY(-4px);
-    }
-  }
-
-  .animate-demo-item {
-    animation: demo-item 7s ease-out infinite both;
-  }
-
-  /* Score bars grow from empty to their real width, hold, then reset */
-  @keyframes demo-bar {
-    0%,
-    2% {
-      transform: scaleX(0);
-    }
-    14% {
-      transform: scaleX(1);
-    }
-    76% {
-      transform: scaleX(1);
-    }
-    86%,
-    100% {
-      transform: scaleX(0);
-    }
-  }
-
-  .animate-demo-bar {
-    transform-origin: left;
-    animation: demo-bar 7s cubic-bezier(0.22, 1, 0.36, 1) infinite both;
-  }
-
-  /* Small elements (checkmarks, scores, verdict badges) pop into place */
-  @keyframes demo-pop {
-    0% {
-      opacity: 0;
-      transform: scale(0.5);
-    }
-    5% {
-      opacity: 1;
-      transform: scale(1.12);
-    }
-    9% {
-      transform: scale(1);
-    }
-    76% {
-      opacity: 1;
-      transform: scale(1);
-    }
-    86%,
-    100% {
-      opacity: 0;
-      transform: scale(0.85);
-    }
-  }
-
-  .animate-demo-pop {
-    animation: demo-pop 7s ease-out infinite both;
-  }
-
-  /* Soft radar ping for "hot" complaint dots; color via --pulse-color */
-  @keyframes demo-pulse {
-    0%,
-    100% {
-      box-shadow: 0 0 0 0 var(--pulse-color, rgba(59, 130, 246, 0.45));
-    }
-    60% {
-      box-shadow: 0 0 0 5px transparent;
-    }
-  }
-
-  .animate-demo-pulse {
-    animation: demo-pulse 2.2s ease-out infinite;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .animate-demo-item,
-    .animate-demo-bar,
-    .animate-demo-pop,
-    .animate-demo-pulse {
-      animation: none;
-    }
-  }
-
   /* Faint blueprint grid for the landing page backdrop */
   .bg-grid-faint {
     background-image: linear-gradient(
         to right,
-        rgba(148, 163, 184, 0.035) 1px,
+        rgba(181, 166, 150, 0.035) 1px,
         transparent 1px
       ),
-      linear-gradient(to bottom, rgba(148, 163, 184, 0.035) 1px, transparent 1px);
+      linear-gradient(to bottom, rgba(181, 166, 150, 0.035) 1px, transparent 1px);
     background-size: 72px 72px;
     background-position: center top;
   }
 
   .app-canvas {
     background-image:
-      radial-gradient(circle at 78% 2%, rgba(37, 99, 235, 0.11), transparent 28rem),
-      linear-gradient(rgba(148, 163, 184, 0.025) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(148, 163, 184, 0.025) 1px, transparent 1px);
+      radial-gradient(circle at 78% 2%, rgba(192, 86, 33, 0.09), transparent 28rem),
+      linear-gradient(rgba(181, 166, 150, 0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(181, 166, 150, 0.025) 1px, transparent 1px);
     background-size: auto, 48px 48px, 48px 48px;
   }
 

@@ -1,6 +1,6 @@
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import { Container } from "@/components/container";
-import { Button } from "@/components/ui/button";
 import { RiftMark } from "@/components/logo";
 
 const columns = [
@@ -8,8 +8,8 @@ const columns = [
     title: "Product",
     links: [
       { href: "/#how-it-works", label: "How it works" },
-      { href: "/#features", label: "Features" },
-      { href: "/#why-not-chatgpt", label: "Why not ChatGPT?" },
+      { href: "/#example", label: "Example" },
+      { href: "/#why-rift", label: "Why Rift?" },
       { href: "/#faq", label: "FAQ" },
       { href: "/pricing", label: "Pricing" },
     ],
@@ -39,24 +39,29 @@ export function Footer() {
           <div>
             <div className="flex items-center gap-3">
               <RiftMark size={32} id="footer-mark" />
-              <span className="text-sm font-bold uppercase tracking-[0.18em] text-[var(--color-foreground)]">
+              <span className="text-base font-bold tracking-tight text-[var(--color-foreground)]">
                 Rift
               </span>
             </div>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-[var(--color-muted-foreground)]">
-              Business ideas from real customer pain. Grouped by AI, scored
-              transparently, validated by you.
+              Business ideas from real customer problems. Grouped by AI,
+              scored transparently, tested by you.
             </p>
-            <p className="mt-6 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-muted-foreground)]/70">
-              Find your first idea today
-            </p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              <Button asChild size="sm" className="rounded-full px-4">
-                <Link href="/sign-up">Start free</Link>
-              </Button>
-              <Button asChild variant="secondary" size="sm" className="rounded-full px-4">
-                <Link href="/pricing">View pricing</Link>
-              </Button>
+            {/* The CTA band directly above already makes the sign-up pitch;
+                the footer closes with quiet links, not a second sales beat. */}
+            <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
+              <Link
+                href="/sign-up"
+                className="inline-flex items-center gap-1 font-medium text-[var(--color-primary)] transition-colors duration-150 ease-out hover:text-[var(--color-primary)]/70"
+              >
+                Try Rift free <ArrowRight className="h-3.5 w-3.5" aria-hidden />
+              </Link>
+              <Link
+                href="/pricing"
+                className="text-[var(--color-muted-foreground)] transition-colors duration-150 ease-out hover:text-[var(--color-foreground)]"
+              >
+                View pricing
+              </Link>
             </div>
           </div>
 
@@ -67,7 +72,7 @@ export function Footer() {
           >
             {columns.map((col) => (
               <div key={col.title}>
-                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-muted-foreground)]/70">
+                <p className="text-xs font-semibold text-[var(--color-muted-foreground)]">
                   {col.title}
                 </p>
                 <ul className="mt-4 space-y-2.5">
@@ -88,7 +93,7 @@ export function Footer() {
         </div>
 
         <p className="mt-12 border-t border-[var(--color-border)] pt-6 text-center text-xs text-[var(--color-muted-foreground)]">
-          © 2026 Rift. Business ideas from real customer pain.
+          © 2026 Rift. Business ideas from real customer problems.
         </p>
       </Container>
     </footer>

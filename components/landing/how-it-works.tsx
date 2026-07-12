@@ -1,35 +1,30 @@
-import { Route, Sparkles } from "lucide-react";
+import { Route } from "lucide-react";
 import { Container } from "@/components/container";
 import { SectionHeader } from "@/components/landing/section-header";
+import { DemoVideo } from "@/components/landing/demo-video";
+
+/* Three plain-language steps (July 2026 landing redesign). The numbered
+ * markers are real sequence — this is the order a first-time user actually
+ * moves through the product. The demo video sits beside the steps as an
+ * optional extra: the text must carry the explanation on its own.
+ */
 
 const steps = [
   {
     n: "1",
-    title: "Choose a market or paste complaints",
-    text: "Start fast with starter examples, or use real complaints for stronger results.",
+    title: "Tell Rift an industry",
+    text: "Type any market you're curious about — or paste reviews, support messages, and complaints you already have.",
   },
   {
     n: "2",
-    title: "Find ideas",
-    text: "Rift groups repeated complaints into possible ideas and scores each one 0–100.",
-    highlight: true,
+    title: "See the problems customers repeat",
+    text: "Rift reads everything and groups the complaints that keep coming up, with links back to the original posts.",
   },
   {
     n: "3",
-    title: "Compare ideas",
-    text: "Pick 2 to 3 ideas and choose which one to test first.",
+    title: "Explore ideas backed by sources",
+    text: "Each repeated problem becomes a practical business idea you can explore, with a score that is explained, never a black box.",
   },
-  {
-    n: "4",
-    title: "Test with real people",
-    text: "Scores help you inspect ideas. They do not prove demand.",
-  },
-];
-
-const previewClusters = [
-  { label: "invoices chased by hand", count: "11 complaints", width: "92%" },
-  { label: "no-show fees disputed", count: "8 complaints", width: "67%" },
-  { label: "exports break weekly", count: "5 complaints", width: "42%" },
 ];
 
 export function HowItWorks() {
@@ -41,11 +36,13 @@ export function HowItWorks() {
           badge="How it works"
           heading={
             <>
-              It does not brainstorm.{" "}
-              <span className="text-[var(--color-primary)]">It narrows.</span>
+              Three steps.{" "}
+              <span className="text-[var(--color-primary)]">
+                No research skills needed.
+              </span>
             </>
           }
-          lead="Complaints go in, repeated pain gets grouped and scored, and you walk out with one idea worth testing first."
+          lead="You don't need to know anything about customer research or idea validation. If you can type a market you're curious about, you can use Rift."
         />
 
         <div className="mt-12 grid items-start gap-8 lg:grid-cols-2 lg:gap-12">
@@ -54,26 +51,16 @@ export function HowItWorks() {
             {steps.map((s) => (
               <li
                 key={s.n}
-                className={`flex gap-4 rounded-xl border p-5 transition-all duration-150 ease-out ${
-                  s.highlight
-                    ? "border-[var(--color-primary)]/40 bg-[var(--color-primary)]/5"
-                    : "border-[var(--color-border)] bg-[var(--color-card)] hover:border-[var(--color-border)] hover:bg-[var(--color-surface)]"
-                }`}
+                className="flex gap-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-5 sm:p-6"
               >
-                <span
-                  className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${
-                    s.highlight
-                      ? "bg-[var(--color-primary-fill)] text-white"
-                      : "bg-[var(--color-primary-soft)] text-[var(--color-primary)] ring-1 ring-[var(--color-primary)]/20"
-                  }`}
-                >
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary-soft)] text-base font-semibold text-[var(--color-primary)] ring-1 ring-[var(--color-primary)]/20">
                   {s.n}
                 </span>
                 <div>
-                  <h3 className="text-sm font-semibold text-[var(--color-foreground)]">
+                  <h3 className="text-base font-semibold text-[var(--color-foreground)]">
                     {s.title}
                   </h3>
-                  <p className="mt-1 text-sm leading-relaxed text-[var(--color-muted-foreground)]">
+                  <p className="mt-1.5 text-base leading-relaxed text-[var(--color-muted-foreground)]">
                     {s.text}
                   </p>
                 </div>
@@ -81,40 +68,12 @@ export function HowItWorks() {
             ))}
           </ol>
 
-          {/* Preview panel for the highlighted step */}
-          <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-2 shadow-[var(--shadow-elevated)] lg:sticky lg:top-24">
-            <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-background)] p-5">
-              <div className="mb-5 flex items-center justify-between gap-3">
-                <p className="text-xs text-[var(--color-muted-foreground)]">
-                  Grouping 24 complaints…
-                </p>
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-primary-soft)] px-3 py-1 text-xs font-medium text-[var(--color-primary)]">
-                  <Sparkles className="h-3 w-3" aria-hidden /> AI at work
-                </span>
-              </div>
-              <div className="space-y-4">
-                {previewClusters.map((c) => (
-                  <div key={c.label}>
-                    <div className="mb-1.5 flex items-center justify-between">
-                      <p className="text-xs font-medium text-[var(--color-foreground)]">
-                        {c.label}
-                      </p>
-                      <span className="text-xs tabular-nums text-[var(--color-muted-foreground)]">
-                        {c.count}
-                      </span>
-                    </div>
-                    <div className="h-1.5 overflow-hidden rounded-full bg-[var(--color-surface)]">
-                      <div
-                        className="h-full rounded-full bg-[var(--color-primary)]"
-                        style={{ width: c.width }}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <p className="px-3 py-2.5 text-center text-xs uppercase tracking-wider text-[var(--color-muted-foreground)]/70">
-              Step 2 · Repeated problems become scored ideas
+          {/* Optional demo video — an extra, not the explanation */}
+          <div className="lg:sticky lg:top-24">
+            <DemoVideo />
+            <p className="mt-3 text-center text-sm text-[var(--color-muted-foreground)]">
+              Prefer to watch? The whole flow in 90 seconds. The video is
+              optional — everything it shows is explained on this page.
             </p>
           </div>
         </div>

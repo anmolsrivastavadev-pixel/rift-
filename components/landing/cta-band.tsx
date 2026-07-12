@@ -4,8 +4,8 @@ import { Container } from "@/components/container";
 import { Button } from "@/components/ui/button";
 
 const assurances = [
-  "Free during the private beta",
-  "Start with just 5–10 complaints",
+  "Free during the beta",
+  "Works with just 5–10 pasted comments",
   "No credit card required",
 ];
 
@@ -16,7 +16,7 @@ export function CtaBand() {
       className="border-y border-[var(--color-primary)]/30"
       style={{
         background:
-          "linear-gradient(120deg, rgba(29,78,216,0.35) 0%, rgba(37,99,235,0.22) 55%, rgba(59,130,246,0.30) 100%)",
+          "linear-gradient(120deg, rgba(154,64,18,0.35) 0%, rgba(192,86,33,0.22) 55%, rgba(224,138,94,0.26) 100%)",
       }}
     >
       <Container className="flex flex-col items-start gap-6 py-12 sm:py-14 md:flex-row md:items-center md:justify-between">
@@ -38,7 +38,7 @@ export function CtaBand() {
         </div>
         <Button asChild size="lg" className="shrink-0 rounded-full px-7">
           <Link href="/sign-up">
-            Start free <ArrowRight className="h-4 w-4" aria-hidden />
+            Find my first idea <ArrowRight className="h-4 w-4" aria-hidden />
           </Link>
         </Button>
       </Container>

@@ -6,24 +6,25 @@ import { ImageResponse } from "next/og";
  * meta chips. Grid lines are plain divs (satori has no repeating gradients).
  */
 
-export const alt = "Rift: turn complaints into business ideas worth testing.";
+export const alt = "Rift: find business ideas hidden in real customer problems.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 const headlineWords = [
-  ...["Turn", "complaints", "into", "business", "ideas"].map((text) => ({
+  ...["Find", "business", "ideas", "hidden", "in"].map((text) => ({
     text,
     accent: false,
   })),
-  { text: "worth", accent: true },
-  { text: "testing.", accent: true },
+  { text: "real", accent: true },
+  { text: "customer", accent: true },
+  { text: "problems.", accent: true },
 ];
 
-/* Keep in sync with metaChips in components/landing/hero.tsx */
+/* Keep in sync with assurances in components/landing/hero.tsx */
 const chips = [
-  "Every idea comes with receipts",
-  "Searches 7 sources at once",
-  "Free during the private beta",
+  "Sources included with every result",
+  "Free during the beta",
+  "No credit card required",
 ];
 
 export default function OpenGraphImage() {
@@ -39,7 +40,7 @@ export default function OpenGraphImage() {
           padding: 72,
           backgroundColor: "#000000",
           backgroundImage:
-            "radial-gradient(circle at 62% 0%, rgba(30,64,175,0.38), transparent 58%), radial-gradient(circle at 0% 100%, rgba(37,99,235,0.14), transparent 45%)",
+            "radial-gradient(circle at 62% 0%, rgba(154,64,18,0.36), transparent 58%), radial-gradient(circle at 0% 100%, rgba(192,86,33,0.14), transparent 45%)",
           color: "#ffffff",
           fontFamily: "sans-serif",
           position: "relative",
@@ -95,7 +96,7 @@ export default function OpenGraphImage() {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  color: "#2563EB",
+                  color: "#A04213",
                   fontSize: 72,
                   fontWeight: 800,
                   clipPath: "polygon(0% 0%, 66% 0%, 37% 100%, 0% 100%)",
@@ -113,7 +114,7 @@ export default function OpenGraphImage() {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  color: "#3B7CFF",
+                  color: "#E08A5E",
                   fontSize: 72,
                   fontWeight: 800,
                   clipPath: "polygon(66% 0%, 100% 0%, 100% 100%, 37% 100%)",
@@ -127,11 +128,11 @@ export default function OpenGraphImage() {
           <div
             style={{
               display: "flex",
-              border: "2px solid rgba(59,130,246,0.4)",
-              backgroundColor: "rgba(59,130,246,0.12)",
+              border: "2px solid rgba(224,138,94,0.4)",
+              backgroundColor: "rgba(224,138,94,0.12)",
               borderRadius: 999,
               padding: "10px 26px",
-              color: "#93c5fd",
+              color: "#f0c4a8",
               fontSize: 26,
               fontWeight: 600,
             }}
@@ -142,18 +143,14 @@ export default function OpenGraphImage() {
 
         {/* Kicker + headline — same voice and accent as the hero */}
         <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-            <div style={{ width: 40, height: 2, backgroundColor: "rgba(107,158,255,0.6)" }} />
-            <div
-              style={{
-                color: "#6b9eff",
-                fontSize: 22,
-                fontWeight: 700,
-                letterSpacing: 4,
-              }}
-            >
-              IDEA RESEARCH FROM CUSTOMER PAIN
-            </div>
+          <div
+            style={{
+              color: "#e08a5e",
+              fontSize: 24,
+              fontWeight: 600,
+            }}
+          >
+            For first-time founders and side-project builders
           </div>
           {/* Satori can't mix raw text and elements in one node, so the
               headline is word-by-word spans in a wrapping flex row. */}
@@ -161,10 +158,10 @@ export default function OpenGraphImage() {
             style={{
               display: "flex",
               flexWrap: "wrap",
-              fontSize: 92,
+              fontSize: 76,
               fontWeight: 800,
-              lineHeight: 1.02,
-              letterSpacing: -4,
+              lineHeight: 1.05,
+              letterSpacing: -2,
               maxWidth: 1040,
             }}
           >
@@ -172,7 +169,7 @@ export default function OpenGraphImage() {
               <span
                 key={i}
                 style={{
-                  color: word.accent ? "#6b9eff" : "#ffffff",
+                  color: word.accent ? "#e08a5e" : "#ffffff",
                   marginRight: 22,
                 }}
               >

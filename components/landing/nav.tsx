@@ -7,8 +7,7 @@ import { MobileMenu } from "@/components/landing/mobile-menu";
 
 const navLinks = [
   { href: "/#how-it-works", label: "How it works" },
-  { href: "/#features", label: "Features" },
-  { href: "/#why-not-chatgpt", label: "Why not ChatGPT?" },
+  { href: "/#example", label: "Example" },
   { href: "/pricing", label: "Pricing" },
   { href: "/#faq", label: "FAQ" },
 ];
@@ -20,7 +19,7 @@ const navLinks = [
 export function LandingNav() {
   return (
     <header className="sticky top-0 z-50 px-4 pt-3">
-      <div className="relative mx-auto flex h-14 w-full max-w-6xl items-center justify-between rounded-2xl border border-[var(--color-border)] bg-[#0c1017]/88 px-3 pl-4 shadow-[var(--shadow-elevated)] backdrop-blur-xl">
+      <div className="relative mx-auto flex h-14 w-full max-w-6xl items-center justify-between rounded-2xl border border-[var(--color-border)] bg-[#16120e]/88 px-3 pl-4 shadow-[var(--shadow-elevated)] backdrop-blur-xl">
         <Link
           href="/"
           className="flex items-center gap-2 text-base font-bold tracking-tight"
@@ -47,7 +46,7 @@ export function LandingNav() {
           </Button>
           <Button asChild size="sm" className="rounded-full px-4">
             <Link href="/sign-up">
-              Start free <ArrowUpRight className="h-3.5 w-3.5" />
+              Try free <ArrowUpRight className="h-3.5 w-3.5" />
             </Link>
           </Button>
           <MobileMenu links={navLinks} />

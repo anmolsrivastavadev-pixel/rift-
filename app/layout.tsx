@@ -8,9 +8,9 @@ const inter = Inter({
   display: "swap",
 });
 
-const title = "Rift | Turn complaints into business ideas";
+const title = "Rift | Find business ideas in real customer problems";
 const description =
-  "Type a market or paste real complaints. Rift finds repeated problems and turns them into ideas you can compare.";
+  "Enter an industry or paste customer feedback. Rift groups the problems people keep repeating, shows the original sources, and suggests practical ideas you can explore.";
 
 // Public site origin for OG images / sitemap URLs. Prefer Vercel's automatic
 // production-domain variable — BETTER_AUTH_URL has pointed at deployment-

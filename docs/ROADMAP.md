@@ -393,6 +393,24 @@ The Start Fresh Test patch addresses workspace-mixing confusion:
 
 ---
 
+### Beginner-first landing page redesign (founder-prompted, July 12, 2026)
+- **Status:** ✅ Done. The founder collected an outside "brutal verdict" review of the landing page (polished but not beginner-friendly: jargon, unexplained scores, unreadable dashboard preview, no clear audience) and pasted it as the spec. Landing page only — nothing inside the app was renamed.
+- **What was built:**
+  - **Hero rewritten for a five-second read:** eyebrow "For first-time founders and side-project builders"; headline "Find business ideas hidden in real customer problems."; a real market input (zero-JS GET form to `/sign-up?market=...`) with placeholder "Try “dog grooming” or “online tutoring”", primary CTA "Find ideas", and an "Or see a full example first" link to `#example`. The right column is a large readable example (typed market → repeated problem with a quote and complaint count → suggested idea with a labeled, explained score), clearly marked as sample data. The idea-spark particles and extra glows were removed; the demo video moved out of the hero.
+  - **How it works** cut from 4 steps to 3 plain-language steps; the Remotion demo video now sits beside them as an explicitly optional extra (`components/landing/demo-video.tsx`, extracted verbatim from the old hero: preload="none", IntersectionObserver play, reduced-motion poster).
+  - **New `#example` section** (`example-walkthrough.tsx`): the dog-grooming story end to end — three sample quotes with named source types, the idea brief (who has the problem / what they do today / idea score 86 of 100 with the three factors spelled out), and beginner next actions (Explore / Save for later / Dismiss language on the landing page only — the app keeps Pursue/Park/Reject).
+  - **New Trust section** (`trust.tsx`): repeated problems not one-off gripes; a fixed, checkable score; AI that never invents statistics; data privacy incl. account deletion. No testimonials or user counts — none exist yet.
+  - **Jargon replaced across the landing surface:** "customer pain" → "customer problems", "receipts" → "sources/links to the original post", "worth testing" → "worth exploring", "private beta" → "beta". "Why not ChatGPT?" left the nav; the section is retitled "Why Rift?" (`#why-rift`) and stays lower on the page. Nav is now How it works / Example / Pricing / FAQ + Sign in + "Try free".
+  - **Removed sections (files deleted):** `tag-ribbon.tsx` (decorative jargon ribbon), `features.tsx` (tiny animated previews with unexplained 86/71/58 scores), `output-wall.tsx`; their now-orphaned keyframes (`idea-spark`, `ribbon-scroll`, `demo-*`, and the long-dead `drift`) removed from `globals.css`.
+  - **Truthful-claims pass:** assurances everywhere are exactly "Sources included with every result / Free during the beta / No credit card required" — all true under the FREE_BETA switch. No instant-access claim, since sign-up may be founder-gated (`RIFT_BETA_MODE`).
+  - **Metadata + social card:** `app/layout.tsx` title/description match the new hero; `app/opengraph-image.tsx` rebuilt around the new headline/eyebrow/chips.
+  - **Readability:** body copy on landing sections raised to 16px+, FAQ answers to text-base; scores never communicated by color alone.
+- **Also done in passing:** removed a leftover `<script src="http://localhost:8400/live.js">` block that a local design-preview tool had injected into `app/layout.tsx` (dev-only artifact; failed lint and must never deploy).
+- **Not changed:** in-app labels (Complaints, candidates, Pursue/Park/Reject), Gemini prompt, scoring, CSV pipeline, auth/billing, Prisma schema, dashboard, no new dependencies.
+- **Verified:** `pnpm lint` (0 errors), `pnpm exec tsc --noEmit`, `pnpm build` all pass; new page exercised on localhost (anchors, sign-up form, video, pricing page, OG image all confirmed).
+
+---
+
 ### Free beta switch (founder-prompted, July 2026)
 - **Status:** ✅ Done (immediately after M34 — the founder hit the free-plan 10-runs/month cap while beta testing their own app)
 - **What was built:** `FREE_BETA = true` constant in `lib/plans.ts`. While on: `resolvePlanId` returns "pro" for every account (Pro limits everywhere, all quota/upgrade nags and "See plans" notices disappear since they key off `plan === "free"`), both billing server actions refuse to start ("Rift is free during the beta — no payment needed."), the pricing page keeps BOTH plan cards but replaces the Pro CTA with an "Included free during the beta" badge and beta copy, and the sidebar Plan & pricing badge reads "beta". `User.plan` in the database is never touched; the Stripe webhook and keys are untouched and dormant.
