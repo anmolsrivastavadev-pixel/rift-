@@ -10,6 +10,11 @@ const appBaseUrl = process.env.BETTER_AUTH_URL;
 
 const configuredAppOrigin = appBaseUrl ? new URL(appBaseUrl).origin : undefined;
 
+/** Vercel's system vars carry a bare host (no scheme); trusted origins need one. */
+function vercelOrigin(host: string | undefined): string | undefined {
+  return host ? `https://${host}` : undefined;
+}
+
 /* Account deletion must never leave a paying subscription behind: cancel it
  * at Stripe first, and refuse the deletion if that fails (a deleted account
  * that keeps being charged is worse than asking the user to email support).
@@ -69,12 +74,21 @@ export const auth = betterAuth({
    * accounts: anyone could deploy "rift-<anything>" and become a trusted
    * origin. Trusted origins gate the CSRF check AND the reset-password
    * `redirectTo`, which carries the reset token in the URL — so a claimable
-   * wildcard is an account-takeover path. Preview deployments get their own
-   * exact origin from VERCEL_URL instead.
+   * wildcard is an account-takeover path.
+   *
+   * The Vercel vars below are set BY Vercel for this deployment, so they are
+   * ours by construction and nobody else can claim them. All three are needed
+   * because they are different URLs: PROJECT_PRODUCTION_URL is the stable
+   * production domain, BRANCH_URL is the preview alias a human actually opens
+   * (rift-git-<branch>-<team>.vercel.app), and VERCEL_URL is the immutable
+   * per-deployment URL. Listing only VERCEL_URL would leave preview sign-in
+   * failing CSRF, because that is not the origin the browser is on.
    */
   trustedOrigins: [
     configuredAppOrigin,
-    process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined,
+    vercelOrigin(process.env.VERCEL_PROJECT_PRODUCTION_URL),
+    vercelOrigin(process.env.VERCEL_BRANCH_URL),
+    vercelOrigin(process.env.VERCEL_URL),
     "http://localhost:3000",
   ].filter((origin): origin is string => Boolean(origin)),
   session: {

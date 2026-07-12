@@ -21,7 +21,7 @@ const DEFAULT_MODEL = "gemini-flash-latest";
 const FALLBACK_MODEL = "gemini-flash-lite-latest";
 
 const RETRYABLE_GEMINI_ERROR =
-  /NOT_FOUND|UNAVAILABLE|RESOURCE_EXHAUSTED|timed out|"code":\s*(404|503|429)/;
+  /NOT_FOUND|UNAVAILABLE|RESOURCE_EXHAUSTED|timed out|timeout|abort|"code":\s*(404|503|429)/i;
 
 /** GEMINI_MODEL env override first, then the always-current aliases. */
 export function geminiModelCandidates(): string[] {
@@ -31,23 +31,22 @@ export function geminiModelCandidates(): string[] {
 
 /* Every other outbound call in the codebase carries a timeout (the source
  * fetchers use AbortSignal.timeout(10s)); the Gemini SDK call did not. A hung
- * request would therefore sit until the whole 300s lambda died, taking the
- * user's entire run with it and leaving the AIRun row stuck on "running".
- * "timed out" is deliberately matched by RETRYABLE_GEMINI_ERROR, so a stalled
- * model falls through to the next candidate instead of failing the run. */
-const GEMINI_TIMEOUT_MS = 60_000;
-
-function withTimeout<T>(promise: Promise<T>, ms: number, model: string): Promise<T> {
-  return Promise.race([
-    promise,
-    new Promise<never>((_, reject) =>
-      setTimeout(
-        () => reject(new Error(`Gemini request to ${model} timed out after ${ms}ms`)),
-        ms
-      ).unref?.()
-    ),
-  ]) as Promise<T>;
-}
+ * request would sit until the whole 300s lambda died, taking the user's entire
+ * run with it and leaving the AIRun row stuck on "running".
+ *
+ * Uses the SDK's own abortSignal rather than a Promise.race, so a timed-out
+ * request actually releases its connection instead of running on unobserved.
+ * Per the SDK docs the abort is client-side only — Google still bills for the
+ * work it already did — so a timeout genuinely costs money, and the budget for
+ * one is set generously: it exists to bound a HANG, not to clip a slow batch.
+ * A merely-slow call that gets cut here would be retried on the lite model and
+ * produce weaker clusters, so this number should stay well above normal
+ * latency (a 100-complaint clustering call is seconds, not a minute).
+ *
+ * "timed out" / "aborted" are matched by RETRYABLE_GEMINI_ERROR so a stalled
+ * model falls through to the next candidate rather than failing the whole run.
+ */
+const GEMINI_TIMEOUT_MS = 90_000;
 
 /**
  * generateContent (JSON mode) with model fallback. Tries each candidate in
@@ -65,15 +64,14 @@ export async function generateJsonWithModelFallback(
   let lastError: unknown = null;
   for (const model of geminiModelCandidates()) {
     try {
-      const res = await withTimeout(
-        ai.models.generateContent({
-          model,
-          contents: prompt,
-          config: { responseMimeType: "application/json" },
-        }),
-        GEMINI_TIMEOUT_MS,
-        model
-      );
+      const res = await ai.models.generateContent({
+        model,
+        contents: prompt,
+        config: {
+          responseMimeType: "application/json",
+          abortSignal: AbortSignal.timeout(GEMINI_TIMEOUT_MS),
+        },
+      });
       return res.text ?? undefined;
     } catch (err) {
       lastError = err;

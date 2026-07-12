@@ -13,6 +13,13 @@ import { requireOwnedProject } from "@/lib/projects";
 import { trackProductEvent } from "@/lib/product-events";
 import { checkIdeaRunQuota } from "@/lib/quotas";
 
+/* How many raw complaints the pipeline pulls before cleaning. Deliberately
+ * larger than MAX_COMPLAINTS (the post-dedupe clustering cap in lib/ai.ts):
+ * cleaning collapses duplicate bodies, so the raw fetch needs headroom to
+ * still yield a full MAX_COMPLAINTS unique complaints. 4x covers a project
+ * that is three-quarters duplicates while keeping the fetch bounded. */
+const COMPLAINT_FETCH_LIMIT = MAX_COMPLAINTS * 4;
+
 /* -------------------------------------------------------------------------
  * Form-action wrapper for Reset (clientside <form action=...>).
  * Accepts FormData so the project id can be sent as a hidden input. M16A:
@@ -186,23 +193,31 @@ export async function runPipeline(
     /* --- Stage 1: Cleaning --- */
     logger.info("pipeline.started", { jobId, projectId: project.id });
 
-    // Newest first, capped at the clustering limit. Without the orderBy,
-    // Postgres returned rows in physical order, so the 1,500 that survived
-    // lib/ai.ts's slice were arbitrary and unstable between runs — while the
-    // UI promised "your 1,500 most recent complaints". The take also stops us
-    // pulling 20k bodies into the lambda just to throw 18.5k away.
+    // Newest first. Without the orderBy, Postgres returned rows in physical
+    // order, so the 1,500 that survived lib/ai.ts's slice were arbitrary and
+    // unstable between runs — while the UI promised "your 1,500 most recent
+    // complaints". The id tiebreaker matters: a CSV chunk is one transaction,
+    // so up to 500 rows share an identical createdAt, and a cut that lands
+    // inside a tie group would still be nondeterministic without it.
+    //
+    // The fetch is bounded but NOT at MAX_COMPLAINTS: cleanComplaints dedupes
+    // by body, and lib/ai.ts takes its 1,500 from the CLEANED list. Fetching
+    // exactly 1,500 raw rows would hand it fewer than 1,500 unique ones
+    // whenever there are duplicates (CSV upload deliberately does not dedupe
+    // against the DB), quietly shrinking every run. The buffer keeps the
+    // analyzed set at a full 1,500 unique while still refusing to drag all
+    // 20k bodies into the lambda.
     //
     // totalComplaints is counted separately because the cap notice below has
-    // to know the project is bigger than the analyzed slice — with `take` in
-    // place, the fetched array alone can no longer tell us that.
+    // to know the project is bigger than the fetched slice.
     const where = { userId: user.id, projectId: project.id };
     const [totalComplaints, all] = await Promise.all([
       prisma.complaint.count({ where }),
       prisma.complaint.findMany({
         where,
         select: { id: true, body: true },
-        orderBy: { createdAt: "desc" },
-        take: MAX_COMPLAINTS,
+        orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+        take: COMPLAINT_FETCH_LIMIT,
       }),
     ]);
 
@@ -212,7 +227,13 @@ export async function runPipeline(
       return { created: 0, error: "No complaints to analyze. Add complaints first." };
     }
 
-    allCount = all.length;
+    // The project total, not the fetched buffer: AIRun.inputComplaintCount and
+    // the product event both mean "complaints this project held at run time",
+    // and that meaning predates the fetch cap. Keeping it identical means the
+    // run-history line and the analytics series don't quietly change
+    // definition at this deploy. The cap the user actually hit is carried
+    // separately by cappedAt.
+    allCount = totalComplaints;
     await createAIRunRow(jobId);
     if (!runId) {
       throw new Error("Unable to create AI run history row.");

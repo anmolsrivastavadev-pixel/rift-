@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Target, Upload } from "lucide-react";
 
 import { prisma } from "@/lib/db";
+import { reapStaleRunsAndFindLive } from "@/lib/ai-runs";
 import { RunOpportunitiesButton } from "@/components/opportunities/run-button";
 import { OpportunityWorkspace } from "@/components/opportunities/opportunity-browser";
 import { Button } from "@/components/ui/button";
@@ -14,10 +15,6 @@ import { MAX_COMPLAINTS } from "@/lib/ai";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const PAIN_TREND_QUERY_DAYS = 365;
-
-// A run can legitimately take up to maxDuration (300s). Past that, a row still
-// marked "running" is a corpse from a killed lambda, not live work.
-const STALE_RUN_MS = 10 * 60 * 1000;
 
 // Long idea runs (clustering 1,500 complaints across ~15 Gemini batches) can
 // exceed Vercel's default Server Action time limit. The page-level
@@ -43,7 +40,6 @@ export default async function OpportunitiesPage({
   const initialDecision = isValidDecisionStatus(rawDecision) ? rawDecision : undefined;
   const now = new Date().getTime();
   const painTrendStart = new Date(now - PAIN_TREND_QUERY_DAYS * DAY_MS);
-  const staleRunBefore = new Date(now - STALE_RUN_MS);
   const [ops, savedRows, complaintCount, usage, datedComplaints, runningRun] = await Promise.all([
     prisma.opportunity.findMany({
       where: { userId: user.id, projectId: project.id },
@@ -71,20 +67,11 @@ export default async function OpportunitiesPage({
     }),
     // An idea run that's still in flight (e.g. the user navigated away
     // mid-run) — the run button reattaches its progress poll to this jobId.
-    // Bounded by age: a lambda killed mid-run (timeout, OOM, deploy) never
-    // reaches failRun, so its row stays "running" forever. Without this
-    // window such a corpse would re-arm the poll on every visit and leave
-    // "Find ideas" disabled permanently, with no way back for the user.
-    prisma.aIRun.findFirst({
-      where: {
-        userId: user.id,
-        projectId: project.id,
-        status: "running",
-        createdAt: { gte: staleRunBefore },
-      },
-      orderBy: { createdAt: "desc" },
-      select: { jobId: true },
-    }),
+    // This also reaps abandoned runs: a lambda killed mid-run never reaches
+    // failRun, so its row would otherwise stay "running" forever, re-arming
+    // the poll on every visit (disabling "Find ideas" permanently) and
+    // showing "Running…" in the history for good.
+    reapStaleRunsAndFindLive(user.id, project.id, now),
   ]);
 
   // Display flag only — runPipeline re-checks the quota server-side.
