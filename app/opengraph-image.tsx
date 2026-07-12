@@ -1,10 +1,13 @@
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 import { ImageResponse } from "next/og";
 
 /* Social share card (OG + Twitter). Generated at request time with next/og —
- * no static asset, no extra dependency. Mirrors the doodle landing hero:
- * warm cream paper, faint ink grid, split-R coral mark, huge ink headline
- * with coral accent, paper meta chips. Grid lines are plain divs (satori
- * has no repeating gradients).
+ * no static asset, no extra dependency. Mirrors the doodle landing hero for
+ * real: Baloo 2 headline with the yellow underline, the yellow founder badge
+ * sticker, paper chips, coral split-R mark. Fonts are read from
+ * assets/og-fonts (satori needs WOFF/TTF; the site's live fonts are WOFF2).
+ * Grid lines are plain divs (satori has no repeating gradients).
  */
 
 export const alt = "Rift: find business ideas hidden in real customer problems.";
@@ -15,16 +18,11 @@ const INK = "#3a3245";
 const MUTED = "#5f5569";
 const CORAL = "#bc3917";
 const CORAL_LIGHT = "#f07a52";
+const YELLOW = "#ffc53d";
+const PAPER = "#fffcf5";
 
-const headlineWords = [
-  ...["Find", "business", "ideas", "hidden", "in"].map((text) => ({
-    text,
-    accent: false,
-  })),
-  { text: "real", accent: true },
-  { text: "customer", accent: true },
-  { text: "problems.", accent: true },
-];
+/* The last word gets the hand-drawn-style yellow underline, like the hero */
+const headlineWords = ["Find", "business", "ideas", "hidden", "in", "real", "customer"];
 
 /* Keep in sync with assurances in components/landing/doodle.tsx */
 const chips = [
@@ -33,7 +31,12 @@ const chips = [
   "No credit card required",
 ];
 
-export default function OpenGraphImage() {
+export default async function OpenGraphImage() {
+  const [baloo, nunito] = await Promise.all([
+    readFile(join(process.cwd(), "assets/og-fonts/baloo2-latin-800.woff")),
+    readFile(join(process.cwd(), "assets/og-fonts/nunito-latin-700.woff")),
+  ]);
+
   return new ImageResponse(
     (
       <div
@@ -43,12 +46,12 @@ export default function OpenGraphImage() {
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          padding: 72,
+          padding: "60px 72px",
           backgroundColor: "#fdf1e3",
           backgroundImage:
-            "radial-gradient(circle at 62% 0%, rgba(207,67,24,0.08), transparent 58%)",
+            "radial-gradient(circle at 62% 0%, rgba(207,67,24,0.07), transparent 58%)",
           color: INK,
-          fontFamily: "sans-serif",
+          fontFamily: "Nunito",
           position: "relative",
         }}
       >
@@ -62,7 +65,7 @@ export default function OpenGraphImage() {
               top: 0,
               width: 1,
               height: 630,
-              backgroundColor: "rgba(58,50,69,0.06)",
+              backgroundColor: "rgba(58,50,69,0.05)",
             }}
           />
         ))}
@@ -75,12 +78,12 @@ export default function OpenGraphImage() {
               left: 0,
               width: 1200,
               height: 1,
-              backgroundColor: "rgba(58,50,69,0.06)",
+              backgroundColor: "rgba(58,50,69,0.05)",
             }}
           />
         ))}
 
-        {/* Top row: brand left, domain right */}
+        {/* Top row: brand left, domain chip right */}
         <div
           style={{
             display: "flex",
@@ -88,23 +91,24 @@ export default function OpenGraphImage() {
             justifyContent: "space-between",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
             {/* Split-R brand mark (see components/logo.tsx) recreated with CSS
                 clip-path — satori doesn't support SVG clipPath elements. */}
-            <div style={{ display: "flex", position: "relative", width: 76, height: 76 }}>
+            <div style={{ display: "flex", position: "relative", width: 68, height: 68 }}>
               <div
                 style={{
                   position: "absolute",
                   top: -1,
                   left: -1,
-                  width: 76,
-                  height: 76,
+                  width: 68,
+                  height: 68,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   color: CORAL,
-                  fontSize: 72,
+                  fontSize: 62,
                   fontWeight: 800,
+                  fontFamily: "Baloo 2",
                   clipPath: "polygon(0% 0%, 66% 0%, 37% 100%, 0% 100%)",
                 }}
               >
@@ -115,89 +119,110 @@ export default function OpenGraphImage() {
                   position: "absolute",
                   top: 1,
                   left: 1,
-                  width: 76,
-                  height: 76,
+                  width: 68,
+                  height: 68,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   color: CORAL_LIGHT,
-                  fontSize: 72,
+                  fontSize: 62,
                   fontWeight: 800,
+                  fontFamily: "Baloo 2",
                   clipPath: "polygon(66% 0%, 100% 0%, 100% 100%, 37% 100%)",
                 }}
               >
                 R
               </div>
             </div>
-            <div style={{ fontSize: 46, fontWeight: 800, letterSpacing: -1 }}>Rift</div>
+            <div style={{ display: "flex", fontSize: 44, fontWeight: 800, fontFamily: "Baloo 2" }}>
+              Rift<span style={{ color: CORAL }}>.</span>
+            </div>
           </div>
           <div
             style={{
               display: "flex",
-              border: `2px solid rgba(188,57,23,0.45)`,
-              backgroundColor: "rgba(207,67,24,0.1)",
+              border: "3px solid rgba(58,50,69,0.3)",
+              backgroundColor: PAPER,
               borderRadius: 999,
               padding: "10px 26px",
-              color: CORAL,
-              fontSize: 26,
-              fontWeight: 600,
+              color: MUTED,
+              fontSize: 25,
             }}
           >
             rift-fawn.vercel.app
           </div>
         </div>
 
-        {/* Kicker + headline — same voice and accent as the hero */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
+        {/* Badge + headline — the hero, faithfully */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 26 }}>
           <div
             style={{
-              color: CORAL,
-              fontSize: 24,
-              fontWeight: 700,
+              display: "flex",
+              alignSelf: "flex-start",
+              alignItems: "center",
+              gap: 10,
+              border: `3px solid ${INK}`,
+              backgroundColor: YELLOW,
+              boxShadow: `0 4px 0 ${INK}`,
+              borderRadius: 999,
+              padding: "10px 28px",
+              color: INK,
+              fontSize: 25,
             }}
           >
-            For first-time founders and side-project builders
+            <svg width={26} height={26} viewBox="0 0 24 24">
+              <path
+                d="M12 2l2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4L12 2z"
+                fill={INK}
+              />
+            </svg>
+            For first-time founders
           </div>
-          {/* Satori can't mix raw text and elements in one node, so the
-              headline is word-by-word spans in a wrapping flex row. */}
           <div
             style={{
               display: "flex",
               flexWrap: "wrap",
-              fontSize: 76,
+              alignItems: "flex-end",
+              fontSize: 82,
               fontWeight: 800,
-              lineHeight: 1.05,
-              letterSpacing: -2,
-              maxWidth: 1040,
+              fontFamily: "Baloo 2",
+              lineHeight: 1.06,
+              maxWidth: 1060,
             }}
           >
             {headlineWords.map((word, i) => (
-              <span
-                key={i}
-                style={{
-                  color: word.accent ? CORAL : INK,
-                  marginRight: 22,
-                }}
-              >
-                {word.text}
+              <span key={i} style={{ marginRight: 24 }}>
+                {word}
               </span>
             ))}
+            {/* Last word wears the chunky yellow underline */}
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <span>problems.</span>
+              <div
+                style={{
+                  height: 12,
+                  borderRadius: 999,
+                  backgroundColor: YELLOW,
+                  marginTop: -6,
+                }}
+              />
+            </div>
           </div>
         </div>
 
-        {/* Meta chips, like the hero */}
+        {/* Meta chips, like the hero assurances */}
         <div style={{ display: "flex", gap: 16 }}>
           {chips.map((chip) => (
             <div
               key={chip}
               style={{
                 display: "flex",
-                border: "2px solid rgba(58,50,69,0.3)",
-                backgroundColor: "#fffcf5",
+                border: "3px solid rgba(58,50,69,0.3)",
+                backgroundColor: PAPER,
                 borderRadius: 999,
-                padding: "12px 34px",
+                padding: "12px 30px",
                 color: MUTED,
-                fontSize: 23,
+                fontSize: 24,
               }}
             >
               {chip}
@@ -206,6 +231,12 @@ export default function OpenGraphImage() {
         </div>
       </div>
     ),
-    size
+    {
+      ...size,
+      fonts: [
+        { name: "Baloo 2", data: baloo, style: "normal", weight: 800 },
+        { name: "Nunito", data: nunito, style: "normal", weight: 700 },
+      ],
+    }
   );
 }
