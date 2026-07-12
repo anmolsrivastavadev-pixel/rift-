@@ -7,7 +7,9 @@ import { Maximize2, Minimize2, Pause, Play, Volume2, VolumeX } from "lucide-reac
  * research-cockpit video that used to BE the hero, now offered as an extra
  * beside the How-it-works steps — the static page must explain Rift on its
  * own. Source composition: promo-video/src/HeroDemo.tsx, re-encoded to
- * public/hero-demo-v2.mp4 with a poster frame.
+ * public/hero-demo-v3.mp4 with a poster frame. (Version the filenames on
+ * every re-render — browsers cache the mp4 hard, so a same-name replace
+ * keeps serving old copies to returning visitors.)
  *
  * The video is preload="none" and only starts (and therefore downloads)
  * once it is actually on screen, so the poster is all the initial page
@@ -141,11 +143,11 @@ export function DemoVideo() {
         onPause={() => setIsPaused(true)}
         onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
         onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
-        poster="/hero-demo-poster.jpg"
+        poster="/hero-demo-poster-v3.jpg"
         aria-label="Demo of Rift grouping complaints into a scored idea"
         className={isFull ? "block h-full max-w-full" : "block h-full w-full object-cover"}
       >
-        <source src="/hero-demo-v2.mp4" type="video/mp4" />
+        <source src="/hero-demo-v3.mp4" type="video/mp4" />
       </video>
       {/* Bottom control bar: play/pause, grayscale seek bar, time,
           fullscreen. Hidden until hover/focus (always shown while
