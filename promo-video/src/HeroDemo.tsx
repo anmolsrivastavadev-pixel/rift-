@@ -8,31 +8,47 @@ import {
   useCurrentFrame,
   useVideoConfig,
 } from "remotion";
-import { FONT } from "./theme";
+import { loadFont as loadNunito } from "@remotion/google-fonts/Nunito";
+import { loadFont as loadBaloo } from "@remotion/google-fonts/Baloo2";
 
 /* HeroDemo — 90-second scored promo for the landing hero's product window.
  * Four screens inside one browser frame: the research cockpit, the compare
  * board (cursor picks a winner), the validation brief (checklist ticks),
  * and a closing title card. Soundtrack: public/promo-audio.m4a (fades out).
- * 1040x1200, 30fps, 2700 frames, loop-safe (fades to black at the end).
+ * 1040x1200, 30fps, 2700 frames, loop-safe (fades out at the end).
+ *
+ * Restyled July 2026 for the doodle rebrand: cream paper window, coral
+ * accents, plum ink, Nunito body + Baloo 2 display — mirrors the site's
+ * tokens in app/globals.css. Also updated for current features: 7 sources
+ * (Hacker News et al.) and the weekly niche watch beat in the results.
  */
+
+const { fontFamily: BODY } = loadNunito("normal", {
+  weights: ["400", "600", "700", "800"],
+});
+const { fontFamily: DISPLAY } = loadBaloo("normal", {
+  weights: ["700", "800"],
+});
 
 export const HERO_DEMO_DURATION = 2700; // 90s @ 30fps
 
 const C = {
-  window: "#0a0a0a",
-  panel: "rgba(255,255,255,0.05)",
-  border: "#242424",
-  fg: "#ffffff",
-  muted: "#737373",
-  primary: "#3b82f6",
-  primaryFill: "#2563eb",
-  primarySoft: "rgba(59,130,246,0.12)",
-  success: "#22c55e",
-  successSoft: "rgba(34,197,94,0.12)",
-  warning: "#f59e0b",
-  danger: "#ef4444",
+  window: "#fdf1e3",
+  panel: "#fffcf5",
+  border: "rgba(58,50,69,0.16)",
+  fg: "#3a3245",
+  muted: "#5f5569",
+  primary: "#bc3917",
+  primaryFill: "#cf4318",
+  primarySoft: "rgba(207,67,24,0.10)",
+  success: "#15803d",
+  successSoft: "rgba(21,128,61,0.12)",
+  warning: "#b45309",
+  danger: "#b91c1c",
+  yellow: "#ffc53d",
 };
+
+const CARD_SHADOW = "0 6px 16px rgba(58,50,69,0.08)";
 
 const quotes = [
   {
@@ -71,7 +87,8 @@ const checks = [
 // ---- Timeline (frames) -----------------------------------------------------
 /* Retimed 2026-07-06: the first cut had ~20s of dead air (static brief tail,
  * 12s frozen end card). Now every beat lands within ~1.5s of the previous one
- * and a Results scene fills the former gap. */
+ * and a Results scene fills the former gap. July 2026: the Results scene
+ * gained a niche-watch beat (S5.watch), so its closing line moved later. */
 const S1 = {
   scan: 12,
   quotes: [100, 150, 200],
@@ -104,7 +121,8 @@ const S5 = {
   in: 1720,
   counters: [1750, 1800, 1850],
   meter: 1905,
-  line: 1985,
+  watch: 1985,
+  line: 2065,
   out: 2150,
 };
 const S4 = { in: 2180, tagline: 2235, pill: 2310 };
@@ -142,9 +160,9 @@ const Sidebar: React.FC<{ items: string[]; active: string }> = ({ items, active 
           marginBottom: 8,
           borderRadius: 16,
           fontSize: 23,
-          fontWeight: item === active ? 600 : 400,
+          fontWeight: item === active ? 700 : 400,
           color: item === active ? C.fg : C.muted,
-          backgroundColor: item === active ? C.panel : "transparent",
+          backgroundColor: item === active ? C.primarySoft : "transparent",
         }}
       >
         {item}
@@ -194,10 +212,10 @@ const Cursor: React.FC = () => {
         top: y,
         opacity,
         transform: `scale(${pressed ? 0.82 : 1})`,
-        filter: "drop-shadow(0 4px 14px rgba(0,0,0,0.7))",
+        filter: "drop-shadow(0 4px 14px rgba(58,50,69,0.4))",
       }}
     >
-      <path d="M5.5 3.2l12.6 7.9-5.6 1.2-1.9 5.4L5.5 3.2z" fill="#ffffff" stroke="#0a0a0a" strokeWidth={1.2} />
+      <path d="M5.5 3.2l12.6 7.9-5.6 1.2-1.9 5.4L5.5 3.2z" fill="#ffffff" stroke="#3a3245" strokeWidth={1.4} />
     </svg>
   );
 };
@@ -237,14 +255,14 @@ const CockpitScreen: React.FC = () => {
                   width: 12,
                   height: 12,
                   borderRadius: "50%",
-                  backgroundColor: C.primary,
+                  backgroundColor: C.primaryFill,
                   opacity: 0.35 + 0.65 * Math.abs(Math.sin((frame - i * 5) / 8)),
                 }}
               />
             ))}
           </div>
           <div style={{ color: C.muted, fontSize: 23 }}>
-            Scanning Reddit, YouTube, App Store, the web…
+            Scanning Reddit, Hacker News, app reviews & 4 more places…
           </div>
         </div>
       )}
@@ -253,8 +271,8 @@ const CockpitScreen: React.FC = () => {
         style={{
           ...riseAt(frame, fps, S1.pattern),
           display: frame < S1.pattern ? "none" : "flex",
-          border: "2px solid rgba(59,130,246,0.3)",
-          backgroundColor: "rgba(59,130,246,0.05)",
+          border: "2px solid rgba(207,67,24,0.35)",
+          backgroundColor: "rgba(207,67,24,0.05)",
           borderRadius: 22,
           padding: "26px 30px",
           justifyContent: "space-between",
@@ -264,17 +282,19 @@ const CockpitScreen: React.FC = () => {
       >
         <div>
           <Label color={C.primary}>Pattern detected</Label>
-          <div style={{ color: C.fg, fontSize: 30, fontWeight: 600, marginTop: 10 }}>Repeated booking friction</div>
+          <div style={{ color: C.fg, fontSize: 30, fontWeight: 700, marginTop: 10, fontFamily: DISPLAY }}>
+            Repeated booking friction
+          </div>
         </div>
         <div
           style={{
-            border: "2px solid rgba(59,130,246,0.4)",
+            border: "2px solid rgba(207,67,24,0.4)",
             backgroundColor: C.primarySoft,
             borderRadius: 999,
             padding: "10px 24px",
             color: C.primary,
             fontSize: 23,
-            fontWeight: 600,
+            fontWeight: 700,
             whiteSpace: "nowrap",
             transform:
               frame > S1.pattern + 62
@@ -293,14 +313,15 @@ const CockpitScreen: React.FC = () => {
             ...riseAt(frame, fps, S1.quotes[i]),
             border: `2px solid ${C.border}`,
             backgroundColor: C.panel,
+            boxShadow: CARD_SHADOW,
             borderRadius: 22,
             padding: "22px 30px",
           }}
         >
-          <div style={{ color: "rgba(255,255,255,0.85)", fontSize: 25, lineHeight: 1.35 }}>
+          <div style={{ color: C.fg, fontSize: 25, lineHeight: 1.35 }}>
             {quote.text}
           </div>
-          <div style={{ color: C.primary, fontSize: 18, fontWeight: 600, marginTop: 10 }}>
+          <div style={{ color: C.primary, fontSize: 18, fontWeight: 700, marginTop: 10 }}>
             {quote.receipt}
           </div>
         </div>
@@ -315,11 +336,13 @@ const CockpitScreen: React.FC = () => {
               style={{
                 opacity: frame < S1.chips + i * 9 ? 0 : Math.min(1, pop * 1.4),
                 transform: `scale(${0.6 + 0.4 * pop})`,
-                border: `2px solid ${C.border}`,
+                border: "2px solid rgba(58,50,69,0.3)",
+                backgroundColor: C.panel,
                 borderRadius: 999,
                 padding: "9px 20px",
                 color: C.muted,
                 fontSize: 21,
+                fontWeight: 600,
               }}
             >
               {chip}
@@ -335,12 +358,13 @@ const CockpitScreen: React.FC = () => {
             flex: 1,
             border: `2px solid ${C.border}`,
             backgroundColor: C.panel,
+            boxShadow: CARD_SHADOW,
             borderRadius: 22,
             padding: 28,
           }}
         >
           <Label color={C.muted}>Pain trend</Label>
-          <div style={{ color: C.success, fontSize: 38, fontWeight: 700, margin: "8px 0 18px" }}>
+          <div style={{ color: C.success, fontSize: 38, fontWeight: 800, margin: "8px 0 18px" }}>
             Growing +{signalPct}%
           </div>
           <div style={{ display: "flex", alignItems: "flex-end", gap: 11, height: 120 }}>
@@ -354,7 +378,7 @@ const CockpitScreen: React.FC = () => {
                     flex: 1,
                     height: `${h * Math.min(1.06, grow) * wobble}%`,
                     borderRadius: "6px 6px 2px 2px",
-                    background: "linear-gradient(to top, rgba(37,99,235,0.55), #3b82f6)",
+                    background: "linear-gradient(to top, rgba(207,67,24,0.55), #e8663d)",
                   }}
                 />
               );
@@ -367,12 +391,22 @@ const CockpitScreen: React.FC = () => {
             flex: 1,
             border: `2px solid ${C.border}`,
             backgroundColor: C.panel,
+            boxShadow: CARD_SHADOW,
             borderRadius: 22,
             padding: 28,
           }}
         >
           <Label color={C.primary}>Top opportunity</Label>
-          <div style={{ color: C.fg, fontSize: 27, fontWeight: 600, lineHeight: 1.25, margin: "10px 0" }}>
+          <div
+            style={{
+              color: C.fg,
+              fontSize: 27,
+              fontWeight: 700,
+              lineHeight: 1.25,
+              margin: "10px 0",
+              fontFamily: DISPLAY,
+            }}
+          >
             Booking reminders for groomers
           </div>
           <div style={{ color: C.muted, fontSize: 21, lineHeight: 1.45 }}>
@@ -394,13 +428,14 @@ const CockpitScreen: React.FC = () => {
         <div
           style={{
             transform: `scale(${press})`,
-            border: `2px solid ${clicked ? C.primaryFill : "rgba(59,130,246,0.4)"}`,
+            border: `2px solid ${clicked ? "#3a3245" : "rgba(207,67,24,0.4)"}`,
             backgroundColor: clicked ? C.primaryFill : C.primarySoft,
-            borderRadius: 16,
+            boxShadow: clicked ? "0 4px 0 #3a3245" : undefined,
+            borderRadius: 999,
             padding: "12px 34px",
             color: clicked ? "#ffffff" : C.primary,
             fontSize: 23,
-            fontWeight: 600,
+            fontWeight: 700,
           }}
         >
           Compare
@@ -418,14 +453,16 @@ const CompareScreen: React.FC = () => {
   return (
     <div style={{ flex: 1, padding: 30, display: "flex", flexDirection: "column", gap: 22 }}>
       <div style={{ ...riseAt(frame, fps, S2.in + 6), display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <div style={{ color: C.fg, fontSize: 34, fontWeight: 700, letterSpacing: "-0.02em" }}>Compare ideas</div>
+        <div style={{ color: C.fg, fontSize: 34, fontWeight: 800, fontFamily: DISPLAY }}>Compare ideas</div>
         <div
           style={{
             border: `2px solid ${C.border}`,
+            backgroundColor: C.panel,
             borderRadius: 999,
             padding: "8px 18px",
             color: C.muted,
             fontSize: 20,
+            fontWeight: 600,
           }}
         >
           3 candidates
@@ -448,22 +485,23 @@ const CompareScreen: React.FC = () => {
             key={idea.title}
             style={{
               ...riseAt(frame, fps, S2.cards[i]),
-              border: `2px solid ${winnerLift ? "rgba(34,197,94,0.5)" : C.border}`,
-              backgroundColor: winnerLift ? "rgba(34,197,94,0.05)" : C.panel,
+              border: `2px solid ${winnerLift ? "rgba(21,128,61,0.5)" : C.border}`,
+              backgroundColor: winnerLift ? "rgba(21,128,61,0.06)" : C.panel,
+              boxShadow: CARD_SHADOW,
               borderRadius: 22,
               padding: "26px 30px",
             }}
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 18 }}>
               <div style={{ minWidth: 0 }}>
-                <div style={{ color: C.fg, fontSize: 26, fontWeight: 600 }}>{idea.title}</div>
+                <div style={{ color: C.fg, fontSize: 26, fontWeight: 700 }}>{idea.title}</div>
                 <div style={{ color: C.muted, fontSize: 20, marginTop: 6 }}>{idea.tag}</div>
               </div>
-              <div style={{ color: idea.tone, fontSize: 40, fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>
+              <div style={{ color: idea.tone, fontSize: 40, fontWeight: 800, fontVariantNumeric: "tabular-nums" }}>
                 {scoreNow}
               </div>
             </div>
-            <div style={{ height: 10, borderRadius: 999, backgroundColor: "rgba(255,255,255,0.07)", margin: "18px 0" }}>
+            <div style={{ height: 10, borderRadius: 999, backgroundColor: "rgba(58,50,69,0.08)", margin: "18px 0" }}>
               <div
                 style={{
                   height: "100%",
@@ -489,7 +527,7 @@ const CompareScreen: React.FC = () => {
                       borderRadius: 999,
                       padding: "8px 22px",
                       fontSize: 20,
-                      fontWeight: active ? 700 : 400,
+                      fontWeight: active ? 800 : 400,
                     }}
                   >
                     {d}
@@ -508,6 +546,7 @@ const CompareScreen: React.FC = () => {
           textAlign: "center",
           color: C.muted,
           fontSize: 21,
+          fontWeight: 600,
         }}
       >
         Decision saved. One idea moves forward.
@@ -524,7 +563,7 @@ const BriefScreen: React.FC = () => {
     <div style={{ flex: 1, padding: 30, display: "flex", flexDirection: "column", gap: 22 }}>
       <div style={{ ...riseAt(frame, fps, S3.in + 6) }}>
         <Label color={C.primary}>Validation brief</Label>
-        <div style={{ color: C.fg, fontSize: 32, fontWeight: 700, marginTop: 10, letterSpacing: "-0.02em" }}>
+        <div style={{ color: C.fg, fontSize: 32, fontWeight: 800, marginTop: 10, fontFamily: DISPLAY }}>
           Booking reminders for groomers
         </div>
       </div>
@@ -536,12 +575,13 @@ const BriefScreen: React.FC = () => {
             ...riseAt(frame, fps, S3.rows[i]),
             border: `2px solid ${C.border}`,
             backgroundColor: C.panel,
+            boxShadow: CARD_SHADOW,
             borderRadius: 22,
             padding: "24px 30px",
           }}
         >
           <Label color={C.muted}>{label}</Label>
-          <div style={{ color: "rgba(255,255,255,0.9)", fontSize: 25, lineHeight: 1.4, marginTop: 10 }}>{text}</div>
+          <div style={{ color: C.fg, fontSize: 25, lineHeight: 1.4, marginTop: 10 }}>{text}</div>
         </div>
       ))}
 
@@ -550,6 +590,7 @@ const BriefScreen: React.FC = () => {
           ...riseAt(frame, fps, S3.checks[0] - 15),
           border: `2px solid ${C.border}`,
           backgroundColor: C.panel,
+          boxShadow: CARD_SHADOW,
           borderRadius: 22,
           padding: "24px 30px",
           display: "flex",
@@ -590,11 +631,13 @@ const BriefScreen: React.FC = () => {
         <div
           style={{
             backgroundColor: C.primaryFill,
-            borderRadius: 16,
+            border: "2px solid #3a3245",
+            boxShadow: "0 4px 0 #3a3245",
+            borderRadius: 999,
             padding: "14px 36px",
             color: "#fff",
             fontSize: 23,
-            fontWeight: 600,
+            fontWeight: 700,
             transform: `scale(${1 + 0.02 * Math.sin(Math.max(0, frame - S3.button - 15) / 9)})`,
           }}
         >
@@ -619,11 +662,13 @@ const ResultsScreen: React.FC = () => {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
+  const watchOn = frame >= S5.watch + 18;
+  const knob = spring({ frame: frame - (S5.watch + 18), fps, config: { damping: 15 } });
   return (
     <div style={{ flex: 1, padding: 30, display: "flex", flexDirection: "column", gap: 22 }}>
       <div style={{ ...riseAt(frame, fps, S5.in + 6) }}>
         <Label color={C.primary}>Market test</Label>
-        <div style={{ color: C.fg, fontSize: 34, fontWeight: 700, marginTop: 10, letterSpacing: "-0.02em" }}>
+        <div style={{ color: C.fg, fontSize: 34, fontWeight: 800, marginTop: 10, fontFamily: DISPLAY }}>
           One session. One decision.
         </div>
       </div>
@@ -644,12 +689,13 @@ const ResultsScreen: React.FC = () => {
                 flex: 1,
                 border: `2px solid ${C.border}`,
                 backgroundColor: C.panel,
+                boxShadow: CARD_SHADOW,
                 borderRadius: 22,
                 padding: "30px 28px",
                 textAlign: "center",
               }}
             >
-              <div style={{ color: tone === C.muted ? C.fg : tone, fontSize: 62, fontWeight: 800, fontVariantNumeric: "tabular-nums" }}>
+              <div style={{ color: tone === C.muted ? C.fg : tone, fontSize: 62, fontWeight: 800, fontVariantNumeric: "tabular-nums", fontFamily: DISPLAY }}>
                 {value}
               </div>
               <div style={{ color: C.muted, fontSize: 21, marginTop: 8 }}>{label}</div>
@@ -663,21 +709,68 @@ const ResultsScreen: React.FC = () => {
           ...riseAt(frame, fps, S5.meter - 12),
           border: `2px solid ${C.border}`,
           backgroundColor: C.panel,
+          boxShadow: CARD_SHADOW,
           borderRadius: 22,
           padding: "26px 30px",
         }}
       >
         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
           <Label color={C.muted}>From noise to signal</Label>
-          <div style={{ color: C.fg, fontSize: 22, fontWeight: 700 }}>{Math.round(meterPct)}%</div>
+          <div style={{ color: C.fg, fontSize: 22, fontWeight: 800 }}>{Math.round(meterPct)}%</div>
         </div>
-        <div style={{ height: 12, borderRadius: 999, backgroundColor: "rgba(255,255,255,0.07)" }}>
+        <div style={{ height: 12, borderRadius: 999, backgroundColor: "rgba(58,50,69,0.08)" }}>
           <div
             style={{
               height: "100%",
               width: `${meterPct}%`,
               borderRadius: 999,
-              background: "linear-gradient(90deg, #2563eb, #22c55e)",
+              background: "linear-gradient(90deg, #cf4318, #15803d)",
+            }}
+          />
+        </div>
+      </div>
+
+      {/* Weekly niche watch (M31): the toggle flips on and the promise lands */}
+      <div
+        style={{
+          ...riseAt(frame, fps, S5.watch),
+          border: `2px solid ${watchOn ? "rgba(21,128,61,0.5)" : C.border}`,
+          backgroundColor: watchOn ? "rgba(21,128,61,0.06)" : C.panel,
+          boxShadow: CARD_SHADOW,
+          borderRadius: 22,
+          padding: "24px 30px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 20,
+        }}
+      >
+        <div>
+          <Label color={watchOn ? C.success : C.muted}>Niche watch {watchOn ? "on" : ""}</Label>
+          <div style={{ color: C.fg, fontSize: 23, lineHeight: 1.4, marginTop: 8 }}>
+            Rift keeps watching and emails you when new complaints appear.
+          </div>
+        </div>
+        <div
+          style={{
+            width: 84,
+            height: 46,
+            borderRadius: 999,
+            flexShrink: 0,
+            border: `2px solid ${watchOn ? C.success : C.border}`,
+            backgroundColor: watchOn ? C.successSoft : "rgba(58,50,69,0.06)",
+            position: "relative",
+          }}
+        >
+          <div
+            style={{
+              position: "absolute",
+              top: 4,
+              left: 4 + Math.min(1, knob) * (watchOn ? 38 : 0),
+              width: 34,
+              height: 34,
+              borderRadius: "50%",
+              backgroundColor: watchOn ? C.success : C.muted,
             }}
           />
         </div>
@@ -688,9 +781,9 @@ const ResultsScreen: React.FC = () => {
           ...riseAt(frame, fps, S5.line, 18),
           marginTop: "auto",
           textAlign: "center",
-          color: "rgba(255,255,255,0.9)",
+          color: C.fg,
           fontSize: 26,
-          fontWeight: 600,
+          fontWeight: 700,
         }}
       >
         No invented stats. Just your customers, organized.
@@ -720,11 +813,11 @@ const OutroScreen: React.FC = () => {
           width: 620,
           height: 620,
           borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(59,130,246,0.16), transparent 65%)",
+          background: "radial-gradient(circle, rgba(207,67,24,0.12), transparent 65%)",
           transform: `scale(${1 + 0.06 * Math.sin((frame - S4.in) / 14)})`,
         }}
       />
-      <div style={{ ...riseAt(frame, fps, S4.in + 8), color: C.primary, fontSize: 88, fontWeight: 800, letterSpacing: "-0.04em" }}>
+      <div style={{ ...riseAt(frame, fps, S4.in + 8), color: C.primary, fontSize: 88, fontWeight: 800, fontFamily: DISPLAY }}>
         Rift
       </div>
       <div
@@ -732,11 +825,11 @@ const OutroScreen: React.FC = () => {
           ...riseAt(frame, fps, S4.tagline),
           color: C.fg,
           fontSize: 46,
-          fontWeight: 700,
-          letterSpacing: "-0.03em",
+          fontWeight: 800,
           textAlign: "center",
           lineHeight: 1.15,
           maxWidth: 780,
+          fontFamily: DISPLAY,
         }}
       >
         Turn complaints into business ideas worth testing.
@@ -744,13 +837,14 @@ const OutroScreen: React.FC = () => {
       <div
         style={{
           ...riseAt(frame, fps, S4.pill, 20),
-          border: "2px solid rgba(59,130,246,0.4)",
-          backgroundColor: C.primarySoft,
+          border: "2px solid #3a3245",
+          backgroundColor: C.yellow,
+          boxShadow: "0 4px 0 #3a3245",
           borderRadius: 999,
           padding: "14px 34px",
-          color: C.primary,
+          color: "#3a3245",
           fontSize: 24,
-          fontWeight: 600,
+          fontWeight: 800,
         }}
       >
         Free during the private beta
@@ -786,7 +880,7 @@ export const HeroDemo: React.FC = () => {
             : "rift.app";
   const sidebar =
     frame < S2.in
-      ? { items: ["Reddit", "YouTube", "App Store", "GitHub"], active: "Reddit" }
+      ? { items: ["Reddit", "Hacker News", "App reviews", "GitHub"], active: "Reddit" }
       : frame < S3.in
         ? { items: ["Home", "Complaints", "Ideas", "Compare", "Saved"], active: "Compare" }
         : frame < S5.in
@@ -794,7 +888,7 @@ export const HeroDemo: React.FC = () => {
           : { items: ["Home", "Complaints", "Ideas", "Compare", "Saved"], active: "Saved" };
 
   return (
-    <AbsoluteFill style={{ backgroundColor: C.window, fontFamily: FONT }}>
+    <AbsoluteFill style={{ backgroundColor: C.window, fontFamily: BODY }}>
       <Audio src={staticFile("promo-audio.m4a")} volume={0.9} />
 
       <div style={{ opacity: globalFade, position: "absolute", inset: 0, display: "flex", flexDirection: "column" }}>
@@ -811,7 +905,7 @@ export const HeroDemo: React.FC = () => {
           }}
         >
           <div style={{ display: "flex", gap: 13 }}>
-            {[`${C.danger}99`, `${C.warning}99`, `${C.success}99`].map((bg, i) => (
+            {["#b91c1c99", "#b4530999", "#15803d99"].map((bg, i) => (
               <div key={i} style={{ width: 21, height: 21, borderRadius: "50%", backgroundColor: bg }} />
             ))}
           </div>
