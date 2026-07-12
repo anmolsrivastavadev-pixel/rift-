@@ -209,8 +209,12 @@ export function RunOpportunitiesButton({
                   : "text-[var(--color-muted-foreground)] hover:text-[var(--color-danger)]"
               }
             >
+              {/* Naming the collateral damage: clearing ideas cascades into
+                  saved ideas, decisions, checklists and share links. The old
+                  copy only promised that complaints survive, which read as
+                  "nothing else is lost". */}
               {confirmClear
-                ? "Delete all ideas? Complaints are kept."
+                ? "Delete all ideas, saved ideas and decisions? Complaints are kept."
                 : "Clear all ideas"}
             </Button>
           </form>

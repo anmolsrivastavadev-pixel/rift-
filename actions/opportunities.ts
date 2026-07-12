@@ -8,10 +8,108 @@ import { setProgress, getProgress, type ProcessingStatus, type Stage } from "@/l
 import { cleanComplaints } from "@/lib/cleaning";
 import { clusterComplaints, MAX_COMPLAINTS } from "@/lib/ai";
 import { computeOpportunityScore } from "@/lib/scoring";
+import { matchClustersToKeptOpportunities } from "@/lib/opportunity-match";
 import { BETA_BLOCKED_MESSAGE, BetaAccessError, requireActor } from "@/lib/action-auth";
 import { requireOwnedProject } from "@/lib/projects";
 import { trackProductEvent } from "@/lib/product-events";
 import { checkIdeaRunQuota } from "@/lib/quotas";
+
+/* -------------------------------------------------------------------------
+ * Keeping the user's work across a re-run.
+ *
+ * An opportunity is "kept" when the user has invested in it: they saved it,
+ * made a decision or ticked a checklist item on it (ValidationWorkspace rows
+ * are only ever written by an explicit action, never by viewing a page), or
+ * published a share link for it. Those rows are the ones whose deletion used
+ * to cascade away the user's work.
+ *
+ * This function does the database side; the pairing rules live in
+ * lib/opportunity-match.ts, which is pure and covered by tests.
+ * ------------------------------------------------------------------------- */
+type KeptState = {
+  /** Opportunities to spare from the delete. */
+  keptIds: string[];
+  /** Kept opportunities a cluster will be written onto (their complaints are released). */
+  matchedIds: string[];
+  /** Per cluster index: the kept opportunity id to update, or null to create a new one. */
+  clusterMatch: (string | null)[];
+  /** Complaints held by kept ideas that no cluster matched — off limits, so those ideas keep their receipts. */
+  unavailableComplaintIds: Set<string>;
+};
+
+async function resolveKeptOpportunities({
+  userId,
+  projectId,
+  clusterComplaintIds,
+}: {
+  userId: string;
+  projectId: string;
+  clusterComplaintIds: string[][];
+}): Promise<KeptState> {
+  const existing = await prisma.opportunity.findMany({
+    where: { userId, projectId },
+    select: { id: true },
+  });
+  const existingIds = existing.map((o) => o.id);
+  if (existingIds.length === 0) {
+    return { keptIds: [], matchedIds: [], clusterMatch: clusterComplaintIds.map(() => null), unavailableComplaintIds: new Set() };
+  }
+
+  // Scope the child lookups by opportunity id: SavedOpportunity.projectId is
+  // nullable (SetNull), so filtering on projectId alone could miss rows.
+  const [saved, workspaces, shares, links] = await Promise.all([
+    prisma.savedOpportunity.findMany({
+      where: { userId, opportunityId: { in: existingIds } },
+      select: { opportunityId: true },
+    }),
+    prisma.validationWorkspace.findMany({
+      where: { userId, opportunityId: { in: existingIds } },
+      select: { opportunityId: true },
+    }),
+    prisma.shareLink.findMany({
+      where: { userId, revokedAt: null, opportunityId: { in: existingIds } },
+      select: { opportunityId: true },
+    }),
+    // Which complaints each existing opportunity currently rests on.
+    prisma.complaint.findMany({
+      where: { userId, projectId, opportunityId: { in: existingIds } },
+      select: { id: true, opportunityId: true },
+    }),
+  ]);
+
+  const keptIds = Array.from(
+    new Set([
+      ...saved.map((r) => r.opportunityId),
+      ...workspaces.map((r) => r.opportunityId),
+      ...shares.flatMap((r) => (r.opportunityId ? [r.opportunityId] : [])),
+    ])
+  ).filter((id) => existingIds.includes(id));
+
+  const complaintsByOpportunity = new Map<string, Set<string>>();
+  for (const row of links) {
+    if (!row.opportunityId) continue;
+    const set = complaintsByOpportunity.get(row.opportunityId) ?? new Set<string>();
+    set.add(row.id);
+    complaintsByOpportunity.set(row.opportunityId, set);
+  }
+
+  // Only kept ideas take part in matching; the rest are about to be deleted.
+  const keptComplaintsByOpportunity = new Map<string, Set<string>>();
+  for (const id of keptIds) {
+    keptComplaintsByOpportunity.set(
+      id,
+      complaintsByOpportunity.get(id) ?? new Set<string>()
+    );
+  }
+
+  const { clusterMatch, matchedIds, unavailableComplaintIds } =
+    matchClustersToKeptOpportunities({
+      clusterComplaintIds,
+      keptComplaintsByOpportunity,
+    });
+
+  return { keptIds, matchedIds, clusterMatch, unavailableComplaintIds };
+}
 
 /* How many raw complaints the pipeline pulls before cleaning. Deliberately
  * larger than MAX_COMPLAINTS (the post-dedupe clustering cap in lib/ai.ts):
@@ -302,23 +400,78 @@ export async function runPipeline(
     /* --- Stage 4: Opportunity Generation --- */
     await setJobProgress({ stage: "generating", message: "Creating ideas…", total: clusters.length, done: 0, cappedAt });
 
-    // Reset existing opportunities first, so re-runs replace stale data.
-    // M16A: scoped to this project so other projects' opportunities survive.
-    await prisma.opportunity.deleteMany({
-      where: { userId: user.id, projectId: project.id },
-    });
-    await prisma.complaint.updateMany({
-      where: { userId: user.id, projectId: project.id },
-      data: { opportunityId: null },
+    /* Re-runs used to wipe the slate: deleteMany on every opportunity in the
+     * project, then create fresh rows. Because SavedOpportunity,
+     * ValidationWorkspace and ShareLink all cascade off Opportunity, that
+     * silently destroyed the user's saved ideas, their pursue/park decisions,
+     * their validation checklists, and any public share link — every time they
+     * pressed "Find ideas" again. And re-running is the designed loop: the
+     * weekly niche watch adds complaints automatically and emails the user to
+     * come back, and new complaints do nothing until a re-run.
+     *
+     * So a re-run now UPDATES rather than replaces. An idea the user has
+     * invested in is "kept"; the regenerated cluster that came from the same
+     * complaints is written back onto that same row, so its id — and
+     * everything hanging off its id — survives. Identity is matched on shared
+     * evidence, not on the AI-written title, which drifts between runs.
+     */
+    // The complaints behind each cluster, resolved to real ids up front: this
+    // is both what gets linked and what identifies a cluster across runs.
+    const clusterComplaintIds: string[][] = clusters.map((cluster) =>
+      cluster.complaintIndices
+        .map((idx) => cleaned[idx]?.id)
+        .filter((x): x is string => Boolean(x))
+    );
+
+    const keptState = await resolveKeptOpportunities({
+      userId: user.id,
+      projectId: project.id,
+      clusterComplaintIds,
     });
 
+    // Everything the user has NOT invested in is still disposable: delete it so
+    // stale ideas don't pile up. Complaint.opportunityId is SetNull, so their
+    // complaints are released automatically.
+    await prisma.opportunity.deleteMany({
+      where: {
+        userId: user.id,
+        projectId: project.id,
+        ...(keptState.keptIds.length > 0
+          ? { id: { notIn: keptState.keptIds } }
+          : {}),
+      },
+    });
+    // Release the complaints held by kept ideas that a cluster is about to be
+    // written onto, so the refreshed evidence can be linked cleanly. Kept ideas
+    // that no cluster matches hold on to their complaints — their receipts stay
+    // intact rather than being stolen by a new idea.
+    if (keptState.matchedIds.length > 0) {
+      await prisma.complaint.updateMany({
+        where: {
+          userId: user.id,
+          projectId: project.id,
+          opportunityId: { in: keptState.matchedIds },
+        },
+        data: { opportunityId: null },
+      });
+    }
+
     const created: string[] = [];
+    // Complaints already spoken for by an earlier cluster in this same run.
+    // Gemini is asked to put each complaint in exactly one cluster but nothing
+    // enforces it, and a complaint can only carry one opportunityId — so
+    // first-cluster-wins keeps `mentions` equal to the rows actually linked.
+    const claimedComplaintIds = new Set<string>();
 
     for (let i = 0; i < clusters.length; i++) {
       const cluster = clusters[i];
-      const complaintIds = cluster.complaintIndices
-        .map((idx) => cleaned[idx]?.id)
-        .filter((x): x is string => Boolean(x));
+      // Only complaints this cluster can actually hold: not held by a kept idea
+      // no cluster matched, and not already taken by an earlier cluster.
+      const complaintIds = clusterComplaintIds[i].filter(
+        (id) =>
+          !keptState.unavailableComplaintIds.has(id) &&
+          !claimedComplaintIds.has(id)
+      );
 
       if (complaintIds.length === 0) continue;
 
@@ -336,48 +489,68 @@ export async function runPipeline(
         .filter((c): c is { sourceDate: Date | null; createdAt: Date } => Boolean(c));
       const trend = bucketTrend(linked.map((c) => c.createdAt));
 
-      const op = await prisma.opportunity.create({
-        data: {
-          title: cluster.title,
-          summary: cluster.summary,
-          industry: cluster.industry,
-          keywords: cluster.keywords,
-          opportunityScore: score,
-          scoreBreakdown: breakdown as unknown as object,
-          mentions: complaintIds.length,
-          growth: trendGrowth(trend),
-          competition: "Medium",
-          sentiment: null,
-          severity: cluster.severity,
-          confidence: cluster.confidence,
-          reason: cluster.reason,
-          suggestedSoftware: cluster.suggestedSoftware,
-          // M9 market-gap hypothesis fields. Store null for missing optional
-          // strings; lists default to [] via the schema/Zod. A missing field
-          // never fails the whole pipeline.
-          marketGap: cluster.marketGap ?? null,
-          targetCustomer: cluster.targetCustomer ?? null,
-          likelyCurrentWorkarounds: cluster.likelyCurrentWorkarounds ?? null,
-          whyWorkaroundsFallShort: cluster.whyWorkaroundsFallShort ?? null,
-          productAngle: cluster.productAngle ?? null,
-          differentiationAngle: cluster.differentiationAngle ?? null,
-          validationQuestions: cluster.validationQuestions,
-          riskFlags: cluster.riskFlags,
-          trend: trend as unknown as object,
-          userId: user.id,
-          projectId: project.id,
-          aiRunId: runId,
-        },
-      });
+      // Everything the run regenerates about an idea. Identical whether the row
+      // is new or is a kept idea being refreshed — the only difference is that
+      // an update preserves the row's id, and with it the user's save, their
+      // decision, their checklist, and any share link pointing at it.
+      const content = {
+        title: cluster.title,
+        summary: cluster.summary,
+        industry: cluster.industry,
+        keywords: cluster.keywords,
+        opportunityScore: score,
+        scoreBreakdown: breakdown as unknown as object,
+        mentions: complaintIds.length,
+        growth: trendGrowth(trend),
+        competition: "Medium",
+        sentiment: null,
+        severity: cluster.severity,
+        confidence: cluster.confidence,
+        reason: cluster.reason,
+        suggestedSoftware: cluster.suggestedSoftware,
+        // M9 market-gap hypothesis fields. Store null for missing optional
+        // strings; lists default to [] via the schema/Zod. A missing field
+        // never fails the whole pipeline.
+        marketGap: cluster.marketGap ?? null,
+        targetCustomer: cluster.targetCustomer ?? null,
+        likelyCurrentWorkarounds: cluster.likelyCurrentWorkarounds ?? null,
+        whyWorkaroundsFallShort: cluster.whyWorkaroundsFallShort ?? null,
+        productAngle: cluster.productAngle ?? null,
+        differentiationAngle: cluster.differentiationAngle ?? null,
+        validationQuestions: cluster.validationQuestions,
+        riskFlags: cluster.riskFlags,
+        trend: trend as unknown as object,
+        userId: user.id,
+        projectId: project.id,
+        aiRunId: runId,
+      };
+
+      const keptId = keptState.clusterMatch[i];
+      const op = keptId
+        ? await prisma.opportunity.update({ where: { id: keptId }, data: content })
+        : await prisma.opportunity.create({ data: content });
 
       await prisma.complaint.updateMany({
-        where: { id: { in: complaintIds }, userId: user.id, projectId: project.id },
+        where: {
+          id: { in: complaintIds },
+          userId: user.id,
+          projectId: project.id,
+          // Never take a complaint that still belongs to something else: kept
+          // ideas hold theirs, and an earlier cluster may have claimed some.
+          opportunityId: null,
+        },
         data: { opportunityId: op.id },
       });
+      for (const id of complaintIds) claimedComplaintIds.add(id);
 
       created.push(op.id);
       await setJobProgress({ stage: "generating", done: i + 1, total: clusters.length, message: `Saved idea ${i + 1} of ${clusters.length}.`, cappedAt });
-      logger.info("pipeline.opportunity_saved", { id: op.id, score, mentions: complaintIds.length });
+      logger.info("pipeline.opportunity_saved", {
+        id: op.id,
+        score,
+        mentions: complaintIds.length,
+        refreshedKeptIdea: Boolean(keptId),
+      });
     }
 
     await setJobProgress({ stage: "saving", done: created.length, total: created.length, message: "Saving results…", cappedAt });
