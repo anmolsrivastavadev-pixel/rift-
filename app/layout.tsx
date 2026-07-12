@@ -1,9 +1,18 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Baloo_2, Nunito } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-inter",
+/* Site fonts (July 2026 doodle rebrand, founder choice): Nunito for body
+ * copy, Baloo 2 for headings — warm and rounded to match the cream/coral
+ * palette. Wired to --font-sans / --font-display in globals.css. */
+const nunito = Nunito({
+  variable: "--font-nunito",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const baloo = Baloo_2({
+  variable: "--font-baloo",
   subsets: ["latin"],
   display: "swap",
 });
@@ -45,7 +54,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} h-full antialiased`}>
+    <html lang="en" className={`${nunito.variable} ${baloo.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <a
           href="#main-content"

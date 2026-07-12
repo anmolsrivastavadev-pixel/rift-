@@ -66,7 +66,7 @@ export function MobileMenu({ links }: { links: NavLink[] }) {
         <nav
           id="mobile-nav"
           aria-label="Main"
-          className="absolute inset-x-0 top-[calc(100%+8px)] rounded-2xl border border-[var(--color-border)] bg-[#0a0a0a]/95 p-2 shadow-[var(--shadow-elevated)] backdrop-blur-xl"
+          className="absolute inset-x-0 top-[calc(100%+8px)] rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)]/95 p-2 shadow-[var(--shadow-elevated)] backdrop-blur-xl"
         >
           <ul>
             {[...links, { href: "/sign-in", label: "Sign in" }].map(

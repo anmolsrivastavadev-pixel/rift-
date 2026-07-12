@@ -26,6 +26,10 @@ import { Button, type ButtonProps } from "@/components/ui/button";
  */
 
 const NAV_DELAY_MS = 560;
+/* Clear the burst after it finishes so the same button can fire again —
+ * without this, a bfcache Back-restore (or an aborted navigation) leaves the
+ * "burst pending" state stuck and every later click skips the animation. */
+const RESET_MS = 900;
 
 /* Upward fan of five bulbs: angle (deg, -90 = straight up), distance (px),
  * icon size (px), start delay (ms). Middle bulb leads, edges trail. */
@@ -46,16 +50,52 @@ function prefersReducedMotion() {
 
 type Burst = { x: number; y: number };
 
-function useEureka() {
+/* "light" (default) tunes the bulbs for the cream site: deeper amber +
+ * stronger glow so they read on paper. "dark" is the bright-yellow variant
+ * kept for any future dark surface. The tone rides on the overlay's own
+ * class because the portal renders on <body>, outside any page-level theme
+ * wrapper. */
+export type EurekaTone = "dark" | "light";
+
+const EurekaToneContext = React.createContext<EurekaTone>("light");
+
+/* Wrap a whole page (e.g. /redesign) to default every burst inside it to a
+ * tone without threading props into each button. */
+export function EurekaToneProvider({
+  tone,
+  children,
+}: {
+  tone: EurekaTone;
+  children: React.ReactNode;
+}) {
+  return (
+    <EurekaToneContext.Provider value={tone}>
+      {children}
+    </EurekaToneContext.Provider>
+  );
+}
+
+function useEureka(tone?: EurekaTone) {
+  const contextTone = React.useContext(EurekaToneContext);
+  const resolvedTone = tone ?? contextTone;
   const [burst, setBurst] = React.useState<Burst | null>(null);
   const timer = React.useRef<number | null>(null);
+  const resetTimer = React.useRef<number | null>(null);
 
-  React.useEffect(
-    () => () => {
+  React.useEffect(() => {
+    /* Back-button returns often restore this page from the browser's
+     * back/forward cache with the old JS state intact, mid-burst flag
+     * included. Reset so the buttons celebrate every visit. */
+    const onPageShow = (e: PageTransitionEvent) => {
+      if (e.persisted) setBurst(null);
+    };
+    window.addEventListener("pageshow", onPageShow);
+    return () => {
+      window.removeEventListener("pageshow", onPageShow);
       if (timer.current !== null) window.clearTimeout(timer.current);
-    },
-    []
-  );
+      if (resetTimer.current !== null) window.clearTimeout(resetTimer.current);
+    };
+  }, []);
 
   /* Returns true when the burst was started and the caller should
    * preventDefault; false means "navigate normally, right now". */
@@ -66,6 +106,7 @@ function useEureka() {
       if (!rect) return false;
       setBurst({ x: rect.left + rect.width / 2, y: rect.top + 4 });
       timer.current = window.setTimeout(then, NAV_DELAY_MS);
+      resetTimer.current = window.setTimeout(() => setBurst(null), RESET_MS);
       return true;
     },
     [burst]
@@ -75,7 +116,11 @@ function useEureka() {
     ? createPortal(
         <span
           aria-hidden
-          className="eureka-burst"
+          className={
+            resolvedTone === "light"
+              ? "eureka-burst eureka-burst--light"
+              : "eureka-burst"
+          }
           style={{ left: burst.x, top: burst.y }}
         >
           <span className="eureka-flash" />
@@ -119,15 +164,17 @@ export function EurekaLink({
   className,
   size,
   variant,
+  tone,
 }: {
   href: string;
   children: React.ReactNode;
   className?: string;
   size?: ButtonProps["size"];
   variant?: ButtonProps["variant"];
+  tone?: EurekaTone;
 }) {
   const router = useRouter();
-  const { fire, overlay } = useEureka();
+  const { fire, overlay } = useEureka(tone);
 
   return (
     <>
@@ -154,13 +201,15 @@ export function EurekaMenuLink({
   href,
   className,
   children,
+  tone,
 }: {
   href: string;
   className?: string;
   children: React.ReactNode;
+  tone?: EurekaTone;
 }) {
   const router = useRouter();
-  const { fire, overlay } = useEureka();
+  const { fire, overlay } = useEureka(tone);
 
   return (
     <>
@@ -189,14 +238,16 @@ export function EurekaForm({
   className,
   style,
   children,
+  tone,
 }: {
   action: string;
   method: string;
   className?: string;
   style?: React.CSSProperties;
   children: React.ReactNode;
+  tone?: EurekaTone;
 }) {
-  const { fire, overlay } = useEureka();
+  const { fire, overlay } = useEureka(tone);
 
   return (
     <>

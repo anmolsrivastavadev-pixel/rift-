@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { Container } from "@/components/container";
-import { LandingNav } from "@/components/landing/nav";
+import { DoodleNav } from "@/components/landing/doodle";
 import { Footer } from "@/components/landing/footer";
 import { SUPPORT_EMAIL } from "@/lib/contact";
 
@@ -27,7 +27,7 @@ export default function TermsPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-[var(--color-background)]">
-      <LandingNav />
+      <DoodleNav />
       <main id="main-content" className="flex-1">
         <Container className="py-16">
           <article className="mx-auto max-w-2xl space-y-8 text-sm leading-6">

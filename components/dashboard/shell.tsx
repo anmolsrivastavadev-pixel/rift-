@@ -194,7 +194,7 @@ export function DashboardShell({
                 collapsed && !onNavigate ? "justify-center px-2" : ""
               } ${
                 isActive
-                  ? "border-blue-400/15 bg-[var(--color-primary-soft)] text-[var(--color-foreground)] font-semibold shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]"
+                  ? "border-[var(--color-primary)]/20 bg-[var(--color-primary-soft)] text-[var(--color-foreground)] font-semibold"
                   : "border-transparent text-[var(--color-muted-foreground)] hover:border-[var(--color-border)] hover:bg-[var(--color-surface)] hover:text-[var(--color-foreground)]"
               }`}
             >
@@ -215,7 +215,7 @@ export function DashboardShell({
     <div className="app-canvas flex min-h-screen w-full bg-[var(--color-background)]">
       {/* Desktop sidebar — M24: collapsible to an icon rail */}
       <aside
-        className={`sticky top-0 hidden h-screen shrink-0 border-r border-[var(--color-border)] bg-[#080b11]/95 py-6 shadow-[12px_0_40px_rgba(0,0,0,0.16)] backdrop-blur-xl transition-[width] duration-150 ease-out md:block ${
+        className={`sticky top-0 hidden h-screen shrink-0 border-r border-[var(--color-border)] bg-[var(--color-card)]/95 py-6 shadow-[12px_0_40px_rgba(58,50,69,0.08)] backdrop-blur-xl transition-[width] duration-150 ease-out md:block ${
           collapsed ? "w-16" : "w-60"
         }`}
       >
@@ -312,7 +312,7 @@ export function DashboardShell({
 
       {/* Mobile top bar — M24: single row + hamburger drawer, no horizontal
           scrolling pill strip. */}
-      <div className="fixed inset-x-0 top-0 z-50 border-b border-[var(--color-border)] bg-[#080b11]/90 shadow-lg backdrop-blur-xl md:hidden">
+      <div className="fixed inset-x-0 top-0 z-50 border-b border-[var(--color-border)] bg-[var(--color-card)]/90 shadow-lg backdrop-blur-xl md:hidden">
         <div className="flex h-14 items-center gap-3 px-4">
           <Link
             href="/"
@@ -349,7 +349,7 @@ export function DashboardShell({
           />
           <div
             ref={drawerPanelRef}
-            className="absolute inset-y-0 left-0 flex w-72 max-w-[85vw] flex-col gap-4 overflow-y-auto border-r border-[var(--color-border)] bg-[#080b11] p-4 shadow-[var(--shadow-elevated)]"
+            className="absolute inset-y-0 left-0 flex w-72 max-w-[85vw] flex-col gap-4 overflow-y-auto border-r border-[var(--color-border)] bg-[var(--color-card)] p-4 shadow-[var(--shadow-elevated)]"
           >
             <div className="flex items-center justify-between">
               <Link

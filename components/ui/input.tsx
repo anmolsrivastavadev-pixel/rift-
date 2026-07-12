@@ -4,7 +4,7 @@ import { ChevronDown, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const fieldClass =
-  "h-10 w-full rounded-xl border border-[var(--color-border)] bg-[#080b11] px-3 text-sm text-[var(--color-foreground)] shadow-[inset_0_1px_0_rgba(255,255,255,0.025)] placeholder:text-[var(--color-muted-foreground)] outline-none transition-all duration-150 ease-out hover:border-slate-500/60 focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20 disabled:cursor-not-allowed disabled:opacity-50";
+  "h-10 w-full rounded-xl border border-[var(--color-border)] bg-white px-3 text-sm text-[var(--color-foreground)] shadow-[var(--shadow-card)] placeholder:text-[var(--color-muted-foreground)] outline-none transition-all duration-150 ease-out hover:border-[#3a3245]/40 focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20 disabled:cursor-not-allowed disabled:opacity-50";
 
 export interface InputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {

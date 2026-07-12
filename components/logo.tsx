@@ -1,5 +1,6 @@
 /* Brand mark — the "split R": a bold R sheared in two by a diagonal rift,
- * left plate deep blue, right plate lighter and slipped down. Hand-built SVG
+ * left plate deep coral, right plate lighter and slipped down (recolored
+ * from the original blues in the July 2026 doodle rebrand). Hand-built SVG
  * chosen by the founder from vector candidates (July 2026). Also mirrored in
  * app/icon.svg (favicon) and app/opengraph-image.tsx — keep the three in sync.
  *
@@ -10,10 +11,15 @@ export function RiftMark({
   size = 28,
   id = "rift-mark",
   className,
+  leftFill = "#BC3917",
+  rightFill = "#F07A52",
 }: {
   size?: number;
   id?: string;
   className?: string;
+  /* Optional recolor for themed previews; defaults stay the brand blues */
+  leftFill?: string;
+  rightFill?: string;
 }) {
   return (
     <svg
@@ -39,7 +45,7 @@ export function RiftMark({
             fontFamily="Inter, 'Segoe UI', Arial, sans-serif"
             fontSize="58"
             fontWeight="800"
-            fill="#2563EB"
+            fill={leftFill}
             textAnchor="middle"
           >
             R
@@ -54,7 +60,7 @@ export function RiftMark({
             fontFamily="Inter, 'Segoe UI', Arial, sans-serif"
             fontSize="58"
             fontWeight="800"
-            fill="#3B7CFF"
+            fill={rightFill}
             textAnchor="middle"
           >
             R

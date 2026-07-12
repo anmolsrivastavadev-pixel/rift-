@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Check } from "lucide-react";
 
 import { Container } from "@/components/container";
-import { LandingNav } from "@/components/landing/nav";
+import { DoodleNav } from "@/components/landing/doodle";
 import { Footer } from "@/components/landing/footer";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -119,7 +119,7 @@ export default async function PricingPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-[var(--color-background)]">
-      <LandingNav />
+      <DoodleNav />
       <main id="main-content" className="flex-1">
         <Container className="py-16 sm:py-24">
           <div className="mx-auto max-w-2xl text-center">

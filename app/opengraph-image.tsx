@@ -1,14 +1,20 @@
 import { ImageResponse } from "next/og";
 
 /* Social share card (OG + Twitter). Generated at request time with next/og —
- * no static asset, no extra dependency. Mirrors the current landing hero:
- * pure black, faint blueprint grid, navy glow, split-R mark, huge headline,
- * meta chips. Grid lines are plain divs (satori has no repeating gradients).
+ * no static asset, no extra dependency. Mirrors the doodle landing hero:
+ * warm cream paper, faint ink grid, split-R coral mark, huge ink headline
+ * with coral accent, paper meta chips. Grid lines are plain divs (satori
+ * has no repeating gradients).
  */
 
 export const alt = "Rift: find business ideas hidden in real customer problems.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
+
+const INK = "#3a3245";
+const MUTED = "#5f5569";
+const CORAL = "#bc3917";
+const CORAL_LIGHT = "#f07a52";
 
 const headlineWords = [
   ...["Find", "business", "ideas", "hidden", "in"].map((text) => ({
@@ -20,7 +26,7 @@ const headlineWords = [
   { text: "problems.", accent: true },
 ];
 
-/* Keep in sync with assurances in components/landing/hero.tsx */
+/* Keep in sync with assurances in components/landing/doodle.tsx */
 const chips = [
   "Sources included with every result",
   "Free during the beta",
@@ -38,15 +44,15 @@ export default function OpenGraphImage() {
           flexDirection: "column",
           justifyContent: "space-between",
           padding: 72,
-          backgroundColor: "#000000",
+          backgroundColor: "#fdf1e3",
           backgroundImage:
-            "radial-gradient(circle at 62% 0%, rgba(29,78,216,0.36), transparent 58%), radial-gradient(circle at 0% 100%, rgba(37,99,235,0.14), transparent 45%)",
-          color: "#ffffff",
+            "radial-gradient(circle at 62% 0%, rgba(207,67,24,0.08), transparent 58%)",
+          color: INK,
           fontFamily: "sans-serif",
           position: "relative",
         }}
       >
-        {/* Faint blueprint grid */}
+        {/* Faint ink grid on the paper */}
         {Array.from({ length: 11 }, (_, i) => (
           <div
             key={`v${i}`}
@@ -56,7 +62,7 @@ export default function OpenGraphImage() {
               top: 0,
               width: 1,
               height: 630,
-              backgroundColor: "rgba(255,255,255,0.05)",
+              backgroundColor: "rgba(58,50,69,0.06)",
             }}
           />
         ))}
@@ -69,7 +75,7 @@ export default function OpenGraphImage() {
               left: 0,
               width: 1200,
               height: 1,
-              backgroundColor: "rgba(255,255,255,0.05)",
+              backgroundColor: "rgba(58,50,69,0.06)",
             }}
           />
         ))}
@@ -96,7 +102,7 @@ export default function OpenGraphImage() {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  color: "#2563EB",
+                  color: CORAL,
                   fontSize: 72,
                   fontWeight: 800,
                   clipPath: "polygon(0% 0%, 66% 0%, 37% 100%, 0% 100%)",
@@ -114,7 +120,7 @@ export default function OpenGraphImage() {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  color: "#3B7CFF",
+                  color: CORAL_LIGHT,
                   fontSize: 72,
                   fontWeight: 800,
                   clipPath: "polygon(66% 0%, 100% 0%, 100% 100%, 37% 100%)",
@@ -128,11 +134,11 @@ export default function OpenGraphImage() {
           <div
             style={{
               display: "flex",
-              border: "2px solid rgba(59,130,246,0.4)",
-              backgroundColor: "rgba(59,130,246,0.12)",
+              border: `2px solid rgba(188,57,23,0.45)`,
+              backgroundColor: "rgba(207,67,24,0.1)",
               borderRadius: 999,
               padding: "10px 26px",
-              color: "#a8c7fa",
+              color: CORAL,
               fontSize: 26,
               fontWeight: 600,
             }}
@@ -145,9 +151,9 @@ export default function OpenGraphImage() {
         <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
           <div
             style={{
-              color: "#3b82f6",
+              color: CORAL,
               fontSize: 24,
-              fontWeight: 600,
+              fontWeight: 700,
             }}
           >
             For first-time founders and side-project builders
@@ -169,7 +175,7 @@ export default function OpenGraphImage() {
               <span
                 key={i}
                 style={{
-                  color: word.accent ? "#3b82f6" : "#ffffff",
+                  color: word.accent ? CORAL : INK,
                   marginRight: 22,
                 }}
               >
@@ -186,11 +192,11 @@ export default function OpenGraphImage() {
               key={chip}
               style={{
                 display: "flex",
-                border: "2px solid #242424",
-                backgroundColor: "#0a0a0a",
+                border: "2px solid rgba(58,50,69,0.3)",
+                backgroundColor: "#fffcf5",
                 borderRadius: 999,
                 padding: "12px 34px",
-                color: "#a1a1a1",
+                color: MUTED,
                 fontSize: 23,
               }}
             >

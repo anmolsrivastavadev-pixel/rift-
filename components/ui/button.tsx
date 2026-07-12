@@ -10,13 +10,13 @@ const buttonVariants = cva(
     variants: {
       variant: {
         primary:
-          "border-blue-400/20 bg-[linear-gradient(135deg,#3478f6,#255fd4)] text-[var(--color-primary-foreground)] shadow-[0_8px_24px_rgba(37,99,235,0.22)] hover:brightness-110 hover:shadow-[0_10px_30px_rgba(37,99,235,0.3)]",
+          "border-white/15 bg-[linear-gradient(135deg,color-mix(in_srgb,var(--color-primary-fill),white_10%),var(--color-primary-fill))] text-[var(--color-primary-foreground)] shadow-[0_8px_24px_color-mix(in_srgb,var(--color-primary-fill),transparent_78%)] hover:brightness-110 hover:shadow-[0_10px_30px_color-mix(in_srgb,var(--color-primary-fill),transparent_70%)]",
         secondary:
-          "border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-foreground)] shadow-sm hover:border-slate-500/60 hover:bg-[rgba(255,255,255,0.075)]",
+          "border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-foreground)] shadow-sm hover:border-[#3a3245]/40 hover:brightness-[0.98]",
         ghost:
           "text-[var(--color-foreground)] hover:bg-[var(--color-surface)]",
         outline:
-          "border-[var(--color-border)] bg-[var(--color-card)] text-[var(--color-foreground)] hover:border-slate-500/60 hover:bg-[var(--color-surface)]",
+          "border-[var(--color-border)] bg-[var(--color-card)] text-[var(--color-foreground)] hover:border-[#3a3245]/40 hover:bg-[var(--color-surface)]",
         danger:
           "bg-[var(--color-danger)] text-white shadow-sm hover:brightness-110 hover:shadow-md",
       },
