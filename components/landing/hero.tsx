@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowDown, ArrowRight, Check, Lightbulb, MessagesSquare } from "lucide-react";
 import { Container } from "@/components/container";
 import { Button } from "@/components/ui/button";
+import { EurekaForm } from "@/components/landing/eureka";
 
 /* Hero — beginner-first layout (July 2026 landing redesign):
  * plain-English headline and a real "type your market" input on the left,
@@ -62,8 +63,10 @@ export function Hero() {
             and suggests practical ideas you can explore.
           </p>
 
-          {/* The market input: a zero-JS GET form into sign-up. */}
-          <form
+          {/* The market input: a zero-JS GET form into sign-up. EurekaForm
+              adds the lightbulb burst on submit (JS-only enhancement; the
+              native GET still works without it). */}
+          <EurekaForm
             action="/sign-up"
             method="get"
             className="animate-fade-up mt-8 flex max-w-lg flex-col gap-3 sm:flex-row"
@@ -83,7 +86,7 @@ export function Hero() {
             <Button type="submit" size="lg" className="shrink-0 rounded-full px-7">
               Find ideas <ArrowRight className="h-4 w-4" aria-hidden />
             </Button>
-          </form>
+          </EurekaForm>
 
           <p
             className="animate-fade-up mt-4 text-base"

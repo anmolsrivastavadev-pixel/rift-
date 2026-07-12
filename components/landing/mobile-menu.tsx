@@ -5,6 +5,8 @@ import { createPortal } from "react-dom";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 
+import { EurekaMenuLink } from "@/components/landing/eureka";
+
 /* Mobile disclosure menu for the landing nav pill. The desktop link row is
  * hidden below md; this hamburger keeps How it works / Features / Pricing /
  * FAQ (and Sign in) reachable on phones. Panel is anchored to the pill, so
@@ -82,13 +84,14 @@ export function MobileMenu({ links }: { links: NavLink[] }) {
               )
             )}
             <li className="mt-1 border-t border-[var(--color-border)] pt-2 pb-1">
-              <Link
+              {/* Eureka burst plays over the open panel (the overlay is
+                  portalled to <body>), then navigation closes everything. */}
+              <EurekaMenuLink
                 href="/sign-up"
-                onClick={() => setOpen(false)}
                 className="block rounded-xl bg-[var(--color-primary-fill)] px-4 py-3 text-center text-sm font-medium text-[var(--color-primary-foreground)] shadow-sm transition-all duration-150 ease-out hover:brightness-110 active:scale-[0.97]"
               >
                 Start free
-              </Link>
+              </EurekaMenuLink>
             </li>
           </ul>
         </nav>

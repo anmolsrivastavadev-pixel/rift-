@@ -1,7 +1,6 @@
-import Link from "next/link";
 import { ArrowRight, Bookmark, Compass, Link2, Search, XCircle } from "lucide-react";
 import { Container } from "@/components/container";
-import { Button } from "@/components/ui/button";
+import { EurekaLink } from "@/components/landing/eureka";
 import { SectionHeader } from "@/components/landing/section-header";
 
 /* One complete worked example (July 2026 landing redesign): the same
@@ -164,12 +163,10 @@ export function ExampleWalkthrough() {
             ))}
           </div>
           <div className="mt-7 flex flex-wrap items-center gap-4">
-            <Button asChild size="lg" className="rounded-full px-7">
-              <Link href="/sign-up">
-                Try it with your own market{" "}
-                <ArrowRight className="h-4 w-4" aria-hidden />
-              </Link>
-            </Button>
+            <EurekaLink href="/sign-up" size="lg" className="rounded-full px-7">
+              Try it with your own market{" "}
+              <ArrowRight className="h-4 w-4" aria-hidden />
+            </EurekaLink>
             <p className="text-sm text-[var(--color-muted-foreground)]">
               Free during the beta · No credit card required
             </p>

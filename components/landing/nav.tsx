@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { EurekaLink } from "@/components/landing/eureka";
 import { RiftMark } from "@/components/logo";
 import { MobileMenu } from "@/components/landing/mobile-menu";
 
@@ -44,11 +45,9 @@ export function LandingNav() {
           <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
             <Link href="/sign-in">Sign in</Link>
           </Button>
-          <Button asChild size="sm" className="rounded-full px-4">
-            <Link href="/sign-up">
-              Try free <ArrowUpRight className="h-3.5 w-3.5" />
-            </Link>
-          </Button>
+          <EurekaLink href="/sign-up" size="sm" className="rounded-full px-4">
+            Try free <ArrowUpRight className="h-3.5 w-3.5" />
+          </EurekaLink>
           <MobileMenu links={navLinks} />
         </div>
       </div>

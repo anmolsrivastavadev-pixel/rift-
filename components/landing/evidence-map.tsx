@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Inbox } from "lucide-react";
 import { Container } from "@/components/container";
 import { Button } from "@/components/ui/button";
+import { EurekaLink } from "@/components/landing/eureka";
 import { RiftMark } from "@/components/logo";
 
 /* "Bring your own evidence" section: complaint sources orbiting the Rift
@@ -43,9 +44,9 @@ export function EvidenceMap() {
             feeds one set of scored ideas.
           </p>
           <div className="mt-7 flex flex-wrap gap-3">
-            <Button asChild className="rounded-full px-5">
-              <Link href="/sign-up">Try Rift free</Link>
-            </Button>
+            <EurekaLink href="/sign-up" className="rounded-full px-5">
+              Try Rift free
+            </EurekaLink>
             <Button asChild variant="secondary" className="rounded-full px-5">
               <Link href="/#faq">Read the FAQ</Link>
             </Button>

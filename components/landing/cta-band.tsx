@@ -1,7 +1,6 @@
-import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
 import { Container } from "@/components/container";
-import { Button } from "@/components/ui/button";
+import { EurekaLink } from "@/components/landing/eureka";
 
 const assurances = [
   "Free during the beta",
@@ -36,11 +35,9 @@ export function CtaBand() {
             ))}
           </ul>
         </div>
-        <Button asChild size="lg" className="shrink-0 rounded-full px-7">
-          <Link href="/sign-up">
-            Find my first idea <ArrowRight className="h-4 w-4" aria-hidden />
-          </Link>
-        </Button>
+        <EurekaLink href="/sign-up" size="lg" className="shrink-0 rounded-full px-7">
+          Find my first idea <ArrowRight className="h-4 w-4" aria-hidden />
+        </EurekaLink>
       </Container>
     </section>
   );
