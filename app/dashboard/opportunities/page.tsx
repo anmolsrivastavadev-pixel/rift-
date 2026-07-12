@@ -15,6 +15,10 @@ import { MAX_COMPLAINTS } from "@/lib/ai";
 const DAY_MS = 24 * 60 * 60 * 1000;
 const PAIN_TREND_QUERY_DAYS = 365;
 
+// A run can legitimately take up to maxDuration (300s). Past that, a row still
+// marked "running" is a corpse from a killed lambda, not live work.
+const STALE_RUN_MS = 10 * 60 * 1000;
+
 // Long idea runs (clustering 1,500 complaints across ~15 Gemini batches) can
 // exceed Vercel's default Server Action time limit. The page-level
 // `maxDuration` propagates to every Server Action invoked from this segment,
@@ -37,7 +41,9 @@ export default async function OpportunitiesPage({
   // Invalid values silently fall back to no filtering.
   const rawDecision = firstParam(params.decision);
   const initialDecision = isValidDecisionStatus(rawDecision) ? rawDecision : undefined;
-  const painTrendStart = new Date(new Date().getTime() - PAIN_TREND_QUERY_DAYS * DAY_MS);
+  const now = new Date().getTime();
+  const painTrendStart = new Date(now - PAIN_TREND_QUERY_DAYS * DAY_MS);
+  const staleRunBefore = new Date(now - STALE_RUN_MS);
   const [ops, savedRows, complaintCount, usage, datedComplaints, runningRun] = await Promise.all([
     prisma.opportunity.findMany({
       where: { userId: user.id, projectId: project.id },
@@ -65,8 +71,17 @@ export default async function OpportunitiesPage({
     }),
     // An idea run that's still in flight (e.g. the user navigated away
     // mid-run) — the run button reattaches its progress poll to this jobId.
+    // Bounded by age: a lambda killed mid-run (timeout, OOM, deploy) never
+    // reaches failRun, so its row stays "running" forever. Without this
+    // window such a corpse would re-arm the poll on every visit and leave
+    // "Find ideas" disabled permanently, with no way back for the user.
     prisma.aIRun.findFirst({
-      where: { userId: user.id, projectId: project.id, status: "running" },
+      where: {
+        userId: user.id,
+        projectId: project.id,
+        status: "running",
+        createdAt: { gte: staleRunBefore },
+      },
       orderBy: { createdAt: "desc" },
       select: { jobId: true },
     }),

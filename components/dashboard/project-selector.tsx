@@ -110,7 +110,7 @@ export function ProjectSelector({
           title="Manage projects"
           aria-label="Manage projects"
           aria-expanded={manageOpen}
-          className="flex h-6 w-6 items-center justify-center rounded-md text-[var(--color-muted-foreground)] transition-colors hover:bg-[var(--color-surface)] hover:text-[var(--color-foreground)]"
+          className="flex h-6 w-6 items-center justify-center rounded-lg text-[var(--color-muted-foreground)] transition-colors hover:bg-[var(--color-surface)] hover:text-[var(--color-foreground)]"
         >
           <SlidersHorizontal className="h-3.5 w-3.5" />
         </button>

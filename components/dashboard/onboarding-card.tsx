@@ -126,7 +126,7 @@ export function OnboardingCard({
                     className={`h-3.5 w-3.5 shrink-0 ${
                       step === active
                         ? "text-[var(--color-primary)]"
-                        : "text-[var(--color-muted-foreground)]/50"
+                        : "text-[var(--color-muted-foreground)]"
                     }`}
                   />
                 )}

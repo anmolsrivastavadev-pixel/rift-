@@ -34,7 +34,12 @@ export async function ComplaintsList({
   const [initialRows, total] = await Promise.all([
     prisma.complaint.findMany({
       where,
-      orderBy: { createdAt: "desc" },
+      // id is the tiebreaker, not decoration: a CSV chunk is one transaction,
+      // so up to 500 rows share an identical createdAt. Sorting on the
+      // timestamp alone leaves their relative order undefined per query, and
+      // the page-1 and page-2 queries could each pick a different order —
+      // showing the same complaint twice and hiding another entirely.
+      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
       skip: (page - 1) * PAGE_SIZE,
       take: PAGE_SIZE,
     }),

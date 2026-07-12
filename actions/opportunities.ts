@@ -186,10 +186,25 @@ export async function runPipeline(
     /* --- Stage 1: Cleaning --- */
     logger.info("pipeline.started", { jobId, projectId: project.id });
 
-    const all = await prisma.complaint.findMany({
-      where: { userId: user.id, projectId: project.id },
-      select: { id: true, body: true },
-    });
+    // Newest first, capped at the clustering limit. Without the orderBy,
+    // Postgres returned rows in physical order, so the 1,500 that survived
+    // lib/ai.ts's slice were arbitrary and unstable between runs — while the
+    // UI promised "your 1,500 most recent complaints". The take also stops us
+    // pulling 20k bodies into the lambda just to throw 18.5k away.
+    //
+    // totalComplaints is counted separately because the cap notice below has
+    // to know the project is bigger than the analyzed slice — with `take` in
+    // place, the fetched array alone can no longer tell us that.
+    const where = { userId: user.id, projectId: project.id };
+    const [totalComplaints, all] = await Promise.all([
+      prisma.complaint.count({ where }),
+      prisma.complaint.findMany({
+        where,
+        select: { id: true, body: true },
+        orderBy: { createdAt: "desc" },
+        take: MAX_COMPLAINTS,
+      }),
+    ]);
 
     if (all.length === 0) {
       await setJobProgress({ stage: "error", error: "No complaints to analyze. Add complaints first.", message: "No complaints found." });
@@ -206,8 +221,9 @@ export async function runPipeline(
     const cleaned = cleanComplaints(all);
     // The clustering stage caps at MAX_COMPLAINTS (see lib/ai.ts). Surface the
     // cap to the user's progress panel + final result so it isn't silent.
-    const cappedAt =
-      cleaned.length > MAX_COMPLAINTS ? MAX_COMPLAINTS : undefined;
+    // Derived from the project total, not the fetched slice, which the query
+    // above already caps.
+    const cappedAt = totalComplaints > MAX_COMPLAINTS ? MAX_COMPLAINTS : undefined;
     await setJobProgress({ stage: "cleaning", total: all.length, done: cleaned.length, message: `Cleaned ${cleaned.length} of ${all.length} complaints.`, cappedAt });
     logger.info("pipeline.cleaned", { raw: all.length, cleaned: cleaned.length, capped: cappedAt ?? null });
 
@@ -374,13 +390,15 @@ export async function runPipeline(
     logger.info("pipeline.completed", { created: created.length });
     return { created: created.length, cappedAt };
   } catch (err) {
-    // Log + store the real error (admins can see it on the AIRun row), but
-    // never surface raw provider/internal messages to the user.
+    // The raw error goes to the logs only. AIRun.errorMessage is NOT an admin
+    // field — components/dashboard/project-history.tsx prints it verbatim in
+    // the user's run history, so storing the raw message there was showing
+    // people things like Gemini's quota-metric JSON. Store the friendly line.
     const message = err instanceof Error ? err.message : String(err);
     const friendly = "Idea generation failed. Please try again in a moment.";
     logger.error("pipeline.failed", { jobId, error: message });
     await setJobProgress({ stage: "error", error: friendly, message: "Pipeline failed." });
-    await failRun(message);
+    await failRun(friendly);
     return { created: 0, error: friendly };
   }
 

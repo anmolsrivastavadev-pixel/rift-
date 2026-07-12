@@ -216,7 +216,10 @@ export default async function SharePage({
   }
 
   return (
-    <div className="share-report min-h-screen bg-[var(--color-background)]">
+    <main
+      id="main-content"
+      className="share-report min-h-screen bg-[var(--color-background)]"
+    >
       <div className="mx-auto max-w-3xl px-4 py-10 sm:py-14">
         <div className="print-hide mb-8 flex items-center justify-between">
           <Link href="/" className="text-base font-semibold tracking-tight text-[var(--color-foreground)]">
@@ -252,6 +255,6 @@ export default async function SharePage({
           </Link>
         </footer>
       </div>
-    </div>
+    </main>
   );
 }

@@ -10,7 +10,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         primary:
-          "border-white/15 bg-[linear-gradient(135deg,color-mix(in_srgb,var(--color-primary-fill),white_10%),var(--color-primary-fill))] text-[var(--color-primary-foreground)] shadow-[0_8px_24px_color-mix(in_srgb,var(--color-primary-fill),transparent_78%)] hover:brightness-110 hover:shadow-[0_10px_30px_color-mix(in_srgb,var(--color-primary-fill),transparent_70%)]",
+          "border-[#3a3245]/20 bg-[linear-gradient(135deg,color-mix(in_srgb,var(--color-primary-fill),white_10%),var(--color-primary-fill))] text-[var(--color-primary-foreground)] shadow-[0_8px_24px_color-mix(in_srgb,var(--color-primary-fill),transparent_78%)] hover:brightness-110 hover:shadow-[0_10px_30px_color-mix(in_srgb,var(--color-primary-fill),transparent_70%)]",
         secondary:
           "border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-foreground)] shadow-sm hover:border-[#3a3245]/40 hover:brightness-[0.98]",
         ghost:

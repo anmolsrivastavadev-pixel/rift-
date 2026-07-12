@@ -380,7 +380,7 @@ function DoodleCtaBand() {
               {ctaAssurances.map((item) => (
                 <li
                   key={item}
-                  className="flex items-center gap-2 text-sm font-semibold text-white/90"
+                  className="flex items-center gap-2 text-sm font-semibold text-white"
                 >
                   <Check className="h-4 w-4 text-white" strokeWidth={3} aria-hidden />
                   {item}

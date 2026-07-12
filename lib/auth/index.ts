@@ -63,10 +63,19 @@ export const auth = betterAuth({
   },
   baseURL: appBaseUrl,
   secret: process.env.BETTER_AUTH_SECRET,
+  /* Exact origins only — never a wildcard. A pattern like
+   * "https://rift-*.vercel.app" is matched by Better Auth as a real wildcard,
+   * and *.vercel.app subdomains are first-come-first-served across all Vercel
+   * accounts: anyone could deploy "rift-<anything>" and become a trusted
+   * origin. Trusted origins gate the CSRF check AND the reset-password
+   * `redirectTo`, which carries the reset token in the URL — so a claimable
+   * wildcard is an account-takeover path. Preview deployments get their own
+   * exact origin from VERCEL_URL instead.
+   */
   trustedOrigins: [
     configuredAppOrigin,
+    process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined,
     "http://localhost:3000",
-    "https://rift-*.vercel.app",
   ].filter((origin): origin is string => Boolean(origin)),
   session: {
     expiresIn: 60 * 60 * 24 * 7,

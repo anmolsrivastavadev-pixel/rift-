@@ -103,7 +103,7 @@ export function ComplaintFinder({
             disabled={pending}
             onClick={() => setNicheOffset((o) => o + 6)}
             aria-label="Show different niche ideas"
-            className="inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs text-[var(--color-primary)] transition-colors hover:bg-[var(--color-card)] disabled:opacity-50"
+            className="inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs text-[var(--color-primary)] transition-colors hover:bg-[var(--color-surface)] disabled:opacity-50"
           >
             <Shuffle className="h-3 w-3" /> more
           </button>

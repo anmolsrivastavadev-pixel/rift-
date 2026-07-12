@@ -5,7 +5,10 @@ import { Button } from "@/components/ui/button";
 
 export default function NotFound() {
   return (
-    <div className="mx-auto max-w-md space-y-6 py-24 text-center">
+    <main
+      id="main-content"
+      className="mx-auto max-w-md space-y-6 py-24 text-center"
+    >
       <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--color-primary)]/10 text-[var(--color-primary)]">
         <Compass className="h-6 w-6" />
       </div>
@@ -18,6 +21,6 @@ export default function NotFound() {
       <Button asChild>
         <Link href="/">Back to home</Link>
       </Button>
-    </div>
+    </main>
   );
 }

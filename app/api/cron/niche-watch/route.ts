@@ -1,3 +1,6 @@
+import { timingSafeEqual } from "node:crypto";
+
+import { getAppBaseUrl } from "@/lib/app-url";
 import { prisma } from "@/lib/db";
 import {
   buildNicheWatchDigestEmail,
@@ -37,12 +40,22 @@ export const maxDuration = 300;
 const MAX_WATCHES_PER_RUN = 3;
 const DUE_AFTER_MS = 6.5 * 24 * 60 * 60 * 1000; // ~a week, with slack for cron timing drift
 
+/* Constant-time bearer check. A plain `!==` on secrets leaks their prefix
+ * through response timing; the cost of doing it properly is one comparison. */
+function authorized(header: string | null, secret: string): boolean {
+  const expected = Buffer.from(`Bearer ${secret}`);
+  const got = Buffer.from(header ?? "");
+  // timingSafeEqual throws on length mismatch, so length is checked first —
+  // that leaks only the length of the header, never its contents.
+  return got.length === expected.length && timingSafeEqual(got, expected);
+}
+
 export async function GET(req: Request): Promise<Response> {
   const cronSecret = process.env.CRON_SECRET;
   if (!cronSecret) {
     return new Response("Niche watch cron is not configured.", { status: 503 });
   }
-  if (req.headers.get("authorization") !== `Bearer ${cronSecret}`) {
+  if (!authorized(req.headers.get("authorization"), cronSecret)) {
     return new Response("Unauthorized.", { status: 401 });
   }
 
@@ -74,10 +87,23 @@ export async function GET(req: Request): Promise<Response> {
   for (const watch of due) {
     // Claim first: a crash below leaves this watch waiting until NEXT week
     // (never retried daily), and a concurrent invocation finds nothing due.
-    await prisma.nicheWatch.update({
-      where: { id: watch.id },
-      data: { lastRunAt: new Date(), lastRunStatus: "failed", lastRunInserted: 0 },
-    });
+    // The claim is inside its own try: if the row vanished between the
+    // findMany and here (the user deleted the project, cascading the watch
+    // away) or Neon blipped, an uncaught throw here would abandon every
+    // remaining watch in this invocation, not just this one.
+    try {
+      await prisma.nicheWatch.update({
+        where: { id: watch.id },
+        data: { lastRunAt: new Date(), lastRunStatus: "failed", lastRunInserted: 0 },
+      });
+    } catch (err) {
+      failed += 1;
+      logger.warn("niche_watch.claim_failed", {
+        watchId: watch.id,
+        error: err instanceof Error ? err.message : String(err),
+      });
+      continue;
+    }
 
     try {
       const result = await runFinderImport({
@@ -100,8 +126,9 @@ export async function GET(req: Request): Promise<Response> {
       processed += 1;
 
       if ((result.inserted > 0 || result.quotaFull) && isEmailEnabled()) {
-        const baseUrl = process.env.BETTER_AUTH_URL ?? "";
-        const complaintsUrl = `${baseUrl}/dashboard/complaints?projectId=${watch.projectId}`;
+        // Absolute, always: an empty base URL shipped digest emails whose
+        // "Open the project" link was a relative href — dead in every mail client.
+        const complaintsUrl = `${getAppBaseUrl()}/dashboard/complaints?projectId=${watch.projectId}`;
         const email = buildNicheWatchDigestEmail({
           projectName: watch.project.name,
           keyword: watch.keyword,

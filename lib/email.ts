@@ -13,6 +13,17 @@ import { logger } from "@/lib/logger";
 const RESEND_ENDPOINT = "https://api.resend.com/emails";
 const DEFAULT_FROM = "Rift <onboarding@resend.dev>";
 
+/* Brand tokens for email HTML. Mail clients strip <style> and CSS vars, so
+ * these are inlined literals — keep them in sync with app/globals.css
+ * (doodle rebrand, July 2026). */
+const MAIL = {
+  ink: "#3a3245",
+  muted: "#5f5569",
+  faint: "#8b8194",
+  paper: "#fdf1e3",
+  coral: "#cf4318",
+} as const;
+
 export function isEmailEnabled(): boolean {
   return Boolean(process.env.RESEND_API_KEY);
 }
@@ -89,22 +100,37 @@ export function buildNicheWatchDigestEmail(input: {
 
   const titleListHtml =
     topComplaintTitles.length > 0
-      ? `<ul style="font-size: 14px; color: #18181b; padding-left: 20px;">${topComplaintTitles
-          .map((t) => `<li style="margin-bottom: 4px;">${escapeHtml(t)}</li>`)
+      ? `<ul style="font-size: 14px; color: ${MAIL.ink}; padding-left: 20px;">${topComplaintTitles
+          .map((t) => `<li style="margin-bottom: 6px;">${escapeHtml(t)}</li>`)
           .join("")}</ul>`
       : "";
 
-  const html = `
-  <div style="font-family: -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 24px; color: #18181b;">
-    <p style="font-size: 15px;">${escapeHtml(introText)}</p>
+  const html = mailShell(`
+    <p style="font-size: 15px; margin: 0;">${escapeHtml(introText)}</p>
     ${titleListHtml}
-    <p style="margin: 24px 0;">
-      <a href="${complaintsUrl}" style="display: inline-block; background: #4f46e5; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 10px; font-size: 14px; font-weight: 600;">Open the project</a>
-    </p>
-    <p style="font-size: 13px; color: #52525b;">${escapeHtml(footerText)}</p>
-    <p style="font-size: 12px; color: #a1a1aa; margin-top: 32px;">Rift: business ideas from real customer pain.</p>
-  </div>`;
+    ${mailButton(complaintsUrl, "Open the project")}
+    <p style="font-size: 13px; color: ${MAIL.muted}; margin: 0;">${escapeHtml(footerText)}</p>`);
   return { subject, html, text };
+}
+
+/* Shared cream-paper wrapper + coral sticker button, so both emails look
+ * like the site. Inline styles only: mail clients drop stylesheets. */
+function mailShell(inner: string): string {
+  return `
+  <div style="background: ${MAIL.paper}; padding: 32px 16px;">
+    <div style="font-family: 'Nunito', -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 480px; margin: 0 auto; background: #fffcf5; border: 2px solid rgba(58,50,69,0.16); border-radius: 20px; padding: 28px; color: ${MAIL.ink};">
+      <p style="font-size: 22px; font-weight: 800; margin: 0 0 18px;">Rift<span style="color: ${MAIL.coral};">.</span></p>
+      ${inner}
+      <p style="font-size: 12px; color: ${MAIL.faint}; margin: 28px 0 0;">Rift: business ideas from real customer pain.</p>
+    </div>
+  </div>`;
+}
+
+function mailButton(url: string, label: string): string {
+  return `
+    <p style="margin: 24px 0;">
+      <a href="${escapeHtml(url)}" style="display: inline-block; background: ${MAIL.coral}; color: #ffffff; text-decoration: none; padding: 12px 24px; border: 2px solid ${MAIL.ink}; border-radius: 999px; font-size: 14px; font-weight: 700;">${label}</a>
+    </p>`;
 }
 
 function escapeHtml(s: string): string {
@@ -130,14 +156,9 @@ export function buildResetPasswordEmail(url: string): {
     "",
     "The link expires in 1 hour. If you didn't ask for this, you can ignore this email. Your password stays unchanged.",
   ].join("\n");
-  const html = `
-  <div style="font-family: -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 24px; color: #18181b;">
-    <p style="font-size: 15px;">Someone (hopefully you) asked to reset the password for your Rift account.</p>
-    <p style="margin: 24px 0;">
-      <a href="${url}" style="display: inline-block; background: #4f46e5; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 10px; font-size: 14px; font-weight: 600;">Reset password</a>
-    </p>
-    <p style="font-size: 13px; color: #52525b;">The link expires in 1 hour. If you didn't ask for this, you can ignore this email. Your password stays unchanged.</p>
-    <p style="font-size: 12px; color: #a1a1aa; margin-top: 32px;">Rift: business ideas from real customer pain.</p>
-  </div>`;
+  const html = mailShell(`
+    <p style="font-size: 15px; margin: 0;">Someone (hopefully you) asked to reset the password for your Rift account.</p>
+    ${mailButton(url, "Reset password")}
+    <p style="font-size: 13px; color: ${MAIL.muted}; margin: 0;">The link expires in 1 hour. If you didn't ask for this, you can ignore this email. Your password stays unchanged.</p>`);
   return { subject, html, text };
 }

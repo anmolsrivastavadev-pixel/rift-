@@ -60,9 +60,11 @@ const nextConfig: NextConfig = {
         headers: securityHeaders,
       },
       {
-        // Versioned hero video assets: filename changes on re-render, so
-        // browsers can cache them forever
-        source: "/hero-demo-v2.:ext(mp4|webm)",
+        // Versioned hero video assets: the filename carries the version and
+        // changes on every re-render, so browsers can cache them forever.
+        // Matches any -vN so a future re-render can't silently lose the header
+        // (the v2 → v3 rename did exactly that).
+        source: "/hero-demo-v:version(\\d+).:ext(mp4|webm)",
         headers: [
           {
             key: "Cache-Control",

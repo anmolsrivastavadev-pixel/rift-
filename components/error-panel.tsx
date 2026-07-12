@@ -22,7 +22,10 @@ export function ErrorPanel({
   className,
 }: ErrorPanelProps) {
   return (
-    <div
+    /* <main id="main-content"> so the layout's "Skip to main content" link has
+       a target on error routes too — it previously jumped nowhere here. */
+    <main
+      id="main-content"
       className={cn(
         "mx-auto max-w-md space-y-6 py-24 text-center",
         className
@@ -43,6 +46,6 @@ export function ErrorPanel({
         </Button>
       )}
       {children}
-    </div>
+    </main>
   );
 }

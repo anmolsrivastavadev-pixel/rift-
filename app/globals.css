@@ -21,10 +21,13 @@
   --color-primary-fill: #cf4318;
   --color-primary-soft: rgba(207, 67, 24, 0.1);
   --color-primary-foreground: #ffffff;
-  --color-success: #15803d;
-  --color-success-soft: rgba(21, 128, 61, 0.12);
-  --color-warning: #b45309;
-  --color-warning-soft: rgba(180, 83, 9, 0.14);
+  /* Darkened from #15803d / #b45309: at small text sizes those cleared 4.5:1
+     on plain cream but only reached ~4.1:1 on their own soft tints, which is
+     exactly where they are used (badges, decision chips, notices). */
+  --color-success: #166534;
+  --color-success-soft: rgba(22, 101, 52, 0.12);
+  --color-warning: #92400e;
+  --color-warning-soft: rgba(146, 64, 14, 0.14);
   --color-danger: #b91c1c;
   --color-danger-soft: rgba(185, 28, 28, 0.12);
 
@@ -60,6 +63,15 @@
     /* clip (not hidden) so decorative elements can never widen the page or
        let it be scrolled sideways programmatically */
     overflow-x: clip;
+  }
+
+  /* Smooth scrolling is the one motion on this site that reliably triggers
+     vestibular symptoms (every landing anchor link jumps the whole viewport),
+     so it is the first thing to go when the user asks for less motion. */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
   }
 
   body {
@@ -135,6 +147,22 @@
     );
     background-size: 200% 100%;
     animation: shimmer 2s ease-in-out infinite;
+  }
+
+  /* Skeletons and spinners are the two infinite animations in the app. Stop
+     the shimmer sweep (the skeleton keeps its surface fill, so loading is
+     still legible) and slow the spinners to a step rather than removing them:
+     a frozen spinner would read as "hung", which is worse than a slow one. */
+  @media (prefers-reduced-motion: reduce) {
+    .animate-shimmer {
+      animation: none;
+      background: var(--color-surface);
+    }
+
+    .animate-spin {
+      animation-duration: 1.5s;
+      animation-timing-function: steps(8, end);
+    }
   }
 
   /* Faint ink grid for page backdrops */

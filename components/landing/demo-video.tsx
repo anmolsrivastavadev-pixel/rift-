@@ -163,7 +163,7 @@ export function DemoVideo() {
           type="button"
           onClick={togglePlay}
           aria-label={isPaused ? "Play demo" : "Pause demo"}
-          className="shrink-0 rounded-lg p-1.5 text-[var(--color-foreground)] transition-colors duration-150 ease-out hover:bg-[var(--color-surface)] active:scale-[0.95]"
+          className="shrink-0 rounded-lg p-1.5 text-white/90 transition-colors duration-150 ease-out hover:bg-white/15 hover:text-white active:scale-[0.95]"
         >
           {isPaused ? (
             <Play className="h-4 w-4" aria-hidden />
@@ -198,7 +198,7 @@ export function DemoVideo() {
           type="button"
           onClick={toggleMute}
           aria-label={isMuted ? "Unmute demo" : "Mute demo"}
-          className="shrink-0 rounded-lg p-1.5 text-[var(--color-foreground)] transition-colors duration-150 ease-out hover:bg-[var(--color-surface)] active:scale-[0.95]"
+          className="shrink-0 rounded-lg p-1.5 text-white/90 transition-colors duration-150 ease-out hover:bg-white/15 hover:text-white active:scale-[0.95]"
         >
           {isMuted ? (
             <VolumeX className="h-4 w-4" aria-hidden />
@@ -210,7 +210,7 @@ export function DemoVideo() {
           type="button"
           onClick={toggleFullscreen}
           aria-label={isFull ? "Exit full screen" : "View full screen"}
-          className="shrink-0 rounded-lg p-1.5 text-[var(--color-foreground)] transition-colors duration-150 ease-out hover:bg-[var(--color-surface)] active:scale-[0.95]"
+          className="shrink-0 rounded-lg p-1.5 text-white/90 transition-colors duration-150 ease-out hover:bg-white/15 hover:text-white active:scale-[0.95]"
         >
           {isFull ? (
             <Minimize2 className="h-4 w-4" aria-hidden />

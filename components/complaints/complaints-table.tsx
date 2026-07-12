@@ -87,7 +87,7 @@ export function ComplaintsTable({
               return (
                 <tr
                   key={r.id}
-                  className="border-b border-[var(--color-border)] last:border-0 hover:bg-[var(--color-card)]"
+                  className="border-b border-[var(--color-border)] last:border-0 hover:bg-[var(--color-surface)]"
                 >
                   <td className="max-w-md px-4 py-3">
                     {/* Zero-JS expand: click the row title to read the full

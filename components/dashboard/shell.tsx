@@ -239,7 +239,7 @@ export function DashboardShell({
               title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
               aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
               aria-expanded={!collapsed}
-              className="flex h-7 w-7 items-center justify-center rounded-lg text-[var(--color-muted-foreground)] transition-all duration-150 ease-out hover:bg-[var(--color-card)] hover:text-[var(--color-foreground)]"
+              className="flex h-7 w-7 items-center justify-center rounded-lg text-[var(--color-muted-foreground)] transition-all duration-150 ease-out hover:bg-[var(--color-surface)] hover:text-[var(--color-foreground)]"
             >
               {collapsed ? (
                 <PanelLeftOpen className="h-4 w-4" />
@@ -332,7 +332,7 @@ export function DashboardShell({
             onClick={() => setDrawerOpen(true)}
             aria-label="Open menu"
             aria-expanded={drawerOpen}
-            className="ml-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-[var(--color-foreground)] transition-all duration-150 ease-out hover:bg-[var(--color-card)]"
+            className="ml-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-[var(--color-foreground)] transition-all duration-150 ease-out hover:bg-[var(--color-surface)]"
           >
             <Menu className="h-5 w-5" />
           </button>
@@ -365,7 +365,7 @@ export function DashboardShell({
                 ref={closeButtonRef}
                 onClick={() => setDrawerOpen(false)}
                 aria-label="Close menu"
-                className="flex h-9 w-9 items-center justify-center rounded-lg text-[var(--color-muted-foreground)] transition-all duration-150 ease-out hover:bg-[var(--color-card)] hover:text-[var(--color-foreground)]"
+                className="flex h-9 w-9 items-center justify-center rounded-lg text-[var(--color-muted-foreground)] transition-all duration-150 ease-out hover:bg-[var(--color-surface)] hover:text-[var(--color-foreground)]"
               >
                 <X className="h-5 w-5" />
               </button>

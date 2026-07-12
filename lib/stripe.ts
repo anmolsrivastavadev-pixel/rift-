@@ -36,7 +36,8 @@ export function getProPriceId(): string {
   return priceId;
 }
 
-/** Absolute base URL for checkout/portal return links. */
-export function getAppBaseUrl(): string {
-  return process.env.BETTER_AUTH_URL || "http://localhost:3000";
-}
+/** Absolute base URL for checkout/portal return links. Re-exported from
+ * lib/app-url so existing Stripe callers keep working; new callers that only
+ * need a URL should import from lib/app-url directly and skip this module's
+ * SDK import. */
+export { getAppBaseUrl } from "@/lib/app-url";
