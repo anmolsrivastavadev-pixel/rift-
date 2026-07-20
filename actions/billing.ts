@@ -21,7 +21,7 @@ import { getAppBaseUrl, getProPriceId, getStripe, isBillingEnabled } from "@/lib
 export type BillingActionResult = { ok: false; error: string };
 
 const BILLING_DISABLED_MESSAGE =
-  "Payments aren't live yet. Rift is free during the private beta.";
+  "Payments aren't available right now. Please try again soon.";
 
 const FREE_BETA_MESSAGE =
   "Rift is free during the beta — no payment needed. Every account already has the Pro limits.";

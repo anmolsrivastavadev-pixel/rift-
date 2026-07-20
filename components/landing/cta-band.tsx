@@ -3,7 +3,7 @@ import { Container } from "@/components/container";
 import { EurekaLink } from "@/components/landing/eureka";
 
 const assurances = [
-  "Free during the beta",
+  "Free to start",
   "Works with just 5–10 pasted comments",
   "No credit card required",
 ];

@@ -1,6 +1,6 @@
 /* M25 — Plan definitions and limits.
  *
- * Two plans: "free" and "pro" ($9/month via Stripe, M28). Limits are enforced
+ * Two plans: "free" and "pro" (£9/month via Stripe, M28). Limits are enforced
  * app-side in lib/quotas.ts from existing history tables — no counter tables.
  * Admins from RIFT_ADMIN_EMAILS always resolve to pro limits so the founder
  * never hits caps, regardless of their stored plan.
@@ -19,7 +19,7 @@ import { isAdminEmail } from "@/lib/admin";
  * Flip to false to restore the real Free/Pro split — only on the founder's
  * explicit instruction.
  */
-export const FREE_BETA = true;
+export const FREE_BETA = false;
 
 export type PlanId = "free" | "pro";
 
@@ -53,7 +53,7 @@ export const PLANS: Record<PlanId, PlanLimits> = {
   },
 };
 
-export const PRO_PRICE_LABEL = "$9/month";
+export const PRO_PRICE_LABEL = "£9/month";
 
 export function isPlanId(value: string | null | undefined): value is PlanId {
   return value === "free" || value === "pro";

@@ -168,7 +168,7 @@ export function ExampleWalkthrough() {
               <ArrowRight className="h-4 w-4" aria-hidden />
             </EurekaLink>
             <p className="text-sm text-[var(--color-muted-foreground)]">
-              Free during the beta · No credit card required
+              Free to start · No credit card required
             </p>
           </div>
         </div>

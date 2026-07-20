@@ -39,7 +39,7 @@ const YELLOW = "#ffc53d";
 
 const heroAssurances = [
   "Sources included with every result",
-  "Free during the beta",
+  "Free to start",
   "No credit card required",
 ];
 
@@ -361,7 +361,7 @@ function DoodleEvidenceMap() {
 }
 
 const ctaAssurances = [
-  "Free during the beta",
+  "Free to start",
   "Works with just 5–10 pasted comments",
   "No credit card required",
 ];

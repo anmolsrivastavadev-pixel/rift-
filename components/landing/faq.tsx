@@ -55,7 +55,7 @@ const faqs: { q: string; a: React.ReactNode }[] = [
   },
   {
     q: "What does Rift cost?",
-    a: "Nothing right now. Everything is free during the beta, and no credit card is ever asked for. After the beta there will be a Free plan and a Pro plan at $9/month with higher limits. See the pricing page for details.",
+    a: "There's a real Free plan — no credit card needed to sign up. Pro is £9/month and raises the limits for people running many market tests at once. See the pricing page for the full comparison.",
   },
 ];
 

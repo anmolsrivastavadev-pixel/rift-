@@ -26,7 +26,7 @@ import {
 export const metadata: Metadata = {
   title: "Pricing",
   description:
-    "Rift is free to start. Pro is $9/month for more projects, idea runs, and Complaint Finder searches.",
+    "Rift is free to start. Pro is £9/month for more projects, idea runs, and Complaint Finder searches.",
 };
 
 /* M25 — Public pricing page. Honest copy, no fake urgency: the free plan is a
@@ -103,7 +103,7 @@ function ProCta({ signedIn, plan }: { signedIn: boolean; plan: "free" | "pro" })
         Upgrade to Pro
       </Button>
       <p className="text-xs text-[var(--color-muted-foreground)]">
-        Payments coming soon. Rift is free during the private beta.
+        Payments aren&apos;t available right now. Please check back soon.
       </p>
     </div>
   );
@@ -151,7 +151,7 @@ export default async function PricingPage() {
                   Everything you need to test your first market.
                 </CardDescription>
                 <p className="mt-2 text-3xl font-semibold tracking-tight">
-                  $0
+                  £0
                   <span className="text-sm font-normal text-[var(--color-muted-foreground)]">
                     {" "}
                     / month
@@ -192,7 +192,7 @@ export default async function PricingPage() {
                   Room to run many market tests side by side.
                 </CardDescription>
                 <p className="mt-2 text-3xl font-semibold tracking-tight">
-                  $9
+                  £9
                   <span className="text-sm font-normal text-[var(--color-muted-foreground)]">
                     {" "}
                     / month
@@ -220,7 +220,7 @@ export default async function PricingPage() {
             {FREE_BETA
               ? "No payments during the beta. After the beta, Pro will be "
               : "Pro is "}
-            {PRO_PRICE_LABEL}, billed through Stripe. Prices in USD.{" "}
+            {PRO_PRICE_LABEL}, billed through Stripe. Prices in GBP.{" "}
             {user ? (
               <>Questions? Use the feedback button inside the app.</>
             ) : (

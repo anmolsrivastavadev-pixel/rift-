@@ -27,7 +27,7 @@ const headlineWords = ["Find", "business", "ideas", "hidden", "in", "real", "cus
 /* Keep in sync with assurances in components/landing/doodle.tsx */
 const chips = [
   "Sources included with every result",
-  "Free during the beta",
+  "Free to start",
   "No credit card required",
 ];
 

@@ -15,7 +15,7 @@ import { EurekaForm } from "@/components/landing/eureka";
 
 const assurances = [
   "Sources included with every result",
-  "Free during the beta",
+  "Free to start",
   "No credit card required",
 ];
 
