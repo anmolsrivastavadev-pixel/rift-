@@ -1,215 +1,92 @@
 # Rift
 
-Rift helps founders discover business opportunities from real customer complaints.
+Rift helps founders find and test business ideas using real customer complaints instead of guesses.
 
-Upload a CSV of customer complaints, run the Gemini-powered AI engine, and Rift clusters similar complaints, summarises the underlying problems, and scores each resulting business opportunity — so you build what people already want.
+Type a market (like "dog grooming") and Rift's built-in finder collects real complaints about it from seven public sources. Or paste your own reviews, support messages, and feedback. Gemini-powered AI groups the complaints that describe the same problem, and each group becomes a business idea with a transparent 0-100 score computed by a fixed formula (never by the AI). Every idea links back to the original complaints, so you can check the evidence yourself.
 
----
+Live at: https://rift-fawn.vercel.app
+
+## What it does today
+
+- **Accounts and projects.** Sign up with email and password (Better Auth). Organise research into separate projects, one per market or niche.
+- **Complaint finder.** Type a market and Rift searches the web, Reddit, app reviews, Hacker News, GitHub issues, Stack Exchange, and YouTube comments for real complaints. Each source is optional and key-gated; sources without keys quietly sit out.
+- **Bring your own data.** Upload a CSV, paste text, or drop in a .txt/.md file. Even 5-10 sentences is enough to start.
+- **AI clustering.** Gemini groups complaints that describe the same underlying problem and summarises each group. It never invents market statistics.
+- **Deterministic scoring.** Each idea gets a 0-100 score from a fixed formula (frequency, severity, consistency). The same complaints always give the same score. The AI never computes the score.
+- **Validation tools.** A per-idea validation workspace with a checklist and copyable research brief, an evidence log, Pursue / Park / Reject decisions, and side-by-side comparison of 2-3 ideas.
+- **Sharing.** Create a revocable public share link for an idea.
+- **Weekly niche watch.** Rift can watch a niche and email you (via Resend) when new complaints appear, powered by a Vercel cron job.
+- **Billing.** Free plan plus Rift Pro at £9/month via Stripe. All billing code is key-gated: without Stripe keys the pricing page shows "payments coming soon" and no billing code runs.
 
 ## Tech stack
 
 - **Framework:** Next.js 16 (App Router, Turbopack)
 - **Language:** TypeScript (strict)
-- **Styling:** Tailwind CSS v4
-- **UI:** Lucide icons, Radix Slot, custom shadcn-style primitives
-- **Charts:** Recharts
-- **Database:** PostgreSQL (Neon in production) + Prisma ORM 7 (driver-adapter mode)
+- **Styling:** Tailwind CSS v4 (warm cream "doodle" theme, Nunito + Baloo 2 fonts)
+- **Auth:** Better Auth (email + password, password reset via Resend)
+- **Database:** PostgreSQL (Neon in production) + Prisma ORM 7 in driver-adapter mode
 - **AI:** Google Gemini (`@google/genai`)
-- **CSV parsing:** PapaParse
+- **Billing:** Stripe (subscription, webhook-driven)
+- **Email:** Resend
+- **Charts:** Recharts. **CSV parsing:** PapaParse. **Validation:** Zod.
 
----
+## Environment variables
 
-## Required environment variables
+Copy `.env.example` to `.env` and fill in real values. Never commit `.env` (it is gitignored).
 
-Create a `.env` file in the project root (this file is gitignored) by copying `.env.example`:
+Core (required for the app to run):
 
-```bash
-cp .env.example .env
-```
+| Variable | Purpose |
+|---|---|
+| `DATABASE_URL` | PostgreSQL connection string (local Postgres, or Neon pooled URL with `?sslmode=require`) |
+| `GEMINI_API_KEY` | Google Gemini API key, from https://aistudio.google.com/apikey |
+| `BETTER_AUTH_URL` | App origin with no trailing slash |
+| `BETTER_AUTH_SECRET` | Long random secret for sessions and tokens |
 
-| Variable | Purpose | Where to get it |
-|---|---|---|
-| `DATABASE_URL` | PostgreSQL connection string | local Postgres, or Neon pooled URL |
-| `GEMINI_API_KEY` | Google Gemini API key (server-only) | https://aistudio.google.com/apikey |
-| `BETTER_AUTH_URL` | Better Auth app origin, with no trailing slash | local app URL, Vercel production URL, or preview URL |
-| `BETTER_AUTH_SECRET` | Better Auth secret for sessions/tokens | generate a long random string |
+Optional, key-gated features (the app runs without them; the matching feature switches off politely): `REDDIT_CLIENT_ID` / `REDDIT_CLIENT_SECRET` / `REDDIT_USER_AGENT` (Reddit source), `TAVILY_API_KEY` (whole-web source), `YOUTUBE_API_KEY` (YouTube source), `RESEND_API_KEY` / `EMAIL_FROM` (password reset + watch emails), `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` / `STRIPE_PRICE_PRO_MONTHLY` (billing), `CRON_SECRET` (weekly niche watch), `RIFT_ADMIN_EMAILS` / `RIFT_BETA_MODE` / `NEXT_PUBLIC_SUPPORT_EMAIL` (admin page + beta gate), `NEXT_PUBLIC_APP_URL` (browser auth origin on Vercel).
 
-Example local `.env`:
-
-```
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/rift?schema=public"
-GEMINI_API_KEY="your_key_here"
-BETTER_AUTH_URL="http://localhost:3000"
-BETTER_AUTH_SECRET="replace-with-a-long-random-secret"
-```
-
-Example Neon `.env` (production):
-
-```
-DATABASE_URL="postgresql://USER:PASSWORD@HOST.neon.tech/DBNAME?sslmode=require"
-GEMINI_API_KEY="your_key_here"
-BETTER_AUTH_URL="https://your-app.vercel.app"
-BETTER_AUTH_SECRET="replace-with-a-long-random-secret"
-```
-
-> Never commit `.env`. The `.gitignore` is already configured to ignore it.
-
----
+Full setup instructions for every key live as comments in `.env.example`.
 
 ## Local setup
 
-### 1. Install Node.js
-
-Install Node.js 18.18+ (LTS recommended) from https://nodejs.org.
-
-### 2. Install PostgreSQL (or skip and use Neon)
-
-Either:
-- install PostgreSQL locally and create a database named `rift`, OR
-- create a free Neon project at https://neon.tech and use its pooled connection string.
-
-### 3. Install dependencies
-
-```bash
-pnpm install
-```
-
-> On React 19 + Recharts the install prints a peer-dep warning. This is expected — pnpm handles this gracefully.
-
-### 4. Configure `.env`
-
-See "Required environment variables" above.
-
-### 5. Generate the Prisma client + push the schema
-
-```bash
-pnpm exec prisma generate
-pnpm exec prisma db push
-```
-
-`prisma generate` creates the typed client at `lib/generated/prisma/` (gitignored).
-`prisma db push` creates the tables in your database.
-
-### 6. Run the dev server
-
-```bash
-pnpm dev
-```
-
-Visit http://localhost:3000.
-
----
+1. Install Node.js 18.18+ and pnpm.
+2. Install PostgreSQL locally (create a database named `rift`), or create a free Neon project at https://neon.tech and use its pooled connection string.
+3. `pnpm install`
+4. Copy `.env.example` to `.env` and fill in at least the four core variables.
+5. `pnpm exec prisma generate` then `pnpm exec prisma db push` (creates the typed client and the tables).
+6. `pnpm dev` and visit http://localhost:3000.
 
 ## How to use Rift
 
-### Upload a CSV of complaints
-
-1. Open http://localhost:3000/dashboard/complaints.
-2. Drag a CSV file into the upload box.
-3. Required column: `body`. Optional columns: `title`, `sourceDate`.
-4. A sample file (`sample_complaints.csv`) is included in the project root — 10 fake complaints.
-
-### Run AI clustering
-
-1. Go to http://localhost:3000/dashboard/opportunities.
-2. Click **Run AI clustering** — wait ~20s for 10 complaints.
-3. Opportunities appear as cards, sorted by score.
-4. Use search, filters, and sort to explore them.
-5. Click any card to open the detail page with AI reasoning, score breakdown, related opportunities, and linked complaints.
-6. Bookmark opportunities with the save icon; view saved ones at `/dashboard/saved`.
-
----
-
-## Neon Postgres setup
-
-1. Create a free account at https://neon.tech.
-2. Create a new project; pick a region close to your Vercel deployment.
-3. On the dashboard, find the **Connection string**.
-4. Use the **pooled** connection string (it includes `-pooler` in the hostname). Append `?sslmode=require`.
-5. Paste it into `.env` locally and into the Vercel env vars (see below).
-6. Run `pnpm exec prisma db push` once against the Neon database so tables are created.
-   ```bash
-   DATABASE_URL="postgresql://USER:PASSWORD@HOST-pooler.neon.tech/DBNAME?sslmode=require" pnpm exec prisma db push
-   ```
-
----
+1. Sign up, then create a project for the market you want to research.
+2. On the Complaints page, either type a market and let the finder collect complaints, or upload/paste your own (`sample_complaints.csv` in the project root has 10 fake complaints for a quick test).
+3. On the Ideas page, run the AI engine. Ideas appear as scored cards you can search, filter, and sort.
+4. Open an idea for the full breakdown: AI reasoning, score breakdown, example complaints with source links, validation workspace, and evidence log.
+5. Record a Pursue / Park / Reject decision, compare shortlisted ideas side by side, and save favourites.
 
 ## Deploy to Vercel
 
-1. Push the project to a GitHub repository. Ensure `.env` is NOT committed (it isn't — `.gitignore` covers it).
-2. Sign in to https://vercel.com and create a new project from the GitHub repo.
-3. In the Vercel project settings → **Environment Variables**, add:
-   - `DATABASE_URL` — Neon pooled connection string with `?sslmode=require`.
-   - `GEMINI_API_KEY` — your Gemini API key.
-   - `BETTER_AUTH_URL` — the deployed site origin with no trailing slash, for example `https://your-app.vercel.app`.
-   - `BETTER_AUTH_SECRET` — a long random secret.
-4. Build command: leave the default `pnpm build` — `package.json` already runs `prisma generate && next build`.
-5. Deploy.
-6. Open the deployed URL and verify:
-   - homepage loads,
-   - `/dashboard` loads,
-   - `/dashboard/complaints` lets you upload the sample CSV,
-    - `/dashboard/opportunities` lets you run AI clustering.
+1. Push the repo to GitHub (`.env` stays out; `.gitignore` covers it).
+2. Create a Vercel project from the repo. Leave the default build command (`package.json` already runs `prisma generate && next build`).
+3. Add the environment variables in Vercel project settings. Use the Neon pooled `DATABASE_URL` and set `BETTER_AUTH_URL` to the deployed origin.
+4. For Stripe, add the webhook endpoint `https://YOUR-DOMAIN/api/stripe/webhook` (events listed in `.env.example`) and set the three Stripe variables.
+5. For the weekly niche watch, set `CRON_SECRET`; the cron schedule is defined in `vercel.json`.
 
-For Vercel Preview deployments, make sure these environment variables are available to the Preview environment too. Set `BETTER_AUTH_URL` to the preview deployment origin with no trailing slash.
+## Common errors and fixes
 
----
+- **Prisma error about an undefined URL at boot:** `DATABASE_URL` is missing from `.env` or Vercel env vars.
+- **`Cannot find module '@/lib/generated/prisma/client'`:** run `pnpm exec prisma generate`. The generated client is gitignored and must be created on every machine; the `build` script already does this.
+- **AI run returns a mock/no-key note:** `GEMINI_API_KEY` is missing.
+- **Connection refused on `localhost:5432`:** local PostgreSQL is not running. On Windows: `Get-Service postgresql-*` then `Start-Service postgresql-x64-16`.
+- **A finder source shows "not configured":** that source's optional API key is missing; see `.env.example`.
 
-## Common beginner errors and fixes
+## Documentation
 
-### Missing `DATABASE_URL`
-**Symptom:** App crashes at boot with a Prisma error about an undefined URL.
-**Fix:** Add `DATABASE_URL="postgresql://postgres:postgres@localhost:5432/rift?schema=public"` to `.env` (local) or as a Vercel env var (production).
+The full internal docs live in `/docs`:
 
-### Missing `GEMINI_API_KEY`
-**Symptom:** "Run AI clustering" returns "ai.no_key_using_mock" or the pipeline errors during clustering.
-**Fix:** Add `GEMINI_API_KEY="..."` to `.env` (local) or as a Vercel env var (production). Get a free key at https://aistudio.google.com/apikey.
-
-### Prisma generate issues
-**Symptom:** TypeScript error like `Cannot find module '@/lib/generated/prisma/client'`.
-**Fix:** Run `pnpm exec prisma generate`. The `lib/generated/prisma/` folder is gitignored and must be created on every machine/Vercel build. The `build` script already does this — `prisma generate && next build`.
-
-### Local PostgreSQL not running
-**Symptom:** Connection refused on `localhost:5432`.
-**Fix:** Start the PostgreSQL service. On Windows: `Get-Service postgresql-*` then `Start-Service postgresql-x64-16`. Verify port 5432 is open.
-
-### Vercel build fails because env vars are missing
-**Symptom:** `pnpm build` fails on Vercel with "Missing required environment variable: DATABASE_URL".
-**Fix:** Add `DATABASE_URL` and `GEMINI_API_KEY` in Vercel → Project → Settings → Environment Variables. Re-deploy.
-
-### Accidentally committed `.env`
-**Symptom:** A secret appears in the git history.
-**Fix:** Remove the file from git (`git rm --cached .env`), commit, then force-push or rotate any exposed secrets. `.gitignore` already excludes `.env`; this only happens if you `git add -f .env`.
-
----
-
-## Project structure
-
-```
-app/                    Next.js App Router routes
-  layout.tsx            Root layout (Inter font, dark mode, metadata)
-  page.tsx              Landing page
-  dashboard/            Dashboard routes (overview, complaints, opportunities, saved)
-components/
-  ui/                   Button, Card, Badge primitives
-  dashboard/            StatCard, ComplaintsChart
-  complaints/           CSV uploader, complaints table, search
-  opportunities/        Card, browser, filters, save button, related card, etc.
-  landing/              Hero, Features, How-it-works, Footer
-lib/
-  db.ts                 Prisma client singleton (driver-adapter mode)
-  ai.ts                 Gemini clustering + summarisation service
-  cleaning.ts           Complaint cleaning stage
-  scoring.ts            Deterministic Opportunity Score (0-100)
-  schemas.ts            Zod schemas for CSV rows
-  logger.ts             Structured server logs
-  progress.ts           In-memory pipeline progress tracker
-  generated/prisma/     Prisma client (gitignored; regenerated at build)
-actions/                Server actions (upload, pipeline, saved)
-prisma/                 schema.prisma + prisma.config.ts
-```
-
----
+- `docs/PROJECT_CONTEXT.md` covers the architecture, database models, AI pipeline, scoring algorithm, and env vars in depth.
+- `docs/ROADMAP.md` tracks milestones.
+- `docs/AI_AGENT_INSTRUCTIONS.md` and `docs/TESTING_CHECKLIST.md` govern how AI coding agents work on this repo.
 
 ## Development scripts
 
@@ -219,8 +96,6 @@ prisma/                 schema.prisma + prisma.config.ts
 | `pnpm build` | Generate Prisma client + production build |
 | `pnpm start` | Start the production server (after `build`) |
 | `pnpm lint` | Run ESLint |
-
----
 
 ## License
 
